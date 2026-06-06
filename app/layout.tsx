@@ -10,24 +10,27 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'KUMPLIO - Cumplimiento Ley 21.719 Chile | Inteligencia Documental',
-  description: 'Plataforma de inteligencia documental para cumplimiento normativo en Chile. Automatiza análisis de documentos con Ley 21.719, extrae obligaciones, riesgos y plazos legales. Solución premium para empresas chilenas.',
+  title: 'KUMPLIO - Cumplimiento Ley 21.719 Chile | IA & LLM para Compliance Legal',
+  description: 'KUMPLIO: Plataforma con IA y LLM para cumplimiento automático de Ley 21.719 en Chile. 7 agentes expertos, análisis de documentos, cuantificación de riesgos, roadmaps de cumplimiento. Solución enterprise para empresas chilenas. Desarrollado por n3uralia.com',
   keywords: [
     'Cumplimiento Ley 21.719',
     'Protección de datos Chile',
+    'IA legal Chile',
+    'LLM compliance',
     'Inteligencia documental',
     'Auditoría de compliance',
-    'Análisis de documentos',
-    'Gestión de obligaciones',
-    'Riesgo normativo',
-    'Cumplimiento legal Chile',
+    'Análisis de documentos IA',
+    'Gestión de obligaciones legales',
+    'Riesgo normativo Chile',
+    'Agentes IA legal',
+    'n3uralia',
     'KUMPLIO',
   ],
   generator: 'kumplio.cl',
   referrer: 'strict-origin-when-cross-origin',
-  authors: [{ name: 'KUMPLIO', url: 'https://kumplio.cl' }],
-  creator: 'KUMPLIO',
-  publisher: 'KUMPLIO',
+  authors: [{ name: 'KUMPLIO by n3uralia', url: 'https://www.n3uralia.com' }],
+  creator: 'KUMPLIO (n3uralia.com)',
+  publisher: 'KUMPLIO by n3uralia',
   robots: {
     index: true,
     follow: true,
@@ -40,28 +43,29 @@ export const metadata: Metadata = {
     canonical: 'https://kumplio.cl',
     languages: {
       'es-CL': 'https://kumplio.cl',
+      'es-ES': 'https://kumplio.es',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'es_CL',
     url: 'https://kumplio.cl',
-    siteName: 'KUMPLIO',
-    title: 'KUMPLIO - Plataforma de Cumplimiento Ley 21.719 en Chile',
-    description: 'Inteligencia documental para automatizar cumplimiento normativo. Análisis con Ley 21.719 y normativas chilenas.',
+    siteName: 'KUMPLIO - Compliance IA para Ley 21.719',
+    title: 'KUMPLIO: Agentes IA para Cumplimiento Ley 21.719 | Desarrollado por n3uralia',
+    description: 'Sistema experto con 7 agentes IA y LLM para automatizar cumplimiento de Ley 21.719. Análisis de documentos, cuantificación de riesgos, recomendaciones estratégicas. Desarrollado por n3uralia.com para empresas chilenas.',
     images: [
       {
         url: 'https://kumplio.cl/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'KUMPLIO - Cumplimiento Legal Chile',
+        alt: 'KUMPLIO - Sistema de Compliance IA | n3uralia.com',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KUMPLIO - Cumplimiento Ley 21.719',
-    description: 'Inteligencia documental para cumplimiento normativo en Chile',
+    title: 'KUMPLIO: IA para Cumplimiento Ley 21.719 | n3uralia',
+    description: 'Agentes IA expertos en compliance legal. Análisis automático con LLM. Desarrollado por n3uralia.com',
     images: ['https://kumplio.cl/twitter-image.png'],
     creator: '@kumplio_cl',
   },
@@ -111,14 +115,24 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'KUMPLIO',
+              name: 'KUMPLIO by n3uralia',
               url: 'https://kumplio.cl',
+              parentOrganization: {
+                '@type': 'Organization',
+                name: 'n3uralia',
+                url: 'https://www.n3uralia.com',
+              },
               logo: 'https://kumplio.cl/logo.png',
-              description: 'Plataforma de inteligencia documental para cumplimiento normativo con Ley 21.719 en Chile',
+              description: 'Plataforma de IA y LLM para cumplimiento automático de Ley 21.719 con 7 agentes expertos. Desarrollado por n3uralia.com',
               sameAs: [
                 'https://www.linkedin.com/company/kumplio',
                 'https://twitter.com/kumplio_cl',
+                'https://www.n3uralia.com',
               ],
+              areaServed: {
+                '@type': 'Country',
+                name: 'CL',
+              },
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'Customer Support',
@@ -135,19 +149,61 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
               name: 'KUMPLIO',
-              description: 'Plataforma de inteligencia documental para cumplimiento Ley 21.719',
+              description: 'Sistema experto con IA y LLM para cumplimiento automático de Ley 21.719 en Chile',
               applicationCategory: 'BusinessApplication',
               url: 'https://kumplio.cl',
+              creator: {
+                '@type': 'Organization',
+                name: 'n3uralia',
+                url: 'https://www.n3uralia.com',
+              },
               operatingSystem: 'Web',
+              areaServed: 'CL',
+              inLanguage: 'es-CL',
               offers: {
                 '@type': 'Offer',
                 price: '0',
                 priceCurrency: 'CLP',
+                description: 'Prueba gratis sin tarjeta de crédito',
               },
               aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: '4.9',
                 ratingCount: '150',
+              },
+              featureList: [
+                'Agentes IA expertos',
+                'Análisis automático con LLM',
+                'Cuantificación de riesgos',
+                'Compliance con Ley 21.719',
+                'Razonamiento transparente',
+                'SERNAC precedent database',
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              name: 'KUMPLIO Chile',
+              url: 'https://kumplio.cl',
+              description: 'Cumplimiento legal con IA para empresas chilenas',
+              geo: {
+                '@type': 'GeoShape',
+                box: '-56.5,−27.1 -66.4,−17.5',
+                description: 'Chile (focus area)',
+              },
+              areaServed: {
+                '@type': 'Country',
+                name: 'CL',
+              },
+              parentOrganization: {
+                '@type': 'Organization',
+                name: 'n3uralia',
+                url: 'https://www.n3uralia.com',
               },
             }),
           }}

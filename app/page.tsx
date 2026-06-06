@@ -100,14 +100,17 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">El equipo de agentes de KUMPLIO</h2>
-            <p className="text-lg text-muted-foreground">6 agentes especializados orquestados para compliance total</p>
+            <p className="text-lg text-muted-foreground">7 agentes especializados orquestados con Legal Expert para compliance total. Desarrollado por n3uralia.com</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-xl">📄</div>
               <div>
-                <h3 className="font-semibold text-lg">Sofia - Analista de Documentos</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Is1dora- Agente Documentos</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Extrae obligaciones legales, stakeholders, fechas críticas. Entiende contexto regulatorio chileno con razonamiento explícito.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Chain-of-Thought • Confidence Scoring • Cross-references</p>
               </div>
@@ -116,7 +119,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center text-xl">🔍</div>
               <div>
-                <h3 className="font-semibold text-lg">Elena - Monitor Regulatorio</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Be4triz- Agente Monitor</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Rastrea cambios en Ley 21.719, identifica plazos regulatorios, alerta de cambios críticos.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Real-time Monitoring • Regulatory Tracking • Alerts</p>
               </div>
@@ -125,7 +131,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center text-xl">⚠️</div>
               <div>
-                <h3 className="font-semibold text-lg">Bruno - Evaluador de Riesgos</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">R0drigo- Agente Riesgos</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Cuantifica riesgos (0-100), calcula penales en UF, modela escenarios best/likely/worst.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Multi-scenario Analysis • Penalty Calculation • Confidence Scoring</p>
               </div>
@@ -134,7 +143,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-xl">💡</div>
               <div>
-                <h3 className="font-semibold text-lg">Marco - Asesor de Cumplimiento</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Jav1er- Agente Compliance</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Genera roadmaps priorizados, estima viabilidad, predice éxito basado en contexto organizacional.</p>
                 <p className="text-xs text-primary mt-3 font-medium">3-Phase Roadmaps • Feasibility Scoring • Success Prediction</p>
               </div>
@@ -143,7 +155,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-xl">✅</div>
               <div>
-                <h3 className="font-semibold text-lg">Laura - Auditor de Cumplimiento</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Ver0nica- Agente Auditoría</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Audita estado actual, verifica implementación, identifica gaps vs. requisitos.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Gap Analysis • Compliance Verification • Audit Trails</p>
               </div>
@@ -152,9 +167,24 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center text-xl">🎓</div>
               <div>
-                <h3 className="font-semibold text-lg">Kai - Aprendizaje Continuo</h3>
-                <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje.</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Andr3s- Agente Aprendizaje</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-pink-500/20 text-pink-500 font-bold">IA</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje continuo del sistema.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Continuous Learning • Pattern Analysis • System Optimization</p>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">⚖️</div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Cat4lina- Agente Legal</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-indigo-500/20 text-indigo-500 font-bold">IA</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">Especialista en Ley 21.719 con base de datos SERNAC real. Valida todas las decisiones de otros agentes. Calcula penales reales: 50-200 UF.</p>
+                <p className="text-xs text-primary mt-3 font-medium">SERNAC Precedents • Article Mapping • Penalty Calculation • Legal Validation</p>
               </div>
             </div>
           </div>
@@ -167,7 +197,7 @@ export default function HomePage() {
           <div className="bg-card border border-border rounded-lg p-8 lg:p-12 space-y-8">
             <div className="text-center mb-4">
               <h3 className="text-2xl font-bold">Pipeline de análisis en tiempo real</h3>
-              <p className="text-muted-foreground mt-2">De documento a decisión en 6 pasos de agentes especializados</p>
+              <p className="text-muted-foreground mt-2">De documento a decisión en 7 pasos con agentes especializados</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
@@ -178,8 +208,8 @@ export default function HomePage() {
               </div>
               <div className="space-y-2 p-4 bg-secondary rounded-lg">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Agentes</p>
-                <p className="text-3xl lg:text-4xl font-bold text-blue-500">6</p>
-                <p className="text-xs text-muted-foreground">Orquestados</p>
+                <p className="text-3xl lg:text-4xl font-bold text-blue-500">7</p>
+                <p className="text-xs text-muted-foreground">+ Legal Expert</p>
               </div>
               <div className="space-y-2 p-4 bg-secondary rounded-lg">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Speed</p>
@@ -244,51 +274,58 @@ export default function HomePage() {
       <section id="how-it-works" className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Pipeline de agentes inteligentes</h2>
-          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Desde documento a decisión en 6 pasos coordinados</p>
+          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Desde documento a decisión en 7 pasos coordinados. Cada agente aporta su expertise para que tu empresa esté 100% en compliance.</p>
 
           <div className="space-y-8">
             {[
               {
-                agent: 'Sofia',
+                agent: 'Is1dora',
                 step: '1',
                 title: 'Análisis de Documentos',
-                description: 'Sofia extrae automáticamente obligaciones, stakeholders, fechas críticas. Usa Chain-of-Thought para mostrar reasoning explícito.',
+                description: 'Is1dora- Agente Documentos analiza tu documento regulatorio y extrae automáticamente todas las obligaciones, responsables y fechas críticas. Te muestra exactamente qué tienes que hacer y cuándo.',
                 output: '→ 34 obligaciones estructuradas con confianza 92%'
               },
               {
-                agent: 'Elena',
+                agent: 'Be4triz',
                 step: '2',
                 title: 'Monitoreo Regulatorio',
-                description: 'Elena verifica cambios recientes en Ley 21.719 y regulaciones relevantes. Alerta de deadlines que afecten tu compliance.',
+                description: 'Be4triz- Agente Monitor verifica cambios recientes en Ley 21.719 y normativas relevantes. Te avisa de plazos y nuevos requisitos que podrían afectar tu cumplimiento.',
                 output: '→ 8 cambios regulatorios relevantes identificados'
               },
               {
-                agent: 'Bruno',
+                agent: 'R0drigo',
                 step: '3',
                 title: 'Evaluación de Riesgos',
-                description: 'Bruno cuantifica cada riesgo (0-100), calcula penales en UF con multi-pass verification, modela escenarios best/likely/worst.',
-                output: '→ 12 riesgos con exposición 50-200 UF'
+                description: 'R0drigo- Agente Riesgos cuantifica cada riesgo en una escala 0-100 y calcula exactamente cuántos pesos (UF) podrías perder por cada incumplimiento. Así sabes qué es prioritario.',
+                output: '→ 12 riesgos cuantificados (50-200 UF en penales)'
               },
               {
-                agent: 'Marco',
+                agent: 'Jav1er',
                 step: '4',
                 title: 'Recomendaciones Prioritarias',
-                description: 'Marco genera roadmap de 3 fases con viabilidad, recursos y timeline. Predice éxito basado en tu contexto.',
+                description: 'Jav1er- Agente Compliance te genera un roadmap realista en 3 fases. Te dice qué hacer primero, cuántos recursos necesitas y cuándo lo tendrás listo. Sin falsas promesas.',
                 output: '→ 18 recomendaciones priorizadas con 88% éxito esperado'
               },
               {
-                agent: 'Laura',
+                agent: 'Ver0nica',
                 step: '5',
                 title: 'Auditoría de Cumplimiento',
-                description: 'Laura audita tu estado actual, verifica implementación, identifica gaps. Genera reporte de hallazgos.',
+                description: 'Ver0nica- Agente Auditoría verifica tu estado actual paso a paso. Identifica exactamente dónde hay gaps y te propone acciones correctivas concretas y ejecutables.',
                 output: '→ Gap analysis con 6 acciones correctivas'
               },
               {
-                agent: 'Kai',
+                agent: 'Andr3s',
                 step: '6',
                 title: 'Aprendizaje Continuo',
-                description: 'Kai analiza patrones, identifica causas raíz, mejora recomendaciones futuras. El sistema se vuelve más inteligente.',
+                description: 'Andr3s- Agente Aprendizaje analiza los patrones, identifica por qué funcionan algunas cosas y otras no. El sistema se vuelve más inteligente cada vez que lo usas.',
                 output: '→ Insights para futuras implementaciones'
+              },
+              {
+                agent: 'Cat4lina',
+                step: '7',
+                title: 'Validación Legal Experta',
+                description: 'Cat4lina- Agente Legal valida todas las decisiones con la ley chilena real. Consulta base de datos SERNAC y jurisprudencia para asegurarse que todo es 100% legal. La palabra final.',
+                output: '→ Validación legal completa + precedentes SERNAC'
               },
             ].map((item, idx) => (
               <div key={idx} className="flex gap-6 lg:gap-12">
@@ -315,7 +352,7 @@ export default function HomePage() {
       <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Capacidades de KUMPLIO</h2>
-          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Orquestación inteligente con 6 agentes especializados</p>
+          <p className="text-lg text-muted-foreground text-center text-balance mb-16">7 agentes inteligentes orquestados. Razonamiento transparente. Para empresas chilenas que no pueden fallar.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {[
@@ -342,8 +379,8 @@ export default function HomePage() {
       <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-bold">Sistema de compliance enterprise-grade</h2>
-            <p className="text-lg text-muted-foreground">6 agentes especializados, orquestación inteligente, razonamiento transparente. Para empresas que necesitan cumplimiento sin ambigüedades.</p>
+            <h2 className="text-3xl md:text-5xl font-bold">Compliance enterprise-grade para Chile</h2>
+            <p className="text-lg text-muted-foreground">7 agentes de IA, orquestación inteligente, razonamiento 100% transparente. Para empresas que necesitan cumplimiento sin ambigüedades. Desarrollado por n3uralia.com</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button size="lg" asChild>
@@ -361,14 +398,43 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12 text-center text-muted-foreground text-xs">
-        <div className="container mx-auto px-6 space-y-4">
-          <p>KUMPLIO • Inteligencia documental para empresas serias</p>
-          <div className="flex justify-center gap-6 text-xs">
-            <a href="#" className="hover:text-foreground transition">Privacidad</a>
-            <a href="#" className="hover:text-foreground transition">Términos</a>
-            <a href="#" className="hover:text-foreground transition">Soporte</a>
-            <a href="#" className="hover:text-foreground transition">Contacto</a>
+      <footer className="border-t border-border bg-card/50 py-16">
+        <div className="container mx-auto px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">KUMPLIO</h3>
+                <p className="text-xs text-muted-foreground">Sistema de IA y LLM para cumplimiento automático de Ley 21.719 en Chile. Desarrollado por n3uralia.com</p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Sobre n3uralia</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">n3uralia.com</a></li>
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Inteligencia Legal</a></li>
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Compliance IA</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Producto</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="/features/ley-21719" className="text-muted-foreground hover:text-primary transition">Ley 21.719</a></li>
+                  <li><a href="/sign-up" className="text-muted-foreground hover:text-primary transition">Comenzar gratis</a></li>
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentación</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Legal</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Privacidad</a></li>
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Términos de Servicio</a></li>
+                  <li><a href="mailto:support@kumplio.cl" className="text-muted-foreground hover:text-primary transition">Soporte</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-border pt-8 text-center">
+              <p className="text-xs text-muted-foreground mb-2">© 2026 KUMPLIO by <a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">n3uralia.com</a>. Todos los derechos reservados.</p>
+              <p className="text-xs text-muted-foreground">Cumplimiento de Ley 21.719 con Agentes IA y LLM • Compliance para empresas chilenas</p>
+            </div>
           </div>
         </div>
       </footer>

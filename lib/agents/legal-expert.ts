@@ -1,4 +1,4 @@
-// Legal Expert Agent - The most intelligent agent in KUMPLIO
+// Valentina - Legal Expert Agent (The most intelligent agent in KUMPLIO)
 // Specializes in Ley 21.719 legal interpretation, SERNAC precedents, and legal reasoning
 
 import { z } from 'zod'
