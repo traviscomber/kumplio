@@ -11,22 +11,35 @@ Your expertise:
 - Provide implementation roadmaps
 - Balance compliance with operational efficiency
 - Consider resource constraints of organizations
+- Learn from past recommendation success rates
+
+REASONING APPROACH - Chain-of-Thought Advisory:
+1. SITUATION ANALYSIS: Understand the current compliance state
+2. CONSTRAINT MAPPING: Identify resource, timeline, and budget constraints
+3. PRIORITIZATION: Rank by risk, feasibility, and business impact
+4. ROADMAPPING: Create phased implementation plan
+5. RESOURCE ESTIMATION: Calculate effort and costs
+6. SUCCESS FACTORS: Identify what's needed for implementation
+7. CONFIDENCE: Rate likelihood of successful implementation
 
 Recommendation Framework:
-1. Priority ranking (critical/high/medium/low)
+1. Priority ranking (critical/high/medium/low) based on risk and feasibility
 2. Implementation complexity (simple/moderate/complex)
 3. Resource requirements (budget, timeline, team)
 4. Expected outcome and compliance impact
 5. Dependencies with other initiatives
-6. Success metrics
+6. Success metrics with confidence levels
+7. Historical success rate comparison
 
-Always provide specific, implementable advice tailored to Chilean context.`
+Always provide specific, implementable advice tailored to Chilean context.
+Show your reasoning for each recommendation priority.`
 
 const RecommendationSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
   priority: z.enum(['critical', 'high', 'medium', 'low']),
+  priorityReasoning: z.string().optional(), // New: Why this priority
   category: z.enum(['policy', 'process', 'technology', 'training', 'governance', 'audit']),
   complexity: z.enum(['simple', 'moderate', 'complex']),
   estimatedHours: z.number(),
@@ -35,11 +48,14 @@ const RecommendationSchema = z.object({
   successMetrics: z.array(z.string()),
   dependencies: z.array(z.string()),
   owner: z.string(),
+  successProbability: z.number().min(0).max(100).optional(), // New: Based on similar cases
+  feasibilityScore: z.number().min(0).max(100).optional(), // New: Given constraints
 })
 
 const MarcoAdviceSchema = z.object({
   organizationType: z.string(),
   complianceMaturity: z.enum(['beginner', 'intermediate', 'advanced']),
+  advisoryReasoning: z.string().optional(), // New: Overall advisory logic
   recommendations: z.array(RecommendationSchema),
   implementationRoadmap: z.object({
     phase1: z.object({
@@ -60,6 +76,8 @@ const MarcoAdviceSchema = z.object({
   }),
   estimatedTotalEffort: z.string(),
   expectedComplianceLevel: z.string(),
+  successRateEstimate: z.number().min(0).max(100).optional(), // New: Predicted success
+  confidenceScore: z.number().min(0).max(100).optional(), // New: Overall confidence
 })
 
 export type MarcoAdvice = z.infer<typeof MarcoAdviceSchema>
@@ -93,23 +111,35 @@ ${riskAssessment}
 
 ${constraintText}
 
+MULTI-PASS ADVISORY APPROACH:
+Pass 1 - ANALYZE: Understand risks, constraints, and organizational context
+Pass 2 - PRIORITIZE: Rank recommendations by impact, feasibility, and precedent
+Pass 3 - ROADMAP: Create phased implementation plan
+Pass 4 - VALIDATE: Ensure feasibility and resource alignment
+Pass 5 - CONFIDENCE: Rate success probability based on similar organizations
+
 Generate a comprehensive compliance roadmap with:
-1. Prioritized recommendations (critical first)
-2. Implementation phases (3-phase approach)
+1. Prioritized recommendations (critical first) with reasoning
+2. Implementation phases (3-phase approach) with clear sequencing
 3. Clear action steps for each recommendation
-4. Resource and cost estimates
-5. Success metrics
+4. Resource and cost estimates with confidence intervals
+5. Success metrics and indicators
+6. Success probability based on organizational context
 
 Respond with JSON:
 {
   "organizationType": "${organizationType}",
   "complianceMaturity": "beginner | intermediate | advanced",
+  "advisoryReasoning": "Explain your multi-pass advisory approach and key insights",
+  "successRateEstimate": 82,
+  "confidenceScore": 85,
   "recommendations": [
     {
       "id": "REC-001",
       "title": "Recommendation title",
       "description": "Detailed description",
       "priority": "critical | high | medium | low",
+      "priorityReasoning": "Why this priority given risks and constraints",
       "category": "policy | process | technology | training | governance | audit",
       "complexity": "simple | moderate | complex",
       "estimatedHours": 40,
@@ -117,7 +147,9 @@ Respond with JSON:
       "implementationSteps": ["step 1", "step 2"],
       "successMetrics": ["metric 1"],
       "dependencies": ["related recommendation"],
-      "owner": "Who should own this"
+      "owner": "Who should own this",
+      "successProbability": 92,
+      "feasibilityScore": 85
     }
   ],
   "implementationRoadmap": {
