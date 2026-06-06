@@ -69,15 +69,17 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg shadow-xl p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary mb-4">
-              <span className="text-white font-bold text-lg">BS</span>
+        <div className="bg-card border border-border rounded-lg p-8 space-y-6">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
+              <span className="text-primary-foreground font-bold text-lg">BS</span>
             </div>
-            <h1 className="text-2xl font-bold text-foreground">BrightScope</h1>
-            <p className="text-sm text-muted-foreground mt-1">Crear cuenta</p>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">BrightScope</h1>
+              <p className="text-sm text-muted-foreground">Crear nueva cuenta</p>
+            </div>
           </div>
 
           <form onSubmit={handleSignUp} className="space-y-4">
@@ -88,55 +90,55 @@ export default function SignUp() {
               </div>
             )}
 
-            <div>
-              <label htmlFor="organization" className="block text-sm font-medium text-foreground mb-2">
+            <div className="space-y-2">
+              <label htmlFor="organization" className="block text-sm font-medium text-foreground">
                 Nombre de la organización
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="organization"
                   type="text"
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
                   placeholder="Mi Empresa"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Correo electrónico
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@empresa.cl"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Contraseña
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
               </div>
@@ -151,16 +153,18 @@ export default function SignUp() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            {`¿Ya tienes cuenta? `}
-            <a href="/sign-in" className="text-primary hover:underline font-medium">
-              Inicia sesión
-            </a>
-          </p>
+          <div className="space-y-3 border-t border-border pt-6">
+            <p className="text-center text-sm text-muted-foreground">
+              {`¿Ya tienes cuenta?`}
+            </p>
+            <Button variant="outline" className="w-full" asChild>
+              <a href="/sign-in">Inicia sesión aquí</a>
+            </Button>
+          </div>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8">
-          Protegemos tu información conforme a Ley 21.719
+          Cumplimiento automático para Ley 21.719 de protección de datos
         </p>
       </div>
     </div>
