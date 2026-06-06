@@ -38,31 +38,31 @@
     --risk-low: 132 204 22;
     
     /* UI Layer System */
-    --background: rgb(0 0 0);
-    --foreground: rgb(248 249 252);
-    --card: rgb(10 13 20);
-    --card-foreground: rgb(248 249 252);
-    --popover: rgb(10 13 20);
-    --popover-foreground: rgb(248 249 252);
+    --background: 0 0 0;
+    --foreground: 248 249 252;
+    --card: 10 13 20;
+    --card-foreground: 248 249 252;
+    --popover: 10 13 20;
+    --popover-foreground: 248 249 252;
     
-    --primary: rgb(var(--bs-blue));
-    --primary-foreground: rgb(0 0 0);
+    --primary: 59 102 255;
+    --primary-foreground: 0 0 0;
     
-    --secondary: rgb(26 31 46);
-    --secondary-foreground: rgb(248 249 252);
+    --secondary: 26 31 46;
+    --secondary-foreground: 248 249 252;
     
-    --muted: rgb(45 49 66);
-    --muted-foreground: rgb(154 162 181);
+    --muted: 45 49 66;
+    --muted-foreground: 154 162 181;
     
-    --accent: rgb(var(--bs-cyan));
-    --accent-foreground: rgb(0 0 0);
+    --accent: 6 214 214;
+    --accent-foreground: 0 0 0;
     
-    --destructive: rgb(var(--error));
-    --destructive-foreground: rgb(248 249 252);
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 249 252;
     
-    --border: rgb(45 49 66);
-    --input: rgb(26 31 46);
-    --ring: rgb(var(--bs-blue));
+    --border: 45 49 66;
+    --input: 26 31 46;
+    --ring: 59 102 255;
     
     /* Spacing & Sizing */
     --radius-xs: 4px;
@@ -73,40 +73,39 @@
   }
 
   .light {
-    --background: rgb(248 249 252);
-    --foreground: rgb(15 20 25);
-    --card: rgb(255 255 255);
-    --card-foreground: rgb(15 20 25);
-    --popover: rgb(255 255 255);
-    --popover-foreground: rgb(15 20 25);
+    --background: 248 249 252;
+    --foreground: 15 20 25;
+    --card: 255 255 255;
+    --card-foreground: 15 20 25;
+    --popover: 255 255 255;
+    --popover-foreground: 15 20 25;
     
-    --primary: rgb(var(--bs-blue));
-    --primary-foreground: rgb(255 255 255);
+    --primary: 59 102 255;
+    --primary-foreground: 255 255 255;
     
-    --secondary: rgb(248 249 252);
-    --secondary-foreground: rgb(15 20 25);
+    --secondary: 248 249 252;
+    --secondary-foreground: 15 20 25;
     
-    --muted: rgb(228 232 240);
-    --muted-foreground: rgb(70 79 99);
+    --muted: 228 232 240;
+    --muted-foreground: 70 79 99;
     
-    --accent: rgb(var(--bs-cyan));
-    --accent-foreground: rgb(0 0 0);
+    --accent: 6 214 214;
+    --accent-foreground: 0 0 0;
     
-    --border: rgb(228 232 240);
-    --input: rgb(248 249 252);
+    --border: 228 232 240;
+    --input: 248 249 252;
   }
 
   * {
-    border-color: rgb(var(--border));
+    @apply border-border;
   }
 
   body {
-    background-color: rgb(var(--background));
-    color: rgb(var(--foreground));
+    @apply bg-background text-foreground;
   }
 
   html {
-    scroll-behavior: smooth;
+    @apply scroll-smooth;
   }
   
   /* Custom scrollbar styling */
@@ -116,15 +115,38 @@
   }
   
   ::-webkit-scrollbar-track {
-    background: rgb(var(--secondary));
+    @apply bg-secondary;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgb(var(--muted));
-    border-radius: var(--radius-md);
+    @apply bg-muted rounded;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--muted-foreground));
+    @apply bg-muted-foreground;
   }
+}
+
+@theme inline {
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive: rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
+  --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  
+  --radius: var(--radius-md);
 }
