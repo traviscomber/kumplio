@@ -6,11 +6,6 @@ import { createClient } from '@supabase/supabase-js';
 import { extractDocumentText, cleanText, chunkText } from '@/lib/services/pdf-extraction';
 import { extractObligations, generateComplianceMatrix, formatExtractionForStorage } from '@/lib/services/openai-extraction';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 export async function POST(req: NextRequest) {
   try {
     const { documentId, userId } = await req.json();
@@ -21,6 +16,18 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return NextResponse.json(
+        { error: 'Missing Supabase configuration' },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     console.log('[v0] Processing document:', documentId);
 

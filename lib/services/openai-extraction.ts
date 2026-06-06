@@ -4,15 +4,19 @@
 import OpenAI from 'openai';
 import { Obligation } from '@/lib/types/documents';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 interface ExtractionResult {
   obligations: Obligation[];
   riskSummary: string;
   keyPoints: string[];
 }
+
+const getOpenAIClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing OPENAI_API_KEY environment variable');
+  }
+  return new OpenAI({ apiKey });
+};
 
 const EXTRACTION_PROMPT = `You are a legal compliance expert analyzing regulatory documents in Spanish.
 
@@ -54,6 +58,8 @@ export async function extractObligations(
 ): Promise<ExtractionResult> {
   try {
     console.log('[v0] Calling OpenAI for obligation extraction');
+
+    const openai = getOpenAIClient();
 
     const systemPrompt = industry
       ? `${EXTRACTION_PROMPT}\n\nDOCUMENT TYPE: ${industry} industry document`
