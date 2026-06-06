@@ -110,9 +110,9 @@ export default function SignIn() {
             <p className="text-center text-sm text-muted-foreground">
               {`¿No tienes cuenta?`}
             </p>
-            <Button variant="outline" className="w-full" asChild>
-              <a href="/sign-up">Crear una nueva cuenta</a>
-            </Button>
+            <a href="/sign-up" className="inline-flex w-full items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
+              Crear una nueva cuenta
+            </a>
           </div>
         </div>
 
