@@ -65,9 +65,9 @@ export default function HomePage() {
               Transforma documentos complejos en matrices de acción
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground text-balance">
-              KUMPLIO estructura automáticamente contratos, licitaciones y normativas, extrayendo obligaciones, riesgos, plazos y responsables en formato ejecutivo.
-            </p>
+          <p className="text-lg md:text-xl text-muted-foreground text-balance mb-8">
+            KUMPLIO estructura automáticamente contratos, licitaciones y normativas, extrayendo obligaciones, riesgos, plazos y responsables en formato ejecutivo. Cumple con Ley 21.719 y regulaciones chilenas.
+          </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-8">
               <Button size="lg" asChild>
