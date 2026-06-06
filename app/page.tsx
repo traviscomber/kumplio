@@ -100,7 +100,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">El equipo de agentes de KUMPLIO</h2>
-            <p className="text-lg text-muted-foreground">6 agentes especializados orquestados para compliance total</p>
+            <p className="text-lg text-muted-foreground">7 agentes especializados orquestados con Legal Expert para compliance total. Desarrollado por n3uralia.com</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -153,8 +153,17 @@ export default function HomePage() {
               <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center text-xl">🎓</div>
               <div>
                 <h3 className="font-semibold text-lg">Kai - Aprendizaje Continuo</h3>
-                <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje.</p>
+                <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje continuo del sistema.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Continuous Learning • Pattern Analysis • System Optimization</p>
+              </div>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">⚖️</div>
+              <div>
+                <h3 className="font-semibold text-lg">Legal Expert - Experto Jurídico</h3>
+                <p className="text-sm text-muted-foreground mt-2">Especialista en Ley 21.719 con base de datos SERNAC real. Valida todas las decisiones de otros agentes. Calcula penales reales: 50-200 UF.</p>
+                <p className="text-xs text-primary mt-3 font-medium">SERNAC Precedents • Article Mapping • Penalty Calculation • Legal Validation</p>
               </div>
             </div>
           </div>
@@ -361,14 +370,43 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12 text-center text-muted-foreground text-xs">
-        <div className="container mx-auto px-6 space-y-4">
-          <p>KUMPLIO • Inteligencia documental para empresas serias</p>
-          <div className="flex justify-center gap-6 text-xs">
-            <a href="#" className="hover:text-foreground transition">Privacidad</a>
-            <a href="#" className="hover:text-foreground transition">Términos</a>
-            <a href="#" className="hover:text-foreground transition">Soporte</a>
-            <a href="#" className="hover:text-foreground transition">Contacto</a>
+      <footer className="border-t border-border bg-card/50 py-16">
+        <div className="container mx-auto px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">KUMPLIO</h3>
+                <p className="text-xs text-muted-foreground">Sistema de IA y LLM para cumplimiento automático de Ley 21.719 en Chile. Desarrollado por n3uralia.com</p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Sobre n3uralia</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">n3uralia.com</a></li>
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Inteligencia Legal</a></li>
+                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Compliance IA</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Producto</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="/features/ley-21719" className="text-muted-foreground hover:text-primary transition">Ley 21.719</a></li>
+                  <li><a href="/sign-up" className="text-muted-foreground hover:text-primary transition">Comenzar gratis</a></li>
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentación</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-foreground">Legal</h3>
+                <ul className="space-y-2 text-xs">
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Privacidad</a></li>
+                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Términos de Servicio</a></li>
+                  <li><a href="mailto:support@kumplio.cl" className="text-muted-foreground hover:text-primary transition">Soporte</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-border pt-8 text-center">
+              <p className="text-xs text-muted-foreground mb-2">© 2026 KUMPLIO by <a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">n3uralia.com</a>. Todos los derechos reservados.</p>
+              <p className="text-xs text-muted-foreground">Cumplimiento de Ley 21.719 con Agentes IA y LLM • Compliance para empresas chilenas</p>
+            </div>
           </div>
         </div>
       </footer>
