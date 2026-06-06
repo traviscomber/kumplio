@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
 import { Plus, AlertTriangle, CheckCircle, Activity, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
@@ -111,12 +110,10 @@ export function DashboardContent() {
           </h1>
           <p className="text-muted-foreground mt-1">Cumplimiento y seguridad en tiempo real</p>
         </div>
-        <Button asChild>
-          <Link href="/projects/new">
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo proyecto
-          </Link>
-        </Button>
+        <Link href="/projects/new" className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/80 transition-colors">
+          <Plus className="w-4 h-4 mr-2" />
+          Nuevo proyecto
+        </Link>
       </div>
 
       {/* Stats Cards */}
@@ -168,9 +165,9 @@ export function DashboardContent() {
         {projects.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground mb-4">No hay proyectos aún</p>
-            <Button asChild>
-              <Link href="/projects/new">Crear primer proyecto</Link>
-            </Button>
+            <Link href="/projects/new" className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/80 transition-colors">
+              Crear primer proyecto
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
