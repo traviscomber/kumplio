@@ -39,6 +39,9 @@ export function TopNav() {
           <a href="/regulations" className="text-sm text-muted-foreground hover:text-foreground">
             Regulaciones
           </a>
+          <a href="/mineria" className="text-sm text-muted-foreground hover:text-foreground">
+            Minería
+          </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
           </a>
@@ -80,6 +83,9 @@ export function TopNav() {
           </a>
           <a href="/regulations" className="block text-sm text-muted-foreground hover:text-foreground">
             Regulaciones
+          </a>
+          <a href="/mineria" className="block text-sm text-muted-foreground hover:text-foreground">
+            Minería
           </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
