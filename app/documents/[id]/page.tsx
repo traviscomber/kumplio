@@ -9,6 +9,7 @@ import { ChevronLeft, Download, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Obligation, ComplianceMatrix } from '@/lib/types/documents'
 import { ComplianceMatrixView } from '@/components/documents/matrix-view'
+import { ExportMenu } from '@/components/export/export-menu'
 
 export default function DocumentDetailPage() {
   const params = useParams()
@@ -111,19 +112,16 @@ export default function DocumentDetailPage() {
 
         <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{document.filename}</h1>
-              <p className="text-muted-foreground">
-                {document.industry && <span className="mr-4">Industria: {document.industry}</span>}
-                Cargado el {new Date(document.created_at).toLocaleDateString('es-CL')}
-              </p>
-            </div>
-            <Button variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Exportar
-            </Button>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{document.filename}</h1>
+            <p className="text-muted-foreground">
+              {document.industry && <span className="mr-4">Industria: {document.industry}</span>}
+              Cargado el {new Date(document.created_at).toLocaleDateString('es-CL')}
+            </p>
           </div>
+          <ExportMenu documentId={docId} documentName={document.filename} />
+        </div>
 
           {/* Status indicator */}
           <div className="bg-card border border-border rounded-lg p-4">
