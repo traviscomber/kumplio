@@ -49,8 +49,6 @@ export function DocumentUpload({ onSuccess, onError }: DocumentUploadProps) {
       setUploadProgress(0);
 
       try {
-        console.log('[v0] Starting file upload');
-        
         // Simulate upload progress
         const progressInterval = setInterval(() => {
           setUploadProgress((prev) => {
@@ -62,7 +60,6 @@ export function DocumentUpload({ onSuccess, onError }: DocumentUploadProps) {
         const doc = await uploadDocument(file, user.id, selectedIndustry);
 
         // Trigger async processing
-        console.log('[v0] Triggering document processing');
         fetch('/api/documents/process', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -70,7 +67,7 @@ export function DocumentUpload({ onSuccess, onError }: DocumentUploadProps) {
             documentId: doc.id,
             userId: user.id,
           }),
-        }).catch((err) => console.error('[v0] Processing trigger error:', err));
+        }).catch((err) => console.error('Processing trigger error:', err));
 
         clearInterval(progressInterval);
         setUploadProgress(100);
@@ -83,7 +80,6 @@ export function DocumentUpload({ onSuccess, onError }: DocumentUploadProps) {
           onSuccess?.();
         }, 500);
       } catch (error) {
-        console.error('[v0] Upload failed:', error);
         const errorMessage = error instanceof Error ? error.message : 'Error al cargar el documento';
         onError?.(errorMessage);
         setIsUploading(false);

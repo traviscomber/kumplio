@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
 import { LogOut, Settings, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -28,19 +27,19 @@ export function TopNav() {
 
         <nav className="hidden md:flex items-center gap-6">
           <a href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-            Dashboard
+            Panel de Control
+          </a>
+          <a href="/dashboard/agents" className="text-sm text-muted-foreground hover:text-foreground">
+            Agentes
+          </a>
+          <a href="/dashboard/workflows" className="text-sm text-muted-foreground hover:text-foreground">
+            Flujos de Trabajo
+          </a>
+          <a href="/dashboard/monitoring" className="text-sm text-muted-foreground hover:text-foreground">
+            Monitoreo
           </a>
           <a href="/documents" className="text-sm text-muted-foreground hover:text-foreground">
             Documentos
-          </a>
-          <a href="/analytics" className="text-sm text-muted-foreground hover:text-foreground">
-            Analytics
-          </a>
-          <a href="/regulations" className="text-sm text-muted-foreground hover:text-foreground">
-            Regulaciones
-          </a>
-          <a href="/mineria" className="text-sm text-muted-foreground hover:text-foreground">
-            Minería
           </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
@@ -48,14 +47,12 @@ export function TopNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <a href="/settings">
-              <Settings className="w-5 h-5" />
-            </a>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <a href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
+            <Settings className="w-5 h-5" />
+          </a>
+          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
             <LogOut className="w-5 h-5" />
-          </Button>
+          </button>
         </div>
 
         <button
@@ -73,34 +70,32 @@ export function TopNav() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border px-6 py-4 space-y-3">
           <a href="/dashboard" className="block text-sm text-muted-foreground hover:text-foreground">
-            Dashboard
+            Panel de Control
+          </a>
+          <a href="/dashboard/agents" className="block text-sm text-muted-foreground hover:text-foreground">
+            Agentes
+          </a>
+          <a href="/dashboard/workflows" className="block text-sm text-muted-foreground hover:text-foreground">
+            Flujos de Trabajo
+          </a>
+          <a href="/dashboard/monitoring" className="block text-sm text-muted-foreground hover:text-foreground">
+            Monitoreo
           </a>
           <a href="/documents" className="block text-sm text-muted-foreground hover:text-foreground">
             Documentos
-          </a>
-          <a href="/analytics" className="block text-sm text-muted-foreground hover:text-foreground">
-            Analytics
-          </a>
-          <a href="/regulations" className="block text-sm text-muted-foreground hover:text-foreground">
-            Regulaciones
-          </a>
-          <a href="/mineria" className="block text-sm text-muted-foreground hover:text-foreground">
-            Minería
           </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
           </a>
           <div className="border-t border-border pt-3 space-y-2">
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <a href="/settings">
-                <Settings className="w-4 h-4 mr-2" />
-                Configuración
-              </a>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
+            <a href="/settings" className="block text-sm text-muted-foreground hover:text-foreground">
+              <Settings className="w-4 h-4 mr-2 inline" />
+              Configuración
+            </a>
+            <button onClick={handleLogout} className="block w-full text-left text-sm text-muted-foreground hover:text-foreground">
+              <LogOut className="w-4 h-4 mr-2 inline" />
               Cerrar sesión
-            </Button>
+            </button>
           </div>
         </div>
       )}

@@ -35,33 +35,31 @@ export default function SignUp() {
       }
 
       if (authData.user) {
-        // Create organization
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .insert([{ name: organizationName, country: 'CL' }])
-          .select()
-          .single()
+        // Create organization via API
+        try {
+          const response = await fetch('/api/auth/create-organization', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              organizationName,
+              userId: authData.user.id,
+            }),
+          })
 
-        if (orgError) {
+          const result = await response.json()
+
+          if (!response.ok) {
+            setError(result.error || 'Error al crear la organización')
+            return
+          }
+
+          router.push('/sign-in?message=Cuenta creada. Por favor inicia sesión.')
+        } catch (err) {
           setError('Error al crear la organización')
           return
         }
-
-        // Add user as owner
-        const { error: memberError } = await supabase
-          .from('organization_members')
-          .insert([{
-            organization_id: orgData.id,
-            user_id: authData.user.id,
-            role: 'owner',
-          }])
-
-        if (memberError) {
-          setError('Error al configurar la membresía')
-          return
-        }
-
-        router.push('/sign-in?message=Cuenta creada. Por favor inicia sesión.')
       }
     } catch (err) {
       setError('Error durante el registro')
@@ -159,9 +157,9 @@ export default function SignUp() {
             <p className="text-center text-sm text-muted-foreground">
               {`¿Ya tienes cuenta?`}
             </p>
-            <Button variant="outline" className="w-full" asChild>
-              <a href="/sign-in">Inicia sesión aquí</a>
-            </Button>
+            <a href="/sign-in" className="inline-flex w-full items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
+              Inicia sesión aquí
+            </a>
           </div>
         </div>
 
