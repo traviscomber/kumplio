@@ -3,20 +3,25 @@
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut, Settings, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function TopNav() {
   const router = useRouter()
-  const [supabase] = useState(() => createClient())
+  const [supabase, setSupabase] = useState<ReturnType<typeof createClient> | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  useEffect(() => {
+    setSupabase(createClient())
+  }, [])
+
   const handleLogout = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     router.push('/sign-in')
   }
 
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-40">
+    <header className="border-b border-border bg-card fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">

@@ -4,17 +4,17 @@ import { AgentDashboard } from '@/components/agents/agent-dashboard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const metadata = {
-  title: 'Agent Dashboard - KUMPLIO',
-  description: 'Monitor and manage KUMPLIO AI agents for compliance analysis',
+  title: 'Centro de Control de Agentes - KUMPLIO',
+  description: 'Monitorea y gestiona los agentes IA de KUMPLIO para análisis de cumplimiento',
 }
 
 export default function AgentsDashboardPage() {
   return (
-    <main className="space-y-8">
+    <main className="container mx-auto px-6 py-8 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold">Agent Control Center</h1>
+        <h1 className="text-4xl font-bold">Centro de Control de Agentes</h1>
         <p className="text-lg text-muted-foreground">
-          Monitor your AI agent team and execute compliance analyses in real-time
+          Monitorea tu equipo de agentes IA y ejecuta análisis de cumplimiento en tiempo real
         </p>
       </div>
 
@@ -23,90 +23,90 @@ export default function AgentsDashboardPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Sofia - Document Analyzer</CardTitle>
-            <CardDescription>Extracts obligations and structures legal documents</CardDescription>
+            <CardTitle>Sofia - Analizador de Documentos</CardTitle>
+            <CardDescription>Extrae obligaciones y estructura documentos legales</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Legal obligation extraction</li>
-              <li>✓ Stakeholder identification</li>
-              <li>✓ Clause mapping</li>
-              <li>✓ Ley 21.719 relevance scoring</li>
+              <li>✓ Extracción de obligaciones legales</li>
+              <li>✓ Identificación de partes interesadas</li>
+              <li>✓ Mapeo de cláusulas</li>
+              <li>✓ Puntuación de relevancia Ley 21.719</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Elena - Regulatory Monitor</CardTitle>
-            <CardDescription>Tracks regulatory changes and compliance requirements</CardDescription>
+            <CardTitle>Elena - Monitor Regulatorio</CardTitle>
+            <CardDescription>Rastrea cambios regulatorios y requisitos de cumplimiento</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Regulatory scanning</li>
-              <li>✓ Deadline tracking</li>
-              <li>✓ Critical alert generation</li>
-              <li>✓ Ley 21.719 status monitoring</li>
+              <li>✓ Escaneo regulatorio</li>
+              <li>✓ Seguimiento de plazos</li>
+              <li>✓ Generación de alertas críticas</li>
+              <li>✓ Monitoreo de estado Ley 21.719</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Bruno - Risk Assessor</CardTitle>
-            <CardDescription>Quantifies compliance risks and penalties</CardDescription>
+            <CardTitle>Bruno - Evaluador de Riesgos</CardTitle>
+            <CardDescription>Cuantifica riesgos de cumplimiento y sanciones</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Risk quantification (0-100 score)</li>
-              <li>✓ Penalty calculations (UF)</li>
-              <li>✓ Financial exposure analysis</li>
-              <li>✓ Probability & impact mapping</li>
+              <li>✓ Cuantificación de riesgos (puntuación 0-100)</li>
+              <li>✓ Cálculos de sanciones (UF)</li>
+              <li>✓ Análisis de exposición financiera</li>
+              <li>✓ Mapeo de probabilidad e impacto</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Marco - Compliance Advisor</CardTitle>
-            <CardDescription>Generates prioritized recommendations</CardDescription>
+            <CardTitle>Marco - Asesor de Cumplimiento</CardTitle>
+            <CardDescription>Genera recomendaciones priorizadas</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Actionable recommendations</li>
-              <li>✓ Implementation roadmaps</li>
-              <li>✓ Resource estimates</li>
-              <li>✓ Success metrics</li>
+              <li>✓ Recomendaciones accionables</li>
+              <li>✓ Hojas de ruta de implementación</li>
+              <li>✓ Estimaciones de recursos</li>
+              <li>✓ Métricas de éxito</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Laura - Compliance Auditor</CardTitle>
-            <CardDescription>Verifies compliance status and tracks progress</CardDescription>
+            <CardTitle>Laura - Auditora de Cumplimiento</CardTitle>
+            <CardDescription>Verifica estado de cumplimiento y rastrea progreso</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Compliance verification</li>
-              <li>✓ Gap identification</li>
-              <li>✓ Evidence collection</li>
-              <li>✓ Progress tracking</li>
+              <li>✓ Verificación de cumplimiento</li>
+              <li>✓ Identificación de brechas</li>
+              <li>✓ Recopilación de evidencia</li>
+              <li>✓ Seguimiento de progreso</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Kai - Continuous Learning</CardTitle>
-            <CardDescription>Improves system based on outcomes</CardDescription>
+            <CardTitle>Kai - Aprendizaje Continuo</CardTitle>
+            <CardDescription>Mejora el sistema basado en resultados</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Pattern recognition</li>
-              <li>✓ Success rate analysis</li>
-              <li>✓ Prompt refinement</li>
-              <li>✓ System improvement</li>
+              <li>✓ Reconocimiento de patrones</li>
+              <li>✓ Análisis de tasa de éxito</li>
+              <li>✓ Refinamiento de indicaciones</li>
+              <li>✓ Mejora del sistema</li>
             </ul>
           </CardContent>
         </Card>
@@ -114,33 +114,33 @@ export default function AgentsDashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>How the Agent Team Works</CardTitle>
+          <CardTitle>Cómo funciona el equipo de agentes</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h4 className="font-semibold">Full Analysis Pipeline (6-agent system)</h4>
+            <h4 className="font-semibold">Pipeline de análisis completo (sistema de 6 agentes)</h4>
             <ol className="mt-2 space-y-2 text-sm">
-              <li>1. Sofia analyzes your document → extracts obligations</li>
-              <li>2. Elena monitors regulations → identifies applicable laws</li>
-              <li>3. Bruno assesses risks → calculates penalties & exposure</li>
-              <li>4. Marco generates recommendations → creates implementation roadmap</li>
-              <li>5. Laura audits compliance → verifies what's been done</li>
-              <li>6. Kai learns from results → improves future analyses</li>
+              <li>1. Sofia analiza tu documento → extrae obligaciones</li>
+              <li>2. Elena monitorea regulaciones → identifica leyes aplicables</li>
+              <li>3. Bruno evalúa riesgos → calcula sanciones y exposición</li>
+              <li>4. Marco genera recomendaciones → crea hoja de ruta de implementación</li>
+              <li>5. Laura audita cumplimiento → verifica qué se ha realizado</li>
+              <li>6. Kai aprende de resultados → mejora análisis futuros</li>
             </ol>
           </div>
 
           <div>
-            <h4 className="font-semibold">Quick Scan (3-agent system)</h4>
+            <h4 className="font-semibold">Escaneo rápido (sistema de 3 agentes)</h4>
             <ol className="mt-2 space-y-2 text-sm">
-              <li>1. Sofia extracts obligations</li>
-              <li>2. Bruno identifies top risks</li>
-              <li>3. Marco prioritizes actions</li>
+              <li>1. Sofia extrae obligaciones</li>
+              <li>2. Bruno identifica riesgos principales</li>
+              <li>3. Marco prioriza acciones</li>
             </ol>
           </div>
 
           <div className="bg-blue-50 p-3 rounded">
-            <p className="text-sm font-semibold text-blue-900">Designed for Ley 21.719</p>
-            <p className="text-sm text-blue-700">All agents are specialized in Chilean data protection law and provide recommendations within that legal framework.</p>
+            <p className="text-sm font-semibold text-blue-900">Diseñado para Ley 21.719</p>
+            <p className="text-sm text-blue-700">Todos los agentes están especializados en la ley chilena de protección de datos y proporcionan recomendaciones dentro de ese marco legal.</p>
           </div>
         </CardContent>
       </Card>

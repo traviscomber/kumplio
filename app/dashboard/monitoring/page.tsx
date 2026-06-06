@@ -7,11 +7,11 @@ import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function MonitoringPage() {
   return (
-    <div className="space-y-6">
+    <main className="container mx-auto px-6 py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Production Monitoring</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Monitoreo de Producción</h1>
         <p className="text-muted-foreground mt-2">
-          Real-time system health, performance metrics, and agent status monitoring
+          Salud del sistema en tiempo real, métricas de rendimiento y monitoreo del estado de agentes
         </p>
       </div>
 
@@ -153,6 +153,6 @@ export default function MonitoringPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }
