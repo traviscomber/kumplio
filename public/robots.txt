@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /(auth)/*
+Disallow: /dashboard/*
+Disallow: /admin/*
+Disallow: /.well-known/pki-validation/
+
+Sitemap: https://kumplio.cl/sitemap.xml
+
+# Chile-specific crawl delay
+User-agent: *
+Crawl-delay: 1
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.5

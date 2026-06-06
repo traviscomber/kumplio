@@ -8,7 +8,7 @@ import { useState } from 'react'
 
 export function TopNav() {
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -21,9 +21,9 @@ export function TopNav() {
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold">BS</span>
+            <span className="text-white text-sm font-bold">K</span>
           </div>
-          <h1 className="text-xl font-bold text-foreground">BrightScope</h1>
+          <h1 className="text-xl font-bold text-foreground">KUMPLIO</h1>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -33,11 +33,17 @@ export function TopNav() {
           <a href="/documents" className="text-sm text-muted-foreground hover:text-foreground">
             Documentos
           </a>
+          <a href="/analytics" className="text-sm text-muted-foreground hover:text-foreground">
+            Analytics
+          </a>
+          <a href="/regulations" className="text-sm text-muted-foreground hover:text-foreground">
+            Regulaciones
+          </a>
+          <a href="/mineria" className="text-sm text-muted-foreground hover:text-foreground">
+            Minería
+          </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
-          </a>
-          <a href="/compliance" className="text-sm text-muted-foreground hover:text-foreground">
-            Cumplimiento
           </a>
         </nav>
 
@@ -72,11 +78,17 @@ export function TopNav() {
           <a href="/documents" className="block text-sm text-muted-foreground hover:text-foreground">
             Documentos
           </a>
+          <a href="/analytics" className="block text-sm text-muted-foreground hover:text-foreground">
+            Analytics
+          </a>
+          <a href="/regulations" className="block text-sm text-muted-foreground hover:text-foreground">
+            Regulaciones
+          </a>
+          <a href="/mineria" className="block text-sm text-muted-foreground hover:text-foreground">
+            Minería
+          </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
-          </a>
-          <a href="/compliance" className="block text-sm text-muted-foreground hover:text-foreground">
-            Cumplimiento
           </a>
           <div className="border-t border-border pt-3 space-y-2">
             <Button variant="ghost" className="w-full justify-start" asChild>

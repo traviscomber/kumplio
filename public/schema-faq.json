@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Qué es la Ley 21.719 en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La Ley 21.719 es la normativa chilena de protección de datos personales que entró en vigencia el 1 de enero de 2023. Regula cómo las organizaciones deben recopilar, procesar y proteger datos personales, estableciendo derechos para los titulares de datos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿A quién aplica la Ley 21.719?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Aplica a todas las personas jurídicas, tanto públicas como privadas, que traten datos personales en Chile o que afecten derechos de personas en territorio chileno."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuáles son las sanciones por incumplimiento?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las infracciones graves pueden resultar en multas hasta 200 UF (aproximadamente $7 millones CLP), registro público de infractores, demandas civiles y reparación de daños morales y patrimoniales."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo KUMPLIO ayuda a cumplir con Ley 21.719?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "KUMPLIO automatiza el análisis de documentos para identificar brechas de cumplimiento, extrae obligaciones legales, crea matrices de cumplimiento y proporciona alertas sobre regulaciones y plazos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué obligaciones impone Ley 21.719?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las principales obligaciones incluyen: obtener consentimiento informado, transparencia en aviso de privacidad, derechos de acceso y portabilidad, seguridad de datos, gestión de incidentes de seguridad y respuesta a autoridades de control."
+      }
+    }
+  ]
+}
