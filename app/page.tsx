@@ -134,7 +134,7 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-xl">💡</div>
               <div>
-                <h3 className="font-semibold text-lg">Jav1er-Compliance v1.0</h3>
+                <h3 className="font-semibold text-lg">Jav1er- Agente Compliance</h3>
                 <p className="text-sm text-muted-foreground mt-2">Genera roadmaps priorizados, estima viabilidad, predice éxito basado en contexto organizacional.</p>
                 <p className="text-xs text-primary mt-3 font-medium">3-Phase Roadmaps • Feasibility Scoring • Success Prediction</p>
               </div>
