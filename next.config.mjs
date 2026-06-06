@@ -11,9 +11,15 @@ const nextConfig = {
     pagesBufferLength: 5,
   },
   experimental: {
-    isrMemoryCacheSize: 0,
+    // Removed invalid isrMemoryCacheSize option
   },
   staticPageGenerationTimeout: 120,
+  // Allow HMR from Vercel Sandbox environment
+  allowedDevOrigins: [
+    'vm-78e3ge8hc20jbvfj4sutbj03.vusercontent.net',
+    'localhost:3000',
+    '127.0.0.1:3000',
+  ],
 }
 
 export default nextConfig
