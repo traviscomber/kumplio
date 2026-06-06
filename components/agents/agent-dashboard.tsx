@@ -48,18 +48,18 @@ export function AgentDashboard() {
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5" />
-                KUMPLIO Agent Team
+                Equipo de Agentes KUMPLIO
               </CardTitle>
-              <CardDescription>6 specialized AI agents for compliance analysis</CardDescription>
+              <CardDescription>6 agentes IA especializados para análisis de cumplimiento</CardDescription>
             </div>
             <Button onClick={() => setAnalyzing(!analyzing)} disabled={analyzing}>
               {analyzing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
+                  Analizando...
                 </>
               ) : (
-                'Start Analysis'
+                'Iniciar Análisis'
               )}
             </Button>
           </div>
@@ -67,9 +67,9 @@ export function AgentDashboard() {
         <CardContent>
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="agents">Agents</TabsTrigger>
-              <TabsTrigger value="metrics">Metrics</TabsTrigger>
+              <TabsTrigger value="overview">Resumen</TabsTrigger>
+              <TabsTrigger value="agents">Agentes</TabsTrigger>
+              <TabsTrigger value="metrics">Métricas</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4">
@@ -79,7 +79,12 @@ export function AgentDashboard() {
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="text-sm font-medium">{agent.agentName}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{agent.status}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {agent.status === 'idle' && 'Inactivo'}
+                          {agent.status === 'running' && 'Ejecutando'}
+                          {agent.status === 'success' && 'Exitoso'}
+                          {agent.status === 'error' && 'Error'}
+                        </p>
                       </div>
                       {getStatusIcon(agent.status)}
                     </div>
@@ -119,23 +124,23 @@ export function AgentDashboard() {
             <TabsContent value="metrics" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm">System Metrics</CardTitle>
+                  <CardTitle className="text-sm">Métricas del Sistema</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Active Agents</span>
+                    <span>Agentes Activos</span>
                     <span className="font-medium">{agents.filter((a) => a.status !== 'idle').length}/6</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Success Rate</span>
+                    <span>Tasa de Éxito</span>
                     <span className="font-medium">95%</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Avg. Analysis Time</span>
+                    <span>Tiempo Promedio de Análisis</span>
                     <span className="font-medium">2.4s</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Cost per Analysis</span>
+                    <span>Costo por Análisis</span>
                     <span className="font-medium">$0.12</span>
                   </div>
                 </CardContent>
