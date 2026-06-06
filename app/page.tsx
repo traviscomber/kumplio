@@ -107,7 +107,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-xl">📄</div>
               <div>
-                <h3 className="font-semibold text-lg">Is1dora- Agente Documentos</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Is1dora- Agente Documentos</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Extrae obligaciones legales, stakeholders, fechas críticas. Entiende contexto regulatorio chileno con razonamiento explícito.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Chain-of-Thought • Confidence Scoring • Cross-references</p>
               </div>
@@ -116,7 +119,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center text-xl">🔍</div>
               <div>
-                <h3 className="font-semibold text-lg">Be4triz- Agente Monitor</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Be4triz- Agente Monitor</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Rastrea cambios en Ley 21.719, identifica plazos regulatorios, alerta de cambios críticos.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Real-time Monitoring • Regulatory Tracking • Alerts</p>
               </div>
@@ -125,7 +131,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center text-xl">⚠️</div>
               <div>
-                <h3 className="font-semibold text-lg">R0drigo- Agente Riesgos</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">R0drigo- Agente Riesgos</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Cuantifica riesgos (0-100), calcula penales en UF, modela escenarios best/likely/worst.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Multi-scenario Analysis • Penalty Calculation • Confidence Scoring</p>
               </div>
@@ -134,7 +143,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-xl">💡</div>
               <div>
-                <h3 className="font-semibold text-lg">Jav1er- Agente Compliance</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Jav1er- Agente Compliance</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Genera roadmaps priorizados, estima viabilidad, predice éxito basado en contexto organizacional.</p>
                 <p className="text-xs text-primary mt-3 font-medium">3-Phase Roadmaps • Feasibility Scoring • Success Prediction</p>
               </div>
@@ -143,7 +155,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-xl">✅</div>
               <div>
-                <h3 className="font-semibold text-lg">Ver0nica- Agente Auditoría</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Ver0nica- Agente Auditoría</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Audita estado actual, verifica implementación, identifica gaps vs. requisitos.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Gap Analysis • Compliance Verification • Audit Trails</p>
               </div>
@@ -152,7 +167,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center text-xl">🎓</div>
               <div>
-                <h3 className="font-semibold text-lg">Andr3s- Agente Aprendizaje</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Andr3s- Agente Aprendizaje</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-pink-500/20 text-pink-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje continuo del sistema.</p>
                 <p className="text-xs text-primary mt-3 font-medium">Continuous Learning • Pattern Analysis • System Optimization</p>
               </div>
@@ -161,7 +179,10 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">⚖️</div>
               <div>
-                <h3 className="font-semibold text-lg">Cat4lina- Agente Legal</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">Cat4lina- Agente Legal</h3>
+                  <span className="text-xs px-2 py-1 rounded bg-indigo-500/20 text-indigo-500 font-bold">IA</span>
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">Especialista en Ley 21.719 con base de datos SERNAC real. Valida todas las decisiones de otros agentes. Calcula penales reales: 50-200 UF.</p>
                 <p className="text-xs text-primary mt-3 font-medium">SERNAC Precedents • Article Mapping • Penalty Calculation • Legal Validation</p>
               </div>
