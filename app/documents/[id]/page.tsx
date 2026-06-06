@@ -5,9 +5,10 @@ import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { TopNav } from '@/components/layout/top-nav'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, Download } from 'lucide-react'
+import { ChevronLeft, Download, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Obligation, ComplianceMatrix } from '@/lib/types/documents'
+import { ComplianceMatrixView } from '@/components/documents/matrix-view'
 
 export default function DocumentDetailPage() {
   const params = useParams()
@@ -15,6 +16,7 @@ export default function DocumentDetailPage() {
   const [document, setDocument] = useState<any>(null)
   const [obligations, setObligations] = useState<Obligation[]>([])
   const [matrix, setMatrix] = useState<ComplianceMatrix[]>([])
+  const [report, setReport] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,6 +54,13 @@ export default function DocumentDetailPage() {
           .order('created_at', { ascending: false })
 
         setMatrix(mtrx || [])
+
+        // Load report
+        const reportRes = await fetch(`/api/compliance-matrix/report?documentId=${docId}`)
+        if (reportRes.ok) {
+          const reportData = await reportRes.json()
+          setReport(reportData)
+        }
       } catch (err) {
         console.error('[v0] Error loading document:', err)
         setError('Error al cargar el documento')
@@ -187,41 +196,32 @@ export default function DocumentDetailPage() {
             </div>
           )}
 
-          {/* Compliance Matrix */}
+          {/* Compliance Matrix View */}
           {matrix.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">Matriz de cumplimiento</h2>
-              <div className="bg-card border border-border rounded-lg overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-secondary/50">
-                      <th className="text-left py-3 px-4 font-semibold">Obligación</th>
-                      <th className="text-left py-3 px-4 font-semibold">Riesgo</th>
-                      <th className="text-left py-3 px-4 font-semibold">Responsable</th>
-                      <th className="text-left py-3 px-4 font-semibold">Vencimiento</th>
-                      <th className="text-left py-3 px-4 font-semibold">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matrix.map(row => (
-                      <tr key={row.id} className="border-b border-border hover:bg-secondary/30">
-                        <td className="py-3 px-4 max-w-xs truncate">{row.obligation}</td>
-                        <td className="py-3 px-4">
-                          <span className={`px-2 py-0.5 rounded text-xs ${getRiskColor(row.risk_level)}`}>
-                            {row.risk_level}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">{row.responsible || '—'}</td>
-                        <td className="py-3 px-4">{row.due_date || '—'}</td>
-                        <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded text-xs bg-secondary">
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Matriz de cumplimiento</h2>
+              <ComplianceMatrixView matrix={matrix} />
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {report?.recommendations && report.recommendations.length > 0 && (
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <TrendingUp className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                    Recomendaciones
+                  </h3>
+                  <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                    {report.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-blue-600 dark:text-blue-300 font-bold mt-0.5">•</span>
+                        <span>{rec}</span>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
+                  </ul>
+                </div>
               </div>
             </div>
           )}
