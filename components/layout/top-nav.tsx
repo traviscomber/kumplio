@@ -36,11 +36,11 @@ export function TopNav() {
           <a href="/analytics" className="text-sm text-muted-foreground hover:text-foreground">
             Analytics
           </a>
+          <a href="/regulations" className="text-sm text-muted-foreground hover:text-foreground">
+            Regulaciones
+          </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
-          </a>
-          <a href="/compliance" className="text-sm text-muted-foreground hover:text-foreground">
-            Cumplimiento
           </a>
         </nav>
 
@@ -78,11 +78,11 @@ export function TopNav() {
           <a href="/analytics" className="block text-sm text-muted-foreground hover:text-foreground">
             Analytics
           </a>
+          <a href="/regulations" className="block text-sm text-muted-foreground hover:text-foreground">
+            Regulaciones
+          </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
-          </a>
-          <a href="/compliance" className="block text-sm text-muted-foreground hover:text-foreground">
-            Cumplimiento
           </a>
           <div className="border-t border-border pt-3 space-y-2">
             <Button variant="ghost" className="w-full justify-start" asChild>
