@@ -161,7 +161,7 @@ export default function HomePage() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
               <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">⚖️</div>
               <div>
-                <h3 className="font-semibold text-lg">Legal Expert - Experto Jurídico</h3>
+                <h3 className="font-semibold text-lg">Valentina - Experto Jurídico</h3>
                 <p className="text-sm text-muted-foreground mt-2">Especialista en Ley 21.719 con base de datos SERNAC real. Valida todas las decisiones de otros agentes. Calcula penales reales: 50-200 UF.</p>
                 <p className="text-xs text-primary mt-3 font-medium">SERNAC Precedents • Article Mapping • Penalty Calculation • Legal Validation</p>
               </div>
