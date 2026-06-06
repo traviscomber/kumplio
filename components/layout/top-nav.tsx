@@ -33,6 +33,9 @@ export function TopNav() {
           <a href="/documents" className="text-sm text-muted-foreground hover:text-foreground">
             Documentos
           </a>
+          <a href="/analytics" className="text-sm text-muted-foreground hover:text-foreground">
+            Analytics
+          </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
           </a>
@@ -71,6 +74,9 @@ export function TopNav() {
           </a>
           <a href="/documents" className="block text-sm text-muted-foreground hover:text-foreground">
             Documentos
+          </a>
+          <a href="/analytics" className="block text-sm text-muted-foreground hover:text-foreground">
+            Analytics
           </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
