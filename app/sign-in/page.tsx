@@ -38,15 +38,17 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg shadow-xl p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary mb-4">
-              <span className="text-white font-bold text-lg">BS</span>
+        <div className="bg-card border border-border rounded-lg p-8 space-y-6">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
+              <span className="text-primary-foreground font-bold text-lg">BS</span>
             </div>
-            <h1 className="text-2xl font-bold text-foreground">BrightScope</h1>
-            <p className="text-sm text-muted-foreground mt-1">Cumplimiento Legal Chile</p>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">BrightScope</h1>
+              <p className="text-sm text-muted-foreground">Inteligencia documental para Chile</p>
+            </div>
           </div>
 
           <form onSubmit={handleSignIn} className="space-y-4">
@@ -57,37 +59,37 @@ export default function SignIn() {
               </div>
             )}
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Correo electrónico
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@empresa.cl"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Contraseña
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 />
               </div>
@@ -102,16 +104,18 @@ export default function SignIn() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            {`¿No tienes cuenta? `}
-            <a href="/sign-up" className="text-primary hover:underline font-medium">
-              Regístrate aquí
-            </a>
-          </p>
+          <div className="space-y-3 border-t border-border pt-6">
+            <p className="text-center text-sm text-muted-foreground">
+              {`¿No tienes cuenta?`}
+            </p>
+            <Button variant="outline" className="w-full" asChild>
+              <a href="/sign-up">Crear una nueva cuenta</a>
+            </Button>
+          </div>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-8">
-          Protegemos tu información conforme a Ley 21.719
+          Cumplimiento automático para Ley 21.719 de protección de datos
         </p>
       </div>
     </div>
