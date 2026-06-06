@@ -1,5 +1,7 @@
 // Document types for BrightScope
 
+export type DocumentFormat = 'pdf' | 'docx' | 'doc' | 'txt';
+
 export interface Document {
   id: string;
   user_id: string;

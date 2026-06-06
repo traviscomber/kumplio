@@ -59,7 +59,18 @@ export function DocumentUpload({ onSuccess, onError }: DocumentUploadProps) {
           });
         }, 300);
 
-        await uploadDocument(file, user.id, selectedIndustry);
+        const doc = await uploadDocument(file, user.id, selectedIndustry);
+
+        // Trigger async processing
+        console.log('[v0] Triggering document processing');
+        fetch('/api/documents/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            documentId: doc.id,
+            userId: user.id,
+          }),
+        }).catch((err) => console.error('[v0] Processing trigger error:', err));
 
         clearInterval(progressInterval);
         setUploadProgress(100);
