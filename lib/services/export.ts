@@ -21,7 +21,7 @@ export function generateExcelReport(
 
   // Summary sheet
   const summaryData = [
-    ['BrightScope - Reporte de Cumplimiento', ''],
+    ['KUMPLIO - Reporte de Cumplimiento', ''],
     ['', ''],
     ['Documento', documentName],
     ['Fecha de reporte', new Date().toLocaleDateString('es-CL')],
@@ -111,7 +111,7 @@ export async function generatePDFReport(
 
   // Title
   doc.setFontSize(20);
-  doc.text('BrightScope - Reporte de Cumplimiento', 20, 20);
+  doc.text('KUMPLIO - Reporte de Cumplimiento', 20, 20);
 
   // Document info
   doc.setFontSize(11);

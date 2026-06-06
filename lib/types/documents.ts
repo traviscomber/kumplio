@@ -1,4 +1,4 @@
-// Document types for BrightScope
+// Document types for KUMPLIO
 
 export type DocumentFormat = 'pdf' | 'docx' | 'doc' | 'txt';
 

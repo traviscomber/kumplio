@@ -21,9 +21,9 @@ export function TopNav() {
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold">BS</span>
+            <span className="text-white text-sm font-bold">K</span>
           </div>
-          <h1 className="text-xl font-bold text-foreground">BrightScope</h1>
+          <h1 className="text-xl font-bold text-foreground">KUMPLIO</h1>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">

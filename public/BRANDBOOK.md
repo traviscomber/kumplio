@@ -1,4 +1,4 @@
-# BrightScope Brand Book
+# KUMPLIO Brand Book
 
 ## Table of Contents
 1. Brand Overview
@@ -16,18 +16,18 @@
 ## 1. Brand Overview
 
 ### Mission
-Transform how Chilean enterprises understand and manage compliance obligations in complex documents.
+Transformar cómo las empresas chilenas entienden y gestionan las obligaciones de cumplimiento en documentos complejos.
 
 ### Brand Promise
-**Clarity through Intelligence** — Convert overwhelming complexity into actionable insights.
+**Claridad a través de Inteligencia** — Convierte la complejidad abrumadora en información accionable.
 
 ### Brand Positioning
-BrightScope is the premium document intelligence platform for enterprise compliance, trusted by legal, operational, and commercial leaders across Chile.
+KUMPLIO es la plataforma premium de inteligencia documental para cumplimiento empresarial, confiada por líderes legales, operativos y comerciales en Chile.
 
 ### Core Values
-- **Clarity**: Clear, structured information over overwhelming data
-- **Trust**: Enterprise-grade security and reliability
-- **Intelligence**: AI-powered insights that respect human expertise
+- **Clarity**: Información clara y estructurada sobre datos abrumadores
+- **Trust**: Seguridad empresarial y confiabilidad
+- **Intelligence**: Insights potenciados por IA que respetan la experiencia humana
 - **Precision**: Exact, auditable information for high-stakes decisions
 - **Respect**: Serious tools for serious work
 
@@ -43,7 +43,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 ## 2. Color System
 
 ### Primary Brand Color
-**BrightScope Blue** — The color of trust, intelligence, and forward-thinking enterprise.
+**KUMPLIO Blue** — The color of trust, intelligence, and forward-thinking enterprise.
 
 - **Primary**: `#3B66FF` (RGB: 59, 102, 255)
 - **Light**: `#EFF0FF` (RGB: 239, 240, 255) — For backgrounds
@@ -184,7 +184,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 ### Buttons
 
 #### Primary Button
-- **Background**: BrightScope Blue (#3B66FF)
+- **Background**: KUMPLIO Blue (#3B66FF)
 - **Text**: White, 16px, 600 weight
 - **Padding**: 12px 24px
 - **Border Radius**: 8px
@@ -201,7 +201,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 
 #### Tertiary Button (Text)
 - **Background**: Transparent
-- **Text**: BrightScope Blue
+- **Text**: KUMPLIO Blue
 - **Padding**: 8px 12px
 - **No border**
 - **Hover**: Light Blue background
@@ -219,7 +219,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 - **Border**: 1px Gray 200 / Gray 700
 - **Border Radius**: 8px
 - **Padding**: 12px 16px
-- **Focus**: Border becomes BrightScope Blue, shadow 0 0 0 3px rgba(59,102,255,0.1)
+- **Focus**: Border becomes KUMPLIO Blue, shadow 0 0 0 3px rgba(59,102,255,0.1)
 - **Font**: 16px, Regular
 
 ### Status Badges
@@ -262,7 +262,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 
 ### Photography
 - **Style**: Corporate, authentic, professional
-- **Color**: Desaturated with BrightScope Blue color accents
+- **Color**: Desaturated with KUMPLIO Blue color accents
 - **People**: Diverse, professional, in work contexts
 - **Objects**: High-quality, clean, minimal backgrounds
 - **Avoid**: Stock photo clichés, overly polished, artificial
@@ -351,7 +351,7 @@ BrightScope is the premium document intelligence platform for enterprise complia
 
 ### Implementation
 - CSS variables aligned to this specification
-- Tailwind configuration extended with BrightScope tokens
+- Tailwind configuration extended with KUMPLIO tokens
 - Component library with all specifications
 - Figma file as single source of truth
 

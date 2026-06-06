@@ -74,10 +74,10 @@ export default function SignUp() {
         <div className="bg-card border border-border rounded-lg p-8 space-y-6">
           <div className="text-center space-y-3">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
-              <span className="text-primary-foreground font-bold text-lg">BS</span>
+              <span className="text-primary-foreground font-bold text-lg">K</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">BrightScope</h1>
+              <h1 className="text-2xl font-bold text-foreground">KUMPLIO</h1>
               <p className="text-sm text-muted-foreground">Crear nueva cuenta</p>
             </div>
           </div>

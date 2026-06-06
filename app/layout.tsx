@@ -10,9 +10,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'BrightScope - Cumplimiento Legal Chile',
-  description: 'Plataforma de auditoría de cumplimiento para la Ley 21.719 de protección de datos en Chile',
-  generator: 'brightscope.app',
+  title: 'KUMPLIO - Cumplimiento Legal Chile',
+  description: 'Plataforma de auditoría de cumplimiento normativo para empresas chilenas. Análisis automático de documentos, obligaciones y riesgos.',
+  generator: 'kumplio.cl',
   icons: {
     icon: [
       {

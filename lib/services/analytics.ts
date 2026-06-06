@@ -1,4 +1,4 @@
-// Analytics service for BrightScope
+// Analytics service for KUMPLIO compliance platform
 // Generates charts data and insights from compliance data
 
 import { createClient } from '@supabase/supabase-js';

@@ -1,4 +1,4 @@
-// PDF extraction service for BrightScope
+// PDF extraction service for KUMPLIO
 // Extracts text from PDF and DOCX files
 
 import * as pdfParse from 'pdf-parse';

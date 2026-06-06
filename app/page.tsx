@@ -37,9 +37,9 @@ export default function HomePage() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">BS</span>
+              <span className="text-primary-foreground text-xs font-bold">K</span>
             </div>
-            <span className="font-bold text-base">BrightScope</span>
+            <span className="font-bold text-base">KUMPLIO</span>
           </div>
           <div className="hidden md:flex gap-3">
             <Button variant="ghost" asChild className="text-sm">
@@ -66,7 +66,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground text-balance">
-              BrightScope estructura automáticamente contratos, licitaciones y normativas, extrayendo obligaciones, riesgos, plazos y responsables en formato ejecutivo.
+              KUMPLIO estructura automáticamente contratos, licitaciones y normativas, extrayendo obligaciones, riesgos, plazos y responsables en formato ejecutivo.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-8">
@@ -220,7 +220,7 @@ export default function HomePage() {
       <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Para cada situación crítica</h2>
-          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Empresas chilenas usan BrightScope para:</p>
+          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Empresas chilenas usan KUMPLIO para:</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {[
@@ -261,7 +261,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-border py-12 text-center text-muted-foreground text-xs">
         <div className="container mx-auto px-6 space-y-4">
-          <p>BrightScope • Inteligencia documental para empresas serias</p>
+          <p>KUMPLIO • Inteligencia documental para empresas serias</p>
           <div className="flex justify-center gap-6 text-xs">
             <a href="#" className="hover:text-foreground transition">Privacidad</a>
             <a href="#" className="hover:text-foreground transition">Términos</a>

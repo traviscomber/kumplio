@@ -1,4 +1,4 @@
-// Document service for BrightScope
+// Document service for KUMPLIO
 import { createClient } from '@supabase/supabase-js';
 import { Document, UploadProgress } from '@/lib/types/documents';
 
