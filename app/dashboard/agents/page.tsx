@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function AgentsDashboardPage() {
   return (
-    <main className="space-y-8">
+    <main className="container mx-auto px-6 py-8 space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl font-bold">Centro de Control de Agentes</h1>
         <p className="text-lg text-muted-foreground">
