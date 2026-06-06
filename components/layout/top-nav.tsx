@@ -30,17 +30,17 @@ export function TopNav() {
           <a href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
             Dashboard
           </a>
+          <a href="/dashboard/agents" className="text-sm text-muted-foreground hover:text-foreground">
+            Agentes
+          </a>
+          <a href="/dashboard/workflows" className="text-sm text-muted-foreground hover:text-foreground">
+            Workflows
+          </a>
+          <a href="/dashboard/monitoring" className="text-sm text-muted-foreground hover:text-foreground">
+            Monitoreo
+          </a>
           <a href="/documents" className="text-sm text-muted-foreground hover:text-foreground">
             Documentos
-          </a>
-          <a href="/analytics" className="text-sm text-muted-foreground hover:text-foreground">
-            Analytics
-          </a>
-          <a href="/regulations" className="text-sm text-muted-foreground hover:text-foreground">
-            Regulaciones
-          </a>
-          <a href="/mineria" className="text-sm text-muted-foreground hover:text-foreground">
-            Minería
           </a>
           <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
             Proyectos
@@ -48,14 +48,12 @@ export function TopNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <a href="/settings">
-              <Settings className="w-5 h-5" />
-            </a>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <a href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
+            <Settings className="w-5 h-5" />
+          </a>
+          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
             <LogOut className="w-5 h-5" />
-          </Button>
+          </button>
         </div>
 
         <button
@@ -75,17 +73,17 @@ export function TopNav() {
           <a href="/dashboard" className="block text-sm text-muted-foreground hover:text-foreground">
             Dashboard
           </a>
+          <a href="/dashboard/agents" className="block text-sm text-muted-foreground hover:text-foreground">
+            Agentes
+          </a>
+          <a href="/dashboard/workflows" className="block text-sm text-muted-foreground hover:text-foreground">
+            Workflows
+          </a>
+          <a href="/dashboard/monitoring" className="block text-sm text-muted-foreground hover:text-foreground">
+            Monitoreo
+          </a>
           <a href="/documents" className="block text-sm text-muted-foreground hover:text-foreground">
             Documentos
-          </a>
-          <a href="/analytics" className="block text-sm text-muted-foreground hover:text-foreground">
-            Analytics
-          </a>
-          <a href="/regulations" className="block text-sm text-muted-foreground hover:text-foreground">
-            Regulaciones
-          </a>
-          <a href="/mineria" className="block text-sm text-muted-foreground hover:text-foreground">
-            Minería
           </a>
           <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
             Proyectos
