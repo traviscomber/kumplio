@@ -35,33 +35,31 @@ export default function SignUp() {
       }
 
       if (authData.user) {
-        // Create organization
-        const { data: orgData, error: orgError } = await supabase
-          .from('organizations')
-          .insert([{ name: organizationName, country: 'CL' }])
-          .select()
-          .single()
+        // Create organization via API
+        try {
+          const response = await fetch('/api/auth/create-organization', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              organizationName,
+              userId: authData.user.id,
+            }),
+          })
 
-        if (orgError) {
+          const result = await response.json()
+
+          if (!response.ok) {
+            setError(result.error || 'Error al crear la organización')
+            return
+          }
+
+          router.push('/sign-in?message=Cuenta creada. Por favor inicia sesión.')
+        } catch (err) {
           setError('Error al crear la organización')
           return
         }
-
-        // Add user as owner
-        const { error: memberError } = await supabase
-          .from('organization_members')
-          .insert([{
-            organization_id: orgData.id,
-            user_id: authData.user.id,
-            role: 'owner',
-          }])
-
-        if (memberError) {
-          setError('Error al configurar la membresía')
-          return
-        }
-
-        router.push('/sign-in?message=Cuenta creada. Por favor inicia sesión.')
       }
     } catch (err) {
       setError('Error durante el registro')
