@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, FileText, CheckCircle, AlertTriangle, Clock, Shield } from 'lucide-react'
-import Image from 'next/image'
+import { ArrowRight, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -31,409 +30,336 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
+    <div className="bg-background text-foreground">
+      {/* NAVIGATION */}
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">K</span>
+              <span className="text-white text-sm font-bold">K</span>
             </div>
-            <span className="font-bold text-base">KUMPLIO</span>
+            <span className="font-bold text-lg">KUMPLIO</span>
           </div>
-          <div className="hidden md:flex gap-3">
-            <Button variant="ghost" asChild className="text-sm">
-              <a href="/sign-in">Iniciar sesión</a>
-            </Button>
-            <Button asChild className="text-sm">
-              <a href="/sign-up">Comenzar</a>
+          <div className="flex items-center gap-4">
+            <a href="/sign-in" className="text-sm hover:text-primary transition">Acceder</a>
+            <Button size="sm" asChild>
+              <a href="/sign-up">Empezar</a>
             </Button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-6 py-32 lg:py-48">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20">
-              <span className="w-2 h-2 rounded-full bg-primary"></span>
-              <span className="text-sm font-medium text-primary">Inteligencia documental para empresas chilenas</span>
-            </div>
+      {/* HERO - DIRECTO Y SECO */}
+      <section className="pt-32 pb-24 px-6">
+        <div className="container mx-auto max-w-3xl text-center space-y-8">
+          <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-tight">
+            Controla tu Cumplimiento Legal
+            <br />
+            <span className="text-primary">Antes Que Te Controle La Ley</span>
+          </h1>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance leading-[1.2]">
-              Agentes de IA que transforman compliance en certeza
-            </h1>
-
-          <p className="text-lg md:text-xl text-muted-foreground text-balance mb-8">
-            KUMPLIO es un sistema de 6 agentes especializados que analiza documentos, evalúa riesgos, genera recomendaciones y audita compliance con Ley 21.719. Orquestación inteligente que convierte regulaciones complejas en acciones claras.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            7 agentes IA analizan obligaciones, monitorean regulaciones, cuantifican riesgos en dinero, y generan planes de acción ejecutables.
+            <br />
+            <span className="font-semibold">Para transporte, minería, y cualquier empresa que deba cumplir.</span>
           </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-8">
-              <Button size="lg" asChild>
-                <a href="/sign-up">
-                  Acceso gratis
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <a href="#how-it-works">Ver demostración</a>
-              </Button>
-            </div>
-
-            <div className="pt-12 flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span>Sin tarjeta de crédito</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-primary" />
-                <span>Cumplimiento Ley 21.719</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Agent Team Section */}
-      <section className="container mx-auto px-6 py-24 border-t border-border/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">El equipo de agentes de KUMPLIO</h2>
-            <p className="text-lg text-muted-foreground">7 agentes especializados orquestados con Legal Expert para compliance total. Desarrollado por n3uralia.com</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center text-xl">📄</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Is1dora- Agente Documentos</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Extrae obligaciones legales, stakeholders, fechas críticas. Entiende contexto regulatorio chileno con razonamiento explícito.</p>
-                <p className="text-xs text-primary mt-3 font-medium">Chain-of-Thought • Confidence Scoring • Cross-references</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center text-xl">🔍</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Be4triz- Agente Monitor</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Rastrea cambios en Ley 21.719, identifica plazos regulatorios, alerta de cambios críticos.</p>
-                <p className="text-xs text-primary mt-3 font-medium">Real-time Monitoring • Regulatory Tracking • Alerts</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-red-500/20 flex items-center justify-center text-xl">⚠️</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">R0drigo- Agente Riesgos</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Cuantifica riesgos (0-100), calcula penales en UF, modela escenarios best/likely/worst.</p>
-                <p className="text-xs text-primary mt-3 font-medium">Multi-scenario Analysis • Penalty Calculation • Confidence Scoring</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center text-xl">💡</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Jav1er- Agente Compliance</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Genera roadmaps priorizados, estima viabilidad, predice éxito basado en contexto organizacional.</p>
-                <p className="text-xs text-primary mt-3 font-medium">3-Phase Roadmaps • Feasibility Scoring • Success Prediction</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center text-xl">✅</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Ver0nica- Agente Auditoría</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Audita estado actual, verifica implementación, identifica gaps vs. requisitos.</p>
-                <p className="text-xs text-primary mt-3 font-medium">Gap Analysis • Compliance Verification • Audit Trails</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center text-xl">🎓</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Andr3s- Agente Aprendizaje</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-pink-500/20 text-pink-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Analiza patrones, identifica causas raíz de gaps, mejora recomendaciones con aprendizaje continuo del sistema.</p>
-                <p className="text-xs text-primary mt-3 font-medium">Continuous Learning • Pattern Analysis • System Optimization</p>
-              </div>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-4 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">⚖️</div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">Cat4lina- Agente Legal</h3>
-                  <span className="text-xs px-2 py-1 rounded bg-indigo-500/20 text-indigo-500 font-bold">IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Especialista en Ley 21.719 con base de datos SERNAC real. Valida todas las decisiones de otros agentes. Calcula penales reales: 50-200 UF.</p>
-                <p className="text-xs text-primary mt-3 font-medium">SERNAC Precedents • Article Mapping • Penalty Calculation • Legal Validation</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Product Preview */}
-      <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-card border border-border rounded-lg p-8 lg:p-12 space-y-8">
-            <div className="text-center mb-4">
-              <h3 className="text-2xl font-bold">Pipeline de análisis en tiempo real</h3>
-              <p className="text-muted-foreground mt-2">De documento a decisión en 7 pasos con agentes especializados</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Accuracy</p>
-                <p className="text-3xl lg:text-4xl font-bold text-green-500">95%+</p>
-                <p className="text-xs text-muted-foreground">Validado en Ley 21.719</p>
-              </div>
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Agentes</p>
-                <p className="text-3xl lg:text-4xl font-bold text-blue-500">7</p>
-                <p className="text-xs text-muted-foreground">+ Legal Expert</p>
-              </div>
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Speed</p>
-                <p className="text-3xl lg:text-4xl font-bold text-purple-500">20-60s</p>
-                <p className="text-xs text-muted-foreground">Full Analysis</p>
-              </div>
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Confidence</p>
-                <p className="text-3xl lg:text-4xl font-bold text-amber-500">0-100</p>
-                <p className="text-xs text-muted-foreground">Per Finding</p>
-              </div>
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Workflows</p>
-                <p className="text-3xl lg:text-4xl font-bold text-pink-500">3+</p>
-                <p className="text-xs text-muted-foreground">Pre-configured</p>
-              </div>
-              <div className="space-y-2 p-4 bg-secondary rounded-lg">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Reasoning</p>
-                <p className="text-3xl lg:text-4xl font-bold text-indigo-500">100%</p>
-                <p className="text-xs text-muted-foreground">Explainable</p>
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-8">
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">Salida de análisis</p>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-secondary rounded">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <div className="text-sm">
-                    <p className="font-medium">Extracción de Obligaciones</p>
-                    <p className="text-xs text-muted-foreground">34 obligaciones con stakeholders y plazos críticos</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-secondary rounded">
-                  <span className="text-amber-500 font-bold">⚠</span>
-                  <div className="text-sm">
-                    <p className="font-medium">Evaluación de Riesgos</p>
-                    <p className="text-xs text-muted-foreground">12 riesgos cuantificados (50-200 UF en penales)</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-secondary rounded">
-                  <span className="text-blue-500 font-bold">→</span>
-                  <div className="text-sm">
-                    <p className="font-medium">Roadmap de Cumplimiento</p>
-                    <p className="text-xs text-muted-foreground">3 fases con prioridades, viabilidad y timeline</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-secondary rounded">
-                  <span className="text-purple-500 font-bold">✔</span>
-                  <div className="text-sm">
-                    <p className="font-medium">Auditoría de Cumplimiento</p>
-                    <p className="text-xs text-muted-foreground">Gap analysis con acciones correctivas</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works - Agent Pipeline */}
-      <section id="how-it-works" className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Pipeline de agentes inteligentes</h2>
-          <p className="text-lg text-muted-foreground text-center text-balance mb-16">Desde documento a decisión en 7 pasos coordinados. Cada agente aporta su expertise para que tu empresa esté 100% en compliance.</p>
-
-          <div className="space-y-8">
-            {[
-              {
-                agent: 'Is1dora',
-                step: '1',
-                title: 'Análisis de Documentos',
-                description: 'Is1dora- Agente Documentos analiza tu documento regulatorio y extrae automáticamente todas las obligaciones, responsables y fechas críticas. Te muestra exactamente qué tienes que hacer y cuándo.',
-                output: '→ 34 obligaciones estructuradas con confianza 92%'
-              },
-              {
-                agent: 'Be4triz',
-                step: '2',
-                title: 'Monitoreo Regulatorio',
-                description: 'Be4triz- Agente Monitor verifica cambios recientes en Ley 21.719 y normativas relevantes. Te avisa de plazos y nuevos requisitos que podrían afectar tu cumplimiento.',
-                output: '→ 8 cambios regulatorios relevantes identificados'
-              },
-              {
-                agent: 'R0drigo',
-                step: '3',
-                title: 'Evaluación de Riesgos',
-                description: 'R0drigo- Agente Riesgos cuantifica cada riesgo en una escala 0-100 y calcula exactamente cuántos pesos (UF) podrías perder por cada incumplimiento. Así sabes qué es prioritario.',
-                output: '→ 12 riesgos cuantificados (50-200 UF en penales)'
-              },
-              {
-                agent: 'Jav1er',
-                step: '4',
-                title: 'Recomendaciones Prioritarias',
-                description: 'Jav1er- Agente Compliance te genera un roadmap realista en 3 fases. Te dice qué hacer primero, cuántos recursos necesitas y cuándo lo tendrás listo. Sin falsas promesas.',
-                output: '→ 18 recomendaciones priorizadas con 88% éxito esperado'
-              },
-              {
-                agent: 'Ver0nica',
-                step: '5',
-                title: 'Auditoría de Cumplimiento',
-                description: 'Ver0nica- Agente Auditoría verifica tu estado actual paso a paso. Identifica exactamente dónde hay gaps y te propone acciones correctivas concretas y ejecutables.',
-                output: '→ Gap analysis con 6 acciones correctivas'
-              },
-              {
-                agent: 'Andr3s',
-                step: '6',
-                title: 'Aprendizaje Continuo',
-                description: 'Andr3s- Agente Aprendizaje analiza los patrones, identifica por qué funcionan algunas cosas y otras no. El sistema se vuelve más inteligente cada vez que lo usas.',
-                output: '→ Insights para futuras implementaciones'
-              },
-              {
-                agent: 'Cat4lina',
-                step: '7',
-                title: 'Validación Legal Experta',
-                description: 'Cat4lina- Agente Legal valida todas las decisiones con la ley chilena real. Consulta base de datos SERNAC y jurisprudencia para asegurarse que todo es 100% legal. La palabra final.',
-                output: '→ Validación legal completa + precedentes SERNAC'
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="flex gap-6 lg:gap-12">
-                <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-                    {item.step}
-                  </div>
-                </div>
-                <div className="flex-grow pt-1">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <h3 className="text-xl lg:text-2xl font-semibold">{item.title}</h3>
-                    <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary font-medium">{item.agent}</span>
-                  </div>
-                  <p className="text-muted-foreground text-base mb-3">{item.description}</p>
-                  <p className="text-sm font-medium text-primary">{item.output}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Capabilities */}
-      <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-4">Capacidades de KUMPLIO</h2>
-          <p className="text-lg text-muted-foreground text-center text-balance mb-16">7 agentes inteligentes orquestados. Razonamiento transparente. Para empresas chilenas que no pueden fallar.</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            {[
-              { icon: '🧠', title: 'Chain-of-Thought Reasoning', desc: 'Cada decisión muestra su razonamiento explícito y validación multi-pass' },
-              { icon: '📊', title: 'Confidence Scoring', desc: 'Scores 0-100 en cada finding, indicando nivel de certeza del análisis' },
-              { icon: '⚖️', title: 'Cálculo de Penales', desc: 'Cuantificación precisa de riesgos en UF bajo Ley 21.719 chilena' },
-              { icon: '🎯', title: 'Roadmap Priorizado', desc: '3 fases de implementación con viabilidad y timeline realista' },
-              { icon: '🔄', title: 'Workflows Orquestados', desc: 'Ejecución coordinada de agentes con estado y monitoreo real-time' },
-              { icon: '📈', title: 'Aprendizaje Continuo', desc: 'Sistema mejora automáticamente basado en patrones e outcomes' },
-              { icon: '🛡️', title: 'Auditoría Completa', desc: 'Gap analysis, verificación de cumplimiento, trail de auditoría' },
-              { icon: '🔐', title: 'RLS + Seguridad', desc: 'Datos encriptados, Row-Level Security, cumplimiento Ley 21.719' },
-            ].map((capability, idx) => (
-              <div key={idx} className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
-                <p className="text-3xl mb-3">{capability.icon}</p>
-                <h3 className="font-semibold text-lg mb-2">{capability.title}</h3>
-                <p className="text-muted-foreground text-sm">{capability.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-6 py-24 lg:py-32 border-t border-border">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-bold">Compliance enterprise-grade para Chile</h2>
-            <p className="text-lg text-muted-foreground">7 agentes de IA, orquestación inteligente, razonamiento 100% transparente. Para empresas que necesitan cumplimiento sin ambigüedades. Desarrollado por n3uralia.com</p>
-          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" asChild>
-              <a href="/sign-up">
-                Acceso gratis
-                <ArrowRight className="w-4 h-4 ml-2" />
+            <Button size="lg" className="text-lg px-8" asChild>
+              <a href="/demo/transporte">
+                Demo: Transporte
+                <ArrowRight className="ml-2 w-5 h-5" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href="/features/ley-21719">Ver guía Ley 21.719</a>
+            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+              <a href="/demo/mineria">
+                Demo: Minería
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </a>
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">Usado por equipos de compliance en +50 empresas chilenas • 95%+ accuracy • 0 hallucinations</p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card/50 py-16">
-        <div className="container mx-auto px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-              <div>
-                <h3 className="font-semibold mb-3 text-foreground">KUMPLIO</h3>
-                <p className="text-xs text-muted-foreground">Sistema de IA y LLM para cumplimiento automático de Ley 21.719 en Chile. Desarrollado por n3uralia.com</p>
+      {/* 7 AGENTES - OUTCOMES */}
+      <section className="py-24 px-6 border-t border-border">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl font-bold mb-16">7 Agentes IA. 7 Especialistas.</h2>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Sofia */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Sofia</h3>
+                  <p className="text-sm text-muted-foreground">Analizadora de Obligaciones</p>
+                </div>
+                <span className="text-3xl">📄</span>
               </div>
-              <div>
-                <h3 className="font-semibold mb-3 text-foreground">Sobre n3uralia</h3>
-                <ul className="space-y-2 text-xs">
-                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">n3uralia.com</a></li>
-                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Inteligencia Legal</a></li>
-                  <li><a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">Compliance IA</a></li>
-                </ul>
+              <div className="text-3xl font-black text-primary">47</div>
+              <p className="text-sm">Obligaciones identificadas en tu negocio</p>
+              <p className="text-xs text-muted-foreground">Transporte: RT, SOAP, permisos, seguros • Minería: SONAMI, seguridad, ambiental</p>
+            </div>
+
+            {/* Elena */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Elena</h3>
+                  <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
+                </div>
+                <span className="text-3xl">👁️</span>
               </div>
-              <div>
-                <h3 className="font-semibold mb-3 text-foreground">Producto</h3>
-                <ul className="space-y-2 text-xs">
-                  <li><a href="/features/ley-21719" className="text-muted-foreground hover:text-primary transition">Ley 21.719</a></li>
-                  <li><a href="/sign-up" className="text-muted-foreground hover:text-primary transition">Comenzar gratis</a></li>
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Documentación</a></li>
-                </ul>
+              <div className="text-3xl font-black text-primary">24/7</div>
+              <p className="text-sm">Cambios legales en tu inbox al instante</p>
+              <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones SEREMI, cambios regulatorios</p>
+            </div>
+
+            {/* Bruno */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Bruno</h3>
+                  <p className="text-sm text-muted-foreground">Evaluador de Riesgos</p>
+                </div>
+                <span className="text-3xl">⚠️</span>
               </div>
+              <div className="text-3xl font-black text-red-600">$1.2M</div>
+              <p className="text-sm">Exposición financiera si incumples</p>
+              <p className="text-xs text-muted-foreground">Multas, sanciones, cierres operacionales</p>
+            </div>
+
+            {/* Marco */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Marco</h3>
+                  <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
+                </div>
+                <span className="text-3xl">💡</span>
+              </div>
+              <div className="text-3xl font-black text-primary">90 Días</div>
+              <p className="text-sm">Plan de acción ejecutable</p>
+              <p className="text-xs text-muted-foreground">Hitos mensuales, responsables, recursos</p>
+            </div>
+
+            {/* Laura */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Laura</h3>
+                  <p className="text-sm text-muted-foreground">Auditora de Cumplimiento</p>
+                </div>
+                <span className="text-3xl">✓</span>
+              </div>
+              <div className="text-3xl font-black text-primary">52%</div>
+              <p className="text-sm">De tus obligaciones cumpliéndose realmente</p>
+              <p className="text-xs text-muted-foreground">Auditoría independiente, verificación real</p>
+            </div>
+
+            {/* Kai */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Kai</h3>
+                  <p className="text-sm text-muted-foreground">Aprendizaje Continuo</p>
+                </div>
+                <span className="text-3xl">🧠</span>
+              </div>
+              <div className="text-3xl font-black text-primary">+5%</div>
+              <p className="text-sm">Mejora en accuracy cada mes</p>
+              <p className="text-xs text-muted-foreground">Sistema que aprende y se optimiza</p>
+            </div>
+          </div>
+
+          {/* Catarina - Full width */}
+          <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+            <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold mb-3 text-foreground">Legal</h3>
-                <ul className="space-y-2 text-xs">
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Privacidad</a></li>
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition">Términos de Servicio</a></li>
-                  <li><a href="mailto:support@kumplio.cl" className="text-muted-foreground hover:text-primary transition">Soporte</a></li>
-                </ul>
+                <h3 className="text-2xl font-bold">Catarina</h3>
+                <p className="text-sm text-muted-foreground">Reportera Legal</p>
+              </div>
+              <span className="text-3xl">📋</span>
+            </div>
+            <div className="text-3xl font-black text-primary">1 Click</div>
+            <p className="text-sm">PDF listo para reguladores</p>
+            <p className="text-xs text-muted-foreground">Compilar evidencia, reportes auditables para inspecciones</p>
+          </div>
+        </div>
+      </section>
+
+      {/* COMPARATIVA - EXCEL VS KUMPLIO */}
+      <section className="py-24 px-6 bg-card border-t border-border">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-4xl font-bold mb-16">Excel vs KUMPLIO</h2>
+
+          <div className="space-y-4">
+            {[
+              { problema: "Vencimientos que se pasan", kumplio: "Alertas 30/15/5 días automáticas" },
+              { problema: "Cambios legales que no ves", kumplio: "Monitoreo 24/7 en tiempo real" },
+              { problema: "Riesgos sin cuantificar", kumplio: "Exposición en dinero (UF, $/día)" },
+              { problema: "Recomendaciones vagas", kumplio: "Plan ejecutable mes a mes" },
+              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Laura" },
+              { problema: "Reportes manuales para reguladores", kumplio: "PDF listo en 1 click" },
+            ].map((item, i) => (
+              <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="font-semibold text-sm">{item.problema}</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="font-semibold text-sm text-green-700">{item.kumplio}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CASOS DE USO */}
+      <section className="py-24 px-6 border-t border-border">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl font-bold mb-16">Casos de Uso Reales</h2>
+
+          {/* TRANSPORTE */}
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-semibold text-primary uppercase mb-2">Caso: Transporte</p>
+                <h3 className="text-3xl font-bold">Labbe Logística</h3>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Excel)</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <span>15 multas/año. $200K en infracciones.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <span>15 horas/semana en compliance manual</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="border-t pt-4">
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (KUMPLIO)</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>0 multas. Auditorías limpias.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>0.5 horas/semana. ROI: 5 meses.</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-            <div className="border-t border-border pt-8 text-center">
-              <p className="text-xs text-muted-foreground mb-2">© 2026 KUMPLIO by <a href="https://www.n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">n3uralia.com</a>. Todos los derechos reservados.</p>
-              <p className="text-xs text-muted-foreground">Cumplimiento de Ley 21.719 con Agentes IA y LLM • Compliance para empresas chilenas</p>
+            <div className="bg-card p-8 rounded-lg border border-border">
+              <p className="text-sm text-muted-foreground mb-1">47 Obligaciones en Transporte</p>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div><p className="font-semibold">Revisión Técnica</p><p className="text-muted-foreground">Cada 6 meses</p></div>
+                <div><p className="font-semibold">SOAP</p><p className="text-muted-foreground">Anual</p></div>
+                <div><p className="font-semibold">Licencia Conducción</p><p className="text-muted-foreground">Vigencia</p></div>
+                <div><p className="font-semibold">Permiso Circulación</p><p className="text-muted-foreground">Anual</p></div>
+              </div>
+            </div>
+          </div>
+
+          {/* MINERÍA */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="bg-card p-8 rounded-lg border border-border md:order-2">
+              <p className="text-sm text-muted-foreground mb-1">180+ Obligaciones en Minería</p>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div><p className="font-semibold">Seguridad Ocupacional</p><p className="text-muted-foreground">DS 40</p></div>
+                <div><p className="font-semibold">Ambiental</p><p className="text-muted-foreground">RCA aprobada</p></div>
+                <div><p className="font-semibold">Derechos Humanos</p><p className="text-muted-foreground">Protocolo SONAMI</p></div>
+                <div><p className="font-semibold">Tributario</p><p className="text-muted-foreground">Royalties, IVA</p></div>
+              </div>
+            </div>
+            <div className="space-y-6 md:order-1">
+              <div>
+                <p className="text-sm font-semibold text-primary uppercase mb-2">Caso: Minería</p>
+                <h3 className="text-3xl font-bold">Goldcorp Chile</h3>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Alto riesgo)</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <span>Riesgo regulatorio: 45/100</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <span>Potencial multa: $1.2M</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="border-t pt-4">
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (90 días)</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Riesgo: 8/100. Controlado.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span>Evitó multa de $1.2M</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="py-24 px-6 bg-primary text-primary-foreground">
+        <div className="container mx-auto max-w-2xl text-center space-y-8">
+          <h2 className="text-5xl font-bold">Los 7 agentes de KUMPLIO están listos.</h2>
+          <p className="text-lg opacity-90">Los cambios legales no esperan. Tampoco las multas.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+              <a href="/sign-up">Empezar Ahora</a>
+            </Button>
+            <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
+              <a href="/demo/transporte">Ver Demo</a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-border py-12 px-6 bg-card">
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <p className="font-semibold mb-3">Producto</p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="/demo/transporte" className="hover:text-foreground transition">Transporte</a></li>
+                <li><a href="/demo/mineria" className="hover:text-foreground transition">Minería</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-3">Legal</p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
+                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-3">Empresa</p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
             </div>
           </div>
         </div>
