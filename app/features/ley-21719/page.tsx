@@ -21,19 +21,19 @@ export const metadata: Metadata = {
     'Cumplimiento legal chile',
   ],
   alternates: {
-    canonical: 'https://kumplio.cl/features/ley-21719',
+    canonical: 'https://kumplio.app/features/ley-21719',
     languages: {
-      'es-CL': 'https://kumplio.cl/features/ley-21719',
+      'es-CL': 'https://kumplio.app/features/ley-21719',
     },
   },
   openGraph: {
     title: 'Ley 21.719 Chile - Cumplimiento Automático con IA | KUMPLIO',
     description: 'Guía completa sobre Ley 21.719 y cómo cumplir. Soluciones automatizadas con IA.',
-    url: 'https://kumplio.cl/features/ley-21719',
+    url: 'https://kumplio.app/features/ley-21719',
     type: 'article',
     images: [
       {
-        url: 'https://kumplio.cl/og-ley-21719.png',
+        url: 'https://kumplio.app/og-ley-21719.png',
         width: 1200,
         height: 630,
         alt: 'Cumplimiento Ley 21.719 Chile',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Ley 21.719 Chile - Guía & Solución IA',
     description: 'Automatiza tu cumplimiento con KUMPLIO',
-    images: ['https://kumplio.cl/og-ley-21719.png'],
+    images: ['https://kumplio.app/og-ley-21719.png'],
   },
 }
 

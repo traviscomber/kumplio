@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://kumplio.cl'
+  const baseUrl = 'https://kumplio.app'
   const now = new Date()
   
   const routes: MetadataRoute.Sitemap = [

@@ -1,7 +1,7 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "@id": "https://kumplio.cl/#regions",
+  "@id": "https://kumplio.app/#regions",
   "name": "Cobertura Regional Chile",
   "description": "Regiones de Chile donde KUMPLIO proporciona servicios de cumplimiento legal",
   "itemListElement": [
@@ -9,7 +9,7 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Región Metropolitana de Santiago",
-      "url": "https://kumplio.cl/regiones/santiago",
+      "url": "https://kumplio.app/regiones/santiago",
       "description": "Cumplimiento legal para empresas en Santiago, Puente Alto, Maipú y comunas de la región metropolitana",
       "geo": {
         "@type": "GeoCoordinates",
@@ -21,7 +21,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": "Región de Valparaíso",
-      "url": "https://kumplio.cl/regiones/valparaiso",
+      "url": "https://kumplio.app/regiones/valparaiso",
       "description": "Servicios de compliance para Valparaíso, Viña del Mar y región del litoral central",
       "geo": {
         "@type": "GeoCoordinates",
@@ -33,7 +33,7 @@
       "@type": "ListItem",
       "position": 3,
       "name": "Región del Bío Bío",
-      "url": "https://kumplio.cl/regiones/concepcion",
+      "url": "https://kumplio.app/regiones/concepcion",
       "description": "Cumplimiento legal para empresas en Concepción, Talcahuano y sur de Chile",
       "geo": {
         "@type": "GeoCoordinates",
@@ -45,7 +45,7 @@
       "@type": "ListItem",
       "position": 4,
       "name": "Región de Antofagasta",
-      "url": "https://kumplio.cl/regiones/antofagasta",
+      "url": "https://kumplio.app/regiones/antofagasta",
       "description": "Servicios especializados para minería y empresas del norte de Chile",
       "geo": {
         "@type": "GeoCoordinates",

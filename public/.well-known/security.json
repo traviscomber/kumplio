@@ -1,0 +1,12 @@
+{
+  "change_password": "https://kumplio.app/account/change-password",
+  "passive_saml": ["https://kumplio.app/auth/saml"],
+  "security_contact": "security@kumplio.app",
+  "mta-sts": {
+    "version": "STSv1",
+    "mode": "enforce",
+    "max_age": 31536000,
+    "mx": ["mx1.kumplio.app"],
+    "ca": ["letsencrypt"]
+  }
+}

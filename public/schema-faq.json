@@ -4,42 +4,66 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "¿Qué es la Ley 21.719 en Chile?",
+      "name": "¿Qué es KUMPLIO?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "La Ley 21.719 es la normativa chilena de protección de datos personales que entró en vigencia el 1 de enero de 2023. Regula cómo las organizaciones deben recopilar, procesar y proteger datos personales, estableciendo derechos para los titulares de datos."
+        "text": "KUMPLIO es una plataforma con 7 agentes IA y LLM que automatiza el cumplimiento de Ley 21.719 en Chile. Análisis de documentos, cuantificación de riesgos, validación legal SERNAC, y roadmaps ejecutables en 90 días."
       }
     },
     {
       "@type": "Question",
-      "name": "¿A quién aplica la Ley 21.719?",
+      "name": "¿Cómo funciona el cumplimiento con KUMPLIO?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Aplica a todas las personas jurídicas, tanto públicas como privadas, que traten datos personales en Chile o que afecten derechos de personas en territorio chileno."
+        "text": "Is1dora extrae obligaciones de documentos. R0drigo cuantifica riesgos en dinero real (UTM/CLP). Jav1er genera roadmaps. Ver0nica audita. Cat4lina valida legalmente. Be4triz monitorea 24/7. Andr3s optimiza continuamente."
       }
     },
     {
       "@type": "Question",
-      "name": "¿Cuáles son las sanciones por incumplimiento?",
+      "name": "¿Cuál es el costo de KUMPLIO?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Las infracciones graves pueden resultar en multas hasta 200 UF (aproximadamente $7 millones CLP), registro público de infractores, demandas civiles y reparación de daños morales y patrimoniales."
+        "text": "Planes desde $99/mes (Startup), $299/mes (Scale), hasta soluciones Enterprise personalizadas. Sin compromisos a largo plazo. Primer diagnóstico gratis."
       }
     },
     {
       "@type": "Question",
-      "name": "¿Cómo KUMPLIO ayuda a cumplir con Ley 21.719?",
+      "name": "¿KUMPLIO cumple con Ley 21.719?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "KUMPLIO automatiza el análisis de documentos para identificar brechas de cumplimiento, extrae obligaciones legales, crea matrices de cumplimiento y proporciona alertas sobre regulaciones y plazos."
+        "text": "Sí. KUMPLIO está diseñado específicamente para cumplimiento de Ley 21.719 (protección de datos en Chile). Incluye validación con jurisprudencia SERNAC y recomendaciones certificadas."
       }
     },
     {
       "@type": "Question",
-      "name": "¿Qué obligaciones impone Ley 21.719?",
+      "name": "¿Qué industrias pueden usar KUMPLIO?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Las principales obligaciones incluyen: obtener consentimiento informado, transparencia en aviso de privacidad, derechos de acceso y portabilidad, seguridad de datos, gestión de incidentes de seguridad y respuesta a autoridades de control."
+        "text": "Todos. Transporte, minería, manufactura, retail, fintech, healthcare, cualquier empresa con obligaciones regulatorias en Chile."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tiempo tarda el análisis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "60 segundos para extracción de obligaciones. Análisis completo de riesgos y roadmap en menos de 5 minutos. Real-time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es seguro usar KUMPLIO con datos sensibles?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. KUMPLIO cumple con Ley 21.719, tiene encriptación end-to-end, auditoría independiente trimestral, y SLA 99.9% en plans Enterprise."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es la Ley 21.719?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ley chilena de protección de datos personales. Regula recopilación, procesamiento y protección de datos. Aplica a todas las organizaciones en Chile."
       }
     }
   ]

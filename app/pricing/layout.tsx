@@ -13,19 +13,19 @@ export const metadata: Metadata = {
     'ley 21.719 software costo',
   ],
   alternates: {
-    canonical: 'https://kumplio.cl/pricing',
+    canonical: 'https://kumplio.app/pricing',
     languages: {
-      'es-CL': 'https://kumplio.cl/pricing',
+      'es-CL': 'https://kumplio.app/pricing',
     },
   },
   openGraph: {
     title: 'Planes de Precios KUMPLIO - Cumplimiento Legal IA',
     description: 'Planes flexibles. Prueba gratuita. Sin tarjeta de crédito.',
-    url: 'https://kumplio.cl/pricing',
+    url: 'https://kumplio.app/pricing',
     type: 'website',
     images: [
       {
-        url: 'https://kumplio.cl/og-pricing.png',
+        url: 'https://kumplio.app/og-pricing.png',
         width: 1200,
         height: 630,
         alt: 'Planes de Precios KUMPLIO',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Planes KUMPLIO - Cumplimiento IA',
     description: 'Prueba gratis. Sin tarjeta de crédito.',
-    images: ['https://kumplio.cl/og-pricing.png'],
+    images: ['https://kumplio.app/og-pricing.png'],
   },
 }
 

@@ -199,8 +199,8 @@ export function Footer() {
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-primary" />
-                  <a href="mailto:info@kumplio.cl" className="text-muted-foreground hover:text-primary transition">
-                    info@kumplio.cl
+                  <a href="mailto:info@kumplio.app" className="text-muted-foreground hover:text-primary transition">
+                    info@kumplio.app
                   </a>
                 </li>
                 <li className="flex items-center gap-3">

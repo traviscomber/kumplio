@@ -1,23 +1,57 @@
+# Google Crawlers - Aggressive indexing for fast discovery
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+Request-rate: 100/1s
+
+# Bing Crawlers
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0.5
+Request-rate: 50/1s
+
+# Yahoo Crawlers
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Yandex
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+# Default for all other crawlers
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /(auth)/*
-Disallow: /dashboard/*
 Disallow: /admin/*
+Disallow: /dashboard/*
 Disallow: /.well-known/pki-validation/
-
-Sitemap: https://kumplio.cl/sitemap.xml
-
-# Chile-specific crawl delay
-User-agent: *
+Disallow: /.git/
+Disallow: /node_modules/
 Crawl-delay: 1
 
-# Bing
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
+# Multiple Sitemaps for comprehensive coverage
+Sitemap: https://kumplio.app/sitemap.xml
+Sitemap: https://kumplio.app/sitemap-main.xml
+Sitemap: https://kumplio.app/sitemap-industries.xml
+Sitemap: https://kumplio.app/sitemap-regions.xml
 
-# Google
-User-agent: Googlebot
+# Critical Pages - Always Index
 Allow: /
-Crawl-delay: 0.5
+Allow: /pricing
+Allow: /features/
+Allow: /resources/
+Allow: /contact
+Allow: /about
+Allow: /privacy
+Allow: /terms
+
+# Performance: Set max-snippet for fast display
+# max-snippet: -1 (unlimited)
+

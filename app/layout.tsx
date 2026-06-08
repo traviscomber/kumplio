@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/app/providers'
+import { VeraFloatingChat } from '@/components/vera-floating-chat'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -72,9 +73,9 @@ export const metadata: Metadata = {
     // Brand & Organization
     'n3uralia',
     'KUMPLIO',
-    'kumplio.cl',
+    'kumplio.app',
   ],
-  generator: 'kumplio.cl',
+  generator: 'kumplio.app',
   referrer: 'strict-origin-when-cross-origin',
   authors: [{ name: 'KUMPLIO by n3uralia', url: 'https://www.n3uralia.com' }],
   creator: 'KUMPLIO (n3uralia.com)',
@@ -88,22 +89,22 @@ export const metadata: Metadata = {
     maxVideoPreview: -1,
   },
   alternates: {
-    canonical: 'https://kumplio.cl',
+    canonical: 'https://kumplio.app',
     languages: {
-      'es-CL': 'https://kumplio.cl',
+      'es-CL': 'https://kumplio.app',
       'es-ES': 'https://kumplio.es',
     },
   },
   openGraph: {
     type: 'website',
     locale: 'es_CL',
-    url: 'https://kumplio.cl',
+    url: 'https://kumplio.app',
     siteName: 'KUMPLIO - Compliance IA para Ley 21.719',
     title: 'KUMPLIO: Agentes IA para Cumplimiento Ley 21.719 | Desarrollado por n3uralia',
     description: 'Sistema experto con 7 agentes IA y LLM para automatizar cumplimiento de Ley 21.719. Análisis de documentos, cuantificación de riesgos, recomendaciones estratégicas. Desarrollado por n3uralia.com para empresas chilenas.',
     images: [
       {
-        url: 'https://kumplio.cl/og-image.png',
+        url: 'https://kumplio.app/og-image.png',
         width: 1200,
         height: 630,
         alt: 'KUMPLIO - Sistema de Compliance IA | n3uralia.com',
@@ -114,7 +115,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'KUMPLIO: IA para Cumplimiento Ley 21.719 | n3uralia',
     description: 'Agentes IA expertos en compliance legal. Análisis automático con LLM. Desarrollado por n3uralia.com',
-    images: ['https://kumplio.cl/twitter-image.png'],
+    images: ['https://kumplio.app/twitter-image.png'],
     creator: '@kumplio_cl',
   },
   icons: {
@@ -174,13 +175,13 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'KUMPLIO by n3uralia',
-              url: 'https://kumplio.cl',
+              url: 'https://kumplio.app',
               parentOrganization: {
                 '@type': 'Organization',
                 name: 'n3uralia',
                 url: 'https://www.n3uralia.com',
               },
-              logo: 'https://kumplio.cl/logo.png',
+              logo: 'https://kumplio.app/logo.png',
               description: 'Plataforma de IA y LLM para cumplimiento automático de Ley 21.719 con 7 agentes expertos. Desarrollado por n3uralia.com',
               sameAs: [
                 'https://www.linkedin.com/company/kumplio',
@@ -194,7 +195,7 @@ export default function RootLayout({
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'Customer Support',
-                email: 'support@kumplio.cl',
+                email: 'support@kumplio.app',
                 availableLanguage: 'es-CL',
               },
             }),
@@ -209,7 +210,7 @@ export default function RootLayout({
               name: 'KUMPLIO',
               description: 'Sistema experto con IA y LLM para cumplimiento automático de Ley 21.719 en Chile',
               applicationCategory: 'BusinessApplication',
-              url: 'https://kumplio.cl',
+              url: 'https://kumplio.app',
               creator: {
                 '@type': 'Organization',
                 name: 'n3uralia',
@@ -247,7 +248,7 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'LocalBusiness',
               name: 'KUMPLIO Chile',
-              url: 'https://kumplio.cl',
+              url: 'https://kumplio.app',
               description: 'Cumplimiento legal con IA para empresas chilenas',
               geo: {
                 '@type': 'GeoShape',
@@ -277,6 +278,7 @@ export default function RootLayout({
       <body className="font-sans antialiased text-foreground">
         <ClientProviders>
           {children}
+          <VeraFloatingChat />
         </ClientProviders>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

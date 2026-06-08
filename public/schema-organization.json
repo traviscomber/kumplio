@@ -1,0 +1,74 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://kumplio.app/#organization",
+  "name": "KUMPLIO by n3uralia",
+  "alternateName": ["KUMPLIO", "Kumplio"],
+  "description": "Plataforma con IA y LLM para cumplimiento automático de Ley 21.719 en Chile. 7 agentes expertos para análisis de documentos, cuantificación de riesgos, y roadmaps de cumplimiento legal.",
+  "url": "https://kumplio.app",
+  "logo": "https://kumplio.app/logo.png",
+  "image": "https://kumplio.app/og-image.png",
+  "email": "support@kumplio.app",
+  "telephone": "+56 2 XXXX XXXX",
+  "areaServed": {
+    "@type": "Country",
+    "name": "CL",
+    "url": "https://www.wikidata.org/wiki/Q298"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "Customer Support",
+    "email": "support@kumplio.app",
+    "telephone": "+56 2 XXXX XXXX",
+    "availableLanguage": ["es-CL", "es"],
+    "hoursAvailable": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "18:00",
+      "timezone": "America/Santiago"
+    }
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Santiago, Chile",
+    "addressLocality": "Santiago",
+    "addressRegion": "RM",
+    "postalCode": "",
+    "addressCountry": "CL"
+  },
+  "parentOrganization": {
+    "@type": "Organization",
+    "@id": "https://www.n3uralia.com/#organization",
+    "name": "n3uralia",
+    "url": "https://www.n3uralia.com"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/kumplio",
+    "https://twitter.com/kumplio_cl",
+    "https://www.n3uralia.com"
+  ],
+  "knowsAbout": [
+    "Inteligencia Artificial",
+    "Large Language Models (LLM)",
+    "Cumplimiento Legal",
+    "Protección de Datos",
+    "Compliance Automático",
+    "Análisis de Documentos",
+    "Riesgo Legal",
+    "Ley 21.719",
+    "SERNAC"
+  ],
+  "foundingDate": "2024",
+  "foundingLocation": "Santiago, Chile",
+  "legalForm": "SPA",
+  "slogan": "7 Agentes IA para Cumplimiento Legal en Chile",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "@id": "https://kumplio.app/#rating",
+    "ratingValue": "4.9",
+    "ratingCount": "150",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+}
