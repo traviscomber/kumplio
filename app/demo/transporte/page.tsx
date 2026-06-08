@@ -76,42 +76,42 @@ export default function TransporteDemoPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Vehículos detenidos por documentos vencidos</p>
                   <p className="text-sm text-muted-foreground mt-1">RT vencida, SOAP caducado, permiso de circulación expirado</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">$500K</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">$500K</p>
                 <p className="text-sm text-muted-foreground">Costo de operación detenida por 1 día</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">15 multas al año por incumplimientos</p>
                   <p className="text-sm text-muted-foreground mt-1">Licencia vencida, documentos no actualizados, carga mal asegurada</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">$200K</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">$200K</p>
                 <p className="text-sm text-muted-foreground">En infracciones anuales</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Mandantes exigentes piden carpetas actualizadas</p>
                   <p className="text-sm text-muted-foreground mt-1">Auditorías continuas, evidencia documentada, trazabilidad completa</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">15 hrs</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">15 hrs</p>
                 <p className="text-sm text-muted-foreground">Tiempo manual por semana</p>
               </div>
             </div>
@@ -221,8 +221,8 @@ export default function TransporteDemoPage() {
             <div className="p-8 rounded-lg border border-border bg-background">
               <p className="text-sm text-muted-foreground mb-2">Multas/Año</p>
               <div className="mb-4">
-                <p className="text-4xl font-black text-red-600">15</p>
-                <p className="text-xs text-red-600 font-semibold">→</p>
+                <p className="text-4xl font-black text-muted-foreground">15</p>
+                <p className="text-xs text-muted-foreground font-semibold">→</p>
                 <p className="text-4xl font-black text-primary">0</p>
               </div>
               <p className="text-xs text-muted-foreground">Cero infracciones, auditorías limpias</p>
