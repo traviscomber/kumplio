@@ -1,0 +1,54 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "https://kumplio.cl/#industries",
+  "name": "Industrias Soportadas",
+  "description": "Sectores industriales donde KUMPLIO proporciona soluciones de cumplimiento legal especializado",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Transporte y Logística",
+      "url": "https://kumplio.cl/demo/transporte",
+      "description": "Cumplimiento de regulaciones de transporte, licencias, seguridad vial y responsabilidad civil",
+      "image": "https://kumplio.cl/industries/transporte.jpg",
+      "inLanguage": "es-CL"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Minería",
+      "url": "https://kumplio.cl/demo/mineria",
+      "description": "Normativas de seguridad minera, ambiental, laboral y regulaciones específicas de la industria",
+      "image": "https://kumplio.cl/industries/mineria.jpg",
+      "inLanguage": "es-CL"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Manufactura",
+      "url": "https://kumplio.cl/demo/manufactura",
+      "description": "Regulaciones de seguridad industrial, ambientales, laborales y normativas sectoriales",
+      "image": "https://kumplio.cl/industries/manufactura.jpg",
+      "inLanguage": "es-CL"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Retail y Comercio",
+      "url": "https://kumplio.cl/demo/retail",
+      "description": "Protección de datos, publicidad, defensa del consumidor y normativas comerciales",
+      "image": "https://kumplio.cl/industries/retail.jpg",
+      "inLanguage": "es-CL"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Fintech",
+      "url": "https://kumplio.cl/demo/fintech",
+      "description": "Regulaciones financieras, AML/KYC, protección de datos y normativas de ciberseguridad",
+      "image": "https://kumplio.cl/industries/fintech.jpg",
+      "inLanguage": "es-CL"
+    }
+  ]
+}

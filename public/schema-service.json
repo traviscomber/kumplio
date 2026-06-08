@@ -1,0 +1,79 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": "https://kumplio.cl/#service",
+  "name": "Cumplimiento Legal Automático con IA - Ley 21.719 Chile",
+  "description": "Plataforma de IA y LLM para cumplimiento automático de Ley 21.719 y regulaciones legales chilenas. Sistema experto con 7 agentes IA especializados en análisis de documentos, cuantificación de riesgos y generación de roadmaps de cumplimiento.",
+  "provider": {
+    "@type": "Organization",
+    "name": "KUMPLIO by n3uralia",
+    "url": "https://kumplio.cl",
+    "logo": "https://kumplio.cl/logo.png",
+    "sameAs": [
+      "https://www.linkedin.com/company/kumplio",
+      "https://www.n3uralia.com"
+    ]
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "CL"
+  },
+  "availableLanguage": "es-CL",
+  "serviceType": [
+    "Legal Compliance",
+    "Risk Management",
+    "Document Analysis",
+    "Regulatory Monitoring"
+  ],
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CLP",
+    "description": "Prueba gratuita sin tarjeta de crédito"
+  },
+  "hasPart": [
+    {
+      "@type": "Service",
+      "name": "Análisis de Obligaciones Legales",
+      "description": "Identificación automática de obligaciones aplicables según industria y jurisdicción"
+    },
+    {
+      "@type": "Service",
+      "name": "Cuantificación de Riesgos",
+      "description": "Análisis de exposición financiera y evaluación de sanciones"
+    },
+    {
+      "@type": "Service",
+      "name": "Generación de Roadmaps",
+      "description": "Planes de acción ejecutables para cumplimiento"
+    },
+    {
+      "@type": "Service",
+      "name": "Monitoreo Regulatorio 24/7",
+      "description": "Alertas sobre cambios en regulaciones aplicables"
+    },
+    {
+      "@type": "Service",
+      "name": "Auditoría Independiente",
+      "description": "Validación del cumplimiento real de obligaciones"
+    }
+  ],
+  "audience": [
+    {
+      "@type": "Audience",
+      "audienceType": "Empresas Transporte"
+    },
+    {
+      "@type": "Audience",
+      "audienceType": "Empresas Minería"
+    },
+    {
+      "@type": "Audience",
+      "audienceType": "Empresas Manufactura"
+    },
+    {
+      "@type": "Audience",
+      "audienceType": "Empresas Fintech"
+    }
+  ]
+}

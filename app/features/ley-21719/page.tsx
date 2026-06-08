@@ -4,18 +4,46 @@ import { ArrowRight, Shield, CheckCircle, AlertTriangle, FileText } from 'lucide
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Cumplimiento Ley 21.719 Chile | KUMPLIO - Guía Completa',
-  description: 'Guía completa sobre Ley 21.719 de protección de datos en Chile. Cómo cumplir con obligaciones legales, riesgos de incumplimiento y soluciones con KUMPLIO.',
+  title: 'Cumplimiento Ley 21.719 Chile | KUMPLIO - Guía Completa & Solución IA',
+  description: 'Guía completa sobre Ley 21.719 de protección de datos en Chile. Cómo cumplir con obligaciones, riesgos de incumplimiento, multas, sanciones y soluciones automatizadas con IA.',
   keywords: [
     'Ley 21.719',
+    'Ley 21.719 chile',
     'Protección de datos Chile',
     'LGPD Chile',
     'Cumplimiento Ley 21.719',
-    'Regulaciones Chile',
-    'Protección datos personales',
+    'Ley protección datos personales',
+    'Regulaciones Chile datos',
+    'Obligaciones Ley 21.719',
+    'Cumplimiento normativo datos',
+    'Privacidad datos personales',
+    'Cumplimiento legal chile',
   ],
   alternates: {
     canonical: 'https://kumplio.cl/features/ley-21719',
+    languages: {
+      'es-CL': 'https://kumplio.cl/features/ley-21719',
+    },
+  },
+  openGraph: {
+    title: 'Ley 21.719 Chile - Cumplimiento Automático con IA | KUMPLIO',
+    description: 'Guía completa sobre Ley 21.719 y cómo cumplir. Soluciones automatizadas con IA.',
+    url: 'https://kumplio.cl/features/ley-21719',
+    type: 'article',
+    images: [
+      {
+        url: 'https://kumplio.cl/og-ley-21719.png',
+        width: 1200,
+        height: 630,
+        alt: 'Cumplimiento Ley 21.719 Chile',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ley 21.719 Chile - Guía & Solución IA',
+    description: 'Automatiza tu cumplimiento con KUMPLIO',
+    images: ['https://kumplio.cl/og-ley-21719.png'],
   },
 }
 
