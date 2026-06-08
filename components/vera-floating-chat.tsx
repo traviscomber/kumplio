@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { MessageCircle, X, Send } from 'lucide-react'
+import { MessageCircle, X, Send, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
