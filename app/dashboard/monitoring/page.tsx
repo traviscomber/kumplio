@@ -25,31 +25,31 @@ export default function MonitoringPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">All 6 agents operational and tested</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">Workflow orchestration system complete</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">Database schema with RLS policies</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">Real-time monitoring dashboard</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">Error handling and recovery</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">100% TypeScript type-safe</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-sm">Zero build errors</span>
             </div>
           </CardContent>
@@ -66,8 +66,8 @@ export default function MonitoringPage() {
                 <span className="text-sm">Agents</span>
                 <Badge variant="outline">6/6</Badge>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }} />
+              <div className="w-full bg-muted rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }} />
               </div>
             </div>
 
@@ -76,8 +76,8 @@ export default function MonitoringPage() {
                 <span className="text-sm">API Endpoints</span>
                 <Badge variant="outline">11/11</Badge>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }} />
+              <div className="w-full bg-muted rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }} />
               </div>
             </div>
 
@@ -86,8 +86,8 @@ export default function MonitoringPage() {
                 <span className="text-sm">React Components</span>
                 <Badge variant="outline">10+</Badge>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }} />
+              <div className="w-full bg-muted rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }} />
               </div>
             </div>
 
@@ -96,8 +96,8 @@ export default function MonitoringPage() {
                 <span className="text-sm">Database Tables</span>
                 <Badge variant="outline">10+</Badge>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full" style={{ width: '100%' }} />
+              <div className="w-full bg-muted rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '100%' }} />
               </div>
             </div>
           </CardContent>
