@@ -225,21 +225,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold mb-4">Los 7 Especialistas IA del Sistema</h2>
           <p className="text-muted-foreground mb-16 max-w-2xl">Cada agente es un experto en su dominio. Juntos forman un sistema de razonamiento ultra-inteligente que aprende de cada decisión.</p>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {/* 7. Catalina - HERO AGENT - moved first for legal validation prominence */}
-            <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold">7. Cat4lina</h3>
-                  <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
-                </div>
-                <span className="text-3xl text-primary">★</span>
-              </div>
-              <div className="text-3xl font-black text-primary">100% Auditable</div>
-              <p className="text-sm font-semibold">Cada decisión cita el artículo de ley + precedente SERNAC específico</p>
-              <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
-            </div>
-
+          <div className="grid md:grid-cols-2 gap-6">
             {/* 1. Isidora */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
@@ -268,20 +254,6 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">~$1.400M CLP en infracción gravísima. Exacto, en dinero real.</p>
             </div>
 
-            {/* 4. Beatriz - Monitoring */}
-            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold">4. Be4triz</h3>
-                  <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
-                </div>
-                <span className="text-3xl text-muted-foreground">●</span>
-              </div>
-              <div className="text-3xl font-black text-primary">24/7</div>
-              <p className="text-sm">Cambios de ley notificados antes</p>
-              <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
-            </div>
-
             {/* 3. Javier - Action Plan */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
@@ -294,6 +266,20 @@ export default function HomePage() {
               <div className="text-3xl font-black text-primary">90 Días</div>
               <p className="text-sm">Plan ejecutable, viabilidad real</p>
               <p className="text-xs text-muted-foreground">3 fases, hitos mensuales, responsables, recursos — no un checklist</p>
+            </div>
+
+            {/* 4. Beatriz - Monitoring */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">4. Be4triz</h3>
+                  <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
+                </div>
+                <span className="text-3xl text-muted-foreground">●</span>
+              </div>
+              <div className="text-3xl font-black text-primary">24/7</div>
+              <p className="text-sm">Cambios de ley notificados antes</p>
+              <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
             </div>
 
             {/* 5. Verónica - Audit */}
@@ -322,6 +308,20 @@ export default function HomePage() {
               <div className="text-3xl font-black text-primary">+5% Mejora</div>
               <p className="text-sm">Feedback continuo para mejorar el sistema</p>
               <p className="text-xs text-muted-foreground">Cada auditoría entrena al sistema. KUMPLIO mejora mensualmente.</p>
+            </div>
+
+            {/* 7. Catalina - HERO AGENT - moved last for final validation prominence */}
+            <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">7. Cat4lina</h3>
+                  <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
+                </div>
+                <span className="text-3xl text-primary">★</span>
+              </div>
+              <div className="text-3xl font-black text-primary">100% Auditable</div>
+              <p className="text-sm font-semibold">Cada decisión cita el artículo de ley + precedente SERNAC específico</p>
+              <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
             </div>
           </div>
         </div>
