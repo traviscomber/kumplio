@@ -45,44 +45,48 @@ export function CountdownTimer() {
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      <div className="relative">
-        {/* SVG with red crossing lines */}
-        <svg
-          className="absolute inset-0 w-full h-full"
-          style={{ pointerEvents: 'none' }}
-          viewBox="0 0 300 120"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* Top-left to bottom-right diagonal */}
-          <line x1="20" y1="10" x2="280" y2="110" stroke="#ef4444" strokeWidth="3" />
-          {/* Top-right to bottom-left diagonal */}
-          <line x1="280" y1="10" x2="20" y2="110" stroke="#ef4444" strokeWidth="3" />
-        </svg>
+      {/* Large seconds counter - HIDDEN */}
+      <div className="hidden">
+        <div className="relative">
+          {/* SVG with red crossing lines */}
+          <svg
+            className="absolute inset-0 w-full h-full"
+            style={{ pointerEvents: 'none' }}
+            viewBox="0 0 300 120"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            {/* Top-left to bottom-right diagonal */}
+            <line x1="20" y1="10" x2="280" y2="110" stroke="#ef4444" strokeWidth="3" />
+            {/* Top-right to bottom-left diagonal */}
+            <line x1="280" y1="10" x2="20" y2="110" stroke="#ef4444" strokeWidth="3" />
+          </svg>
 
-        <div className="text-7xl md:text-8xl font-black tabular-nums relative z-10">
-          <div className="text-primary mb-6">{String(seconds).padStart(6, '0')}</div>
-          <div className="text-sm md:text-base font-semibold text-muted-foreground">
-            SEGUNDOS
+          <div className="text-7xl md:text-8xl font-black tabular-nums relative z-10">
+            <div className="text-primary mb-6">{String(seconds).padStart(6, '0')}</div>
+            <div className="text-sm md:text-base font-semibold text-muted-foreground">
+              SEGUNDOS
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-4 gap-4 mt-12 text-center">
+      {/* Breakdown display - Visible */}
+      <div className="grid grid-cols-4 gap-8 text-center">
         <div>
-          <div className="text-3xl md:text-4xl font-bold text-primary">{days}</div>
-          <div className="text-xs text-muted-foreground mt-2">Días</div>
+          <div className="text-4xl md:text-5xl font-bold text-primary">{days}</div>
+          <div className="text-sm text-muted-foreground mt-2">Días</div>
         </div>
         <div>
-          <div className="text-3xl md:text-4xl font-bold text-primary">{String(hours).padStart(2, '0')}</div>
-          <div className="text-xs text-muted-foreground mt-2">Horas</div>
+          <div className="text-4xl md:text-5xl font-bold text-primary">{String(hours).padStart(2, '0')}</div>
+          <div className="text-sm text-muted-foreground mt-2">Horas</div>
         </div>
         <div>
-          <div className="text-3xl md:text-4xl font-bold text-primary">{String(minutes).padStart(2, '0')}</div>
-          <div className="text-xs text-muted-foreground mt-2">Min</div>
+          <div className="text-4xl md:text-5xl font-bold text-primary">{String(minutes).padStart(2, '0')}</div>
+          <div className="text-sm text-muted-foreground mt-2">Min</div>
         </div>
         <div>
-          <div className="text-3xl md:text-4xl font-bold text-primary">{String(secs).padStart(2, '0')}</div>
-          <div className="text-xs text-muted-foreground mt-2">Seg</div>
+          <div className="text-4xl md:text-5xl font-bold text-primary">{String(secs).padStart(2, '0')}</div>
+          <div className="text-sm text-muted-foreground mt-2">Seg</div>
         </div>
       </div>
     </div>
