@@ -87,6 +87,65 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* LEAD MAGNET - FREE DIAGNOSIS */}
+      <section className="py-24 px-6 bg-primary/5 border-t border-primary/30">
+        <div className="container mx-auto max-w-4xl">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold">Diagnóstico Gratis en 60 Segundos</h2>
+              <p className="text-lg text-muted-foreground">Sube un documento (contrato, política, RAT) y descubre:</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold text-lg">✓</span>
+                  <span>Todas tus obligaciones según Ley 21.719</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold text-lg">✓</span>
+                  <span>Brecha (gap) exacta de cumplimiento</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold text-lg">✓</span>
+                  <span>Exposición financiera en UF/CLP real</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold text-lg">✓</span>
+                  <span>Reporte ejecutivo (2 páginas) listo para imprimir</span>
+                </li>
+              </ul>
+              <p className="text-sm text-muted-foreground italic">Sin tarjeta de crédito. Sin compromisos.</p>
+              <Button size="lg" className="text-lg px-8 bg-primary text-black hover:bg-primary/80 font-semibold" asChild>
+                <a href="/sign-up">
+                  Obtener Diagnóstico Gratis
+                  <ArrowRight className="ml-3 w-5 h-5" />
+                </a>
+              </Button>
+            </div>
+
+            <div className="bg-card border border-border rounded-lg p-8 space-y-6">
+              <h3 className="font-bold text-lg">Qué recibes al terminar:</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="font-semibold text-sm">Reporte Ejecutivo</p>
+                  <p className="text-xs text-muted-foreground">Resumen de 34 obligaciones identificadas</p>
+                </div>
+                <div className="border-t pt-4 space-y-2">
+                  <p className="font-semibold text-sm">Cuantificación de Riesgos</p>
+                  <p className="text-xs text-muted-foreground">Exposición exacta en UF y CLP según tu sector</p>
+                </div>
+                <div className="border-t pt-4 space-y-2">
+                  <p className="font-semibold text-sm">Prioridades de Acción</p>
+                  <p className="text-xs text-muted-foreground">Top 5 obligaciones críticas para tu empresa</p>
+                </div>
+                <div className="border-t pt-4 space-y-2">
+                  <p className="font-semibold text-sm">Roadmap Inicial</p>
+                  <p className="text-xs text-muted-foreground">Plan de 90 días para alcanzar cumplimiento</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SYSTEM ARCHITECTURE - IA FIRST */}
       <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
         <div className="container mx-auto max-w-6xl">
