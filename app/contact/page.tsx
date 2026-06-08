@@ -126,8 +126,8 @@ export default function ContactPage() {
                     <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-sm mb-1">Teléfono</p>
-                      <a href="tel:+5612345678" className="text-sm text-muted-foreground hover:text-primary transition">
-                        +56 (2) 1234 5678
+                      <a href="tel:+56993826127" className="text-sm text-muted-foreground hover:text-primary transition">
+                        +56 9 9382-6127
                       </a>
                     </div>
                   </div>

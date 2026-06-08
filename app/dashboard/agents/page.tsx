@@ -23,7 +23,7 @@ export default function AgentsDashboardPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Sofia - Analizador de Documentos</CardTitle>
+            <CardTitle>Isidora - Analizador de Documentos</CardTitle>
             <CardDescription>Extrae obligaciones y estructura documentos legales</CardDescription>
           </CardHeader>
           <CardContent>
@@ -38,7 +38,7 @@ export default function AgentsDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Elena - Monitor Regulatorio</CardTitle>
+            <CardTitle>Rodrigo - Monitor Regulatorio</CardTitle>
             <CardDescription>Rastrea cambios regulatorios y requisitos de cumplimiento</CardDescription>
           </CardHeader>
           <CardContent>
@@ -53,7 +53,7 @@ export default function AgentsDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Bruno - Evaluador de Riesgos</CardTitle>
+            <CardTitle>Javier - Evaluador de Riesgos</CardTitle>
             <CardDescription>Cuantifica riesgos de cumplimiento y sanciones</CardDescription>
           </CardHeader>
           <CardContent>
@@ -68,7 +68,7 @@ export default function AgentsDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Marco - Asesor de Cumplimiento</CardTitle>
+            <CardTitle>Beatriz - Asesora de Cumplimiento</CardTitle>
             <CardDescription>Genera recomendaciones priorizadas</CardDescription>
           </CardHeader>
           <CardContent>
@@ -83,7 +83,7 @@ export default function AgentsDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Laura - Auditora de Cumplimiento</CardTitle>
+            <CardTitle>Verónica - Auditora de Cumplimiento</CardTitle>
             <CardDescription>Verifica estado de cumplimiento y rastrea progreso</CardDescription>
           </CardHeader>
           <CardContent>
@@ -98,7 +98,7 @@ export default function AgentsDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Kai - Aprendizaje Continuo</CardTitle>
+            <CardTitle>Andrés - Aprendizaje Continuo</CardTitle>
             <CardDescription>Mejora el sistema basado en resultados</CardDescription>
           </CardHeader>
           <CardContent>
@@ -120,21 +120,21 @@ export default function AgentsDashboardPage() {
           <div>
             <h4 className="font-semibold">Pipeline de análisis completo (sistema de 6 agentes)</h4>
             <ol className="mt-2 space-y-2 text-sm">
-              <li>1. Sofia analiza tu documento → extrae obligaciones</li>
-              <li>2. Elena monitorea regulaciones → identifica leyes aplicables</li>
-              <li>3. Bruno evalúa riesgos → calcula sanciones y exposición</li>
-              <li>4. Marco genera recomendaciones → crea hoja de ruta de implementación</li>
-              <li>5. Laura audita cumplimiento → verifica qué se ha realizado</li>
-              <li>6. Kai aprende de resultados → mejora análisis futuros</li>
+              <li>1. Isidora analiza tu documento → extrae obligaciones</li>
+              <li>2. Rodrigo monitorea regulaciones → identifica leyes aplicables</li>
+              <li>3. Javier evalúa riesgos → calcula sanciones y exposición</li>
+              <li>4. Beatriz genera recomendaciones → crea hoja de ruta de implementación</li>
+              <li>5. Verónica audita cumplimiento → verifica qué se ha realizado</li>
+              <li>6. Andrés aprende de resultados → mejora análisis futuros</li>
             </ol>
           </div>
 
           <div>
             <h4 className="font-semibold">Escaneo rápido (sistema de 3 agentes)</h4>
             <ol className="mt-2 space-y-2 text-sm">
-              <li>1. Sofia extrae obligaciones</li>
-              <li>2. Bruno identifica riesgos principales</li>
-              <li>3. Marco prioriza acciones</li>
+              <li>1. Isidora extrae obligaciones</li>
+              <li>2. Javier identifica riesgos principales</li>
+              <li>3. Beatriz prioriza acciones</li>
             </ol>
           </div>
 

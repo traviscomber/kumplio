@@ -162,8 +162,8 @@ export default function RootLayout({
         {/* Geographic & Geo Tags for Chile */}
         <meta name="geo.placename" content="Chile" />
         <meta name="geo.region" content="CL" />
-        <meta name="geo.position" content="-33.8688;-151.2093" />
-        <meta name="ICBM" content="-33.8688,-151.2093" />
+        <meta name="geo.position" content="-33.4489;-70.6693" />
+        <meta name="ICBM" content="-33.4489,-70.6693" />
         
         {/* Regional Coverage Meta Tags */}
         <meta name="coverage" content="Chile" />

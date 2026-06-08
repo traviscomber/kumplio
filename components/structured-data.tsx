@@ -23,7 +23,7 @@ export function StructuredData() {
             ],
             contactPoint: {
               '@type': 'ContactPoint',
-              telephone: '+56-9-93826127',
+              telephone: '+56-9-9382-6127',
               contactType: 'Customer Service',
               email: 'support@kumplio.cl',
               availableLanguage: ['es', 'en'],

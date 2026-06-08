@@ -199,7 +199,7 @@ export default function PrivacyPage() {
               <p className="text-muted-foreground">
                 KUMPLIO by n3uralia<br/>
                 Email: privacy@kumplio.cl<br/>
-                Teléfono: +56 9 93826127<br/>
+                Teléfono: +56 9 9382-6127<br/>
                 Dirección: Santiago, Chile<br/>
                 Sitio Web: https://kumplio.cl
               </p>

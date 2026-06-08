@@ -18,15 +18,15 @@ const plans = [
     highlighted: false,
     outcomes: [
       { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
-      { text: '1 agente: Sofia (análisis básico)', main: false },
+      { text: '1 agente: Isidora (análisis básico)', main: false },
       { text: 'Alertas de cambios regulatorios', main: false },
       { text: 'Reportes mensuales', main: false },
       { text: 'Email support', main: false },
     ],
     notIncluded: [
-      'Evaluación de riesgos (Bruno)',
-      'Planes de acción (Marco)',
-      'Auditoría independiente (Laura)',
+      'Evaluación de riesgos (Javier)',
+      'Planes de acción (Beatriz)',
+      'Auditoría independiente (Verónica)',
       'Reportes PDF certificados',
     ]
   },
@@ -42,7 +42,7 @@ const plans = [
     badge: 'Más Popular',
     outcomes: [
       { text: '180+ obligaciones mapeadas', main: true },
-      { text: '4 agentes: Sofia, Elena, Bruno, Marco', main: false },
+      { text: '4 agentes: Isidora, Rodrigo, Javier, Beatriz', main: false },
       { text: 'Monitoreo 24/7 de regulaciones chilenas', main: false },
       { text: 'Evaluación de riesgos en UF/dinero', main: false },
       { text: 'Planes de acción priorizados 90 días', main: false },

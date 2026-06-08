@@ -212,7 +212,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Bruno cuantifica la exposición real</h3>
+                  <h3 className="font-semibold mb-1">Javier cuantifica la exposición real</h3>
                   <p className="text-sm text-muted-foreground">$1.2M en riesgos, cierres operacionales, daño reputacional. Números claros.</p>
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Marco genera roadmap de implementación</h3>
+                  <h3 className="font-semibold mb-1">Beatriz genera roadmap de implementación</h3>
                   <p className="text-sm text-muted-foreground">90 días, hitos claros, recursos definidos. Viabilidad realista.</p>
                 </div>
               </div>
@@ -232,7 +232,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Laura audita qué se está cumpliendo realmente</h3>
+                  <h3 className="font-semibold mb-1">Verónica audita qué se está cumpliendo realmente</h3>
                   <p className="text-sm text-muted-foreground">Verificación independiente, gap analysis, acciones correctivas documentadas.</p>
                 </div>
               </div>
@@ -294,15 +294,15 @@ export default function MineriaDemoPage() {
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Semana 2:</strong> Bruno identificó 5 incumplimientos críticos. Exposición real: $1.2M.</span>
+                <span><strong>Semana 2:</strong> Javier identificó 5 incumplimientos críticos. Exposición real: $1.2M.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Semana 3-8:</strong> Marco ejecutó plan. Implementaron sistemas, capacitación, documentación.</span>
+                <span><strong>Semana 3-8:</strong> Beatriz ejecutó plan. Implementaron sistemas, capacitación, documentación.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Semana 9-12:</strong> Laura auditó: 100% de gaps resueltos. Riesgo: 8/100. Listo para SERNAGEOMIN.</span>
+                <span><strong>Semana 9-12:</strong> Verónica auditó: 100% de gaps resueltos. Riesgo: 8/100. Listo para SERNAGEOMIN.</span>
               </li>
             </ul>
           </div>
