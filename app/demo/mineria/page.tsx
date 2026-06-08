@@ -76,56 +76,56 @@ export default function MineriaDemoPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">180+ obligaciones regulatorias complejas</p>
                   <p className="text-sm text-muted-foreground mt-1">SONAMI, DS 40, SERNAGEOMIN, RCA, protocolo DDHH, tributarias</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">45/100</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-muted-foreground mb-1">45/100</p>
                 <p className="text-sm text-muted-foreground">Riesgo regulatorio típico</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Cambios regulatorios frecuentes y no comunicados</p>
                   <p className="text-sm text-muted-foreground mt-1">Nuevas resoluciones SEREMI, cambios SONAMI, actualizaciones RCA</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">8/10</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-muted-foreground mb-1">8/10</p>
                 <p className="text-sm text-muted-foreground">Cambios descobertos</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Potencial multa por incumplimiento: $1.2M+</p>
                   <p className="text-sm text-muted-foreground mt-1">300-500 UF por violación. Cierres de operaciones. Daño reputacional.</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">$1.2M</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-muted-foreground mb-1">$1.2M</p>
                 <p className="text-sm text-muted-foreground">Exposición</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">5+ incumplimientos críticos detectados tarde</p>
                   <p className="text-sm text-muted-foreground mt-1">Seguridad ocupacional, protección ambiental, derechos humanos</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">5+</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-muted-foreground mb-1">5+</p>
                 <p className="text-sm text-muted-foreground">Gaps críticos por detectar</p>
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function MineriaDemoPage() {
           <div className="space-y-4">
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Sofia mapea las 180+ obligaciones</h3>
                   <p className="text-sm text-muted-foreground">Todas las leyes, reglamentos, y protocolos estructurados. Sin olvidar ninguna.</p>
@@ -200,7 +200,7 @@ export default function MineriaDemoPage() {
 
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Elena monitorea cambios regulatorios 24/7</h3>
                   <p className="text-sm text-muted-foreground">Resoluciones SEREMI, cambios SONAMI, actualizaciones SERNAGEOMIN. Alertas inmediatas.</p>
@@ -210,7 +210,7 @@ export default function MineriaDemoPage() {
 
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Bruno cuantifica la exposición real</h3>
                   <p className="text-sm text-muted-foreground">$1.2M en riesgos, cierres operacionales, daño reputacional. Números claros.</p>
@@ -220,7 +220,7 @@ export default function MineriaDemoPage() {
 
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Marco genera roadmap de implementación</h3>
                   <p className="text-sm text-muted-foreground">90 días, hitos claros, recursos definidos. Viabilidad realista.</p>
@@ -230,7 +230,7 @@ export default function MineriaDemoPage() {
 
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Laura audita qué se está cumpliendo realmente</h3>
                   <p className="text-sm text-muted-foreground">Verificación independiente, gap analysis, acciones correctivas documentadas.</p>
@@ -240,7 +240,7 @@ export default function MineriaDemoPage() {
 
             <div className="p-6 rounded-lg border border-border bg-background">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold mb-1">Catarina compila reportes para reguladores</h3>
                   <p className="text-sm text-muted-foreground">1 click: Evidencia de cumplimiento, auditorías lisas, carpetas para SERNAGEOMIN.</p>
@@ -260,9 +260,9 @@ export default function MineriaDemoPage() {
             <div className="p-8 rounded-lg border border-border bg-card">
               <p className="text-sm text-muted-foreground mb-2">Riesgo Regulatorio</p>
               <div className="mb-4">
-                <p className="text-4xl font-black text-red-600">45/100</p>
-                <p className="text-xs text-red-600 font-semibold">→</p>
-                <p className="text-4xl font-black text-green-600">8/100</p>
+                <p className="text-4xl font-black text-muted-foreground">45/100</p>
+                <p className="text-xs text-muted-foreground font-semibold">→</p>
+                <p className="text-4xl font-black text-primary">8/100</p>
               </div>
               <p className="text-xs text-muted-foreground">De alto a controlado en 90 días</p>
             </div>
@@ -289,19 +289,19 @@ export default function MineriaDemoPage() {
             <p className="font-semibold mb-4">Timeline de Implementación:</p>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Semana 1:</strong> Sofia mapeó 180+ obligaciones. Elena alertó sobre cambios SONAMI recientes.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Semana 2:</strong> Bruno identificó 5 incumplimientos críticos. Exposición real: $1.2M.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Semana 3-8:</strong> Marco ejecutó plan. Implementaron sistemas, capacitación, documentación.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Semana 9-12:</strong> Laura auditó: 100% de gaps resueltos. Riesgo: 8/100. Listo para SERNAGEOMIN.</span>
               </li>
             </ul>

@@ -131,9 +131,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">47 obligaciones en transporte: RT, SOAP, permisos, seguros, licencias conductores, documentación carga</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">47</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">47</p>
                   <p className="text-xs text-muted-foreground">Obligaciones mapeadas</p>
                 </div>
               </div>
@@ -145,9 +145,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Cambios en Ley 21.520, nuevas resoluciones SEREMI, modificaciones de requisitos</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">24/7</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">24/7</p>
                   <p className="text-xs text-muted-foreground">Alertas en tiempo real</p>
                 </div>
               </div>
@@ -159,9 +159,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Si tu flota tiene RT vencida: $200 UF por vehículo. Operación detenida: $500K/día</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">$1.2M</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">$1.2M</p>
                   <p className="text-xs text-muted-foreground">Exposición clara</p>
                 </div>
               </div>
@@ -173,9 +173,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Mes 1: Renovar RT flota. Mes 2: Auditoría SOAP. Mes 3: Certificados conductores</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">90 Días</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">90 Días</p>
                   <p className="text-xs text-muted-foreground">Plan con milestones</p>
                 </div>
               </div>
@@ -187,9 +187,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Auditoría real: "52% de tu flota tiene documentos vencidos. Acción urgente."</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">100%</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">100%</p>
                   <p className="text-xs text-muted-foreground">Visibilidad real</p>
                 </div>
               </div>
@@ -201,9 +201,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">1 click: PDF con evidencia de cumplimiento, carpetas documentales, auditorías lisas</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">1 Click</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">1 Click</p>
                   <p className="text-xs text-muted-foreground">Listo para reguladores</p>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export default function TransporteDemoPage() {
               <div className="mb-4">
                 <p className="text-4xl font-black text-red-600">15</p>
                 <p className="text-xs text-red-600 font-semibold">→</p>
-                <p className="text-4xl font-black text-green-600">0</p>
+                <p className="text-4xl font-black text-primary">0</p>
               </div>
               <p className="text-xs text-muted-foreground">Cero infracciones, auditorías limpias</p>
             </div>
@@ -250,15 +250,15 @@ export default function TransporteDemoPage() {
             <p className="font-semibold mb-4">Qué pasó en 90 días:</p>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 1:</strong> Sofia identificó 47 obligaciones. Elena alertó sobre cambios Ley 21.520.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 2:</strong> Bruno cuantificó: $1.2M en riesgo. Marco generó plan de acción. Ejecutaron.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 3:</strong> Laura auditó: 100% de obligaciones cumplidas. Catarina generó carpetas para mandantes.</span>
               </li>
             </ul>

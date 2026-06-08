@@ -156,7 +156,7 @@ export default function WebinarsPage() {
                   <ul className="space-y-2">
                     {webinar.learnings.map((learning, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                         <span>{learning}</span>
                       </li>
                     ))}
