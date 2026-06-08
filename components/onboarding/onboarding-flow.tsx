@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { FileUp, CheckCircle2, Zap, BookOpen, ArrowRight, AlertCircle } from 'lucide-react'
+import { FileUp, CheckCircle2, Zap, BookOpen, ArrowRight, AlertCircle, Upload, BarChart3, Lightbulb } from 'lucide-react'
 
 interface OnboardingFlowProps {
   onComplete?: () => void
@@ -11,255 +10,209 @@ interface OnboardingFlowProps {
 }
 
 export function OnboardingFlow({ onComplete, organizationName }: OnboardingFlowProps) {
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'upload' | 'analyze' | 'next'>('welcome')
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
 
   const steps = [
     {
-      id: 'welcome',
-      title: '¡Bienvenido a KUMPLIO!',
-      description: 'Tu asistente de compliance con IA',
-      icon: Zap,
+      number: 1,
+      title: 'Sube un documento',
+      description: 'PDF, Word, Excel, PowerPoint',
+      icon: Upload,
+      details: [
+        'Cualquier archivo importante',
+        'Máximo 10MB por documento',
+        'Contratos, políticas, TDRs, etc.',
+      ],
     },
     {
-      id: 'upload',
-      title: 'Sube tu primer documento',
-      description: 'PDFs, contratos, políticas',
-      icon: FileUp,
+      number: 2,
+      title: 'Vera analiza',
+      description: 'Con inteligencia artificial',
+      icon: BarChart3,
+      details: [
+        'Detecta riesgos de cumplimiento',
+        'Mapea Ley 21.719 y normativas',
+        'Identifica cláusulas problemáticas',
+      ],
     },
     {
-      id: 'analyze',
-      title: 'Análisis automático',
-      description: 'Vera analiza en minutos',
+      number: 3,
+      title: 'Recibe recomendaciones',
+      description: 'Acciones concretas',
+      icon: Lightbulb,
+      details: [
+        'Qué debe cambiar',
+        'Por qué es importante',
+        'Pasos específicos para cumplir',
+      ],
+    },
+    {
+      number: 4,
+      title: 'Toma acción',
+      description: 'Implementa cambios',
       icon: CheckCircle2,
-    },
-    {
-      id: 'next',
-      title: 'Pasos siguientes',
-      description: 'Qué hacer ahora',
-      icon: BookOpen,
+      details: [
+        'Crea proyectos para organizar',
+        'Asigna tareas al equipo',
+        'Monitorea cumplimiento',
+      ],
     },
   ]
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 'welcome':
-        return (
-          <div className="space-y-6 text-center">
-            <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-              <Zap className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-2">¡Bienvenido a KUMPLIO!</h2>
-              <p className="text-muted-foreground text-lg">
-                {organizationName && `${organizationName}, `}en 3 pasos analizaremos tu cumplimiento con IA
-              </p>
-            </div>
-            <div className="space-y-3 text-left max-w-md mx-auto">
-              <div className="flex gap-3 items-start">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                <span className="text-foreground">Sube documentos (PDFs, contratos, políticas)</span>
-              </div>
-              <div className="flex gap-3 items-start">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                <span className="text-foreground">Vera analiza automáticamente con IA</span>
-              </div>
-              <div className="flex gap-3 items-start">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-                <span className="text-foreground">Recibe recomendaciones de cumplimiento</span>
-              </div>
-            </div>
-          </div>
-        )
-
-      case 'upload':
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                <FileUp className="w-8 h-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground">Sube tu primer documento</h2>
-              <p className="text-muted-foreground">Comienza con un PDF, contrato o política</p>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-900">
-                <p className="font-semibold mb-1">Primeros pasos:</p>
-                <p>Los documentos de ejemplo disponibles en tu página de documentos te mostrarán cómo KUMPLIO realiza el análisis.</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition cursor-pointer">
-                <FileUp className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium text-foreground">Subir PDF</p>
-                <p className="text-xs text-muted-foreground">Máx 10MB</p>
-              </div>
-              <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition cursor-pointer">
-                <FileUp className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm font-medium text-foreground">Subir Documento</p>
-                <p className="text-xs text-muted-foreground">Word, Excel</p>
-              </div>
-            </div>
-          </div>
-        )
-
-      case 'analyze':
-        return (
-          <div className="space-y-6 text-center">
-            <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">Vera analiza automáticamente</h2>
-              <p className="text-muted-foreground">Tu documento se procesa en segundos</p>
-            </div>
-
-            <div className="space-y-3 bg-muted/50 rounded-lg p-6">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm text-foreground">Detectando riesgos de cumplimiento</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm text-foreground">Analizando Ley 21.719 y normativas</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm text-foreground">Generando recomendaciones</span>
-              </div>
-            </div>
-
-            <p className="text-sm text-muted-foreground">⏱️ Tiempo típico: 30-60 segundos</p>
-          </div>
-        )
-
-      case 'next':
-        return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                <BookOpen className="w-8 h-8 text-primary" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground">Pasos siguientes</h2>
-            </div>
-
-            <div className="space-y-3">
-              <Card className="p-4 hover:bg-muted/50 transition cursor-pointer">
-                <h3 className="font-semibold text-foreground mb-1">Ver análisis completo</h3>
-                <p className="text-sm text-muted-foreground">Revisa los riesgos detectados y recomendaciones</p>
-              </Card>
-
-              <Card className="p-4 hover:bg-muted/50 transition cursor-pointer">
-                <h3 className="font-semibold text-foreground mb-1">Crear proyecto</h3>
-                <p className="text-sm text-muted-foreground">Organiza documentos por proyecto o cliente</p>
-              </Card>
-
-              <Card className="p-4 hover:bg-muted/50 transition cursor-pointer">
-                <h3 className="font-semibold text-foreground mb-1">Explorar más features</h3>
-                <p className="text-sm text-muted-foreground">Dashboard, reportes, auditoría, y más</p>
-              </Card>
-            </div>
-
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-sm text-green-900">
-                ✓ Has completado la introducción a KUMPLIO. Estás listo para empezar a analizar documentos.
-              </p>
-            </div>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
-
-  const isLastStep = currentStep === 'next'
+  const currentStepData = steps.find(s => s.number === currentStep)!
+  const CurrentIcon = currentStepData.icon
 
   return (
-    <div className="min-h-[500px] bg-gradient-to-b from-primary/5 to-background rounded-lg border border-border p-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Progress Steps */}
-        <div className="flex justify-between mb-12">
-          {steps.map((step, idx) => {
-            const Icon = step.icon
-            const isActive = currentStep === step.id
-            const isCompleted = steps.findIndex(s => s.id === currentStep) > idx
+    <div className="w-full">
+      {/* Big Step Numbers 1 2 3 4 - Very Clear */}
+      <div className="mb-12">
+        <div className="flex gap-2 md:gap-4 justify-between">
+          {steps.map((step) => {
+            const isActive = currentStep === step.number
+            const isCompleted = currentStep > step.number
 
             return (
-              <div key={step.id} className="flex flex-col items-center gap-2">
+              <button
+                key={step.number}
+                onClick={() => setCurrentStep(step.number as 1 | 2 | 3 | 4)}
+                className={`flex-1 group transition-all duration-200`}
+              >
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition ${
-                    isActive || isCompleted
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                  className={`mb-3 aspect-square rounded-2xl flex items-center justify-center font-bold text-3xl md:text-4xl transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-lg scale-110'
+                      : isCompleted
+                      ? 'bg-green-500 text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
                 >
-                  <Icon className="w-6 h-6" />
+                  {isCompleted ? <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10" /> : step.number}
                 </div>
-                <p className="text-xs text-center font-medium text-foreground hidden sm:block max-w-[80px]">
+                <p className={`text-xs md:text-sm font-semibold transition-colors ${
+                  isActive ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'
+                }`}>
                   {step.title.split(' ')[0]}
                 </p>
-              </div>
+              </button>
             )
           })}
         </div>
+      </div>
 
-        {/* Step Content */}
-        <div className="mb-8">{renderStep()}</div>
+      {/* Main Step Content - Big, Clear, Engaging */}
+      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 rounded-2xl p-8 md:p-12 min-h-[400px] flex flex-col justify-between">
+        
+        {/* Content */}
+        <div className="space-y-8">
+          {/* Icon + Title */}
+          <div className="space-y-4">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-primary/20 flex items-center justify-center">
+              <CurrentIcon className="w-10 h-10 md:w-12 md:h-12 text-primary" />
+            </div>
+            
+            <div>
+              <div className="text-6xl md:text-7xl font-black text-primary mb-2">Paso {currentStep}</div>
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight">
+                {currentStepData.title}
+              </h2>
+              <p className="text-lg text-muted-foreground mt-3">
+                {currentStepData.description}
+              </p>
+            </div>
+          </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex gap-3 justify-center">
-          {currentStep !== 'welcome' && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                const stepIds: Array<'welcome' | 'upload' | 'analyze' | 'next'> = [
-                  'welcome',
-                  'upload',
-                  'analyze',
-                  'next',
-                ]
-                const currentIdx = stepIds.indexOf(currentStep)
-                if (currentIdx > 0) {
-                  setCurrentStep(stepIds[currentIdx - 1])
-                }
-              }}
-            >
-              Anterior
-            </Button>
+          {/* Details */}
+          <div className="bg-white/50 dark:bg-black/20 rounded-xl p-6 space-y-3">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Incluye:</p>
+            {currentStepData.details.map((detail, idx) => (
+              <div key={idx} className="flex gap-3 items-start">
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-foreground font-medium">{detail}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Pro Tip */}
+          {currentStep === 1 && (
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm">
+                <span className="font-semibold text-blue-900 dark:text-blue-200">💡 Consejo:</span>{' '}
+                <span className="text-blue-800 dark:text-blue-300">Comienza con un contrato o política de privacidad para ver cómo KUMPLIO analiza</span>
+              </p>
+            </div>
           )}
 
-          {isLastStep ? (
+          {currentStep === 2 && (
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <p className="text-sm">
+                <span className="font-semibold text-green-900 dark:text-green-200">⚡ Tiempo:</span>{' '}
+                <span className="text-green-800 dark:text-green-300">La mayoría de documentos se analizan en 30-60 segundos</span>
+              </p>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+              <p className="text-sm">
+                <span className="font-semibold text-purple-900 dark:text-purple-200">📋 Cada recomendación incluye:</span>{' '}
+                <span className="text-purple-800 dark:text-purple-300">Línea del documento, cambio sugerido, normativa aplicable, y por qué es importante</span>
+              </p>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <p className="text-sm">
+                <span className="font-semibold text-amber-900 dark:text-amber-200">🎯 Siguiente:</span>{' '}
+                <span className="text-amber-800 dark:text-amber-300">Ya estás listo para sube tu primer documento y comienza a analizar</span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex gap-4 mt-8 pt-8 border-t border-border">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep((currentStep - 1) as 1 | 2 | 3 | 4)}
+            disabled={currentStep === 1}
+            className="flex-1"
+          >
+            Anterior
+          </Button>
+
+          {currentStep === 4 ? (
             <Button
               onClick={() => onComplete?.()}
-              className="gap-2"
+              className="flex-1 gap-2 bg-green-600 hover:bg-green-700"
             >
-              Ir al Dashboard
+              Ir a Documentos
               <ArrowRight className="w-4 h-4" />
             </Button>
           ) : (
             <Button
-              onClick={() => {
-                const stepIds: Array<'welcome' | 'upload' | 'analyze' | 'next'> = [
-                  'welcome',
-                  'upload',
-                  'analyze',
-                  'next',
-                ]
-                const currentIdx = stepIds.indexOf(currentStep)
-                if (currentIdx < stepIds.length - 1) {
-                  setCurrentStep(stepIds[currentIdx + 1])
-                }
-              }}
-              className="gap-2"
+              onClick={() => setCurrentStep((currentStep + 1) as 1 | 2 | 3 | 4)}
+              className="flex-1 gap-2"
             >
               Siguiente
               <ArrowRight className="w-4 h-4" />
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="mt-6 flex gap-2 justify-center">
+        {steps.map((step) => (
+          <div
+            key={step.number}
+            className={`h-1 rounded-full transition-all ${
+              currentStep >= step.number ? 'bg-primary w-8' : 'bg-muted w-4'
+            }`}
+          />
+        ))}
       </div>
     </div>
   )
