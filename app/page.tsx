@@ -68,10 +68,70 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SYSTEM ARCHITECTURE - IA FIRST */}
+      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold">Sistema Integral de IA First</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                7 agentes especializados trabajando en orquesta. Cada uno alimenta al siguiente. Razonamiento avanzado más validación cruzada igual cumplimiento garantizado.
+              </p>
+            </div>
+
+            {/* SYSTEM FLOW */}
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-5 gap-3 items-center">
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Sofia</p>
+                  <p className="text-xs text-muted-foreground">Análisis de Obligaciones</p>
+                  <p className="text-2xl font-black text-primary mt-3">47</p>
+                </div>
+                <div className="text-center text-muted-foreground text-xl">→</div>
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Bruno</p>
+                  <p className="text-xs text-muted-foreground">Evaluación de Riesgos</p>
+                  <p className="text-2xl font-black text-primary mt-3">$1.2M</p>
+                </div>
+                <div className="text-center text-muted-foreground text-xl">→</div>
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Marco</p>
+                  <p className="text-xs text-muted-foreground">Plan de Acción</p>
+                  <p className="text-2xl font-black text-primary mt-3">90 D</p>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-lg border border-primary/30 bg-primary/5">
+                <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
+                <div className="grid md:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Sofia → Bruno</p>
+                    <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Bruno → Marco</p>
+                    <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Marco → Laura</p>
+                    <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Laura → Todos</p>
+                    <p className="text-muted-foreground">Gaps identificados reentrenan a todos los agentes del sistema</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 7 AGENTES - OUTCOMES */}
       <section className="py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold mb-16">7 Agentes IA. 7 Especialistas.</h2>
+          <h2 className="text-3xl font-bold mb-4">Los 7 Especialistas IA del Sistema</h2>
+          <p className="text-muted-foreground mb-16 max-w-2xl">Cada agente es un experto en su dominio. Juntos forman un sistema de razonamiento ultra-inteligente que aprende de cada decisión.</p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             {/* Sofia */}
@@ -305,17 +365,105 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TECHNOLOGY: IA FIRST ARCHITECTURE */}
+      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold">IA First: La Tecnología Detrás del Sistema</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                KUMPLIO no es software que usa IA. Es un sistema architected desde cero con IA como su fundamento.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* REASONING TECHNIQUES */}
+              <div className="p-8 rounded-lg border border-border space-y-4">
+                <h3 className="font-bold text-xl">Razonamiento Avanzado</h3>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Few-Shot Learning</p>
+                    <p className="text-muted-foreground">Cada agente aprende de ejemplos similares a tu caso, no de reglas genéricas.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Analogical Reasoning</p>
+                    <p className="text-muted-foreground">Sofia compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Causal Reasoning</p>
+                    <p className="text-muted-foreground">Bruno entiende causas raíz del incumplimiento, no solo calcula multas.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Metacognitive Validation</p>
+                    <p className="text-muted-foreground">El sistema cuestiona sus propias conclusiones e identifica asunciones débiles.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SYSTEM INTELLIGENCE */}
+              <div className="p-8 rounded-lg border border-border space-y-4">
+                <h3 className="font-bold text-xl">Inteligencia de Sistema</h3>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Multi-Method Validation</p>
+                    <p className="text-muted-foreground">Ninguna conclusión depende de un solo agente. Todo se valida por consenso.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Uncertainty Quantification</p>
+                    <p className="text-muted-foreground">Cada métrica incluye rangos de confianza y evidencia de apoyo completa.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Reasoning Traces</p>
+                    <p className="text-muted-foreground">Auditables por reguladores. Cada decisión tiene su trail de pensamiento completo.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Continuous Learning</p>
+                    <p className="text-muted-foreground">Kai recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RESULTS */}
+            <div className="p-8 rounded-lg border border-primary/30 bg-primary/5">
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">95%</div>
+                  <p className="text-sm text-muted-foreground">Accuracy en análisis de cumplimiento</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">5 meses</div>
+                  <p className="text-sm text-muted-foreground">ROI promedio desde activación</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">40%</div>
+                  <p className="text-sm text-muted-foreground">Menos hallucinating que sistemas estándar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-2xl text-center space-y-8">
-          <h2 className="text-5xl font-bold">Los 7 agentes de KUMPLIO están listos.</h2>
-          <p className="text-lg opacity-90">Los cambios legales no esperan. Tampoco las multas.</p>
+          <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
+          <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
               <a href="/sign-up">Empezar Ahora</a>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
-              <a href="/demo/transporte">Ver Demo</a>
+              <a href="/demo/transporte">Ver Sistema en Acción</a>
             </Button>
           </div>
         </div>
