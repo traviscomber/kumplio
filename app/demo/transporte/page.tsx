@@ -127,7 +127,7 @@ export default function TransporteDemoPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Sofia identifica todas tus obligaciones</h3>
+                <h3 className="font-semibold mb-2">Isidora identifica todas tus obligaciones</h3>
                 <p className="text-sm text-muted-foreground">47 obligaciones en transporte: RT, SOAP, permisos, seguros, licencias conductores, documentación carga</p>
               </div>
               <div className="flex items-start gap-3">
@@ -141,7 +141,7 @@ export default function TransporteDemoPage() {
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Elena monitorea cambios legales 24/7</h3>
+                <h3 className="font-semibold mb-2">Rodrigo monitorea cambios legales 24/7</h3>
                 <p className="text-sm text-muted-foreground">Cambios en Ley 21.520, nuevas resoluciones SEREMI, modificaciones de requisitos</p>
               </div>
               <div className="flex items-start gap-3">
@@ -155,7 +155,7 @@ export default function TransporteDemoPage() {
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Bruno cuantifica el riesgo en dinero</h3>
+                <h3 className="font-semibold mb-2">Javier cuantifica el riesgo en dinero</h3>
                 <p className="text-sm text-muted-foreground">Si tu flota tiene RT vencida: $200 UF por vehículo. Operación detenida: $500K/día</p>
               </div>
               <div className="flex items-start gap-3">
@@ -169,7 +169,7 @@ export default function TransporteDemoPage() {
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Marco genera plan ejecutable</h3>
+                <h3 className="font-semibold mb-2">Beatriz genera plan ejecutable</h3>
                 <p className="text-sm text-muted-foreground">Mes 1: Renovar RT flota. Mes 2: Auditoría SOAP. Mes 3: Certificados conductores</p>
               </div>
               <div className="flex items-start gap-3">
@@ -183,7 +183,7 @@ export default function TransporteDemoPage() {
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Laura verifica qué se está cumpliendo</h3>
+                <h3 className="font-semibold mb-2">Verónica verifica qué se está cumpliendo</h3>
                 <p className="text-sm text-muted-foreground">Auditoría real: "52% de tu flota tiene documentos vencidos. Acción urgente."</p>
               </div>
               <div className="flex items-start gap-3">
@@ -197,7 +197,7 @@ export default function TransporteDemoPage() {
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Catarina genera reportes para mandantes</h3>
+                <h3 className="font-semibold mb-2">Catalina genera reportes para mandantes</h3>
                 <p className="text-sm text-muted-foreground">1 click: PDF con evidencia de cumplimiento, carpetas documentales, auditorías lisas</p>
               </div>
               <div className="flex items-start gap-3">
@@ -251,15 +251,15 @@ export default function TransporteDemoPage() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Mes 1:</strong> Sofia identificó 47 obligaciones. Elena alertó sobre cambios Ley 21.520.</span>
+                <span><strong>Mes 1:</strong> Isidora identificó 47 obligaciones. Rodrigo alertó sobre cambios Ley 21.520.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Mes 2:</strong> Bruno cuantificó: $1.2M en riesgo. Marco generó plan de acción. Ejecutaron.</span>
+                <span><strong>Mes 2:</strong> Javier cuantificó: $1.2M en riesgo. Beatriz generó plan de acción. Ejecutaron.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Mes 3:</strong> Laura auditó: 100% de obligaciones cumplidas. Catarina generó carpetas para mandantes.</span>
+                <span><strong>Mes 3:</strong> Verónica auditó: 100% de obligaciones cumplidas. Catalina generó carpetas para mandantes.</span>
               </li>
             </ul>
           </div>

@@ -165,7 +165,7 @@ export default function AboutPage() {
               satisfacción en clientes iniciales.
             </p>
             <p>
-              Hoy, KUMPLIO ayuda a cientos de empresas chilenas a cumplir normativas. Nuestro objetivo para 2025 es 
+              Hoy, KUMPLIO ayuda a 50 empresas chilenas a cumplir normativas. Nuestro objetivo para 2026 es 
               expandir a toda Latinoamérica con soluciones multi-país.
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function AboutPage() {
           <div className="space-y-6">
             {[
               { year: '2023', title: 'Lanzamiento KUMPLIO', desc: 'Primera versión en producción con análisis de Ley 21.719' },
-              { year: '2024 Q1', title: '100 Empresas', desc: 'Alcanzamos 100 clientes activos en Chile' },
+              { year: '2024 Q1', title: '50 Empresas', desc: 'Alcanzamos 50 empresas activas en Chile' },
               { year: '2024 Q2', title: 'Vera AI Launch', desc: 'Lanzamos asistente IA Vera disponible 24/7' },
               { year: '2024 Q3', title: 'Expansión Regional', desc: 'Plan de expansión a Colombia y Perú (in progress)' },
             ].map((milestone, idx) => (
