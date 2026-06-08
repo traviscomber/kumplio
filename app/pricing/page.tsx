@@ -8,13 +8,15 @@ import { useRouter } from 'next/navigation'
 const plans = [
   {
     name: 'Starter',
-    price: '$99',
+    price: 'UF 3',
+    usdPrice: '$110',
     period: '/mes',
     description: 'Para empresas pequeñas (1-50 empleados)',
+    example: 'Transporte básico, análisis de obligaciones',
     cta: 'Empezar Gratis',
     highlighted: false,
     outcomes: [
-      { text: 'Hasta 47 obligaciones mapeadas', main: true },
+      { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
       { text: '1 agente: Sofia (análisis básico)', main: false },
       { text: 'Alertas de cambios regulatorios', main: false },
       { text: 'Reportes mensuales', main: false },
@@ -24,47 +26,50 @@ const plans = [
       'Evaluación de riesgos (Bruno)',
       'Planes de acción (Marco)',
       'Auditoría independiente (Laura)',
-      'Reportes PDF para reguladores',
+      'Reportes PDF certificados',
     ]
   },
   {
     name: 'Professional',
-    price: '$299',
+    price: 'UF 8',
+    usdPrice: '$290',
     period: '/mes',
     description: 'Para empresas medianas (50-500 empleados)',
+    example: 'Transporte y minería - Caso Labbe & Goldcorp',
     cta: 'Empezar Gratis',
     highlighted: true,
     badge: 'Más Popular',
     outcomes: [
       { text: '180+ obligaciones mapeadas', main: true },
       { text: '4 agentes: Sofia, Elena, Bruno, Marco', main: false },
-      { text: 'Monitoreo 24/7 de regulaciones', main: false },
-      { text: 'Evaluación de riesgos en dinero (UF)', main: false },
-      { text: 'Planes de acción priorizados (90 días)', main: false },
-      { text: 'Priority email + chat support', main: false },
+      { text: 'Monitoreo 24/7 de regulaciones chilenas', main: false },
+      { text: 'Evaluación de riesgos en UF/dinero', main: false },
+      { text: 'Planes de acción priorizados 90 días', main: false },
+      { text: 'Support WhatsApp + chat prioritario', main: false },
     ],
     notIncluded: [
       'Auditoría independiente (Laura)',
-      'Reportes PDF auditables',
-      'Integración con sistemas',
+      'Reportes PDF SERNAGEOMIN',
+      'Integración ERP',
     ]
   },
   {
     name: 'Enterprise',
-    price: '$799',
+    price: 'UF 22',
+    usdPrice: '$800',
     period: '/mes',
     description: 'Para empresas grandes (500+ empleados)',
+    example: 'Minería: Risk 52→8, $1.2M evitados en 90 días',
     cta: 'Contactar Ventas',
     highlighted: false,
     outcomes: [
-      { text: '180+ obligaciones + industrias específicas', main: true },
-      { text: 'Todos los 7 agentes (Sofia a Catarina)', main: false },
-      { text: 'Auditoría independiente continuada (Laura)', main: false },
-      { text: 'Reportes PDF 1-click para reguladores', main: false },
-      { text: 'Roadmap personalizado (Kai - mejora continua)', main: false },
-      { text: 'Account manager dedicado', main: false },
-      { text: 'Integración con ERP/contabilidad', main: false },
-      { text: 'SLA: 99.9% uptime', main: false },
+      { text: 'Obligaciones ilimitadas + personalización', main: true },
+      { text: 'Todos los 7 agentes + Kai (mejora continua)', main: false },
+      { text: 'Auditoría independiente continua', main: false },
+      { text: 'Reportes PDF certificados SERNAGEOMIN', main: false },
+      { text: 'Roadmap personalizado + mejora mensual', main: false },
+      { text: 'Account manager dedicado + SLA 99.9%', main: false },
+      { text: 'Integración ERP, Contabilidad, RRHH', main: false },
     ],
     notIncluded: []
   }
@@ -98,20 +103,21 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
           <div className="text-center space-y-4 mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold">Planes Simples y Claros</h1>
+            <h1 className="text-5xl md:text-6xl font-bold">Planes en UF - Precios Chile</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Elige el plan que mejor se adapta a tu empresa. Todos incluyen acceso a la plataforma KUMPLIO completa.
+              Elige el plan que se adapta a tu empresa. Todos incluyen acceso a la plataforma KUMPLIO completa.
             </p>
+            <p className="text-sm text-muted-foreground">UF Valor: $36.53 (Aproximado Julio 2026)</p>
           </div>
 
-          {/* Pricing Grid */}
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {plans.map((plan) => (
+          {/* Plans Grid */}
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            {plans.map((plan, idx) => (
               <div
-                key={plan.name}
-                className={`relative rounded-lg border transition-all ${
+                key={idx}
+                className={`relative rounded-lg border p-8 transition-all ${
                   plan.highlighted
-                    ? 'border-primary bg-primary/5 lg:scale-105 shadow-lg'
+                    ? 'border-primary bg-primary/5 md:scale-105 shadow-lg'
                     : 'border-border bg-card hover:border-primary/50'
                 }`}
               >
@@ -121,172 +127,134 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <div className="p-8 space-y-8">
-                  {/* Plan Name & Price */}
-                  <div className="space-y-3">
-                    <h2 className="text-2xl font-bold">{plan.name}</h2>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black">{plan.price}</span>
-                      <span className="text-sm text-muted-foreground">{plan.period}</span>
-                    </div>
+                {/* Plan Name & Price */}
+                <div className="space-y-3 mb-8">
+                  <h2 className="text-2xl font-bold">{plan.name}</h2>
+                  <p className="text-sm text-muted-foreground">{plan.description}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground">{plan.period}</span>
                   </div>
+                  {plan.usdPrice && (
+                    <p className="text-xs text-muted-foreground">≈ {plan.usdPrice}/mes (USD)</p>
+                  )}
+                  {plan.example && (
+                    <p className="text-xs text-primary pt-2 font-semibold italic">{plan.example}</p>
+                  )}
+                </div>
 
-                  {/* CTA Button */}
-                  <Button
-                    className="w-full"
-                    variant={plan.highlighted ? 'default' : 'outline'}
-                    onClick={() => router.push('/sign-up')}
-                  >
-                    {plan.cta}
-                  </Button>
+                {/* CTA Button */}
+                <Button
+                  className="w-full mb-8"
+                  variant={plan.highlighted ? 'default' : 'outline'}
+                  onClick={() => router.push('/sign-up')}
+                >
+                  {plan.cta}
+                </Button>
 
-                  {/* Included Features */}
-                  <div className="border-t pt-8 space-y-4">
-                    <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                      Incluido en {plan.name}
+                {/* Included Features */}
+                <div className="border-t pt-8 space-y-4 mb-8">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Incluido en {plan.name}
+                  </p>
+                  <ul className="space-y-3">
+                    {plan.outcomes.map((outcome, oidx) => (
+                      <li key={oidx} className="flex items-start gap-3">
+                        <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${outcome.main ? 'text-primary' : 'text-green-600'}`} />
+                        <span className={outcome.main ? 'font-semibold text-sm' : 'text-sm text-muted-foreground'}>
+                          {outcome.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Not Included */}
+                {plan.notIncluded.length > 0 && (
+                  <div className="space-y-3 border-t pt-8">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      No incluido
                     </p>
-                    <ul className="space-y-3">
-                      {plan.outcomes.map((outcome, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${outcome.main ? 'text-primary' : 'text-green-600'}`} />
-                          <span className={outcome.main ? 'font-semibold text-base' : 'text-sm text-muted-foreground'}>
-                            {outcome.text}
-                          </span>
+                    <ul className="space-y-2">
+                      {plan.notIncluded.map((item, nidx) => (
+                        <li key={nidx} className="text-xs text-muted-foreground">
+                          • {item}
                         </li>
                       ))}
                     </ul>
                   </div>
-
-                  {/* Not Included */}
-                  {plan.notIncluded.length > 0 && (
-                    <div className="border-t pt-4">
-                      <p className="text-xs text-muted-foreground mb-2">No incluido:</p>
-                      <ul className="space-y-1">
-                        {plan.notIncluded.map((item, idx) => (
-                          <li key={idx} className="text-xs text-muted-foreground line-through">
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             ))}
           </div>
 
-          {/* Comparison Table */}
-          <div className="mt-20 border-t pt-16">
-            <h3 className="text-3xl font-bold mb-8">Comparativa Completa</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 font-semibold">Feature</th>
-                    <th className="text-center py-4 px-4 font-semibold">Starter</th>
-                    <th className="text-center py-4 px-4 font-semibold">Professional</th>
-                    <th className="text-center py-4 px-4 font-semibold">Enterprise</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { feature: 'Agentes disponibles', starter: '1', pro: '4', ent: '7' },
-                    { feature: 'Obligaciones mapeadas', starter: '47', pro: '180+', ent: '180+ (personalizado)' },
-                    { feature: 'Monitoreo regulatorio', starter: 'No', pro: '24/7', ent: '24/7' },
-                    { feature: 'Evaluación de riesgos', starter: 'No', pro: 'Sí', ent: 'Sí' },
-                    { feature: 'Planes de acción', starter: 'No', pro: 'Sí (3 fases)', ent: 'Sí (personalizado)' },
-                    { feature: 'Auditoría independiente', starter: 'No', pro: 'No', ent: 'Sí (continuada)' },
-                    { feature: 'Reportes para reguladores', starter: 'Básicos', pro: 'Sí', ent: 'PDF auditables' },
-                    { feature: 'Usuarios', starter: '1', pro: '5', ent: 'Ilimitados' },
-                    { feature: 'Support', starter: 'Email', pro: 'Email + Chat', ent: 'Account Manager' },
-                    { feature: 'SLA', starter: '95%', pro: '99%', ent: '99.9%' },
-                  ].map((row, idx) => (
-                    <tr key={idx} className="border-b border-border hover:bg-card/50 transition">
-                      <td className="py-4 px-4 font-medium">{row.feature}</td>
-                      <td className="text-center py-4 px-4 text-muted-foreground">{row.starter}</td>
-                      <td className="text-center py-4 px-4 text-muted-foreground">{row.pro}</td>
-                      <td className="text-center py-4 px-4 font-semibold">{row.ent}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* ROI Section */}
+          <div className="bg-card border border-border rounded-lg p-8 mb-16">
+            <h2 className="text-2xl font-bold mb-8">ROI Estimado por Industria</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Transporte (Labbe Logística)</h3>
+                <div className="space-y-2 text-sm">
+                  <p><span className="font-semibold">Antes:</span> UF 600/año en multas, 15 hrs/sem</p>
+                  <p><span className="font-semibold">Plan:</span> Professional (UF 8/mes = UF 96/año)</p>
+                  <p><span className="font-semibold">Ahorro:</span> UF 504/año (~$18,400 USD)</p>
+                  <p><span className="font-semibold text-green-600">ROI: 5 meses</span></p>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Minería (Goldcorp Chile)</h3>
+                <div className="space-y-2 text-sm">
+                  <p><span className="font-semibold">Antes:</span> UF 5,000+ exposición, Risk 52/100</p>
+                  <p><span className="font-semibold">Plan:</span> Enterprise (UF 22/mes = UF 264/año)</p>
+                  <p><span className="font-semibold">Ahorro:</span> UF 4,736/año (~$173K USD)</p>
+                  <p><span className="font-semibold text-green-600">ROI: 2 meses</span></p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* FAQ */}
-          <div className="mt-20 border-t pt-16">
-            <h3 className="text-3xl font-bold mb-8">Preguntas Frecuentes</h3>
-            <div className="grid md:grid-cols-2 gap-8">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8">Preguntas Frecuentes</h2>
+            <div className="space-y-6">
               {[
                 {
-                  q: '¿Puedo cambiar de plan después?',
-                  a: 'Sí. Puedes upgrade o downgrade en cualquier momento. Los cambios se reflejan en tu próximo ciclo de facturación.'
+                  q: '¿Incluye capacitación?',
+                  a: 'Sí, todos los planes incluyen onboarding completo y acceso a webinars de capacitación. Enterprise incluye training personalizado.'
                 },
                 {
-                  q: '¿Hay período de prueba?',
-                  a: 'Sí. 14 días gratis para todos los planes. No se requiere tarjeta de crédito.'
+                  q: '¿Puedo cambiar de plan?',
+                  a: 'Sí, puedes cambiar en cualquier momento. Si subes de plan pagas la diferencia prorrateada. Si bajas, se ajusta al siguiente ciclo.'
                 },
                 {
-                  q: '¿Qué es el SLA?',
-                  a: 'Es el acuerdo de nivel de servicio. Garantizamos disponibilidad mínima de la plataforma.'
+                  q: '¿Qué pasa después del trial gratis?',
+                  a: 'El trial es de 14 días sin tarjeta requerida. Si decides no continuar, simplemente no te cobramos. Si continúas, se activa tu suscripción mensual.'
                 },
                 {
-                  q: '¿Puedo tener más usuarios?',
-                  a: 'En Professional y Enterprise sí. En Starter está limitado a 1 usuario, pero puedes contactarnos para más.'
-                },
-              ].map((faq, idx) => (
-                <div key={idx} className="space-y-2">
-                  <h4 className="font-semibold">{faq.q}</h4>
-                  <p className="text-sm text-muted-foreground">{faq.a}</p>
+                  q: '¿Cómo se factua?',
+                  a: 'Facturamos mensualmente en UF. Puedes pagar por transferencia bancaria o tarjeta de crédito. Emitimos factura electrónica completa.'
+                }
+              ].map((item, idx) => (
+                <div key={idx} className="border-b pb-4">
+                  <p className="font-semibold mb-2">{item.q}</p>
+                  <p className="text-sm text-muted-foreground">{item.a}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Final CTA */}
-          <div className="mt-20 bg-primary/5 border border-primary/20 rounded-lg p-12 text-center space-y-6">
-            <h3 className="text-3xl font-bold">¿No estás seguro cuál plan es el correcto?</h3>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Contáctanos. Te ayudamos a elegir el plan perfecto según el tamaño de tu empresa y necesidades específicas.
-            </p>
-            <Button size="lg" asChild>
-              <a href="/contact">Hablar con un especialista</a>
-            </Button>
-          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <p className="font-semibold mb-3">Producto</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/" className="hover:text-foreground transition">Inicio</a></li>
-                <li><a href="/pricing" className="hover:text-foreground transition">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Legal</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Empresa</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
-            </div>
-          </div>
+      {/* CTA */}
+      <section className="py-24 px-6 bg-primary text-primary-foreground">
+        <div className="container mx-auto max-w-2xl text-center space-y-8">
+          <h2 className="text-4xl font-bold">¿Listo para empezar?</h2>
+          <p className="text-lg opacity-90">14 días gratis. Sin tarjeta de crédito. Acceso completo a todos los agentes.</p>
+          <Button size="lg" variant="secondary" asChild>
+            <a href="/sign-up">Comienza tu prueba gratis</a>
+          </Button>
         </div>
-      </footer>
+      </section>
     </div>
   )
 }
