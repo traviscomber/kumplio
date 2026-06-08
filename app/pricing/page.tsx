@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check } from 'lucide-react'
@@ -75,8 +77,6 @@ const plans = [
 ]
 
 export default function PricingPage() {
-  const router = useRouter()
-
   return (
     <div className="bg-background">
       {/* Navigation */}

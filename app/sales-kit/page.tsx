@@ -1,6 +1,9 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Copy, Download } from 'lucide-react'
+import { useState } from 'react'
 
 export const dynamic = 'force-dynamic'
 
