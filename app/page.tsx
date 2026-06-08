@@ -32,6 +32,7 @@ export default function HomePage() {
 
           {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
+            <a href="/sign-in" className="text-sm hover:text-primary transition">Acceder</a>
           </div>
         </div>
       </nav>

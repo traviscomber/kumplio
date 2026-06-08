@@ -29,6 +29,7 @@ export default function MineriaDemoPage() {
 
           {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
+            <Link href="/sign-in" className="text-sm hover:text-primary transition">Acceder</Link>
           </div>
         </div>
       </nav>
