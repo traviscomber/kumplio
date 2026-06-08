@@ -168,10 +168,11 @@ export default function RootLayout({
         <meta name="coverage" content="Chile" />
         <meta name="distribution" content="global" />
         
-        {/* Structured Data Schemas */}
+        {/* Structured Data Schemas - Server Only */}
         
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -205,6 +206,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -245,6 +247,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
