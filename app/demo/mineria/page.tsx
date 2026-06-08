@@ -287,7 +287,7 @@ export default function MineriaDemoPage() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Semana 1:</strong> Isidora mapeó 180+ obligaciones. R0drigo alertó sobre cambios SONAMI recientes.</span>
+                <span><strong>Semana 1:</strong> Is1dora mapeó 180+ obligaciones. R0drigo alertó sobre cambios SONAMI recientes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
