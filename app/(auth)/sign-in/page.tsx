@@ -30,6 +30,8 @@ export default function SignIn() {
       if (signInError) {
         setError(signInError.message)
       } else {
+        // Wait for session to be established
+        await new Promise(resolve => setTimeout(resolve, 500))
         router.push('/dashboard')
       }
     } catch (err) {

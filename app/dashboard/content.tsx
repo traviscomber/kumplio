@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, AlertTriangle, CheckCircle, Activity, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 
 interface DashboardStats {
   totalProjects: number
@@ -16,6 +17,7 @@ export function DashboardContent() {
   const [user, setUser] = useState<any>(null)
   const [organization, setOrganization] = useState<any>(null)
   const [projects, setProjects] = useState<any[]>([])
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
     criticalVulns: 0,
@@ -37,13 +39,29 @@ export function DashboardContent() {
 
         setUser(authUser)
 
-        // Get organization
+        // FIRST: Check if user has ANY documents - if not, show onboarding
+        const { data: documentList } = await supabase
+          .from('documents')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .limit(1)
+
+        console.log('[v0] Document check:', { documentList, count: documentList?.length })
+        if (!documentList || documentList.length === 0) {
+          console.log('[v0] No documents found - showing onboarding')
+          setShowOnboarding(true)
+          setLoading(false)
+          return
+        }
+
+        // If user HAS documents, load organization and stats
         const { data: memberData } = await supabase
           .from('organization_members')
           .select('organization_id')
           .eq('user_id', authUser.id)
           .single()
 
+        console.log('[v0] Member data:', memberData)
         const orgId = memberData?.organization_id
         if (orgId) {
           const { data: org } = await supabase
@@ -52,6 +70,7 @@ export function DashboardContent() {
             .eq('id', orgId)
             .single()
           
+          console.log('[v0] Organization:', org)
           setOrganization(org)
 
           // Get projects
@@ -86,6 +105,8 @@ export function DashboardContent() {
               recentScans: projectList.filter(p => p.last_scan_date).length,
             })
           }
+        } else {
+          console.log('[v0] No organization found for user')
         }
       } catch (error) {
         console.error('[v0] Dashboard load error:', error)
@@ -99,6 +120,27 @@ export function DashboardContent() {
 
   if (loading) {
     return <div className="text-center py-12">Cargando...</div>
+  }
+
+  // Show onboarding flow if no documents
+  if (showOnboarding) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">
+            Bienvenido a KUMPLIO
+          </h1>
+          <p className="text-muted-foreground mt-1">Vamos a empezar analizando tus documentos</p>
+        </div>
+        <OnboardingFlow
+          organizationName={organization?.name}
+          onComplete={() => {
+            // Redirect to documents page
+            window.location.href = '/documents'
+          }}
+        />
+      </div>
+    )
   }
 
   return (
