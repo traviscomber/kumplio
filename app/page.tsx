@@ -578,8 +578,25 @@ export default function HomePage() {
       {/* TRUST SIGNALS SECTION */}
       <TrustSignals />
 
-      {/* CONVERSION CTA SECTION - HIDDEN */}
-      {/* <ConversionCTA /> */}
+      {/* CONVERSION CTA SECTION */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-4xl md:text-5xl font-bold">¿Listo para Cumplir la Ley 21.719?</h2>
+              <p className="text-xl text-muted-foreground">Diagnóstico gratis en 60 segundos. Sin tarjeta de crédito.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" asChild className="text-base font-semibold px-8">
+                <a href="/pricing">Ver Planes y Precios →</a>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="text-base font-semibold px-8">
+                <a href="/sign-up">Comenzar Gratis →</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">
