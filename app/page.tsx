@@ -325,136 +325,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PRICING SECTION */}
-      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-4xl font-bold">Planes Diseñados para Tu Empresa</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Costo mínimo vs riesgo máximo. El costo del seguro vs el costo del siniestro.
+      {/* CTA TO PRICING PAGE */}
+      <section className="py-24 px-6 border-t border-border">
+        <div className="container mx-auto max-w-3xl text-center space-y-8">
+          <div>
+            <h2 className="text-4xl font-bold mb-4">Planes Flexibles para Tu Tamaño</h2>
+            <p className="text-lg text-muted-foreground">
+              Desde startups hasta empresas grandes. Costo mínimo vs riesgo máximo.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Tier 1 - Startup */}
-            <div className="rounded-lg border border-border p-8 space-y-6 hover:border-primary transition">
-              <div>
-                <h3 className="text-2xl font-bold">Startup</h3>
-                <p className="text-xs text-muted-foreground mt-1">1-5 personas</p>
-              </div>
-              <div>
-                <div className="text-4xl font-black text-primary">$99</div>
-                <p className="text-xs text-muted-foreground mt-1">/mes</p>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">1 diagnóstico gratis inicial</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Monitoreo 24/7 Ley 21.719</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Alertas de cambios regulatorios</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Reportes mensuales en PDF</span>
-                </li>
-              </ul>
-              <Button size="lg" className="w-full" asChild>
-                <a href="/sign-up?plan=startup">Comenzar</a>
-              </Button>
-            </div>
-
-            {/* Tier 2 - Scale (Featured) */}
-            <div className="rounded-lg border-2 border-primary p-8 space-y-6 bg-primary/5 relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
-                MÁS POPULAR
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">Scale</h3>
-                <p className="text-xs text-muted-foreground mt-1">5-20 personas</p>
-              </div>
-              <div>
-                <div className="text-4xl font-black text-primary">$299</div>
-                <p className="text-xs text-muted-foreground mt-1">/mes</p>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Diagnósticos ilimitados</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Validación legal SERNAC (Cat4lina)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Cuantificación riesgos en UF real</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Roadmap 90 días ejecutable</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Soporte por chat 24/7</span>
-                </li>
-              </ul>
-              <Button size="lg" className="w-full bg-primary text-black hover:bg-primary/80" asChild>
-                <a href="/sign-up?plan=scale">Comenzar</a>
-              </Button>
-            </div>
-
-            {/* Tier 3 - Enterprise */}
-            <div className="rounded-lg border border-border p-8 space-y-6 hover:border-primary transition">
-              <div>
-                <h3 className="text-2xl font-bold">Enterprise</h3>
-                <p className="text-xs text-muted-foreground mt-1">20+ personas</p>
-              </div>
-              <div>
-                <div className="text-4xl font-black text-primary">A medida</div>
-                <p className="text-xs text-muted-foreground mt-1">/mes</p>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Todo en Scale +</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">API + integración custom</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Auditoría independiente trimestral</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">Account manager dedicado</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-sm">SLA garantizado 99.9%</span>
-                </li>
-              </ul>
-              <Button size="lg" className="w-full" variant="outline" asChild>
-                <a href="mailto:sales@kumplio.com">Contactar Ventas</a>
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-16 p-8 rounded-lg bg-card border border-border text-center space-y-4">
-            <p className="text-muted-foreground">
-              <span className="font-bold">Referencia de valor:</span> Multa mínima por infracción grave = 500 UTM (~$35M CLP). KUMPLIO desde $99/mes. El ROI es inmediato.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Todos los planes incluyen diagnóstico gratis inicial. Sin compromisos.
-            </p>
-          </div>
+          <Button size="lg" className="text-lg px-8 bg-primary text-black hover:bg-primary/80 font-semibold" asChild>
+            <a href="/pricing">
+              Ver Precios y Planes
+              <ArrowRight className="ml-3 w-5 h-5" />
+            </a>
+          </Button>
         </div>
       </section>
 
