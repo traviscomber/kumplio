@@ -1,3 +1,26 @@
+# Google Crawlers - Aggressive indexing
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.5
+Request-rate: 50/1s
+
+# Bing Crawlers
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+Request-rate: 30/1s
+
+# Yahoo Crawlers
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Default for all other crawlers
 User-agent: *
 Allow: /
 Disallow: /api/
@@ -5,19 +28,22 @@ Disallow: /(auth)/*
 Disallow: /dashboard/*
 Disallow: /admin/*
 Disallow: /.well-known/pki-validation/
+Crawl-delay: 1
 
+# Important: Multiple Sitemaps
 Sitemap: https://kumplio.cl/sitemap.xml
+Sitemap: https://kumplio.cl/sitemap-industries.xml
+Sitemap: https://kumplio.cl/sitemap-regions.xml
 
-# Chile-specific crawl delay
-User-agent: *
-Crawl-delay: 1
+# Allow critical paths
+Allow: /pricing
+Allow: /features/
+Allow: /resources/
+Allow: /demo/
+Allow: /blog/
+Allow: /regiones/
+Allow: /about
+Allow: /contact
+Allow: /privacy
+Allow: /terms
 
-# Bing
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-# Google
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0.5
