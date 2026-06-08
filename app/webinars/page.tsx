@@ -54,7 +54,7 @@ const webinars = [
       'Auditoría independiente (Por qué importa)',
     ],
     targetAudience: 'Directores de Cumplimiento, CFOs, Abogados',
-    image: '📋',
+    image: 'legal',
   },
 ]
 

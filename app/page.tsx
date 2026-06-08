@@ -81,7 +81,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Sofia</h3>
                   <p className="text-sm text-muted-foreground">Analizadora de Obligaciones</p>
                 </div>
-                <span className="text-3xl">📄</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">47</div>
               <p className="text-sm">Obligaciones identificadas en tu negocio</p>
@@ -95,7 +95,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Elena</h3>
                   <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
                 </div>
-                <span className="text-3xl">👁️</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">24/7</div>
               <p className="text-sm">Cambios legales en tu inbox al instante</p>
@@ -109,7 +109,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Bruno</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos</p>
                 </div>
-                <span className="text-3xl">⚠️</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">$1.2M</div>
               <p className="text-sm">Exposición financiera si incumples</p>
@@ -123,7 +123,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Marco</h3>
                   <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
                 </div>
-                <span className="text-3xl">💡</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">90 Días</div>
               <p className="text-sm">Plan de acción ejecutable</p>
@@ -137,7 +137,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Laura</h3>
                   <p className="text-sm text-muted-foreground">Auditora de Cumplimiento</p>
                 </div>
-                <span className="text-3xl">✓</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">52%</div>
               <p className="text-sm">De tus obligaciones cumpliéndose realmente</p>
@@ -151,7 +151,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Kai</h3>
                   <p className="text-sm text-muted-foreground">Aprendizaje Continuo</p>
                 </div>
-                <span className="text-3xl">🧠</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">+5%</div>
               <p className="text-sm">Mejora en accuracy cada mes</p>
@@ -166,7 +166,7 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold">Catarina</h3>
                 <p className="text-sm text-muted-foreground">Reportera Legal</p>
               </div>
-              <span className="text-3xl">📋</span>
+              <span className="text-3xl text-muted-foreground">●</span>
             </div>
             <div className="text-3xl font-black text-primary">1 Click</div>
             <p className="text-sm">PDF listo para reguladores</p>

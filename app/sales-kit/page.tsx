@@ -103,9 +103,9 @@ Pensé que podría interesarte porque la mayoría de empresas de transporte que 
 - Reputación con clientes (auditorías fallidas)
 
 Labbe fue diferente. En 90 días:
-✓ De 15 multas → 0 multas
-✓ De $200K expuesto → Controlado
-✓ De 15 hrs/sem → 1 hora/mes
+De 15 multas → 0 multas
+De $200K expuesto → Controlado
+De 15 hrs/sem → 1 hora/mes
 
 No es magia. Solo tecnología.
 
