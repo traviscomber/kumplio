@@ -2,20 +2,49 @@ import type { Metadata } from 'next'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Shield, CheckCircle, AlertTriangle, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
-  title: 'Cumplimiento Ley 21.719 Chile | KUMPLIO - Guía Completa',
-  description: 'Guía completa sobre Ley 21.719 de protección de datos en Chile. Cómo cumplir con obligaciones legales, riesgos de incumplimiento y soluciones con KUMPLIO.',
+  title: 'Cumplimiento Ley 21.719 Chile | KUMPLIO - Guía Completa & Solución IA',
+  description: 'Guía completa sobre Ley 21.719 de protección de datos en Chile. Cómo cumplir con obligaciones, riesgos de incumplimiento, multas, sanciones y soluciones automatizadas con IA.',
   keywords: [
     'Ley 21.719',
+    'Ley 21.719 chile',
     'Protección de datos Chile',
     'LGPD Chile',
     'Cumplimiento Ley 21.719',
-    'Regulaciones Chile',
-    'Protección datos personales',
+    'Ley protección datos personales',
+    'Regulaciones Chile datos',
+    'Obligaciones Ley 21.719',
+    'Cumplimiento normativo datos',
+    'Privacidad datos personales',
+    'Cumplimiento legal chile',
   ],
   alternates: {
     canonical: 'https://kumplio.cl/features/ley-21719',
+    languages: {
+      'es-CL': 'https://kumplio.cl/features/ley-21719',
+    },
+  },
+  openGraph: {
+    title: 'Ley 21.719 Chile - Cumplimiento Automático con IA | KUMPLIO',
+    description: 'Guía completa sobre Ley 21.719 y cómo cumplir. Soluciones automatizadas con IA.',
+    url: 'https://kumplio.cl/features/ley-21719',
+    type: 'article',
+    images: [
+      {
+        url: 'https://kumplio.cl/og-ley-21719.png',
+        width: 1200,
+        height: 630,
+        alt: 'Cumplimiento Ley 21.719 Chile',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ley 21.719 Chile - Guía & Solución IA',
+    description: 'Automatiza tu cumplimiento con KUMPLIO',
+    images: ['https://kumplio.cl/og-ley-21719.png'],
   },
 }
 
@@ -59,10 +88,10 @@ export default function Ley21719Page() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" asChild>
-              <Link href="/sign-up">
+            <Button size="lg" className="group/btn" asChild>
+              <Link href="/sign-up" className="flex items-center">
                 Comenzar análisis de cumplimiento
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </Link>
             </Button>
             <Button size="lg" variant="outline">
@@ -235,10 +264,10 @@ export default function Ley21719Page() {
             })}
           </div>
 
-          <Button size="lg" asChild className="w-full">
-            <Link href="/sign-up">
+          <Button size="lg" asChild className="w-full group/btn" >
+            <Link href="/sign-up" className="flex items-center justify-center">
               Comenzar análisis gratuito de cumplimiento Ley 21.719
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
             </Link>
           </Button>
         </div>
@@ -257,14 +286,7 @@ export default function Ley21719Page() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-12 mt-24">
-        <div className="container mx-auto px-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>KUMPLIO © 2024 - Inteligencia Documental para Cumplimiento Normativo en Chile</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

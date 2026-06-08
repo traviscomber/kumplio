@@ -1,29 +1,40 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import './n3uralia-components.css';
 
 @layer base {
   :root {
-    /* BrightScope Professional Color System */
+    /* N3uralia Premium Portal System - by Irin */
     
-    /* Primary Brand Color - Trust & Intelligence */
-    --bs-blue: 59 102 255;
-    --bs-blue-light: 239 240 255;
-    --bs-blue-dark: 31 61 184;
+    /* Primary Colors */
+    --primary-mist-blue: #7496A0;
+    --primary-blue-gray: #4B5F68;
+    --primary-graphite: #2E323D;
+    --primary-deep-navy: #181E2A;
     
-    /* Secondary Accent Color - Precision */
-    --bs-cyan: 6 214 214;
-    --bs-cyan-light: 224 254 254;
+    /* Neutral Colors */
+    --neutral-black: #010101;
+    --neutral-white: #FFFFFF;
+    --neutral-gray-light: #999999;
+    --neutral-gray-medium: #585858;
     
-    /* Neutral Palette - 7-step gray system */
-    --gray-950: 10 13 20;
-    --gray-900: 15 20 25;
-    --gray-800: 26 31 46;
-    --gray-700: 45 49 66;
-    --gray-600: 70 79 99;
-    --gray-400: 154 162 181;
-    --gray-200: 228 232 240;
-    --gray-50: 248 249 252;
+    /* Secondary/Accent Colors */
+    --secondary-lime: #B1D374;
+    --secondary-olive: #80A440;
+    --secondary-violet: #3F3478;
+    --secondary-deep-violet: #171628;
+    
+    /* Backgrounds & Surfaces */
+    --background-main: #010101;
+    --background-soft: #181E2A;
+    --surface-dark: rgba(24, 30, 42, 0.72);
+    --surface-soft: rgba(75, 95, 104, 0.22);
+    
+    /* Accent System */
+    --accent-main: #B1D374;
+    --accent-secondary: #7496A0;
+    --accent-deep: #3F3478;
     
     /* Semantic Status Colors */
     --success: 16 185 129;
@@ -38,59 +49,63 @@
     --risk-low: 132 204 22;
     
     /* UI Layer System */
-    --background: 0 0 0;
-    --foreground: 248 249 252;
-    --card: 10 13 20;
-    --card-foreground: 248 249 252;
-    --popover: 10 13 20;
-    --popover-foreground: 248 249 252;
+    --background: 1 1 1;
+    --foreground: 255 255 255;
+    --card: 24 30 42;
+    --card-foreground: 255 255 255;
+    --popover: 24 30 42;
+    --popover-foreground: 255 255 255;
     
-    --primary: 59 102 255;
-    --primary-foreground: 0 0 0;
+    --primary: 177 211 116;
+    --primary-foreground: 1 1 1;
     
-    --secondary: 26 31 46;
-    --secondary-foreground: 248 249 252;
+    --secondary: 116 150 160;
+    --secondary-foreground: 255 255 255;
     
-    --muted: 45 49 66;
-    --muted-foreground: 154 162 181;
+    --muted: 75 95 104;
+    --muted-foreground: 153 153 153;
     
-    --accent: 6 214 214;
-    --accent-foreground: 0 0 0;
+    --accent: 177 211 116;
+    --accent-foreground: 1 1 1;
     
     --destructive: 239 68 68;
-    --destructive-foreground: 248 249 252;
+    --destructive-foreground: 255 255 255;
     
-    --border: 45 49 66;
-    --input: 26 31 46;
-    --ring: 59 102 255;
+    --border: 46 50 61;
+    --input: 24 30 42;
+    --ring: 177 211 116;
     
     /* Spacing & Sizing */
+    --radius: 5px;
     --radius-xs: 4px;
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
+    --radius-sm: 5px;
+    --radius-md: 5px;
+    --radius-lg: 5px;
+    --radius-xl: 5px;
+    
+    /* Typography */
+    --font-main: "Montserrat", sans-serif;
   }
 
   .light {
     --background: 248 249 252;
-    --foreground: 15 20 25;
+    --foreground: 1 1 1;
     --card: 255 255 255;
-    --card-foreground: 15 20 25;
+    --card-foreground: 1 1 1;
     --popover: 255 255 255;
-    --popover-foreground: 15 20 25;
+    --popover-foreground: 1 1 1;
     
-    --primary: 59 102 255;
-    --primary-foreground: 255 255 255;
+    --primary: 177 211 116;
+    --primary-foreground: 1 1 1;
     
-    --secondary: 248 249 252;
-    --secondary-foreground: 15 20 25;
+    --secondary: 116 150 160;
+    --secondary-foreground: 1 1 1;
     
-    --muted: 228 232 240;
-    --muted-foreground: 70 79 99;
+    --muted: 153 153 153;
+    --muted-foreground: 88 88 88;
     
-    --accent: 6 214 214;
-    --accent-foreground: 0 0 0;
+    --accent: 177 211 116;
+    --accent-foreground: 1 1 1;
     
     --border: 228 232 240;
     --input: 248 249 252;
@@ -101,11 +116,15 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: var(--font-main), sans-serif;
+    font-weight: 300;
+    background-color: var(--background-main);
   }
 
   html {
     @apply scroll-smooth;
+    background-color: var(--background-main);
   }
   
   /* Custom scrollbar styling */
@@ -115,15 +134,16 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-secondary;
+    background: rgba(46, 50, 61, 0.3);
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded;
+    background: rgba(177, 211, 116, 0.5);
+    border-radius: 5px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground;
+    background: rgba(177, 211, 116, 0.8);
   }
 }
 
@@ -148,5 +168,6 @@
   --color-input: rgb(var(--input));
   --color-ring: rgb(var(--ring));
   
-  --radius: var(--radius-md);
+  --radius: var(--radius);
 }
+

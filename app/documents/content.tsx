@@ -33,7 +33,7 @@ export function DocumentsContent() {
       {/* Alerts */}
       {successMessage && (
         <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-400">
-          ✓ {successMessage}
+          {successMessage}
         </div>
       )}
 

@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: 'KUMPLIO - Cumplimiento Ley 21.719 Chile | IA & LLM para Compliance Legal',
   description: 'KUMPLIO: Plataforma con IA y LLM para cumplimiento automático de Ley 21.719 en Chile. 7 agentes expertos, análisis de documentos, cuantificación de riesgos, roadmaps de cumplimiento. Solución enterprise para empresas chilenas. Desarrollado por n3uralia.com',
   keywords: [
+    // Compliance General
     'Cumplimiento Ley 21.719',
     'Protección de datos Chile',
     'IA legal Chile',
@@ -24,8 +25,54 @@ export const metadata: Metadata = {
     'Gestión de obligaciones legales',
     'Riesgo normativo Chile',
     'Agentes IA legal',
+    
+    // Regional Keywords - Metropolitan & Major Cities
+    'compliance legal santiago',
+    'ley 21.719 santiago',
+    'compliance valparaíso',
+    'compliance concepción',
+    'compliance puente alto',
+    'compliance maipú',
+    'ley datos viña del mar',
+    
+    // Regional Coverage
+    'cumplimiento legal tarapacá',
+    'compliance legal antofagasta',
+    'cumplimiento atacama',
+    'compliance legal o\'higgins',
+    'cumplimiento legal bío bío',
+    'compliance araucanía',
+    'cumplimiento legal los ríos',
+    'compliance los lagos',
+    'cumplimiento legal aysén',
+    'compliance magallanes',
+    
+    // Industry Specific - Transport
+    'compliance transporte chile',
+    'regulaciones transporte',
+    'ley transporte chile',
+    'cumplimiento transportista',
+    'reglamento vías públicas',
+    
+    // Industry Specific - Mining
+    'compliance minería chile',
+    'regulaciones minería',
+    'ley seguridad minería',
+    'cumplimiento minero',
+    'reglamento minería chile',
+    
+    // Legal Frameworks
+    'ley 19.628 datos',
+    'cumplimiento laboral chile',
+    'regulaciones ambientales',
+    'ley 20.045 sistemas',
+    'decreto 40 seguridad',
+    'ley 20.255 pensiones',
+    
+    // Brand & Organization
     'n3uralia',
     'KUMPLIO',
+    'kumplio.cl',
   ],
   generator: 'kumplio.cl',
   referrer: 'strict-origin-when-cross-origin',
@@ -110,6 +157,16 @@ export default function RootLayout({
   return (
     <html lang="es-CL" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
       <head>
+        {/* Geographic & Geo Tags for Chile */}
+        <meta name="geo.placename" content="Chile" />
+        <meta name="geo.region" content="CL" />
+        <meta name="geo.position" content="-33.8688;-151.2093" />
+        <meta name="ICBM" content="-33.8688,-151.2093" />
+        
+        {/* Regional Coverage Meta Tags */}
+        <meta name="coverage" content="Chile" />
+        <meta name="distribution" content="global" />
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -210,6 +267,12 @@ export default function RootLayout({
           }}
         />
         <link rel="sitemap" href="/sitemap.xml" />
+        
+        {/* JSON-LD Schema References */}
+        <link rel="alternate" href="/schema-service.json" type="application/ld+json" />
+        <link rel="alternate" href="/schema-software.json" type="application/ld+json" />
+        <link rel="alternate" href="/schema-industries.json" type="application/ld+json" />
+        <link rel="alternate" href="/schema-regions.json" type="application/ld+json" />
       </head>
       <body className="font-sans antialiased text-foreground">
         <ClientProviders>

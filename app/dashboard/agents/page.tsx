@@ -28,10 +28,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Extracción de obligaciones legales</li>
-              <li>✓ Identificación de partes interesadas</li>
-              <li>✓ Mapeo de cláusulas</li>
-              <li>✓ Puntuación de relevancia Ley 21.719</li>
+              <li>Extracción de obligaciones legales</li>
+              <li>Identificación de partes interesadas</li>
+              <li>Mapeo de cláusulas</li>
+              <li>Puntuación de relevancia Ley 21.719</li>
             </ul>
           </CardContent>
         </Card>
@@ -43,10 +43,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Escaneo regulatorio</li>
-              <li>✓ Seguimiento de plazos</li>
-              <li>✓ Generación de alertas críticas</li>
-              <li>✓ Monitoreo de estado Ley 21.719</li>
+              <li>Escaneo regulatorio</li>
+              <li>Seguimiento de plazos</li>
+              <li>Generación de alertas críticas</li>
+              <li>Monitoreo de estado Ley 21.719</li>
             </ul>
           </CardContent>
         </Card>
@@ -58,10 +58,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Cuantificación de riesgos (puntuación 0-100)</li>
-              <li>✓ Cálculos de sanciones (UF)</li>
-              <li>✓ Análisis de exposición financiera</li>
-              <li>✓ Mapeo de probabilidad e impacto</li>
+              <li>Cuantificación de riesgos (puntuación 0-100)</li>
+              <li>Cálculos de sanciones (UF)</li>
+              <li>Análisis de exposición financiera</li>
+              <li>Mapeo de probabilidad e impacto</li>
             </ul>
           </CardContent>
         </Card>
@@ -73,10 +73,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Recomendaciones accionables</li>
-              <li>✓ Hojas de ruta de implementación</li>
-              <li>✓ Estimaciones de recursos</li>
-              <li>✓ Métricas de éxito</li>
+              <li>Recomendaciones accionables</li>
+              <li>Hojas de ruta de implementación</li>
+              <li>Estimaciones de recursos</li>
+              <li>Métricas de éxito</li>
             </ul>
           </CardContent>
         </Card>
@@ -88,10 +88,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Verificación de cumplimiento</li>
-              <li>✓ Identificación de brechas</li>
-              <li>✓ Recopilación de evidencia</li>
-              <li>✓ Seguimiento de progreso</li>
+              <li>Verificación de cumplimiento</li>
+              <li>Identificación de brechas</li>
+              <li>Recopilación de evidencia</li>
+              <li>Seguimiento de progreso</li>
             </ul>
           </CardContent>
         </Card>
@@ -103,10 +103,10 @@ export default function AgentsDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 text-sm">
-              <li>✓ Reconocimiento de patrones</li>
-              <li>✓ Análisis de tasa de éxito</li>
-              <li>✓ Refinamiento de indicaciones</li>
-              <li>✓ Mejora del sistema</li>
+              <li>Reconocimiento de patrones</li>
+              <li>Análisis de tasa de éxito</li>
+              <li>Refinamiento de indicaciones</li>
+              <li>Mejora del sistema</li>
             </ul>
           </CardContent>
         </Card>

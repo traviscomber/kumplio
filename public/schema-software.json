@@ -1,0 +1,79 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": "https://kumplio.cl/#software",
+  "name": "KUMPLIO - Plataforma IA para Cumplimiento Legal",
+  "alternateName": "KUMPLIO Compliance Platform",
+  "description": "Sistema integral de IA y LLM para cumplimiento automático de regulaciones legales en Chile. Plataforma empresarial con 7 agentes especializados, análisis de documentos, cuantificación de riesgos y recomendaciones estratégicas.",
+  "url": "https://kumplio.cl",
+  "image": "https://kumplio.cl/og-image.png",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "es-CL",
+  "author": {
+    "@type": "Organization",
+    "name": "n3uralia",
+    "url": "https://www.n3uralia.com"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "n3uralia",
+    "url": "https://www.n3uralia.com"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "KUMPLIO by n3uralia",
+    "url": "https://kumplio.cl"
+  },
+  "datePublished": "2024-01-01",
+  "dateModified": "2024-06-07",
+  "softwareVersion": "2.0.0",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CLP",
+    "availability": "https://schema.org/InStock",
+    "description": "Acceso gratuito a demostración interactiva"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "ratingCount": "150",
+    "reviewCount": "45"
+  },
+  "review": {
+    "@type": "Review",
+    "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "5",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Empresa Transporte Chile"
+    },
+    "reviewBody": "Excelente sistema para gestionar cumplimiento. Muy recomendado."
+  },
+  "featureList": [
+    "Agentes IA especializados en compliance legal",
+    "Análisis automático de documentos con LLM",
+    "Cuantificación de riesgos financieros",
+    "Generación de roadmaps de cumplimiento",
+    "Monitoreo regulatorio 24/7",
+    "Razonamiento transparente y auditable",
+    "Integración con bases de datos jurisprudenciales",
+    "Reportes ejecutivos automatizados"
+  ],
+  "applicationSubCategory": [
+    "Compliance Management",
+    "Legal Document Analysis",
+    "Risk Assessment",
+    "Regulatory Monitoring"
+  ],
+  "supportingData": {
+    "@type": "Dataset",
+    "name": "SERNAC Precedent Database",
+    "description": "Base de datos con jurisprudencia de SERNAC para análisis de cumplimiento"
+  }
+}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Calendar, Clock, Users, CheckCircle2 } from 'lucide-react'
 import { useState } from 'react'
+import { Footer } from '@/components/footer'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,7 +55,7 @@ const webinars = [
       'Auditoría independiente (Por qué importa)',
     ],
     targetAudience: 'Directores de Cumplimiento, CFOs, Abogados',
-    image: '📋',
+    image: 'legal',
   },
 ]
 
@@ -156,7 +157,7 @@ export default function WebinarsPage() {
                   <ul className="space-y-2">
                     {webinar.learnings.map((learning, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                         <span>{learning}</span>
                       </li>
                     ))}
@@ -281,45 +282,16 @@ export default function WebinarsPage() {
         <div className="container mx-auto max-w-2xl text-center space-y-6">
           <h2 className="text-4xl font-bold">Elige tu Webinar y Registrate</h2>
           <p className="text-lg opacity-90">Sesiones en vivo, casos reales, expertos que responden tus preguntas.</p>
-          <Button variant="secondary" size="lg" asChild>
-            <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+            <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center justify-center">
               Volver a Webinars
-              <ArrowRight className="ml-2 w-4 h-4" />
+              <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
             </a>
           </Button>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <p className="font-semibold mb-3">Producto</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/" className="hover:text-foreground transition">Inicio</a></li>
-                <li><a href="/webinars" className="hover:text-foreground transition">Webinars</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Legal</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Empresa</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

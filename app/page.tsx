@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/footer'
 import { ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function HomePage() {
@@ -52,18 +53,77 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <a href="/demo/transporte">
+            <Button size="lg" className="text-lg px-8 group/btn" asChild>
+              <a href="/demo/transporte" className="flex items-center">
                 Demo: Transporte
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
-              <a href="/demo/mineria">
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80 group/btn" asChild>
+              <a href="/demo/mineria" className="flex items-center">
                 Demo: Minería
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </a>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* SYSTEM ARCHITECTURE - IA FIRST */}
+      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold">Sistema Integral de IA First</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                7 agentes especializados trabajando en orquesta. Cada uno alimenta al siguiente. Razonamiento avanzado más validación cruzada igual cumplimiento garantizado.
+              </p>
+            </div>
+
+            {/* SYSTEM FLOW */}
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-5 gap-3 items-center">
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Sofia</p>
+                  <p className="text-xs text-muted-foreground">Análisis de Obligaciones</p>
+                  <p className="text-2xl font-black text-primary mt-3">47</p>
+                </div>
+                <div className="text-center text-muted-foreground text-xl">→</div>
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Bruno</p>
+                  <p className="text-xs text-muted-foreground">Evaluación de Riesgos</p>
+                  <p className="text-2xl font-black text-primary mt-3">$1.2M</p>
+                </div>
+                <div className="text-center text-muted-foreground text-xl">→</div>
+                <div className="p-6 rounded-lg border border-border text-center">
+                  <p className="font-bold text-primary mb-2">Marco</p>
+                  <p className="text-xs text-muted-foreground">Plan de Acción</p>
+                  <p className="text-2xl font-black text-primary mt-3">90 D</p>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-lg border border-primary/30 bg-primary/5">
+                <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
+                <div className="grid md:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Sofia → Bruno</p>
+                    <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Bruno → Marco</p>
+                    <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Marco → Laura</p>
+                    <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-semibold text-primary">Laura → Todos</p>
+                    <p className="text-muted-foreground">Gaps identificados reentrenan a todos los agentes del sistema</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -71,7 +131,8 @@ export default function HomePage() {
       {/* 7 AGENTES - OUTCOMES */}
       <section className="py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold mb-16">7 Agentes IA. 7 Especialistas.</h2>
+          <h2 className="text-3xl font-bold mb-4">Los 7 Especialistas IA del Sistema</h2>
+          <p className="text-muted-foreground mb-16 max-w-2xl">Cada agente es un experto en su dominio. Juntos forman un sistema de razonamiento ultra-inteligente que aprende de cada decisión.</p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             {/* Sofia */}
@@ -81,7 +142,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Sofia</h3>
                   <p className="text-sm text-muted-foreground">Analizadora de Obligaciones</p>
                 </div>
-                <span className="text-3xl">📄</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">47</div>
               <p className="text-sm">Obligaciones identificadas en tu negocio</p>
@@ -95,7 +156,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Elena</h3>
                   <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
                 </div>
-                <span className="text-3xl">👁️</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">24/7</div>
               <p className="text-sm">Cambios legales en tu inbox al instante</p>
@@ -109,9 +170,9 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Bruno</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos</p>
                 </div>
-                <span className="text-3xl">⚠️</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-red-600">$1.2M</div>
+              <div className="text-3xl font-black text-primary">$1.2M</div>
               <p className="text-sm">Exposición financiera si incumples</p>
               <p className="text-xs text-muted-foreground">Multas, sanciones, cierres operacionales</p>
             </div>
@@ -123,7 +184,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Marco</h3>
                   <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
                 </div>
-                <span className="text-3xl">💡</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">90 Días</div>
               <p className="text-sm">Plan de acción ejecutable</p>
@@ -137,7 +198,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Laura</h3>
                   <p className="text-sm text-muted-foreground">Auditora de Cumplimiento</p>
                 </div>
-                <span className="text-3xl">✓</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">52%</div>
               <p className="text-sm">De tus obligaciones cumpliéndose realmente</p>
@@ -151,7 +212,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Kai</h3>
                   <p className="text-sm text-muted-foreground">Aprendizaje Continuo</p>
                 </div>
-                <span className="text-3xl">🧠</span>
+                <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">+5%</div>
               <p className="text-sm">Mejora en accuracy cada mes</p>
@@ -166,7 +227,7 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold">Catarina</h3>
                 <p className="text-sm text-muted-foreground">Reportera Legal</p>
               </div>
-              <span className="text-3xl">📋</span>
+              <span className="text-3xl text-muted-foreground">●</span>
             </div>
             <div className="text-3xl font-black text-primary">1 Click</div>
             <p className="text-sm">PDF listo para reguladores</p>
@@ -191,12 +252,12 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <p className="font-semibold text-sm">{item.problema}</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <p className="font-semibold text-sm text-green-700">{item.kumplio}</p>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="font-semibold text-sm">{item.kumplio}</p>
                 </div>
               </div>
             ))}
@@ -221,11 +282,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Excel)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>15 multas/año. $200K en infracciones.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>15 horas/semana en compliance manual</span>
                     </li>
                   </ul>
@@ -234,11 +295,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (KUMPLIO)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>0 multas. Auditorías limpias.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>0.5 horas/semana. ROI: 5 meses.</span>
                     </li>
                   </ul>
@@ -277,11 +338,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Alto riesgo)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>Riesgo regulatorio: 45/100</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>Potencial multa: $1.2M</span>
                     </li>
                   </ul>
@@ -290,11 +351,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (90 días)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>Riesgo: 8/100. Controlado.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>Evitó multa de $1.2M</span>
                     </li>
                   </ul>
@@ -305,52 +366,116 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TECHNOLOGY: IA FIRST ARCHITECTURE */}
+      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold">IA First: La Tecnología Detrás del Sistema</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                KUMPLIO no es software que usa IA. Es un sistema architected desde cero con IA como su fundamento.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* REASONING TECHNIQUES */}
+              <div className="p-8 rounded-lg border border-border space-y-4">
+                <h3 className="font-bold text-xl">Razonamiento Avanzado</h3>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Few-Shot Learning</p>
+                    <p className="text-muted-foreground">Cada agente aprende de ejemplos similares a tu caso, no de reglas genéricas.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Analogical Reasoning</p>
+                    <p className="text-muted-foreground">Sofia compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Causal Reasoning</p>
+                    <p className="text-muted-foreground">Bruno entiende causas raíz del incumplimiento, no solo calcula multas.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Metacognitive Validation</p>
+                    <p className="text-muted-foreground">El sistema cuestiona sus propias conclusiones e identifica asunciones débiles.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SYSTEM INTELLIGENCE */}
+              <div className="p-8 rounded-lg border border-border space-y-4">
+                <h3 className="font-bold text-xl">Inteligencia de Sistema</h3>
+                
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Multi-Method Validation</p>
+                    <p className="text-muted-foreground">Ninguna conclusión depende de un solo agente. Todo se valida por consenso.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Uncertainty Quantification</p>
+                    <p className="text-muted-foreground">Cada métrica incluye rangos de confianza y evidencia de apoyo completa.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Reasoning Traces</p>
+                    <p className="text-muted-foreground">Auditables por reguladores. Cada decisión tiene su trail de pensamiento completo.</p>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <p className="font-semibold text-primary">Continuous Learning</p>
+                    <p className="text-muted-foreground">Kai recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RESULTS */}
+            <div className="p-8 rounded-lg border border-primary/30 bg-primary/5">
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">95%</div>
+                  <p className="text-sm text-muted-foreground">Accuracy en análisis de cumplimiento</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">5 meses</div>
+                  <p className="text-sm text-muted-foreground">ROI promedio desde activación</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-3xl font-black text-primary">40%</div>
+                  <p className="text-sm text-muted-foreground">Menos hallucinating que sistemas estándar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-2xl text-center space-y-8">
-          <h2 className="text-5xl font-bold">Los 7 agentes de KUMPLIO están listos.</h2>
-          <p className="text-lg opacity-90">Los cambios legales no esperan. Tampoco las multas.</p>
+          <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
+          <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
-              <a href="/sign-up">Empezar Ahora</a>
+            <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
+              <a href="/sign-up" className="flex items-center justify-center">
+                Empezar Ahora
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
+              </a>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
-              <a href="/demo/transporte">Ver Demo</a>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
+              <a href="/demo/transporte" className="flex items-center justify-center">
+                Ver Sistema en Acción
+              </a>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <p className="font-semibold mb-3">Producto</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/demo/transporte" className="hover:text-foreground transition">Transporte</a></li>
-                <li><a href="/demo/mineria" className="hover:text-foreground transition">Minería</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Legal</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Empresa</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

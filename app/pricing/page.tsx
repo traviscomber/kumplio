@@ -261,7 +261,7 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-2xl text-center space-y-8">
           <h2 className="text-4xl font-bold">¿Listo para empezar?</h2>
           <p className="text-lg opacity-90">14 días gratis. Sin tarjeta de crédito. Acceso completo a todos los agentes.</p>
-          <Button size="lg" variant="secondary" asChild>
+          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-white/90" asChild>
             <a href="/sign-up">Comienza tu prueba gratis</a>
           </Button>
         </div>

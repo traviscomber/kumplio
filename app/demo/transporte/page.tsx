@@ -61,7 +61,7 @@ export default function TransporteDemoPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80" asChild>
               <Link href="/">Volver</Link>
             </Button>
           </div>
@@ -76,42 +76,42 @@ export default function TransporteDemoPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Vehículos detenidos por documentos vencidos</p>
                   <p className="text-sm text-muted-foreground mt-1">RT vencida, SOAP caducado, permiso de circulación expirado</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">$500K</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">$500K</p>
                 <p className="text-sm text-muted-foreground">Costo de operación detenida por 1 día</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">15 multas al año por incumplimientos</p>
                   <p className="text-sm text-muted-foreground mt-1">Licencia vencida, documentos no actualizados, carga mal asegurada</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">$200K</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">$200K</p>
                 <p className="text-sm text-muted-foreground">En infracciones anuales</p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold">Mandantes exigentes piden carpetas actualizadas</p>
                   <p className="text-sm text-muted-foreground mt-1">Auditorías continuas, evidencia documentada, trazabilidad completa</p>
                 </div>
               </div>
-              <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-3xl font-black text-red-600 mb-1">15 hrs</p>
+              <div className="p-6 rounded-lg bg-muted/10 border border-muted/20">
+                <p className="text-3xl font-black text-primary mb-1">15 hrs</p>
                 <p className="text-sm text-muted-foreground">Tiempo manual por semana</p>
               </div>
             </div>
@@ -131,9 +131,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">47 obligaciones en transporte: RT, SOAP, permisos, seguros, licencias conductores, documentación carga</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">47</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">47</p>
                   <p className="text-xs text-muted-foreground">Obligaciones mapeadas</p>
                 </div>
               </div>
@@ -145,9 +145,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Cambios en Ley 21.520, nuevas resoluciones SEREMI, modificaciones de requisitos</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">24/7</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">24/7</p>
                   <p className="text-xs text-muted-foreground">Alertas en tiempo real</p>
                 </div>
               </div>
@@ -159,9 +159,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Si tu flota tiene RT vencida: $200 UF por vehículo. Operación detenida: $500K/día</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">$1.2M</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">$1.2M</p>
                   <p className="text-xs text-muted-foreground">Exposición clara</p>
                 </div>
               </div>
@@ -173,9 +173,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Mes 1: Renovar RT flota. Mes 2: Auditoría SOAP. Mes 3: Certificados conductores</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">90 Días</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">90 Días</p>
                   <p className="text-xs text-muted-foreground">Plan con milestones</p>
                 </div>
               </div>
@@ -187,9 +187,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">Auditoría real: "52% de tu flota tiene documentos vencidos. Acción urgente."</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">100%</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">100%</p>
                   <p className="text-xs text-muted-foreground">Visibilidad real</p>
                 </div>
               </div>
@@ -201,9 +201,9 @@ export default function TransporteDemoPage() {
                 <p className="text-sm text-muted-foreground">1 click: PDF con evidencia de cumplimiento, carpetas documentales, auditorías lisas</p>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <p className="text-2xl font-black text-green-600">1 Click</p>
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-2xl font-black text-primary">1 Click</p>
                   <p className="text-xs text-muted-foreground">Listo para reguladores</p>
                 </div>
               </div>
@@ -221,9 +221,9 @@ export default function TransporteDemoPage() {
             <div className="p-8 rounded-lg border border-border bg-background">
               <p className="text-sm text-muted-foreground mb-2">Multas/Año</p>
               <div className="mb-4">
-                <p className="text-4xl font-black text-red-600">15</p>
-                <p className="text-xs text-red-600 font-semibold">→</p>
-                <p className="text-4xl font-black text-green-600">0</p>
+                <p className="text-4xl font-black text-muted-foreground">15</p>
+                <p className="text-xs text-muted-foreground font-semibold">→</p>
+                <p className="text-4xl font-black text-primary">0</p>
               </div>
               <p className="text-xs text-muted-foreground">Cero infracciones, auditorías limpias</p>
             </div>
@@ -250,15 +250,15 @@ export default function TransporteDemoPage() {
             <p className="font-semibold mb-4">Qué pasó en 90 días:</p>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 1:</strong> Sofia identificó 47 obligaciones. Elena alertó sobre cambios Ley 21.520.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 2:</strong> Bruno cuantificó: $1.2M en riesgo. Marco generó plan de acción. Ejecutaron.</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span><strong>Mes 3:</strong> Laura auditó: 100% de obligaciones cumplidas. Catarina generó carpetas para mandantes.</span>
               </li>
             </ul>
@@ -274,13 +274,13 @@ export default function TransporteDemoPage() {
             Los 7 agentes de KUMPLIO están listos para transporte. Cero multas. Operaciones 24/7. Auditorías listas.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="/sign-up">
+            <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
+              <Link href="/sign-up" className="flex items-center justify-center">
                 Prueba Gratis
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>
             </Button>
           </div>

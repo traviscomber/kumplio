@@ -122,7 +122,7 @@ export default function NewProjectPageClient() {
 
               <div className="bg-blue-500/5 border border-blue-200/20 rounded-lg p-4">
                 <p className="text-sm text-foreground">
-                  <span className="font-medium">💡 Consejo:</span> {' '}
+                  <span className="font-medium">Consejo:</span> {' '}
                   El proyecto incluirá análisis automático SAST, escaneo de dependencias y validación de cumplimiento Ley 21.719
                 </p>
               </div>

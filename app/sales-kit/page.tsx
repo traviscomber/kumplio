@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Copy, Download } from 'lucide-react'
 import { useState } from 'react'
+import { Footer } from '@/components/footer'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,9 +104,9 @@ Pensé que podría interesarte porque la mayoría de empresas de transporte que 
 - Reputación con clientes (auditorías fallidas)
 
 Labbe fue diferente. En 90 días:
-✓ De 15 multas → 0 multas
-✓ De $200K expuesto → Controlado
-✓ De 15 hrs/sem → 1 hora/mes
+De 15 multas → 0 multas
+De $200K expuesto → Controlado
+De 15 hrs/sem → 1 hora/mes
 
 No es magia. Solo tecnología.
 
@@ -291,12 +292,7 @@ export default function OutreachPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto max-w-6xl text-center text-sm text-muted-foreground">
-          <p>© 2026 KUMPLIO - Sales Resources | Acceso solo para Sales Team</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

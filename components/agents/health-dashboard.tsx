@@ -47,26 +47,26 @@ export function HealthDashboard() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'healthy':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-primary" />;
       case 'degraded':
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+        return <AlertTriangle className="h-4 w-4 text-muted-foreground" />;
       case 'unhealthy':
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-600" />;
+        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getStatusBgColor = (status: string) => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-50 border-green-200';
+        return 'bg-primary/5 border-primary/20';
       case 'degraded':
-        return 'bg-yellow-50 border-yellow-200';
+        return 'bg-muted/5 border-muted/20';
       case 'unhealthy':
-        return 'bg-red-50 border-red-200';
+        return 'bg-muted/5 border-muted/20';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-muted/5 border-muted/20';
     }
   };
 
@@ -82,9 +82,9 @@ export function HealthDashboard() {
 
   if (error) {
     return (
-      <Card className="border-destructive">
+      <Card className="border-muted/30">
         <CardContent className="pt-6">
-          <div className="text-sm text-destructive">{error}</div>
+          <div className="text-sm text-muted-foreground">{error}</div>
         </CardContent>
       </Card>
     );
@@ -115,10 +115,10 @@ export function HealthDashboard() {
             <Badge
               className={
                 health.status === 'operational'
-                  ? 'bg-green-600'
+                  ? 'bg-primary'
                   : health.status === 'degraded'
-                    ? 'bg-yellow-600'
-                    : 'bg-red-600'
+                    ? 'bg-muted'
+                    : 'bg-muted'
               }
             >
               {health.status.toUpperCase()}
