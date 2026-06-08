@@ -9,12 +9,24 @@ export default function HomePage() {
       {/* NAVIGATION */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          {/* LOGO */}
+          <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-white text-sm font-bold">K</span>
             </div>
             <span className="font-bold text-lg">KUMPLIO</span>
+          </a>
+
+          {/* CENTER LINKS - HIDDEN ON MOBILE */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="/pricing" className="text-sm hover:text-primary transition">Precios</a>
+            <a href="/demo/transporte" className="text-sm hover:text-primary transition">Transporte</a>
+            <a href="/demo/mineria" className="text-sm hover:text-primary transition">Minería</a>
+            <a href="/webinars" className="text-sm hover:text-primary transition">Webinars</a>
+            <a href="/sales-kit" className="text-sm hover:text-primary transition">Recursos</a>
           </div>
+
+          {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
             <a href="/sign-in" className="text-sm hover:text-primary transition">Acceder</a>
             <Button size="sm" asChild>

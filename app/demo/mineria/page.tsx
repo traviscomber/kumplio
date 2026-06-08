@@ -10,15 +10,30 @@ export default function MineriaDemoPage() {
       {/* HEADER */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          {/* LOGO */}
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-white text-sm font-bold">K</span>
             </div>
             <span className="font-bold text-lg">KUMPLIO</span>
           </Link>
-          <Button size="sm" asChild>
-            <Link href="/sign-up">Empezar</Link>
-          </Button>
+
+          {/* CENTER LINKS */}
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/" className="text-sm hover:text-primary transition">Inicio</Link>
+            <Link href="/pricing" className="text-sm hover:text-primary transition">Precios</Link>
+            <Link href="/demo/transporte" className="text-sm hover:text-primary transition">Transporte</Link>
+            <Link href="/demo/mineria" className="text-sm font-semibold text-primary">Minería</Link>
+            <Link href="/webinars" className="text-sm hover:text-primary transition">Webinars</Link>
+          </div>
+
+          {/* RIGHT BUTTONS */}
+          <div className="flex items-center gap-4">
+            <Link href="/sign-in" className="text-sm hover:text-primary transition">Acceder</Link>
+            <Button size="sm" asChild>
+              <Link href="/sign-up">Empezar</Link>
+            </Button>
+          </div>
         </div>
       </nav>
 
