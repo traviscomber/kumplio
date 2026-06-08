@@ -5,6 +5,7 @@ import { Footer } from '@/components/footer'
 import { TrustSignals } from '@/components/trust-signals'
 import { ConversionCTA } from '@/components/conversion-cta'
 import { SocialProof } from '@/components/social-proof'
+import { CountdownTimer } from '@/components/countdown-timer'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
@@ -42,52 +43,53 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* HERO - URGENCIA + LEY 21.719 */}
+      {/* HERO - SPLIT LAYOUT WITH COUNTDOWN */}
       <section className="pt-40 pb-24 px-6">
-        <div className="container mx-auto max-w-3xl text-center space-y-8">
-          {/* COUNTDOWN BANNER */}
-          <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
-            <p className="text-sm font-semibold text-primary">
-              La Ley 21.719 entra en vigor: 1 de Diciembre de 2026 — Faltan 178 días
-            </p>
-          </div>
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-2 gap-0 min-h-[600px]">
+            {/* LEFT SIDE - TEXT CONTENT */}
+            <div className="flex flex-col justify-center space-y-8 pr-8">
+              {/* COUNTDOWN BANNER */}
+              <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30 w-fit">
+                <p className="text-sm font-semibold text-primary">
+                  Ley 21.719 — Diciembre 1, 2026
+                </p>
+              </div>
 
-          <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-tight">
-            ¿Tu Empresa Está Lista para la Ley 21.719?
-            <br />
-            <span className="text-primary">Multas de hasta $1.400M CLP</span>
-          </h1>
+              <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-tight">
+                ¿Tu Empresa Está Lista para la Ley 21.719?
+                <br />
+                <span className="text-primary">Multas de hasta $1.400M CLP</span>
+              </h1>
 
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            7 agentes IA especializados analizan tu cumplimiento en 60 segundos. Desde obligaciones hasta cuantificación de riesgos en dinero real, planes ejecutables.
-            <br />
-            <span className="font-semibold">Para retail, fintech, salud, tecnología — cualquier empresa que trate datos en Chile.</span>
-          </p>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                7 agentes IA especializados analizan tu cumplimiento en 60 segundos. Desde obligaciones hasta cuantificación de riesgos en dinero real.
+                <br />
+                <span className="font-semibold">Para retail, fintech, salud, tecnología — cualquier empresa que trate datos en Chile.</span>
+              </p>
 
-          {/* SOCIAL PROOF */}
-          <div className="pt-4 pb-6 border-t border-b border-border/50">
-            <p className="text-sm text-muted-foreground mb-3">Confiado por +50 empresas chilenas</p>
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Retail</span>
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Fintech</span>
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Salud</span>
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Educación</span>
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Tech</span>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
+                  <a href="/sign-up" className="flex items-center justify-center">
+                    Diagnóstico Gratis
+                    <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
+                  </a>
+                </Button>
+                <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-white group/btn font-semibold" variant="outline" asChild>
+                  <a href="/demo/transporte" className="flex items-center justify-center">
+                    Ver Demo de 2 Min
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
-              <a href="/sign-up" className="flex items-center justify-center">
-                Diagnóstico Gratis
-                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
-              </a>
-            </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-white group/btn font-semibold" variant="outline" asChild>
-              <a href="/demo/transporte" className="flex items-center justify-center">
-                Ver Demo de 2 Min
-              </a>
-            </Button>
+            {/* DIVIDER LINE */}
+            <div className="hidden md:block absolute left-1/2 top-40 bottom-24 w-px bg-border/50 transform -translate-x-1/2"></div>
+
+            {/* RIGHT SIDE - COUNTDOWN TIMER */}
+            <div className="flex flex-col justify-center items-center pl-8 pt-8 md:pt-0">
+              <CountdownTimer />
+            </div>
           </div>
         </div>
       </section>
