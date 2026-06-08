@@ -197,19 +197,19 @@ export default function HomePage() {
                 <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
                 <div className="grid md:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Is1dora → R0drigo</p>
+                    <p className="font-semibold text-primary">1. Isidora → 2. Rodrigo</p>
                     <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">R0drigo → Jav1er</p>
+                    <p className="font-semibold text-primary">2. Rodrigo → 3. Javier</p>
                     <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Jav1er → Ver0nica</p>
+                    <p className="font-semibold text-primary">3. Javier → 5. Verónica</p>
                     <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Ver0nica → Cat4lina</p>
+                    <p className="font-semibold text-primary">5. Verónica → 7. Catalina</p>
                     <p className="text-muted-foreground">Gaps identificados se validan con jurisprudencia SERNAC</p>
                   </div>
                 </div>
@@ -226,11 +226,11 @@ export default function HomePage() {
           <p className="text-muted-foreground mb-16 max-w-2xl">Cada agente es un experto en su dominio. Juntos forman un sistema de razonamiento ultra-inteligente que aprende de cada decisión.</p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {/* Catarina - HERO AGENT - moved first for legal validation prominence */}
+            {/* 7. Catalina - HERO AGENT - moved first for legal validation prominence */}
             <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Catalina</h3>
+                  <h3 className="text-2xl font-bold">7. Cat4lina</h3>
                   <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
                 </div>
                 <span className="text-3xl text-primary">★</span>
@@ -240,11 +240,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
             </div>
 
-            {/* Is1dora */}
+            {/* 1. Isidora */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Is1dora</h3>
+                  <h3 className="text-2xl font-bold">1. Is1dora</h3>
                   <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -254,11 +254,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
             </div>
 
-            {/* R0drigo - Risk in UF/CLP money */}
+            {/* 2. Rodrigo - Risk in UF/CLP money */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">R0drigo</h3>
+                  <h3 className="text-2xl font-bold">2. R0drigo</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos (en UF reales)</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -268,11 +268,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">~$1.400M CLP en infracción gravísima. Exacto, en dinero real.</p>
             </div>
 
-            {/* Be4triz - Monitoring */}
+            {/* 4. Beatriz - Monitoring */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Be4triz</h3>
+                  <h3 className="text-2xl font-bold">4. Be4triz</h3>
                   <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -282,11 +282,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
             </div>
 
-            {/* Jav1er - Action Plan */}
+            {/* 3. Javier - Action Plan */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Jav1er</h3>
+                  <h3 className="text-2xl font-bold">3. Jav1er</h3>
                   <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -296,11 +296,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">3 fases, hitos mensuales, responsables, recursos — no un checklist</p>
             </div>
 
-            {/* Ver0nica - Audit */}
+            {/* 5. Verónica - Audit */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Ver0nica</h3>
+                  <h3 className="text-2xl font-bold">5. Ver0nica</h3>
                   <p className="text-sm text-muted-foreground">Auditora de Gap Analysis</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -310,11 +310,11 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Verificación independiente de cumplimiento real vs legal</p>
             </div>
 
-            {/* Andr3s - Learning */}
+            {/* 6. Andrés - Learning */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Andr3s</h3>
+                  <h3 className="text-2xl font-bold">6. Andr3s</h3>
                   <p className="text-sm text-muted-foreground">Optimizador de Sistema</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
