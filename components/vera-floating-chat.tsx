@@ -29,7 +29,7 @@ export function VeraFloatingChat() {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim()) return
+    if (!input?.trim?.()) return
     sendMessage({ text: input })
   }
 
@@ -176,7 +176,7 @@ export function VeraFloatingChat() {
               />
               <button
                 type="submit"
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || !input?.trim?.()}
                 className="h-10 w-10 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
               >
                 <Send className="w-4 h-4" />
