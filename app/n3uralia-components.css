@@ -1,0 +1,188 @@
+/* N3uralia Premium Portal System - Component Utilities */
+
+/* Premium Dark Card */
+.card-premium {
+  background: rgba(24, 30, 42, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+/* Softer Secondary Card */
+.card-soft {
+  background: rgba(75, 95, 104, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+/* Accent Card */
+.card-accent {
+  background: rgba(177, 211, 116, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 12px 40px rgba(177, 211, 116, 0.08);
+}
+
+/* Primary Button */
+.btn-primary {
+  background: rgba(177, 211, 116, 0.88);
+  color: #010101;
+  border: none;
+  border-radius: 5px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  padding: 14px 22px;
+  transition: all 240ms ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  padding: 14px 22px;
+  transition: all 240ms ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Dark Button */
+.btn-dark {
+  background: rgba(24, 30, 42, 0.86);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  padding: 14px 22px;
+  transition: all 240ms ease;
+  cursor: pointer;
+}
+
+.btn-dark:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  background: rgba(24, 30, 42, 1);
+}
+
+/* Typography */
+.hero-title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  font-size: clamp(42px, 6vw, 76px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+}
+
+.section-title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+}
+
+.card-title {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.25;
+  color: #FFFFFF;
+}
+
+.body-text {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.label-text {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-main);
+}
+
+/* Accent Text */
+.accent-lime {
+  color: #B1D374;
+}
+
+.accent-mist-blue {
+  color: #7496A0;
+}
+
+.accent-violet {
+  color: #3F3478;
+}
+
+/* Icon Styling */
+.icon-primary {
+  color: #B1D374;
+}
+
+.icon-secondary {
+  color: #7496A0;
+}
+
+.icon-muted {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Subtle animations */
+.transition-subtle {
+  transition: all 240ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Glass surfaces */
+.glass-dark {
+  background: rgba(24, 30, 42, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-soft {
+  background: rgba(75, 95, 104, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Surface contrast */
+.surface-elevated {
+  background: rgba(46, 50, 61, 0.5);
+}
+
+.surface-recessed {
+  background: rgba(24, 30, 42, 0.5);
+}
