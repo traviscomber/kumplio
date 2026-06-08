@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { Button } from '@/components/ui/button'
 import { MessageCircle, X, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -39,7 +38,8 @@ export function VeraFloatingChat() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-40 group"
-        aria-label="Abrir Vera"
+        type="button"
+        title="Abrir Vera"
       >
         <MessageCircle className="w-7 h-7 text-white" />
         <span className="absolute -top-2 -right-2 w-3 h-3 bg-accent rounded-full animate-pulse" />
@@ -69,14 +69,16 @@ export function VeraFloatingChat() {
             <button
               onClick={() => setIsMinimized(!isMinimized)}
               className="p-1 hover:bg-muted rounded-md transition"
-              aria-label="Minimizar"
+              type="button"
+              title="Minimizar"
             >
               <span className="text-lg">_</span>
             </button>
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-muted rounded-md transition"
-              aria-label="Cerrar"
+              type="button"
+              title="Cerrar"
             >
               <X className="w-5 h-5" />
             </button>
@@ -172,14 +174,13 @@ export function VeraFloatingChat() {
                 disabled={isLoading}
                 autoFocus
               />
-              <Button
+              <button
                 type="submit"
-                size="icon"
                 disabled={isLoading || !input.trim()}
-                className="h-10 w-10"
+                className="h-10 w-10 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
               >
                 <Send className="w-4 h-4" />
-              </Button>
+              </button>
             </form>
           </>
         )}
