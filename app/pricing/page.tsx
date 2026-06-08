@@ -49,7 +49,7 @@ const plans = [
       { text: 'Support WhatsApp + chat prioritario', main: false },
     ],
     notIncluded: [
-      'Auditoría independiente (Laura)',
+      'Auditoría independiente (Verónica)',
       'Reportes PDF SERNAGEOMIN',
       'Integración ERP',
     ]
@@ -65,7 +65,7 @@ const plans = [
     highlighted: false,
     outcomes: [
       { text: 'Obligaciones ilimitadas + personalización', main: true },
-      { text: 'Todos los 7 agentes + Kai (mejora continua)', main: false },
+      { text: 'Todos los 7 agentes + Andrés (mejora continua)', main: false },
       { text: 'Auditoría independiente continua', main: false },
       { text: 'Reportes PDF certificados SERNAGEOMIN', main: false },
       { text: 'Roadmap personalizado + mejora mensual', main: false },
