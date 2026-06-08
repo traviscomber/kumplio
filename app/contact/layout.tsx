@@ -1,22 +1,23 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Contacto KUMPLIO | Soporte y Ventas en Chile',
-  description: 'Contacta a KUMPLIO. Soporte técnico, consultas de ventas y demostraciones. Respuesta en 24 horas.',
+  title: 'Contacto | KUMPLIO - Expertos en Compliance Ley 21.719',
+  description: 'Habla con un especialista en cumplimiento normativo y Ley 21.719. Consulta gratuita sin compromisos. Respuesta en 24 horas. Estamos en Santiago, Chile.',
   keywords: [
-    'contacto kumplio',
-    'soporte kumplio',
-    'venta kumplio',
-    'contacto cumplimiento',
-    'soporte compliance chile',
+    'contacto KUMPLIO',
+    'consultor compliance Chile',
+    'soporte cumplimiento',
+    'asesoría Ley 21.719',
+    'contactar n3uralia',
+    'expertos compliance Santiago',
   ],
   alternates: {
-    canonical: 'https://kumplio.app/contact',
+    canonical: 'https://kumplio.cl/contact',
   },
   openGraph: {
-    title: 'Contacto KUMPLIO | Soporte Chile',
-    description: 'Conecta con nuestro equipo. Respuesta rápida.',
-    url: 'https://kumplio.app/contact',
+    title: 'Contacto KUMPLIO | Expertos en Compliance',
+    description: 'Consulta gratuita con especialistas en cumplimiento normativo. Respuesta en 24 horas.',
+    url: 'https://kumplio.cl/contact',
     type: 'website',
   },
 }
