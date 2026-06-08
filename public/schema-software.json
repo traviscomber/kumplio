@@ -1,12 +1,12 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "@id": "https://kumplio.cl/#software",
+  "@id": "https://kumplio.app/#software",
   "name": "KUMPLIO - Plataforma IA para Cumplimiento Legal",
   "alternateName": "KUMPLIO Compliance Platform",
   "description": "Sistema integral de IA y LLM para cumplimiento automático de regulaciones legales en Chile. Plataforma empresarial con 7 agentes especializados, análisis de documentos, cuantificación de riesgos y recomendaciones estratégicas.",
-  "url": "https://kumplio.cl",
-  "image": "https://kumplio.cl/og-image.png",
+  "url": "https://kumplio.app",
+  "image": "https://kumplio.app/og-image.png",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "inLanguage": "es-CL",
@@ -23,7 +23,7 @@
   "publisher": {
     "@type": "Organization",
     "name": "KUMPLIO by n3uralia",
-    "url": "https://kumplio.cl"
+    "url": "https://kumplio.app"
   },
   "datePublished": "2024-01-01",
   "dateModified": "2024-06-07",

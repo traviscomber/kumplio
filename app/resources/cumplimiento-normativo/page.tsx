@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'Cumplimiento empresarial',
   ],
   alternates: {
-    canonical: 'https://kumplio.cl/resources/cumplimiento-normativo',
+    canonical: 'https://kumplio.app/resources/cumplimiento-normativo',
   },
 }
 

@@ -11,12 +11,12 @@ export const metadata: Metadata = {
     'soporte compliance chile',
   ],
   alternates: {
-    canonical: 'https://kumplio.cl/contact',
+    canonical: 'https://kumplio.app/contact',
   },
   openGraph: {
     title: 'Contacto KUMPLIO | Soporte Chile',
     description: 'Conecta con nuestro equipo. Respuesta rápida.',
-    url: 'https://kumplio.cl/contact',
+    url: 'https://kumplio.app/contact',
     type: 'website',
   },
 }
