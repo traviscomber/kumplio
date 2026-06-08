@@ -39,13 +39,29 @@ export function DashboardContent() {
 
         setUser(authUser)
 
-        // Get organization
+        // FIRST: Check if user has ANY documents - if not, show onboarding
+        const { data: documentList } = await supabase
+          .from('documents')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .limit(1)
+
+        console.log('[v0] Document check:', { documentList, count: documentList?.length })
+        if (!documentList || documentList.length === 0) {
+          console.log('[v0] No documents found - showing onboarding')
+          setShowOnboarding(true)
+          setLoading(false)
+          return
+        }
+
+        // If user HAS documents, load organization and stats
         const { data: memberData } = await supabase
           .from('organization_members')
           .select('organization_id')
           .eq('user_id', authUser.id)
           .single()
 
+        console.log('[v0] Member data:', memberData)
         const orgId = memberData?.organization_id
         if (orgId) {
           const { data: org } = await supabase
@@ -54,6 +70,7 @@ export function DashboardContent() {
             .eq('id', orgId)
             .single()
           
+          console.log('[v0] Organization:', org)
           setOrganization(org)
 
           // Get projects
@@ -65,17 +82,6 @@ export function DashboardContent() {
           
           if (projectList) {
             setProjects(projectList)
-
-            // Check if user has any documents - if not, show onboarding
-            const { data: documentList } = await supabase
-              .from('documents')
-              .select('id')
-              .eq('organization_id', orgId)
-              .limit(1)
-
-            if (!documentList || documentList.length === 0) {
-              setShowOnboarding(true)
-            }
 
             // Calculate stats
             let totalCritical = 0
@@ -99,6 +105,8 @@ export function DashboardContent() {
               recentScans: projectList.filter(p => p.last_scan_date).length,
             })
           }
+        } else {
+          console.log('[v0] No organization found for user')
         }
       } catch (error) {
         console.error('[v0] Dashboard load error:', error)
@@ -120,7 +128,7 @@ export function DashboardContent() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            {organization ? `Bienvenido a KUMPLIO, ${organization.name}!` : 'Bienvenido a KUMPLIO!'}
+            Bienvenido a KUMPLIO
           </h1>
           <p className="text-muted-foreground mt-1">Vamos a empezar analizando tus documentos</p>
         </div>
