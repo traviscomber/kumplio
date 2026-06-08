@@ -43,15 +43,15 @@ export default function PricingPage() {
       highlighted: false,
       outcomes: [
         { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
-        { text: '1 agente: Isidora (análisis básico)', main: false },
+        { text: '1 agente: Is1dora (análisis básico)', main: false },
         { text: 'Alertas de cambios regulatorios', main: false },
         { text: 'Reportes mensuales', main: false },
         { text: 'Email support', main: false },
       ],
       notIncluded: [
-        'Evaluación de riesgos (Javier)',
-        'Planes de acción (Beatriz)',
-        'Auditoría independiente (Verónica)',
+        'Evaluación de riesgos (Jav1er)',
+        'Planes de acción (Beat1z)',
+        'Auditoría independiente (Verón1ca)',
         'Reportes PDF certificados',
       ]
     },
@@ -67,14 +67,14 @@ export default function PricingPage() {
       badge: 'Más Popular',
       outcomes: [
         { text: '180+ obligaciones mapeadas', main: true },
-        { text: '4 agentes: Isidora, Rodrigo, Javier, Beatriz', main: false },
+        { text: '4 agentes: Is1dora, R0drigo, Jav1er, Beat1z', main: false },
         { text: 'Monitoreo 24/7 de regulaciones chilenas', main: false },
         { text: 'Evaluación de riesgos en UF/dinero', main: false },
         { text: 'Planes de acción priorizados 90 días', main: false },
         { text: 'Support WhatsApp + chat prioritario', main: false },
       ],
       notIncluded: [
-        'Auditoría independiente (Verónica)',
+        'Auditoría independiente (Verón1ca)',
         'Reportes PDF SERNAGEOMIN',
         'Integración ERP',
       ]
@@ -90,7 +90,7 @@ export default function PricingPage() {
       highlighted: false,
       outcomes: [
         { text: 'Obligaciones ilimitadas + personalización', main: true },
-        { text: 'Todos los 7 agentes + Andrés (mejora continua)', main: false },
+        { text: 'Todos los 7 agentes + Andr3s (mejora continua)', main: false },
         { text: 'Auditoría independiente continua', main: false },
         { text: 'Reportes PDF certificados SERNAGEOMIN', main: false },
         { text: 'Roadmap personalizado + mejora mensual', main: false },
