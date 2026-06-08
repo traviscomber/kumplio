@@ -95,12 +95,13 @@ export function HealthDashboard() {
   }
 
   const agents = [
-    { name: 'sofia', label: 'Sofia (Analyzer)' },
-    { name: 'elena', label: 'Elena (Monitor)' },
-    { name: 'bruno', label: 'Bruno (Risk)' },
-    { name: 'marco', label: 'Marco (Advisor)' },
-    { name: 'laura', label: 'Laura (Auditor)' },
-    { name: 'kai', label: 'Kai (Learner)' },
+    { name: 'isidora', label: 'Isidora (Analyzer)' },
+    { name: 'rodrigo', label: 'Rodrigo (Monitor)' },
+    { name: 'javier', label: 'Javier (Risk)' },
+    { name: 'beatriz', label: 'Beatriz (Advisor)' },
+    { name: 'veronica', label: 'Verónica (Auditor)' },
+    { name: 'andres', label: 'Andrés (Learner)' },
+    { name: 'catalina', label: 'Catalina (Reporter)' },
   ];
 
   return (

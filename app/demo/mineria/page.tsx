@@ -192,7 +192,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Sofia mapea las 180+ obligaciones</h3>
+                  <h3 className="font-semibold mb-1">Isidora mapea las 180+ obligaciones</h3>
                   <p className="text-sm text-muted-foreground">Todas las leyes, reglamentos, y protocolos estructurados. Sin olvidar ninguna.</p>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Elena monitorea cambios regulatorios 24/7</h3>
+                  <h3 className="font-semibold mb-1">Rodrigo monitorea cambios regulatorios 24/7</h3>
                   <p className="text-sm text-muted-foreground">Resoluciones SEREMI, cambios SONAMI, actualizaciones SERNAGEOMIN. Alertas inmediatas.</p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function MineriaDemoPage() {
               <div className="flex items-start gap-4">
                 <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold mb-1">Catarina compila reportes para reguladores</h3>
+                  <h3 className="font-semibold mb-1">Catalina compila reportes para reguladores</h3>
                   <p className="text-sm text-muted-foreground">1 click: Evidencia de cumplimiento, auditorías lisas, carpetas para SERNAGEOMIN.</p>
                 </div>
               </div>
@@ -290,7 +290,7 @@ export default function MineriaDemoPage() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                <span><strong>Semana 1:</strong> Sofia mapeó 180+ obligaciones. Elena alertó sobre cambios SONAMI recientes.</span>
+                <span><strong>Semana 1:</strong> Isidora mapeó 180+ obligaciones. Rodrigo alertó sobre cambios SONAMI recientes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />

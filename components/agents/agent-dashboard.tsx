@@ -17,12 +17,13 @@ export interface AgentStatus {
 
 export function AgentDashboard() {
   const [agents, setAgents] = useState<AgentStatus[]>([
-    { agentId: 'sofia-analyzer', agentName: 'Sofia', status: 'idle' },
-    { agentId: 'elena-monitor', agentName: 'Elena', status: 'idle' },
-    { agentId: 'bruno-risk', agentName: 'Bruno', status: 'idle' },
-    { agentId: 'marco-advisor', agentName: 'Marco', status: 'idle' },
-    { agentId: 'laura-auditor', agentName: 'Laura', status: 'idle' },
-    { agentId: 'kai-learner', agentName: 'Kai', status: 'idle' },
+    { agentId: 'isidora-analyzer', agentName: 'Isidora', status: 'idle' },
+    { agentId: 'rodrigo-monitor', agentName: 'Rodrigo', status: 'idle' },
+    { agentId: 'javier-risk', agentName: 'Javier', status: 'idle' },
+    { agentId: 'beatriz-advisor', agentName: 'Beatriz', status: 'idle' },
+    { agentId: 'veronica-auditor', agentName: 'Verónica', status: 'idle' },
+    { agentId: 'andres-learner', agentName: 'Andrés', status: 'idle' },
+    { agentId: 'catalina-reporter', agentName: 'Catalina', status: 'idle' },
   ])
 
   const [analyzing, setAnalyzing] = useState(false)

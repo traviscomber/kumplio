@@ -32,7 +32,7 @@ La razón pregunto es porque trabajamos con empresas como Labbe que redujeron su
 • Monitorea cambios regulatorios 24/7 (Ley 21.719 cambia cada 2-3 meses)
 • Calcula el riesgo financiero automáticamente ($1.2M de exposición típicamente)
 • Genera planes de acción priorizados (con viabilidad, timeline, responsables)
-• Audita si realmente estás cumpliendo (Laura verifica el estado REAL)
+• Audita si realmente estás cumpliendo (Verónica verifica el estado REAL)
 
 Labbe pasó de 52% de obligaciones cumpliéndose a 100% en 3 meses.
 
@@ -133,7 +133,7 @@ const objectionHandling = [
   },
   {
     objection: '"¿Qué pasa si tengo una inspección mañana?"',
-    response: 'Catarina (nuestro agente legal) te genera reportes PDF en 1 click listos para reguladores. Auditables, creíbles, completos.',
+    response: 'Catalina (nuestro agente legal) te genera reportes PDF en 1 click listos para reguladores. Auditables, creíbles, completos.',
   },
 ]
 

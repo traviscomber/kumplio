@@ -126,8 +126,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="https://n3uralia.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
-                  n3uralia.com
+                <Link href="https://kumplio.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
+                  kumplio.com
                 </Link>
               </li>
             </ul>
@@ -139,31 +139,31 @@ export function Footer() {
           <h3 className="font-semibold mb-6">Arquitectura IA & LLM</h3>
           <div className="grid grid-cols-1 md:grid-cols-7 gap-4 text-sm">
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Is1dora</p>
+              <p className="font-semibold text-primary mb-1">Isidora</p>
               <p className="text-xs text-muted-foreground">Extracción de Documentos & Obligaciones</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">R0drigo</p>
+              <p className="font-semibold text-primary mb-1">Rodrigo</p>
               <p className="text-xs text-muted-foreground">Cuantificación de Riesgo Regulatorio</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Jav1er</p>
+              <p className="font-semibold text-primary mb-1">Javier</p>
               <p className="text-xs text-muted-foreground">Generación de Roadmaps Ejecutables</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Be4triz</p>
+              <p className="font-semibold text-primary mb-1">Beatriz</p>
               <p className="text-xs text-muted-foreground">Monitoreo 24/7 de Cambios Regulatorios</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Ver0nica</p>
+              <p className="font-semibold text-primary mb-1">Verónica</p>
               <p className="text-xs text-muted-foreground">Auditoría de Compliance Real</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Andr3s</p>
+              <p className="font-semibold text-primary mb-1">Andrés</p>
               <p className="text-xs text-muted-foreground">Análisis de Datos Regulatorios</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Cat4lina</p>
+              <p className="font-semibold text-primary mb-1">Catalina</p>
               <p className="text-xs text-muted-foreground">Validación Legal & Generación de Reportes</p>
             </div>
           </div>
@@ -219,13 +219,13 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Síguenos</h3>
               <div className="flex gap-6 text-sm">
-                <a href="https://linkedin.com/company/n3uralia" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
+                <a href="https://linkedin.com/company/kumplio-cl" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
                   LinkedIn
                 </a>
-                <a href="https://x.com/n3uralia" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
+                <a href="https://x.com/kumplio_cl" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
                   X
                 </a>
-                <a href="https://github.com/n3uralia" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
+                <a href="https://github.com/kumplio" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">
                   GitHub
                 </a>
               </div>

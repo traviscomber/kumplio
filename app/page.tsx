@@ -230,7 +230,7 @@ export default function HomePage() {
             <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Cat4lina</h3>
+                  <h3 className="text-2xl font-bold">Catalina</h3>
                   <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
                 </div>
                 <span className="text-3xl text-primary">★</span>

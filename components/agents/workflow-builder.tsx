@@ -8,8 +8,8 @@ import { Plus, X, Play, ArrowRight, Zap, AlertCircle, Check } from 'lucide-react
 
 const AVAILABLE_AGENTS = [
   { 
-    name: 'sofia', 
-    label: 'Sofia', 
+    name: 'isidora', 
+    label: 'Isidora', 
     specialty: 'Analyzer',
     description: 'Extrae obligaciones legales',
     icon: '📄',
@@ -17,8 +17,8 @@ const AVAILABLE_AGENTS = [
     costPerRun: 0.05,
   },
   { 
-    name: 'elena', 
-    label: 'Elena', 
+    name: 'rodrigo', 
+    label: 'Rodrigo', 
     specialty: 'Monitor',
     description: 'Monitorea regulaciones',
     icon: '👁️',
@@ -26,8 +26,8 @@ const AVAILABLE_AGENTS = [
     costPerRun: 0.04,
   },
   { 
-    name: 'bruno', 
-    label: 'Bruno', 
+    name: 'javier', 
+    label: 'Javier', 
     specialty: 'Risk',
     description: 'Evalúa riesgos',
     icon: '⚠️',
@@ -35,8 +35,8 @@ const AVAILABLE_AGENTS = [
     costPerRun: 0.06,
   },
   { 
-    name: 'marco', 
-    label: 'Marco', 
+    name: 'beatriz', 
+    label: 'Beatriz', 
     specialty: 'Advisor',
     description: 'Genera recomendaciones',
     icon: '💡',
@@ -44,8 +44,8 @@ const AVAILABLE_AGENTS = [
     costPerRun: 0.07,
   },
   { 
-    name: 'laura', 
-    label: 'Laura', 
+    name: 'veronica', 
+    label: 'Verónica', 
     specialty: 'Auditor',
     description: 'Verifica cumplimiento',
     icon: '✓',
@@ -53,13 +53,22 @@ const AVAILABLE_AGENTS = [
     costPerRun: 0.05,
   },
   { 
-    name: 'kai', 
-    label: 'Kai', 
+    name: 'andres', 
+    label: 'Andrés', 
     specialty: 'Learner',
     description: 'Mejora continua',
     icon: '🧠',
     color: 'bg-indigo-500',
     costPerRun: 0.03,
+  },
+  { 
+    name: 'catalina', 
+    label: 'Catalina', 
+    specialty: 'Reporter',
+    description: 'Genera reportes',
+    icon: '📊',
+    color: 'bg-pink-500',
+    costPerRun: 0.04,
   },
 ];
 
