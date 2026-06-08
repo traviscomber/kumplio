@@ -463,11 +463,6 @@ export default function HomePage() {
             <p className="text-xl text-muted-foreground">Diagnóstico gratis en 60 segundos. Sin tarjeta de crédito.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-base font-semibold px-8 bg-primary text-black hover:bg-primary/80" asChild>
-              <a href="/sign-up" className="flex items-center justify-center">
-                Comenzar Gratis →
-              </a>
-            </Button>
             <Button size="lg" variant="outline" className="text-base font-semibold px-8" asChild>
               <a href="/pricing" className="flex items-center justify-center">
                 Ver Planes y Precios →
