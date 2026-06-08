@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/app/providers'
 import { VeraFloatingChat } from '@/components/vera-floating-chat'
-import { StructuredData } from '@/components/structured-data'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -170,7 +169,6 @@ export default function RootLayout({
         <meta name="distribution" content="global" />
         
         {/* Structured Data Schemas */}
-        <StructuredData />
         
         <script
           type="application/ld+json"
