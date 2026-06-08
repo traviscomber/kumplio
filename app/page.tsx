@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
-import { ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -96,19 +96,19 @@ export default function HomePage() {
               <p className="text-lg text-muted-foreground">Sube un documento (contrato, política, RAT) y descubre:</p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <span className="text-primary font-bold text-lg">✓</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span>Todas tus obligaciones según Ley 21.719</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-primary font-bold text-lg">✓</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span>Brecha (gap) exacta de cumplimiento</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-primary font-bold text-lg">✓</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span>Exposición financiera en UF/CLP real</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="text-primary font-bold text-lg">✓</span>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span>Reporte ejecutivo (2 páginas) listo para imprimir</span>
                 </li>
               </ul>
@@ -125,19 +125,31 @@ export default function HomePage() {
               <h3 className="font-bold text-lg">Qué recibes al terminar:</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <p className="font-semibold text-sm">Reporte Ejecutivo</p>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    <p className="font-semibold text-sm">Reporte Ejecutivo</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Resumen de 34 obligaciones identificadas</p>
                 </div>
                 <div className="border-t pt-4 space-y-2">
-                  <p className="font-semibold text-sm">Cuantificación de Riesgos</p>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <p className="font-semibold text-sm">Cuantificación de Riesgos</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Exposición exacta en UF y CLP según tu sector</p>
                 </div>
                 <div className="border-t pt-4 space-y-2">
-                  <p className="font-semibold text-sm">Prioridades de Acción</p>
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-primary" />
+                    <p className="font-semibold text-sm">Prioridades de Acción</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Top 5 obligaciones críticas para tu empresa</p>
                 </div>
                 <div className="border-t pt-4 space-y-2">
-                  <p className="font-semibold text-sm">Roadmap Inicial</p>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-primary" />
+                    <p className="font-semibold text-sm">Roadmap Inicial</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">Plan de 90 días para alcanzar cumplimiento</p>
                 </div>
               </div>
@@ -309,6 +321,139 @@ export default function HomePage() {
               <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
               <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING SECTION */}
+      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-4xl font-bold">Planes Diseñados para Tu Empresa</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Costo mínimo vs riesgo máximo. El costo del seguro vs el costo del siniestro.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Tier 1 - Startup */}
+            <div className="rounded-lg border border-border p-8 space-y-6 hover:border-primary transition">
+              <div>
+                <h3 className="text-2xl font-bold">Startup</h3>
+                <p className="text-xs text-muted-foreground mt-1">1-5 personas</p>
+              </div>
+              <div>
+                <div className="text-4xl font-black text-primary">$99</div>
+                <p className="text-xs text-muted-foreground mt-1">/mes</p>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">1 diagnóstico gratis inicial</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Monitoreo 24/7 Ley 21.719</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Alertas de cambios regulatorios</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Reportes mensuales en PDF</span>
+                </li>
+              </ul>
+              <Button size="lg" className="w-full" asChild>
+                <a href="/sign-up?plan=startup">Comenzar</a>
+              </Button>
+            </div>
+
+            {/* Tier 2 - Scale (Featured) */}
+            <div className="rounded-lg border-2 border-primary p-8 space-y-6 bg-primary/5 relative">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
+                MÁS POPULAR
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold">Scale</h3>
+                <p className="text-xs text-muted-foreground mt-1">5-20 personas</p>
+              </div>
+              <div>
+                <div className="text-4xl font-black text-primary">$299</div>
+                <p className="text-xs text-muted-foreground mt-1">/mes</p>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Diagnósticos ilimitados</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Validación legal SERNAC (Cat4lina)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Cuantificación riesgos en UF real</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Roadmap 90 días ejecutable</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Soporte por chat 24/7</span>
+                </li>
+              </ul>
+              <Button size="lg" className="w-full bg-primary text-black hover:bg-primary/80" asChild>
+                <a href="/sign-up?plan=scale">Comenzar</a>
+              </Button>
+            </div>
+
+            {/* Tier 3 - Enterprise */}
+            <div className="rounded-lg border border-border p-8 space-y-6 hover:border-primary transition">
+              <div>
+                <h3 className="text-2xl font-bold">Enterprise</h3>
+                <p className="text-xs text-muted-foreground mt-1">20+ personas</p>
+              </div>
+              <div>
+                <div className="text-4xl font-black text-primary">A medida</div>
+                <p className="text-xs text-muted-foreground mt-1">/mes</p>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Todo en Scale +</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">API + integración custom</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Auditoría independiente trimestral</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">Account manager dedicado</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-sm">SLA garantizado 99.9%</span>
+                </li>
+              </ul>
+              <Button size="lg" className="w-full" variant="outline" asChild>
+                <a href="mailto:sales@kumplio.com">Contactar Ventas</a>
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-16 p-8 rounded-lg bg-card border border-border text-center space-y-4">
+            <p className="text-muted-foreground">
+              <span className="font-bold">Referencia de valor:</span> Multa mínima por infracción grave = 500 UTM (~$35M CLP). KUMPLIO desde $99/mes. El ROI es inmediato.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Todos los planes incluyen diagnóstico gratis inicial. Sin compromisos.
+            </p>
           </div>
         </div>
       </section>
