@@ -29,10 +29,6 @@ export default function TransporteDemoPage() {
 
           {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
-            <Link href="/sign-in" className="text-sm hover:text-primary transition">Acceder</Link>
-            <Button size="sm" asChild>
-              <Link href="/sign-up">Empezar</Link>
-            </Button>
           </div>
         </div>
       </nav>
