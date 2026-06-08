@@ -116,45 +116,45 @@ export function DashboardContent() {
         </Link>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - N3uralia Color System */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-card border border-border rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/30 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Proyectos activos</p>
-              <p className="text-3xl font-bold text-foreground mt-2">{stats.totalProjects}</p>
+              <p className="text-3xl font-bold text-primary mt-2">{stats.totalProjects}</p>
             </div>
             <Activity className="w-12 h-12 text-primary/20" />
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/30 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Vulnerabilidades críticas</p>
-              <p className="text-3xl font-bold text-red-600 mt-2">{stats.criticalVulns}</p>
+              <p className="text-3xl font-bold text-primary mt-2">{stats.criticalVulns}</p>
             </div>
-            <AlertTriangle className="w-12 h-12 text-red-500/20" />
+            <AlertTriangle className="w-12 h-12 text-primary/20" />
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/30 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Puntuación de cumplimiento</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">{stats.complianceScore}%</p>
+              <p className="text-3xl font-bold text-primary mt-2">{stats.complianceScore}%</p>
             </div>
-            <CheckCircle className="w-12 h-12 text-green-500/20" />
+            <CheckCircle className="w-12 h-12 text-primary/20" />
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-lg p-6">
+        <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/30 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Escaneos recientes</p>
-              <p className="text-3xl font-bold text-blue-600 mt-2">{stats.recentScans}</p>
+              <p className="text-3xl font-bold text-primary mt-2">{stats.recentScans}</p>
             </div>
-            <TrendingUp className="w-12 h-12 text-blue-500/20" />
+            <TrendingUp className="w-12 h-12 text-primary/20" />
           </div>
         </div>
       </div>
@@ -184,7 +184,7 @@ export function DashboardContent() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-foreground">{project.compliance_score}%</p>
+                  <p className="font-bold text-primary">{project.compliance_score}%</p>
                   <p className="text-xs text-muted-foreground">
                     {project.last_scan_date
                       ? `Última actualización: ${new Date(project.last_scan_date).toLocaleDateString('es-CL')}`
