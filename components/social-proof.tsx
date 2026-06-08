@@ -38,9 +38,9 @@ export function SocialProof() {
                 <Image
                   src={company.logo}
                   alt={company.name}
-                  width={120}
-                  height={80}
-                  className="object-contain"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-contain p-4"
                 />
               </div>
               <h3 className="font-bold text-lg text-foreground mb-1">{company.name}</h3>
