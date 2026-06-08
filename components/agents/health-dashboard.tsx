@@ -82,9 +82,9 @@ export function HealthDashboard() {
 
   if (error) {
     return (
-      <Card className="border-destructive">
+      <Card className="border-muted/30">
         <CardContent className="pt-6">
-          <div className="text-sm text-destructive">{error}</div>
+          <div className="text-sm text-muted-foreground">{error}</div>
         </CardContent>
       </Card>
     );
