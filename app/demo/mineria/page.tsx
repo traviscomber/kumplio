@@ -317,8 +317,11 @@ export default function MineriaDemoPage() {
             180+ obligaciones. 7 agentes. 1 plataforma. Riesgo: 8/100.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90" asChild>
-              <Link href="/sign-up">Prueba Gratis para Minería</Link>
+            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+              <Link href="/sign-up" className="flex items-center justify-center">
+                Prueba Gratis para Minería
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
+              </Link>
             </Button>
             <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>

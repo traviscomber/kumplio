@@ -87,10 +87,10 @@ export default function Ley21719Page() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" asChild>
-              <Link href="/sign-up">
+            <Button size="lg" className="group/btn" asChild>
+              <Link href="/sign-up" className="flex items-center">
                 Comenzar análisis de cumplimiento
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </Link>
             </Button>
             <Button size="lg" variant="outline">
@@ -263,10 +263,10 @@ export default function Ley21719Page() {
             })}
           </div>
 
-          <Button size="lg" asChild className="w-full">
-            <Link href="/sign-up">
+          <Button size="lg" asChild className="w-full group/btn" >
+            <Link href="/sign-up" className="flex items-center justify-center">
               Comenzar análisis gratuito de cumplimiento Ley 21.719
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-3 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
             </Link>
           </Button>
         </div>

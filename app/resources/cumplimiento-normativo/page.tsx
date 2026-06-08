@@ -166,7 +166,7 @@ export default function BlogPage() {
                   
                   <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
                     <span>{article.readTime}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" />
                   </div>
                 </div>
               </Link>

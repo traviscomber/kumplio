@@ -281,10 +281,10 @@ export default function WebinarsPage() {
         <div className="container mx-auto max-w-2xl text-center space-y-6">
           <h2 className="text-4xl font-bold">Elige tu Webinar y Registrate</h2>
           <p className="text-lg opacity-90">Sesiones en vivo, casos reales, expertos que responden tus preguntas.</p>
-          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-white/90" asChild>
-            <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+            <a href="#" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center justify-center">
               Volver a Webinars
-              <ArrowRight className="ml-2 w-4 h-4" />
+              <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
             </a>
           </Button>
         </div>

@@ -52,16 +52,16 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <a href="/demo/transporte">
+            <Button size="lg" className="text-lg px-8 group/btn" asChild>
+              <a href="/demo/transporte" className="flex items-center">
                 Demo: Transporte
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </a>
             </Button>
-            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80" asChild>
-              <a href="/demo/mineria">
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80 group/btn" asChild>
+              <a href="/demo/mineria" className="flex items-center">
                 Demo: Minería
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </a>
             </Button>
           </div>
@@ -459,11 +459,16 @@ export default function HomePage() {
           <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
           <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90" asChild>
-              <a href="/sign-up">Empezar Ahora</a>
+            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+              <a href="/sign-up" className="flex items-center justify-center">
+                Empezar Ahora
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
+              </a>
             </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
-              <a href="/demo/transporte">Ver Sistema en Acción</a>
+            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15 group/btn" variant="outline" asChild>
+              <a href="/demo/transporte" className="flex items-center justify-center">
+                Ver Sistema en Acción
+              </a>
             </Button>
           </div>
         </div>
