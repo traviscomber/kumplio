@@ -459,13 +459,13 @@ export default function HomePage() {
           <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
           <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+            <Button size="lg" className="text-lg px-8 bg-black text-primary-foreground hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
               <a href="/sign-up" className="flex items-center justify-center">
                 Empezar Ahora
                 <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </a>
             </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15 group/btn" variant="outline" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-black hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
               <a href="/demo/transporte" className="flex items-center justify-center">
                 Ver Sistema en Acción
               </a>

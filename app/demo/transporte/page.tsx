@@ -274,13 +274,13 @@ export default function TransporteDemoPage() {
             Los 7 agentes de KUMPLIO están listos para transporte. Cero multas. Operaciones 24/7. Auditorías listas.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90 group/btn font-semibold" asChild>
+            <Button size="lg" className="text-lg px-8 bg-black text-primary-foreground hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
               <Link href="/sign-up" className="flex items-center justify-center">
                 Prueba Gratis
                 <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </Link>
             </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-black hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>
             </Button>
           </div>
