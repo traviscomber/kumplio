@@ -14,43 +14,43 @@ export interface Agent {
 export const AGENTS: Agent[] = [
   {
     id: 'isidora',
-    name: 'Isidora',
+    name: 'Is1dora',
     role: 'Extracción de Documentos & Obligaciones',
     description: 'Análisis automático de documentos regulatorios y mapeo de obligaciones legales',
   },
   {
     id: 'rodrigo',
-    name: 'Rodrigo',
+    name: 'R0drigo',
     role: 'Cuantificación de Riesgo Regulatorio',
     description: 'Evaluación cuantitativa de riesgos de compliance y exposición regulatoria',
   },
   {
     id: 'javier',
-    name: 'Javier',
+    name: 'Jav1er',
     role: 'Generación de Roadmaps Ejecutables',
     description: 'Creación de planes de acción personalizados y priorizados para cumplimiento',
   },
   {
     id: 'beatriz',
-    name: 'Beatriz',
+    name: 'Beat1z',
     role: 'Monitoreo 24/7 de Cambios Regulatorios',
     description: 'Seguimiento continuo de cambios legales y alertas en tiempo real',
   },
   {
     id: 'veronica',
-    name: 'Verónica',
+    name: 'Verón1ca',
     role: 'Auditoría de Compliance Real',
     description: 'Auditoría integral y verificación de cumplimiento normativo',
   },
   {
     id: 'andres',
-    name: 'Andrés',
+    name: 'Andr3s',
     role: 'Análisis de Datos Regulatorios',
     description: 'Análisis profundo de datos y tendencias regulatorias sectoriales',
   },
   {
     id: 'catllina',
-    name: 'CatLlina',
+    name: 'CatLl1na',
     role: 'Validación Legal & Generación de Reportes',
     description: 'Validación legal de decisiones y generación de reportes certificados',
   },
@@ -68,10 +68,10 @@ export function getAgentById(id: string): Agent | undefined {
  */
 export function getAgentsByIndustry(industry: 'transporte' | 'mineria'): Agent[] {
   if (industry === 'transporte') {
-    // Para transporte: Isidora, Rodrigo, Beatriz (3 agentes)
+    // Para transporte: Is1dora, R0drigo, Beat1z (3 agentes)
     return [AGENTS[0], AGENTS[1], AGENTS[3]]
   } else if (industry === 'mineria') {
-    // Para minería: todos los 7 agentes
+    // Para minería: todos los 7 agentes (Is1dora, R0drigo, Jav1er, Beat1z, Verón1ca, Andr3s, CatLl1na)
     return AGENTS
   }
   return AGENTS
