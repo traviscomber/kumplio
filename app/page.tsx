@@ -195,20 +195,20 @@ export default function HomePage() {
                 <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
                 <div className="grid md:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Sofia → Bruno</p>
+                    <p className="font-semibold text-primary">Is1dora → R0drigo</p>
                     <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Bruno → Marco</p>
+                    <p className="font-semibold text-primary">R0drigo → Jav1er</p>
                     <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Marco → Laura</p>
+                    <p className="font-semibold text-primary">Jav1er → Ver0nica</p>
                     <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Laura → Todos</p>
-                    <p className="text-muted-foreground">Gaps identificados reentrenan a todos los agentes del sistema</p>
+                    <p className="font-semibold text-primary">Ver0nica → Cat4lina</p>
+                    <p className="text-muted-foreground">Gaps identificados se validan con jurisprudencia SERNAC</p>
                   </div>
                 </div>
               </div>
@@ -343,10 +343,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* COMPARATIVA - EXCEL VS KUMPLIO */}
+      {/* COMPARATIVA - CUMPLIMIENTO MANUAL VS KUMPLIO */}
       <section className="py-24 px-6 bg-card border-t border-border">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-4xl font-bold mb-16">Excel vs KUMPLIO</h2>
+          <h2 className="text-4xl font-bold mb-16">Cumplimiento Manual vs KUMPLIO</h2>
 
           <div className="space-y-4">
             {[
@@ -527,10 +527,18 @@ export default function HomePage() {
                     <p className="text-muted-foreground">Cada métrica incluye rangos de confianza y evidencia de apoyo completa.</p>
                   </div>
                   
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Reasoning Traces</p>
-                    <p className="text-muted-foreground">Auditables por reguladores. Cada decisión tiene su trail de pensamiento completo.</p>
-                  </div>
+              <div className="space-y-1 p-2">
+                <p className="text-sm font-semibold text-muted-foreground">Pipeline en tiempo real:</p>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Is1dora (extrae obligaciones)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">R0drigo (cuantifica riesgos)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">Cat4lina (valida con SERNAC)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">Todos (reporte ejecutivo)</p>
+                </div>
+              </div>
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Continuous Learning</p>
@@ -565,7 +573,7 @@ export default function HomePage() {
       <section className="py-24 px-6 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-2xl text-center space-y-8">
           <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
-          <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
+          <p className="text-lg opacity-90">Is1dora, R0drigo, Be4triz, Jav1er, Ver0nica, Andr3s y Cat4lina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
               <a href="/sign-up" className="flex items-center justify-center">
