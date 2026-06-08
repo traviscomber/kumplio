@@ -6,6 +6,7 @@
 export interface Agent {
   id: string
   name: string
+  displayName: string
   role: string
   description: string
   icon?: string
@@ -15,42 +16,49 @@ export const AGENTS: Agent[] = [
   {
     id: 'isidora',
     name: 'Is1dora',
+    displayName: 'Isidora',
     role: 'Extracción de Documentos & Obligaciones',
     description: 'Análisis automático de documentos regulatorios y mapeo de obligaciones legales',
   },
   {
     id: 'rodrigo',
     name: 'R0drigo',
+    displayName: 'Rodrigo',
     role: 'Cuantificación de Riesgo Regulatorio',
     description: 'Evaluación cuantitativa de riesgos de compliance y exposición regulatoria',
   },
   {
     id: 'javier',
     name: 'Jav1er',
+    displayName: 'Javier',
     role: 'Generación de Roadmaps Ejecutables',
     description: 'Creación de planes de acción personalizados y priorizados para cumplimiento',
   },
   {
     id: 'beatriz',
     name: 'Beat1z',
+    displayName: 'Beatriz',
     role: 'Monitoreo 24/7 de Cambios Regulatorios',
     description: 'Seguimiento continuo de cambios legales y alertas en tiempo real',
   },
   {
     id: 'veronica',
     name: 'Verón1ca',
+    displayName: 'Verónica',
     role: 'Auditoría de Compliance Real',
     description: 'Auditoría integral y verificación de cumplimiento normativo',
   },
   {
     id: 'andres',
     name: 'Andr3s',
+    displayName: 'Andrés',
     role: 'Análisis de Datos Regulatorios',
     description: 'Análisis profundo de datos y tendencias regulatorias sectoriales',
   },
   {
     id: 'catllina',
     name: 'CatLl1na',
+    displayName: 'Catalina',
     role: 'Validación Legal & Generación de Reportes',
     description: 'Validación legal de decisiones y generación de reportes certificados',
   },
