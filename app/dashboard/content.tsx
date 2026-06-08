@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, AlertTriangle, CheckCircle, Activity, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 
 interface DashboardStats {
   totalProjects: number
@@ -16,6 +17,7 @@ export function DashboardContent() {
   const [user, setUser] = useState<any>(null)
   const [organization, setOrganization] = useState<any>(null)
   const [projects, setProjects] = useState<any[]>([])
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [stats, setStats] = useState<DashboardStats>({
     totalProjects: 0,
     criticalVulns: 0,
@@ -64,6 +66,17 @@ export function DashboardContent() {
           if (projectList) {
             setProjects(projectList)
 
+            // Check if user has any documents - if not, show onboarding
+            const { data: documentList } = await supabase
+              .from('documents')
+              .select('id')
+              .eq('organization_id', orgId)
+              .limit(1)
+
+            if (!documentList || documentList.length === 0) {
+              setShowOnboarding(true)
+            }
+
             // Calculate stats
             let totalCritical = 0
             let totalScore = 0
@@ -99,6 +112,27 @@ export function DashboardContent() {
 
   if (loading) {
     return <div className="text-center py-12">Cargando...</div>
+  }
+
+  // Show onboarding flow if no documents
+  if (showOnboarding) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">
+            {organization ? `Bienvenido a KUMPLIO, ${organization.name}!` : 'Bienvenido a KUMPLIO!'}
+          </h1>
+          <p className="text-muted-foreground mt-1">Vamos a empezar analizando tus documentos</p>
+        </div>
+        <OnboardingFlow
+          organizationName={organization?.name}
+          onComplete={() => {
+            // Redirect to documents page
+            window.location.href = '/documents'
+          }}
+        />
+      </div>
+    )
   }
 
   return (
