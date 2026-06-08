@@ -173,20 +173,20 @@ export default function HomePage() {
             <div className="space-y-4">
               <div className="grid md:grid-cols-5 gap-3 items-center">
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Sofia</p>
-                  <p className="text-xs text-muted-foreground">Análisis de Obligaciones</p>
-                  <p className="text-2xl font-black text-primary mt-3">47</p>
+                  <p className="font-bold text-primary mb-2">Is1dora</p>
+                  <p className="text-xs text-muted-foreground">Extrae Obligaciones</p>
+                  <p className="text-2xl font-black text-primary mt-3">34</p>
                 </div>
                 <div className="text-center text-muted-foreground text-xl">→</div>
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Bruno</p>
-                  <p className="text-xs text-muted-foreground">Evaluación de Riesgos</p>
-                  <p className="text-2xl font-black text-primary mt-3">$1.2M</p>
+                  <p className="font-bold text-primary mb-2">R0drigo</p>
+                  <p className="text-xs text-muted-foreground">Cuantifica Riesgos</p>
+                  <p className="text-2xl font-black text-primary mt-3">20K UTM</p>
                 </div>
                 <div className="text-center text-muted-foreground text-xl">→</div>
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Marco</p>
-                  <p className="text-xs text-muted-foreground">Plan de Acción</p>
+                  <p className="font-bold text-primary mb-2">Jav1er</p>
+                  <p className="text-xs text-muted-foreground">Genera Roadmap</p>
                   <p className="text-2xl font-black text-primary mt-3">90 D</p>
                 </div>
               </div>
@@ -195,20 +195,20 @@ export default function HomePage() {
                 <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
                 <div className="grid md:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Sofia → Bruno</p>
+                    <p className="font-semibold text-primary">Is1dora → R0drigo</p>
                     <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Bruno → Marco</p>
+                    <p className="font-semibold text-primary">R0drigo → Jav1er</p>
                     <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Marco → Laura</p>
+                    <p className="font-semibold text-primary">Jav1er → Ver0nica</p>
                     <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
                   </div>
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">Laura → Todos</p>
-                    <p className="text-muted-foreground">Gaps identificados reentrenan a todos los agentes del sistema</p>
+                    <p className="font-semibold text-primary">Ver0nica → Cat4lina</p>
+                    <p className="text-muted-foreground">Gaps identificados se validan con jurisprudencia SERNAC</p>
                   </div>
                 </div>
               </div>
@@ -238,25 +238,25 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
             </div>
 
-            {/* Sofia */}
+            {/* Is1dora */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Sofia</h3>
-                  <p className="text-sm text-muted-foreground">Analizadora de Obligaciones</p>
+                  <h3 className="text-2xl font-bold">Is1dora</h3>
+                  <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">47</div>
-              <p className="text-sm">Obligaciones identificadas en tu negocio</p>
-              <p className="text-xs text-muted-foreground">Ley 21.719, derechos ARCO+, DPA, RAT, EIPD</p>
+              <div className="text-3xl font-black text-primary">60 Segundos</div>
+              <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
+              <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
             </div>
 
-            {/* Bruno - Risk in UF/CLP money */}
+            {/* R0drigo - Risk in UF/CLP money */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Rodrigo</h3>
+                  <h3 className="text-2xl font-bold">R0drigo</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos (en UF reales)</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -266,7 +266,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">~$1.400M CLP en infracción gravísima. Exacto, en dinero real.</p>
             </div>
 
-            {/* Elena - Monitoring */}
+            {/* Be4triz - Monitoring */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -280,7 +280,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
             </div>
 
-            {/* Marco - Action Plan */}
+            {/* Jav1er - Action Plan */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -294,7 +294,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">3 fases, hitos mensuales, responsables, recursos — no un checklist</p>
             </div>
 
-            {/* Laura - Audit */}
+            {/* Ver0nica - Audit */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -308,18 +308,18 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Verificación independiente de cumplimiento real vs legal</p>
             </div>
 
-            {/* Kai - Learning */}
+            {/* Andr3s - Learning */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Is1dora</h3>
-                  <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
+                  <h3 className="text-2xl font-bold">Andr3s</h3>
+                  <p className="text-sm text-muted-foreground">Optimizador de Sistema</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">60 Segundos</div>
-              <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
-              <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
+              <div className="text-3xl font-black text-primary">+5% Mejora</div>
+              <p className="text-sm">Feedback continuo para mejorar el sistema</p>
+              <p className="text-xs text-muted-foreground">Cada auditoría entrena al sistema. KUMPLIO mejora mensualmente.</p>
             </div>
           </div>
         </div>
@@ -343,10 +343,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* COMPARATIVA - EXCEL VS KUMPLIO */}
+      {/* COMPARATIVA - CUMPLIMIENTO MANUAL VS KUMPLIO */}
       <section className="py-24 px-6 bg-card border-t border-border">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-4xl font-bold mb-16">Excel vs KUMPLIO</h2>
+          <h2 className="text-4xl font-bold mb-16">Cumplimiento Manual vs KUMPLIO</h2>
 
           <div className="space-y-4">
             {[
@@ -354,7 +354,7 @@ export default function HomePage() {
               { problema: "Cambios legales que no ves", kumplio: "Monitoreo 24/7 en tiempo real" },
               { problema: "Riesgos sin cuantificar", kumplio: "Exposición en dinero (UF, $/día)" },
               { problema: "Recomendaciones vagas", kumplio: "Plan ejecutable mes a mes" },
-              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Laura" },
+              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Ver0nica" },
               { problema: "Reportes manuales para reguladores", kumplio: "PDF listo en 1 click" },
             ].map((item, i) => (
               <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
@@ -497,12 +497,12 @@ export default function HomePage() {
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Analogical Reasoning</p>
-                    <p className="text-muted-foreground">Sofia compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
+                    <p className="text-muted-foreground">Is1dora compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
                   </div>
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Causal Reasoning</p>
-                    <p className="text-muted-foreground">Bruno entiende causas raíz del incumplimiento, no solo calcula multas.</p>
+                    <p className="text-muted-foreground">R0drigo entiende causas raíz del incumplimiento, no solo calcula multas.</p>
                   </div>
                   
                   <div className="space-y-1">
@@ -527,14 +527,22 @@ export default function HomePage() {
                     <p className="text-muted-foreground">Cada métrica incluye rangos de confianza y evidencia de apoyo completa.</p>
                   </div>
                   
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Reasoning Traces</p>
-                    <p className="text-muted-foreground">Auditables por reguladores. Cada decisión tiene su trail de pensamiento completo.</p>
-                  </div>
+              <div className="space-y-1 p-2">
+                <p className="text-sm font-semibold text-muted-foreground">Pipeline en tiempo real:</p>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Is1dora (extrae obligaciones)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">R0drigo (cuantifica riesgos)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">Cat4lina (valida con SERNAC)</p>
+                  <p className="text-sm text-muted-foreground">↓</p>
+                  <p className="text-sm text-muted-foreground">Todos (reporte ejecutivo)</p>
+                </div>
+              </div>
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Continuous Learning</p>
-                    <p className="text-muted-foreground">Kai recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
+                    <p className="text-muted-foreground">Andr3s recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
                   </div>
                 </div>
               </div>
@@ -565,7 +573,7 @@ export default function HomePage() {
       <section className="py-24 px-6 bg-primary text-primary-foreground">
         <div className="container mx-auto max-w-2xl text-center space-y-8">
           <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
-          <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
+          <p className="text-lg opacity-90">Is1dora, R0drigo, Be4triz, Jav1er, Ver0nica, Andr3s y Cat4lina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
               <a href="/sign-up" className="flex items-center justify-center">
