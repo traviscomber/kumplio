@@ -74,11 +74,13 @@ export function CartContent() {
   const [billing, setBilling] = useState<'mensual' | 'anual'>('mensual')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
   const [form, setForm] = useState({
     nombre: '',
     email: '',
     empresa: '',
     rut: '',
+    telefono: '',
   })
 
   // 2 meses gratis al pagar anual
@@ -95,10 +97,35 @@ export function CartContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // Simula creación de orden / checkout
-    await new Promise((r) => setTimeout(r, 1400))
-    setLoading(false)
-    setSuccess(true)
+    setErrorMsg('')
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planName: plan.name,
+          billingCycle: billing,
+          priceUF: `UF ${displayUF}`,
+          totalCLP: `$${formatCLP(totalCLP)} CLP`,
+          nombre: form.nombre,
+          email: form.email,
+          empresa: form.empresa,
+          rut: form.rut,
+          telefono: form.telefono,
+        }),
+      })
+      if (!res.ok) {
+        throw new Error('No se pudo procesar la solicitud')
+      }
+      setSuccess(true)
+    } catch (err) {
+      console.error('[v0] checkout submit error:', err)
+      setErrorMsg(
+        'Hubo un problema al enviar tu solicitud. Inténtalo nuevamente o escríbenos a info@kumplio.app.',
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (success) {
@@ -109,17 +136,15 @@ export function CartContent() {
             <Check className="w-8 h-8 text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">¡Orden confirmada!</h1>
+            <h1 className="text-3xl font-bold">¡Solicitud recibida!</h1>
             <p className="text-muted-foreground">
-              Tu plan <span className="text-foreground font-semibold">{plan.name}</span> está
-              listo. Te enviamos los detalles de acceso a{' '}
+              Recibimos tu solicitud para el plan{' '}
+              <span className="text-foreground font-semibold">{plan.name}</span>. Nuestro equipo
+              verificará el pago y activará tu cuenta. Te enviamos una confirmación a{' '}
               <span className="text-foreground font-semibold">{form.email}</span>.
             </p>
           </div>
           <div className="flex flex-col gap-3 pt-2">
-            <Button size="lg" onClick={() => router.push('/dashboard')}>
-              Ir al Dashboard
-            </Button>
             <Button size="lg" variant="outline" onClick={() => router.push('/')}>
               Volver al inicio
             </Button>
@@ -265,6 +290,19 @@ export function CartContent() {
                     placeholder="76.123.456-7"
                   />
                 </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="text-sm text-muted-foreground" htmlFor="telefono">
+                    Teléfono de contacto
+                  </label>
+                  <input
+                    id="telefono"
+                    type="tel"
+                    value={form.telefono}
+                    onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                    placeholder="+56 9 1234 5678"
+                  />
+                </div>
               </div>
             </section>
 
@@ -316,6 +354,11 @@ export function CartContent() {
               </div>
             </section>
 
+            {errorMsg && (
+              <p className="text-sm text-red-400 text-center" role="alert">
+                {errorMsg}
+              </p>
+            )}
             <Button
               type="submit"
               size="lg"
@@ -328,7 +371,7 @@ export function CartContent() {
                   Procesando...
                 </>
               ) : (
-                <>Pagar ${formatCLP(totalCLP)} CLP</>
+                <>Confirmar compra · ${formatCLP(totalCLP)} CLP</>
               )}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
