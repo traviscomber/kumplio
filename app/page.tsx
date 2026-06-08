@@ -256,7 +256,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Rodrigo</h3>
+                  <h3 className="text-2xl font-bold">R0drigo</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos (en UF reales)</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
