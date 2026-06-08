@@ -126,7 +126,7 @@ export function VeraFloatingChat() {
                   {/* CTA for registration */}
                   <div className="w-full pt-2 border-t border-border">
                     <a
-                      href="/auth/signup"
+                      href="/sign-up"
                       className="w-full block text-center text-xs py-2 px-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium"
                     >
                       Regístrate Gratis
@@ -200,7 +200,7 @@ export function VeraFloatingChat() {
                           Documentos
                         </a>
                         <a
-                          href="/auth/signup"
+                          href="/sign-up"
                           className="text-xs py-2.5 px-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition text-center font-medium"
                         >
                           Registrarse
