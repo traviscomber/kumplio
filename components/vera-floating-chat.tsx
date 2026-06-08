@@ -90,24 +90,50 @@ export function VeraFloatingChat() {
           <>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <MessageCircle className="w-12 h-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">
-                    Hola, soy Vera. Pregunta lo que necesites sobre cumplimiento de Ley 21.719
-                  </p>
-                  <div className="mt-4 space-y-2 w-full">
+                <div className="h-full flex flex-col items-center justify-between py-6">
+                  <div className="text-center">
+                    <MessageCircle className="w-12 h-12 text-muted-foreground/30 mb-3 mx-auto" />
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Hola, soy Vera. Pregunta lo que necesites sobre Ley 21.719
+                    </p>
+                    <p className="text-xs text-muted-foreground/70">
+                      Respuestas instantáneas • Cuantificación de riesgos • Asesoramiento legal
+                    </p>
+                  </div>
+
+                  {/* Quick-start suggestions */}
+                  <div className="w-full space-y-2">
                     <button
                       onClick={() => sendMessage({ text: '¿Qué es el consentimiento informado?' })}
-                      className="w-full text-xs p-2 rounded bg-muted hover:bg-muted/80 transition text-left"
+                      className="w-full text-xs p-2.5 rounded-lg bg-muted hover:bg-muted/80 transition text-left font-medium"
                     >
                       ¿Qué es el consentimiento?
                     </button>
                     <button
                       onClick={() => sendMessage({ text: '¿Cuáles son mis obligaciones?' })}
-                      className="w-full text-xs p-2 rounded bg-muted hover:bg-muted/80 transition text-left"
+                      className="w-full text-xs p-2.5 rounded-lg bg-muted hover:bg-muted/80 transition text-left font-medium"
                     >
                       ¿Cuáles son mis obligaciones?
                     </button>
+                    <button
+                      onClick={() => sendMessage({ text: '¿Cuáles son las multas por incumplimiento?' })}
+                      className="w-full text-xs p-2.5 rounded-lg bg-muted hover:bg-muted/80 transition text-left font-medium"
+                    >
+                      ¿Cuáles son las multas?
+                    </button>
+                  </div>
+
+                  {/* CTA for registration */}
+                  <div className="w-full pt-2 border-t border-border">
+                    <a
+                      href="/auth/signup"
+                      className="w-full block text-center text-xs py-2 px-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium"
+                    >
+                      Regístrate Gratis
+                    </a>
+                    <p className="text-xs text-muted-foreground text-center pt-2">
+                      Acceso a análisis de documentos, dashboard de riesgos y más
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -132,21 +158,48 @@ export function VeraFloatingChat() {
                           msg.parts
                             .filter((p: any) => p.type === 'text')
                             .map((p: any, i: number) => (
-                              <div key={i}>{p.text}</div>
+                              <div key={i} className="text-sm leading-relaxed">{p.text}</div>
                             ))
                         ) : (
-                          <div>{msg.content}</div>
+                          <div className="text-sm leading-relaxed">{msg.content}</div>
                         )}
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Loading/Typing indicator */}
                   {isLoading && (
-                    <div className="flex gap-2 p-3 bg-muted rounded-lg w-fit">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
+                    <div className="flex items-center gap-2 p-3 bg-muted rounded-lg rounded-bl-none w-fit">
+                      <span className="text-xs text-muted-foreground font-medium">Vera está analizando</span>
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
+                      </div>
                     </div>
                   )}
+                  
+                  {/* CTA when last message is from assistant and not loading */}
+                  {!isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && (
+                    <div className="mt-4 pt-2 border-t border-border space-y-2">
+                      <p className="text-xs text-muted-foreground">¿Te interesó?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <a
+                          href="/is1dora"
+                          className="text-xs py-2 px-2 rounded-lg bg-muted hover:bg-muted/80 transition text-center font-medium"
+                        >
+                          Analizar Documentos
+                        </a>
+                        <a
+                          href="/auth/signup"
+                          className="text-xs py-2 px-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition text-center font-medium"
+                        >
+                          Registrarse
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div ref={messagesEndRef} />
                 </>
               )}
