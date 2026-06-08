@@ -328,24 +328,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA TO PRICING PAGE */}
-      <section className="py-24 px-6 border-t border-border">
-        <div className="container mx-auto max-w-3xl text-center space-y-8">
-          <div>
-            <h2 className="text-4xl font-bold mb-4">Planes Flexibles para Tu Tamaño</h2>
-            <p className="text-lg text-muted-foreground">
-              Desde startups hasta empresas grandes. Costo mínimo vs riesgo máximo.
-            </p>
-          </div>
-          <Button size="lg" className="text-lg px-8 bg-primary text-black hover:bg-primary/80 font-semibold" asChild>
-            <a href="/pricing">
-              Ver Precios y Planes
-              <ArrowRight className="ml-3 w-5 h-5" />
-            </a>
-          </Button>
-        </div>
-      </section>
-
       {/* COMPARATIVA - CUMPLIMIENTO MANUAL VS KUMPLIO */}
       <section className="py-24 px-6 bg-card border-t border-border">
         <div className="container mx-auto max-w-4xl">
@@ -578,8 +560,34 @@ export default function HomePage() {
       {/* TRUST SIGNALS SECTION */}
       <TrustSignals />
 
-      {/* CONVERSION CTA SECTION */}
-      <ConversionCTA />
+      {/* SOCIAL PROOF - AFTER AGENTS */}
+      <section className="py-16 px-6 border-t border-border bg-card/30">
+        <div className="container mx-auto max-w-6xl">
+          <SocialProof />
+        </div>
+      </section>
+
+      {/* FINAL CTA - CLEAN & SIMPLE */}
+      <section className="py-20 px-6 border-t border-border">
+        <div className="container mx-auto max-w-2xl text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-5xl font-bold">¿Listo para Cumplir la Ley 21.719?</h2>
+            <p className="text-xl text-muted-foreground">Diagnóstico gratis en 60 segundos. Sin tarjeta de crédito.</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="text-base font-semibold px-8 bg-primary text-black hover:bg-primary/80" asChild>
+              <a href="/sign-up" className="flex items-center justify-center">
+                Comenzar Gratis →
+              </a>
+            </Button>
+            <Button size="lg" variant="outline" className="text-base font-semibold px-8" asChild>
+              <a href="/pricing" className="flex items-center justify-center">
+                Ver Planes y Precios →
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">

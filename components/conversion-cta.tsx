@@ -58,7 +58,7 @@ export function ConversionCTA() {
                 <h3 className="font-bold text-foreground">Plan Pro</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                <span className="font-bold text-foreground">UF 8/mes</span> • Facturación mensual
+                Facturación mensual
               </p>
               <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
