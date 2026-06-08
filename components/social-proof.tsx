@@ -13,12 +13,6 @@ export function SocialProof() {
       logo: '/logos/goldcorp-chile.png',
       description: 'Minería',
       result: '180+ obligaciones mapeadas'
-    },
-    {
-      name: 'Empresa Chilena',
-      logo: '/logos/empresa-chilena.png',
-      description: 'Compliance Real',
-      result: 'Auditable y verificado'
     }
   ];
 
@@ -34,7 +28,7 @@ export function SocialProof() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {companies.map((company, idx) => (
             <div
               key={idx}

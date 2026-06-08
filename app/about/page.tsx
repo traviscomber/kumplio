@@ -225,8 +225,8 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">500+</div>
-              <p className="text-muted-foreground">Empresas Protegidas</p>
+              <div className="text-4xl font-bold text-primary mb-2">50+</div>
+              <p className="text-muted-foreground">Empresas Activas</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-primary mb-2">$2.5B+</div>
