@@ -578,8 +578,8 @@ export default function HomePage() {
       {/* TRUST SIGNALS SECTION */}
       <TrustSignals />
 
-      {/* CONVERSION CTA SECTION */}
-      <ConversionCTA />
+      {/* CONVERSION CTA SECTION - HIDDEN */}
+      {/* <ConversionCTA /> */}
 
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">
