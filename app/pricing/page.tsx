@@ -182,7 +182,13 @@ export default function PricingPage() {
                 <Button
                   className="w-full mb-8"
                   variant={plan.highlighted ? 'default' : 'outline'}
-                  onClick={() => router.push(plan.name === 'Gratuito' ? '/sign-up' : '/cart')}
+                  onClick={() =>
+                    router.push(
+                      plan.name === 'Gratuito'
+                        ? '/sign-up'
+                        : `/cart?plan=${plan.name.toLowerCase()}`,
+                    )
+                  }
                 >
                   {plan.cta}
                 </Button>
@@ -262,7 +268,7 @@ export default function PricingPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/cart')}>
+                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/cart?plan=enterprise')}>
                     {plans[3].cta}
                   </Button>
                 </div>
