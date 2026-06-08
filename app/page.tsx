@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 import { TrustSignals } from '@/components/trust-signals'
 import { ConversionCTA } from '@/components/conversion-cta'
+import { SocialProof } from '@/components/social-proof'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 
 export default function HomePage() {
@@ -373,6 +374,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* SOCIAL PROOF - COMPANY LOGOS */}
+      <SocialProof />
 
       {/* CASOS DE USO */}
       <section className="py-24 px-6 border-t border-border">
