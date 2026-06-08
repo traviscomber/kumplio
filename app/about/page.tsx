@@ -1,11 +1,16 @@
 import type { Metadata } from 'next'
-import { CheckCircle, Users, Target, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { CheckCircle, Users, Target, Zap, ArrowRight } from 'lucide-react'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: 'Sobre KUMPLIO | Solución Compliance IA para Chile',
   description: 'KUMPLIO es una plataforma IA para cumplimiento normativo. Conoce nuestra misión, valores y equipo de expertos en compliance y Ley 21.719.',
-  robots: 'index, follow',
-  canonical: 'https://kumplio.cl/about',
+  keywords: ['sobre KUMPLIO', 'equipo compliance', 'misión n3uralia', 'solución IA Chile', 'expertos cumplimiento'],
+  alternates: {
+    canonical: 'https://kumplio.cl/about',
+  },
 }
 
 export default function AboutPage() {
@@ -57,14 +62,34 @@ export default function AboutPage() {
 
   return (
     <main className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border/50 sticky top-0 z-50 bg-background/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground text-xs font-bold">K</span>
+            </div>
+            <span className="font-bold hidden sm:inline">KUMPLIO</span>
+          </Link>
+          <div className="flex gap-2">
+            <Button variant="ghost" asChild size="sm">
+              <Link href="/">Volver</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/sign-up">Comenzar</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
       {/* Hero */}
-      <section className="py-20 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/10 via-primary/5 to-background border-b border-border/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="text-5xl font-bold text-foreground mb-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 text-balance">
               Compliance Inteligente para Chile
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-muted-foreground text-pretty">
               KUMPLIO utiliza IA para analizar cumplimiento normativo, 
               detectar riesgos y ayudar empresas a cumplir con Ley 21.719 y normativas chilenas.
             </p>
@@ -220,22 +245,27 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16">
+      <section className="py-16 border-t border-border/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">¿Listo para Cumplir?</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4 text-balance">¿Listo para Cumplir?</h2>
           <p className="text-lg text-muted-foreground mb-8">
             Únete a cientos de empresas chilenas que confían en KUMPLIO para cumplimiento normativo
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/demo" className="px-8 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition font-medium">
-              Solicitar Demo
-            </a>
-            <a href="/contact" className="px-8 py-3 border border-primary text-primary rounded-lg hover:bg-primary/10 transition font-medium">
-              Contactar Equipo
-            </a>
+            <Button asChild size="lg">
+              <Link href="/sign-up">Comenzar Ahora</Link>
+            </Button>
+            <Button variant="outline" asChild size="lg">
+              <Link href="/contact" className="flex items-center gap-2">
+                Contactar Equipo
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
+
+      <Footer />
     </main>
   )
 }
