@@ -1,34 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react'
+import { ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function HomePage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      
-      if (authUser) {
-        router.push('/dashboard')
-      } else {
-        setLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [router])
-
-  if (loading) {
-    return <div className="min-h-screen bg-background" />
-  }
-
   return (
     <div className="bg-background text-foreground">
       {/* NAVIGATION */}
