@@ -12,37 +12,38 @@ export default function HomePage() {
   return (
     <div className="bg-background text-foreground">
       {/* NAVIGATION */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          {/* LOGO */}
-          <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+        <div className="container mx-auto px-6 py-6 flex items-center justify-between">
+          {/* LOGO - LARGER & MORE PROMINENT */}
+          <a href="/" className="flex-shrink-0 hover:opacity-90 transition">
             <Image 
               src="/logo-kumplio.svg" 
               alt="KUMPLIO" 
-              width={64} 
-              height={64}
-              className="w-16 h-16"
+              width={100} 
+              height={100}
+              className="w-24 h-24"
+              priority
             />
           </a>
 
           {/* CENTER LINKS - HIDDEN ON MOBILE */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="/pricing" className="text-sm hover:text-primary transition">Precios</a>
-            <a href="/demo/transporte" className="text-sm hover:text-primary transition">Transporte</a>
-            <a href="/demo/mineria" className="text-sm hover:text-primary transition">Minería</a>
-            <a href="/webinars" className="text-sm hover:text-primary transition">Webinars</a>
-            <a href="/sales-kit" className="text-sm hover:text-primary transition">Recursos</a>
+          <div className="hidden md:flex items-center gap-12 flex-1 justify-center">
+            <a href="/pricing" className="text-sm font-medium hover:text-primary transition">Precios</a>
+            <a href="/demo/transporte" className="text-sm font-medium hover:text-primary transition">Transporte</a>
+            <a href="/demo/mineria" className="text-sm font-medium hover:text-primary transition">Minería</a>
+            <a href="/webinars" className="text-sm font-medium hover:text-primary transition">Webinars</a>
+            <a href="/sales-kit" className="text-sm font-medium hover:text-primary transition">Recursos</a>
           </div>
 
           {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
-            <a href="/sign-in" className="text-sm hover:text-primary transition">Acceder</a>
+            <a href="/sign-in" className="text-sm font-medium hover:text-primary transition">Acceder</a>
           </div>
         </div>
       </nav>
 
       {/* HERO - URGENCIA + LEY 21.719 */}
-      <section className="pt-32 pb-24 px-6">
+      <section className="pt-40 pb-24 px-6">
         <div className="container mx-auto max-w-3xl text-center space-y-8">
           {/* COUNTDOWN BANNER */}
           <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30">

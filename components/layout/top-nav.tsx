@@ -23,14 +23,15 @@ export function TopNav() {
 
   return (
     <header className="border-b border-border bg-card fixed top-0 left-0 right-0 z-50">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex-shrink-0">
           <Image 
             src="/logo-kumplio.svg" 
             alt="KUMPLIO" 
-            width={80} 
-            height={80}
-            className="w-20 h-20"
+            width={100} 
+            height={100}
+            className="w-24 h-24"
+            priority
           />
         </div>
 
