@@ -97,21 +97,13 @@ export function VeraFloatingChat() {
                   </p>
                   <div className="mt-4 space-y-2 w-full">
                     <button
-                      onClick={() => {
-                        const text = '¿Qué es el consentimiento informado?'
-                        handleInputChange({ target: { value: text } } as any)
-                        sendMessage({ text })
-                      }}
+                      onClick={() => sendMessage({ text: '¿Qué es el consentimiento informado?' })}
                       className="w-full text-xs p-2 rounded bg-muted hover:bg-muted/80 transition text-left"
                     >
                       ¿Qué es el consentimiento?
                     </button>
                     <button
-                      onClick={() => {
-                        const text = '¿Cuáles son mis obligaciones?'
-                        handleInputChange({ target: { value: text } } as any)
-                        sendMessage({ text })
-                      }}
+                      onClick={() => sendMessage({ text: '¿Cuáles son mis obligaciones?' })}
                       className="w-full text-xs p-2 rounded bg-muted hover:bg-muted/80 transition text-left"
                     >
                       ¿Cuáles son mis obligaciones?
