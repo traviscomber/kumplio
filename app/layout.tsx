@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/app/providers'
 import { VeraFloatingChat } from '@/components/vera-floating-chat'
-import { StructuredData } from '@/components/structured-data'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -169,11 +168,11 @@ export default function RootLayout({
         <meta name="coverage" content="Chile" />
         <meta name="distribution" content="global" />
         
-        {/* Structured Data Schemas */}
-        <StructuredData />
+        {/* Structured Data Schemas - Server Only */}
         
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -207,6 +206,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -247,6 +247,7 @@ export default function RootLayout({
         />
         <script
           type="application/ld+json"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -279,7 +280,7 @@ export default function RootLayout({
         <link rel="alternate" href="/schema-industries.json" type="application/ld+json" />
         <link rel="alternate" href="/schema-regions.json" type="application/ld+json" />
       </head>
-      <body className="font-sans antialiased text-foreground">
+      <body className="font-sans antialiased text-foreground" suppressHydrationWarning>
         <ClientProviders>
           {children}
           <VeraFloatingChat />

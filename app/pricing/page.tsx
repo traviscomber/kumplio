@@ -1,103 +1,106 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
-const plans = [
-  {
-    name: 'Gratuito',
-    price: 'Gratis',
-    usdPrice: '$0',
-    period: 'siempre',
-    description: 'Para probar KUMPLIO',
-    example: 'Diagnóstico inicial y análisis básico',
-    cta: 'Comenzar Gratis',
-    highlighted: false,
-    outcomes: [
-      { text: 'Análisis 1 documento', main: true },
-      { text: 'Reporte de vulnerabilidades', main: false },
-      { text: 'Acceso 30 días', main: false },
-    ],
-    notIncluded: [
-      'Agentes adicionales',
-      'Monitoreo 24/7',
-      'Evaluación de riesgos',
-      'Soporte prioritario',
-    ]
-  },
-  {
-    name: 'Starter',
-    price: 'UF 3',
-    usdPrice: '$110',
-    period: '/mes',
-    description: 'Para empresas pequeñas (1-50 empleados)',
-    example: 'Transporte básico, análisis de obligaciones',
-    cta: 'Seleccionar Plan',
-    highlighted: false,
-    outcomes: [
-      { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
-      { text: '1 agente: Isidora (análisis básico)', main: false },
-      { text: 'Alertas de cambios regulatorios', main: false },
-      { text: 'Reportes mensuales', main: false },
-      { text: 'Email support', main: false },
-    ],
-    notIncluded: [
-      'Evaluación de riesgos (Javier)',
-      'Planes de acción (Beatriz)',
-      'Auditoría independiente (Verónica)',
-      'Reportes PDF certificados',
-    ]
-  },
-  {
-    name: 'Professional',
-    price: 'UF 8',
-    usdPrice: '$290',
-    period: '/mes',
-    description: 'Para empresas medianas (50-500 empleados)',
-    example: 'Transporte y minería - Caso Labbe & Goldcorp',
-    cta: 'Seleccionar Plan',
-    highlighted: true,
-    badge: 'Más Popular',
-    outcomes: [
-      { text: '180+ obligaciones mapeadas', main: true },
-      { text: '4 agentes: Isidora, Rodrigo, Javier, Beatriz', main: false },
-      { text: 'Monitoreo 24/7 de regulaciones chilenas', main: false },
-      { text: 'Evaluación de riesgos en UF/dinero', main: false },
-      { text: 'Planes de acción priorizados 90 días', main: false },
-      { text: 'Support WhatsApp + chat prioritario', main: false },
-    ],
-    notIncluded: [
-      'Auditoría independiente (Verónica)',
-      'Reportes PDF SERNAGEOMIN',
-      'Integración ERP',
-    ]
-  },
-  {
-    name: 'Enterprise',
-    price: 'UF 22',
-    usdPrice: '$800',
-    period: '/mes',
-    description: 'Para empresas grandes (500+ empleados)',
-    example: 'Minería: Risk 52→8, $1.2M evitados en 90 días',
-    cta: 'Contactar Ventas',
-    highlighted: false,
-    outcomes: [
-      { text: 'Obligaciones ilimitadas + personalización', main: true },
-      { text: 'Todos los 7 agentes + Andrés (mejora continua)', main: false },
-      { text: 'Auditoría independiente continua', main: false },
-      { text: 'Reportes PDF certificados SERNAGEOMIN', main: false },
-      { text: 'Roadmap personalizado + mejora mensual', main: false },
-      { text: 'Account manager dedicado + SLA 99.9%', main: false },
-      { text: 'Integración ERP, Contabilidad, RRHH', main: false },
-    ],
-    notIncluded: []
-  }
-]
-
 export default function PricingPage() {
+  const router = useRouter()
+
+  const plans = [
+    {
+      name: 'Gratuito',
+      price: 'Gratis',
+      usdPrice: '$0',
+      period: 'siempre',
+      description: 'Para probar KUMPLIO',
+      example: 'Diagnóstico inicial y análisis básico',
+      cta: 'Comenzar Gratis',
+      highlighted: false,
+      outcomes: [
+        { text: 'Análisis 1 documento', main: true },
+        { text: 'Reporte de vulnerabilidades', main: false },
+        { text: 'Acceso 30 días', main: false },
+      ],
+      notIncluded: [
+        'Agentes adicionales',
+        'Monitoreo 24/7',
+        'Evaluación de riesgos',
+        'Soporte prioritario',
+      ]
+    },
+    {
+      name: 'Starter',
+      price: 'UF 3',
+      usdPrice: '$110',
+      period: '/mes',
+      description: 'Para empresas pequeñas (1-50 empleados)',
+      example: 'Transporte básico, análisis de obligaciones',
+      cta: 'Seleccionar Plan',
+      highlighted: false,
+      outcomes: [
+        { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
+        { text: '1 agente: Isidora (análisis básico)', main: false },
+        { text: 'Alertas de cambios regulatorios', main: false },
+        { text: 'Reportes mensuales', main: false },
+        { text: 'Email support', main: false },
+      ],
+      notIncluded: [
+        'Evaluación de riesgos (Javier)',
+        'Planes de acción (Beatriz)',
+        'Auditoría independiente (Verónica)',
+        'Reportes PDF certificados',
+      ]
+    },
+    {
+      name: 'Professional',
+      price: 'UF 8',
+      usdPrice: '$290',
+      period: '/mes',
+      description: 'Para empresas medianas (50-500 empleados)',
+      example: 'Transporte y minería - Caso Labbe & Goldcorp',
+      cta: 'Seleccionar Plan',
+      highlighted: true,
+      badge: 'Más Popular',
+      outcomes: [
+        { text: '180+ obligaciones mapeadas', main: true },
+        { text: '4 agentes: Isidora, Rodrigo, Javier, Beatriz', main: false },
+        { text: 'Monitoreo 24/7 de regulaciones chilenas', main: false },
+        { text: 'Evaluación de riesgos en UF/dinero', main: false },
+        { text: 'Planes de acción priorizados 90 días', main: false },
+        { text: 'Support WhatsApp + chat prioritario', main: false },
+      ],
+      notIncluded: [
+        'Auditoría independiente (Verónica)',
+        'Reportes PDF SERNAGEOMIN',
+        'Integración ERP',
+      ]
+    },
+    {
+      name: 'Enterprise',
+      price: 'UF 22',
+      usdPrice: '$800',
+      period: '/mes',
+      description: 'Para empresas grandes (500+ empleados)',
+      example: 'Minería: Risk 52→8, $1.2M evitados en 90 días',
+      cta: 'Contactar Ventas',
+      highlighted: false,
+      outcomes: [
+        { text: 'Obligaciones ilimitadas + personalización', main: true },
+        { text: 'Todos los 7 agentes + Andrés (mejora continua)', main: false },
+        { text: 'Auditoría independiente continua', main: false },
+        { text: 'Reportes PDF certificados SERNAGEOMIN', main: false },
+        { text: 'Roadmap personalizado + mejora mensual', main: false },
+        { text: 'Account manager dedicado + SLA 99.9%', main: false },
+        { text: 'Integración ERP, Contabilidad, RRHH', main: false },
+      ],
+      notIncluded: []
+    }
+  ]
+
   return (
     <div className="bg-background">
       {/* Navigation */}
@@ -123,9 +126,6 @@ export default function PricingPage() {
           {/* RIGHT BUTTONS */}
           <div className="flex items-center gap-4">
             <a href="/sign-in" className="text-sm hover:text-primary transition">Acceder</a>
-            <Button size="sm" asChild>
-              <a href="/sign-up">Empezar</a>
-            </Button>
           </div>
         </div>
       </nav>
@@ -179,7 +179,13 @@ export default function PricingPage() {
                 <Button
                   className="w-full mb-8"
                   variant={plan.highlighted ? 'default' : 'outline'}
-                  onClick={() => router.push(plan.name === 'Gratuito' ? '/sign-up' : '/cart')}
+                  onClick={() =>
+                    router.push(
+                      plan.name === 'Gratuito'
+                        ? '/sign-up'
+                        : `/cart?plan=${plan.name.toLowerCase()}`,
+                    )
+                  }
                 >
                   {plan.cta}
                 </Button>
@@ -259,7 +265,7 @@ export default function PricingPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/cart')}>
+                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/cart?plan=enterprise')}>
                     {plans[3].cta}
                   </Button>
                 </div>
