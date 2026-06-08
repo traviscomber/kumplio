@@ -173,20 +173,20 @@ export default function HomePage() {
             <div className="space-y-4">
               <div className="grid md:grid-cols-5 gap-3 items-center">
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Sofia</p>
-                  <p className="text-xs text-muted-foreground">Análisis de Obligaciones</p>
-                  <p className="text-2xl font-black text-primary mt-3">47</p>
+                  <p className="font-bold text-primary mb-2">Is1dora</p>
+                  <p className="text-xs text-muted-foreground">Extrae Obligaciones</p>
+                  <p className="text-2xl font-black text-primary mt-3">34</p>
                 </div>
                 <div className="text-center text-muted-foreground text-xl">→</div>
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Bruno</p>
-                  <p className="text-xs text-muted-foreground">Evaluación de Riesgos</p>
-                  <p className="text-2xl font-black text-primary mt-3">$1.2M</p>
+                  <p className="font-bold text-primary mb-2">R0drigo</p>
+                  <p className="text-xs text-muted-foreground">Cuantifica Riesgos</p>
+                  <p className="text-2xl font-black text-primary mt-3">20K UTM</p>
                 </div>
                 <div className="text-center text-muted-foreground text-xl">→</div>
                 <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Marco</p>
-                  <p className="text-xs text-muted-foreground">Plan de Acción</p>
+                  <p className="font-bold text-primary mb-2">Jav1er</p>
+                  <p className="text-xs text-muted-foreground">Genera Roadmap</p>
                   <p className="text-2xl font-black text-primary mt-3">90 D</p>
                 </div>
               </div>
@@ -238,21 +238,21 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
             </div>
 
-            {/* Sofia */}
+            {/* Is1dora */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Sofia</h3>
-                  <p className="text-sm text-muted-foreground">Analizadora de Obligaciones</p>
+                  <h3 className="text-2xl font-bold">Is1dora</h3>
+                  <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">47</div>
-              <p className="text-sm">Obligaciones identificadas en tu negocio</p>
-              <p className="text-xs text-muted-foreground">Ley 21.719, derechos ARCO+, DPA, RAT, EIPD</p>
+              <div className="text-3xl font-black text-primary">60 Segundos</div>
+              <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
+              <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
             </div>
 
-            {/* Bruno - Risk in UF/CLP money */}
+            {/* R0drigo - Risk in UF/CLP money */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -266,7 +266,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">~$1.400M CLP en infracción gravísima. Exacto, en dinero real.</p>
             </div>
 
-            {/* Elena - Monitoring */}
+            {/* Be4triz - Monitoring */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -280,7 +280,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
             </div>
 
-            {/* Marco - Action Plan */}
+            {/* Jav1er - Action Plan */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -294,7 +294,7 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">3 fases, hitos mensuales, responsables, recursos — no un checklist</p>
             </div>
 
-            {/* Laura - Audit */}
+            {/* Ver0nica - Audit */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
@@ -308,18 +308,18 @@ export default function HomePage() {
               <p className="text-xs text-muted-foreground">Verificación independiente de cumplimiento real vs legal</p>
             </div>
 
-            {/* Kai - Learning */}
+            {/* Andr3s - Learning */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Is1dora</h3>
-                  <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
+                  <h3 className="text-2xl font-bold">Andr3s</h3>
+                  <p className="text-sm text-muted-foreground">Optimizador de Sistema</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">60 Segundos</div>
-              <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
-              <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
+              <div className="text-3xl font-black text-primary">+5% Mejora</div>
+              <p className="text-sm">Feedback continuo para mejorar el sistema</p>
+              <p className="text-xs text-muted-foreground">Cada auditoría entrena al sistema. KUMPLIO mejora mensualmente.</p>
             </div>
           </div>
         </div>
@@ -354,7 +354,7 @@ export default function HomePage() {
               { problema: "Cambios legales que no ves", kumplio: "Monitoreo 24/7 en tiempo real" },
               { problema: "Riesgos sin cuantificar", kumplio: "Exposición en dinero (UF, $/día)" },
               { problema: "Recomendaciones vagas", kumplio: "Plan ejecutable mes a mes" },
-              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Laura" },
+              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Ver0nica" },
               { problema: "Reportes manuales para reguladores", kumplio: "PDF listo en 1 click" },
             ].map((item, i) => (
               <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
@@ -497,12 +497,12 @@ export default function HomePage() {
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Analogical Reasoning</p>
-                    <p className="text-muted-foreground">Sofia compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
+                    <p className="text-muted-foreground">Is1dora compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
                   </div>
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Causal Reasoning</p>
-                    <p className="text-muted-foreground">Bruno entiende causas raíz del incumplimiento, no solo calcula multas.</p>
+                    <p className="text-muted-foreground">R0drigo entiende causas raíz del incumplimiento, no solo calcula multas.</p>
                   </div>
                   
                   <div className="space-y-1">
@@ -542,7 +542,7 @@ export default function HomePage() {
                   
                   <div className="space-y-1">
                     <p className="font-semibold text-primary">Continuous Learning</p>
-                    <p className="text-muted-foreground">Kai recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
+                    <p className="text-muted-foreground">Andr3s recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
                   </div>
                 </div>
               </div>
