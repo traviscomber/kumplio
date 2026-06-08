@@ -280,7 +280,7 @@ export default function RootLayout({
         <link rel="alternate" href="/schema-industries.json" type="application/ld+json" />
         <link rel="alternate" href="/schema-regions.json" type="application/ld+json" />
       </head>
-      <body className="font-sans antialiased text-foreground">
+      <body className="font-sans antialiased text-foreground" suppressHydrationWarning>
         <ClientProviders>
           {children}
           <VeraFloatingChat />
