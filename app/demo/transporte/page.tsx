@@ -124,7 +124,7 @@ export default function TransporteDemoPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
               <div>
-                <h3 className="font-semibold mb-2">Isidora identifica todas tus obligaciones</h3>
+                <h3 className="font-semibold mb-2">Is1dora identifica todas tus obligaciones</h3>
                 <p className="text-sm text-muted-foreground">47 obligaciones en transporte: RT, SOAP, permisos, seguros, licencias conductores, documentación carga</p>
               </div>
               <div className="flex items-start gap-3">
