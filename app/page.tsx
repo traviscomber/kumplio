@@ -37,32 +37,50 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* HERO - DIRECTO Y SECO */}
+      {/* HERO - URGENCIA + LEY 21.719 */}
       <section className="pt-32 pb-24 px-6">
         <div className="container mx-auto max-w-3xl text-center space-y-8">
+          {/* COUNTDOWN BANNER */}
+          <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
+            <p className="text-sm font-semibold text-primary">
+              La Ley 21.719 entra en vigor: 1 de Diciembre de 2026 — Faltan 178 días
+            </p>
+          </div>
+
           <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-tight">
-            Controla tu Cumplimiento Legal
+            ¿Tu Empresa Está Lista para la Ley 21.719?
             <br />
-            <span className="text-primary">Antes Que Te Controle La Ley</span>
+            <span className="text-primary">Multas de hasta $1.400M CLP</span>
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            7 agentes IA analizan obligaciones, monitorean regulaciones, cuantifican riesgos en dinero, y generan planes de acción ejecutables.
+            7 agentes IA especializados analizan tu cumplimiento en 60 segundos. Desde obligaciones hasta cuantificación de riesgos en dinero real, planes ejecutables.
             <br />
-            <span className="font-semibold">Para transporte, minería, y cualquier empresa que deba cumplir.</span>
+            <span className="font-semibold">Para retail, fintech, salud, tecnología — cualquier empresa que trate datos en Chile.</span>
           </p>
 
+          {/* SOCIAL PROOF */}
+          <div className="pt-4 pb-6 border-t border-b border-border/50">
+            <p className="text-sm text-muted-foreground mb-3">Confiado por +50 empresas chilenas</p>
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Retail</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Fintech</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Salud</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Educación</span>
+              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-semibold">Tech</span>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="text-lg px-8 group/btn" asChild>
-              <a href="/demo/transporte" className="flex items-center">
-                Demo: Transporte
-                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+            <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
+              <a href="/sign-up" className="flex items-center justify-center">
+                Diagnóstico Gratis
+                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </a>
             </Button>
-            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80 group/btn" asChild>
-              <a href="/demo/mineria" className="flex items-center">
-                Demo: Minería
-                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-white group/btn font-semibold" variant="outline" asChild>
+              <a href="/demo/transporte" className="flex items-center justify-center">
+                Ver Demo de 2 Min
               </a>
             </Button>
           </div>
@@ -135,6 +153,20 @@ export default function HomePage() {
           <p className="text-muted-foreground mb-16 max-w-2xl">Cada agente es un experto en su dominio. Juntos forman un sistema de razonamiento ultra-inteligente que aprende de cada decisión.</p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Catarina - HERO AGENT - moved first for legal validation prominence */}
+            <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Cat4lina</h3>
+                  <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
+                </div>
+                <span className="text-3xl text-primary">★</span>
+              </div>
+              <div className="text-3xl font-black text-primary">100% Auditable</div>
+              <p className="text-sm font-semibold">Cada decisión cita el artículo de ley + precedente SERNAC específico</p>
+              <p className="text-xs text-muted-foreground">Validación legal completa. La palabra final antes de la APDP. Zero hallucinations, cadena de razonamiento explícita.</p>
+            </div>
+
             {/* Sofia */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
@@ -146,92 +178,78 @@ export default function HomePage() {
               </div>
               <div className="text-3xl font-black text-primary">47</div>
               <p className="text-sm">Obligaciones identificadas en tu negocio</p>
-              <p className="text-xs text-muted-foreground">Transporte: RT, SOAP, permisos, seguros • Minería: SONAMI, seguridad, ambiental</p>
+              <p className="text-xs text-muted-foreground">Ley 21.719, derechos ARCO+, DPA, RAT, EIPD</p>
             </div>
 
-            {/* Elena */}
+            {/* Bruno - Risk in UF/CLP money */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Elena</h3>
+                  <h3 className="text-2xl font-bold">Rodrigo</h3>
+                  <p className="text-sm text-muted-foreground">Evaluador de Riesgos (en UF reales)</p>
+                </div>
+                <span className="text-3xl text-muted-foreground">●</span>
+              </div>
+              <div className="text-3xl font-black text-primary">20.000 UTM</div>
+              <p className="text-sm">Exposición máxima cuantificada</p>
+              <p className="text-xs text-muted-foreground">~$1.400M CLP en infracción gravísima. Exacto, en dinero real.</p>
+            </div>
+
+            {/* Elena - Monitoring */}
+            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">Be4triz</h3>
                   <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">24/7</div>
-              <p className="text-sm">Cambios legales en tu inbox al instante</p>
-              <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones SEREMI, cambios regulatorios</p>
+              <p className="text-sm">Cambios de ley notificados antes</p>
+              <p className="text-xs text-muted-foreground">Ley 21.719, resoluciones APDP, reglamentos — sin sorpresas</p>
             </div>
 
-            {/* Bruno */}
+            {/* Marco - Action Plan */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Bruno</h3>
-                  <p className="text-sm text-muted-foreground">Evaluador de Riesgos</p>
-                </div>
-                <span className="text-3xl text-muted-foreground">●</span>
-              </div>
-              <div className="text-3xl font-black text-primary">$1.2M</div>
-              <p className="text-sm">Exposición financiera si incumples</p>
-              <p className="text-xs text-muted-foreground">Multas, sanciones, cierres operacionales</p>
-            </div>
-
-            {/* Marco */}
-            <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold">Marco</h3>
+                  <h3 className="text-2xl font-bold">Jav1er</h3>
                   <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
               <div className="text-3xl font-black text-primary">90 Días</div>
-              <p className="text-sm">Plan de acción ejecutable</p>
-              <p className="text-xs text-muted-foreground">Hitos mensuales, responsables, recursos</p>
+              <p className="text-sm">Plan ejecutable, viabilidad real</p>
+              <p className="text-xs text-muted-foreground">3 fases, hitos mensuales, responsables, recursos — no un checklist</p>
             </div>
 
-            {/* Laura */}
+            {/* Laura - Audit */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Laura</h3>
-                  <p className="text-sm text-muted-foreground">Auditora de Cumplimiento</p>
+                  <h3 className="text-2xl font-bold">Ver0nica</h3>
+                  <p className="text-sm text-muted-foreground">Auditora de Gap Analysis</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">52%</div>
-              <p className="text-sm">De tus obligaciones cumpliéndose realmente</p>
-              <p className="text-xs text-muted-foreground">Auditoría independiente, verificación real</p>
+              <div className="text-3xl font-black text-primary">Gap Analysis</div>
+              <p className="text-sm">Sabes exactamente dónde estás</p>
+              <p className="text-xs text-muted-foreground">Verificación independiente de cumplimiento real vs legal</p>
             </div>
 
-            {/* Kai */}
+            {/* Kai - Learning */}
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">Kai</h3>
-                  <p className="text-sm text-muted-foreground">Aprendizaje Continuo</p>
+                  <h3 className="text-2xl font-bold">Is1dora</h3>
+                  <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
               </div>
-              <div className="text-3xl font-black text-primary">+5%</div>
-              <p className="text-sm">Mejora en accuracy cada mes</p>
-              <p className="text-xs text-muted-foreground">Sistema que aprende y se optimiza</p>
+              <div className="text-3xl font-black text-primary">60 Segundos</div>
+              <p className="text-sm">Extrae 34 obligaciones automáticamente</p>
+              <p className="text-xs text-muted-foreground">De contratos, políticas, RAT — sin intermediarios, sin esperar abogados</p>
             </div>
-          </div>
-
-          {/* Catarina - Full width */}
-          <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-2xl font-bold">Catarina</h3>
-                <p className="text-sm text-muted-foreground">Reportera Legal</p>
-              </div>
-              <span className="text-3xl text-muted-foreground">●</span>
-            </div>
-            <div className="text-3xl font-black text-primary">1 Click</div>
-            <p className="text-sm">PDF listo para reguladores</p>
-            <p className="text-xs text-muted-foreground">Compilar evidencia, reportes auditables para inspecciones</p>
           </div>
         </div>
       </section>
