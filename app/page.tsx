@@ -356,107 +356,6 @@ export default function HomePage() {
       {/* SOCIAL PROOF - COMPANY LOGOS */}
       <SocialProof />
 
-      {/* CASOS DE USO */}
-      <section className="py-24 px-6 border-t border-border">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold mb-16">Casos de Uso Reales</h2>
-
-          {/* TRANSPORTE */}
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-            <div className="space-y-6">
-              <div>
-                <p className="text-sm font-semibold text-primary uppercase mb-2">Caso: Transporte</p>
-                <h3 className="text-3xl font-bold">Labbe Logística</h3>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Excel)</p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <span>15 multas/año. $200K en infracciones.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <span>15 horas/semana en compliance manual</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="border-t pt-4">
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (KUMPLIO)</p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span>0 multas. Auditorías limpias.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span>0.5 horas/semana. ROI: 5 meses.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div className="bg-card p-8 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground mb-1">47 Obligaciones en Transporte</p>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div><p className="font-semibold">Revisión Técnica</p><p className="text-muted-foreground">Cada 6 meses</p></div>
-                <div><p className="font-semibold">SOAP</p><p className="text-muted-foreground">Anual</p></div>
-                <div><p className="font-semibold">Licencia Conducción</p><p className="text-muted-foreground">Vigencia</p></div>
-                <div><p className="font-semibold">Permiso Circulación</p><p className="text-muted-foreground">Anual</p></div>
-              </div>
-            </div>
-          </div>
-
-          {/* MINERÍA */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="bg-card p-8 rounded-lg border border-border md:order-2">
-              <p className="text-sm text-muted-foreground mb-1">180+ Obligaciones en Minería</p>
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div><p className="font-semibold">Seguridad Ocupacional</p><p className="text-muted-foreground">DS 40</p></div>
-                <div><p className="font-semibold">Ambiental</p><p className="text-muted-foreground">RCA aprobada</p></div>
-                <div><p className="font-semibold">Derechos Humanos</p><p className="text-muted-foreground">Protocolo SONAMI</p></div>
-                <div><p className="font-semibold">Tributario</p><p className="text-muted-foreground">Royalties, IVA</p></div>
-              </div>
-            </div>
-            <div className="space-y-6 md:order-1">
-              <div>
-                <p className="text-sm font-semibold text-primary uppercase mb-2">Caso: Minería</p>
-                <h3 className="text-3xl font-bold">Goldcorp Chile</h3>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Alto riesgo)</p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <span>Riesgo regulatorio: 45/100</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <span>Potencial multa: $1.2M</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="border-t pt-4">
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (90 días)</p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span>Riesgo: 8/100. Controlado.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span>Evitó multa de $1.2M</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* TECHNOLOGY: IA FIRST ARCHITECTURE */}
       <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
         <div className="container mx-auto max-w-6xl">
@@ -555,13 +454,6 @@ export default function HomePage() {
 
       {/* TRUST SIGNALS SECTION */}
       <TrustSignals />
-
-      {/* SOCIAL PROOF - AFTER AGENTS */}
-      <section className="py-16 px-6 border-t border-border bg-card/30">
-        <div className="container mx-auto max-w-6xl">
-          <SocialProof />
-        </div>
-      </section>
 
       {/* FINAL CTA - CLEAN & SIMPLE */}
       <section className="py-20 px-6 border-t border-border">
