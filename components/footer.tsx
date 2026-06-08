@@ -14,15 +14,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand & Description */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="mb-4">
               <Image 
                 src="/logo-kumplio.svg" 
                 alt="KUMPLIO" 
-                width={32} 
-                height={32}
-                className="w-8 h-8"
+                width={64} 
+                height={64}
+                className="w-16 h-16"
               />
-              <span className="font-bold text-lg">KUMPLIO</span>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
               Plataforma IA integral para cumplimiento legal en Chile. 7 agentes expertos analizando, validando y optimizando tu cumplimiento 24/7.

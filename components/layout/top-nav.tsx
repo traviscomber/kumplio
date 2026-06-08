@@ -28,11 +28,10 @@ export function TopNav() {
           <Image 
             src="/logo-kumplio.svg" 
             alt="KUMPLIO" 
-            width={40} 
-            height={40}
-            className="w-10 h-10"
+            width={80} 
+            height={80}
+            className="w-20 h-20"
           />
-          <h1 className="text-xl font-bold text-foreground">KUMPLIO</h1>
         </div>
 
         <nav className="hidden md:flex items-center gap-6">

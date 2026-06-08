@@ -19,11 +19,10 @@ export default function HomePage() {
             <Image 
               src="/logo-kumplio.svg" 
               alt="KUMPLIO" 
-              width={32} 
-              height={32}
-              className="w-8 h-8"
+              width={64} 
+              height={64}
+              className="w-16 h-16"
             />
-            <span className="font-bold text-lg">KUMPLIO</span>
           </a>
 
           {/* CENTER LINKS - HIDDEN ON MOBILE */}
