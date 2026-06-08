@@ -111,7 +111,7 @@ export default function HomePage() {
                 </div>
                 <span className="text-3xl">⚠️</span>
               </div>
-              <div className="text-3xl font-black text-red-600">$1.2M</div>
+              <div className="text-3xl font-black text-primary">$1.2M</div>
               <p className="text-sm">Exposición financiera si incumples</p>
               <p className="text-xs text-muted-foreground">Multas, sanciones, cierres operacionales</p>
             </div>
@@ -191,12 +191,12 @@ export default function HomePage() {
             ].map((item, i) => (
               <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <p className="font-semibold text-sm">{item.problema}</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <p className="font-semibold text-sm text-green-700">{item.kumplio}</p>
+                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="font-semibold text-sm">{item.kumplio}</p>
                 </div>
               </div>
             ))}
@@ -221,11 +221,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Excel)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>15 multas/año. $200K en infracciones.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>15 horas/semana en compliance manual</span>
                     </li>
                   </ul>
@@ -234,11 +234,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (KUMPLIO)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>0 multas. Auditorías limpias.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>0.5 horas/semana. ROI: 5 meses.</span>
                     </li>
                   </ul>
@@ -277,11 +277,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">ANTES (Alto riesgo)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>Riesgo regulatorio: 45/100</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                       <span>Potencial multa: $1.2M</span>
                     </li>
                   </ul>
@@ -290,11 +290,11 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-muted-foreground mb-2">DESPUÉS (90 días)</p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>Riesgo: 8/100. Controlado.</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <span>Evitó multa de $1.2M</span>
                     </li>
                   </ul>
