@@ -8,6 +8,27 @@ export const dynamic = 'force-dynamic'
 
 const plans = [
   {
+    name: 'Gratuito',
+    price: 'Gratis',
+    usdPrice: '$0',
+    period: 'siempre',
+    description: 'Para probar KUMPLIO',
+    example: 'Diagnóstico inicial y análisis básico',
+    cta: 'Comenzar Gratis',
+    highlighted: false,
+    outcomes: [
+      { text: 'Análisis 1 documento', main: true },
+      { text: 'Reporte de vulnerabilidades', main: false },
+      { text: 'Acceso 30 días', main: false },
+    ],
+    notIncluded: [
+      'Agentes adicionales',
+      'Monitoreo 24/7',
+      'Evaluación de riesgos',
+      'Soporte prioritario',
+    ]
+  },
+  {
     name: 'Starter',
     price: 'UF 3',
     usdPrice: '$110',
