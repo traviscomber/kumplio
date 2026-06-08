@@ -182,17 +182,26 @@ export function VeraFloatingChat() {
                   {/* CTA when last message is from assistant and not loading */}
                   {!isLoading && messages.length > 0 && messages[messages.length - 1]?.role === 'assistant' && (
                     <div className="mt-4 pt-2 border-t border-border space-y-2">
-                      <p className="text-xs text-muted-foreground">¿Te interesó?</p>
-                      <div className="grid grid-cols-2 gap-2">
+                      <p className="text-xs text-muted-foreground font-medium">¿Qué deseas hacer?</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <a
+                          href="https://wa.me/56993826127?text=Hola%20KUMPLIO,%20tengo%20una%20pregunta%20sobre%20cumplimiento%20de%20Ley%2021.719.%20Me%20gustar%C3%ADa%20hablar%20con%20un%20ejecutivo."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs py-2.5 px-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition text-center font-medium flex items-center justify-center gap-1"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          Humano
+                        </a>
                         <a
                           href="/is1dora"
-                          className="text-xs py-2 px-2 rounded-lg bg-muted hover:bg-muted/80 transition text-center font-medium"
+                          className="text-xs py-2.5 px-2 rounded-lg bg-muted hover:bg-muted/80 transition text-center font-medium"
                         >
-                          Analizar Documentos
+                          Documentos
                         </a>
                         <a
                           href="/auth/signup"
-                          className="text-xs py-2 px-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition text-center font-medium"
+                          className="text-xs py-2.5 px-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition text-center font-medium"
                         >
                           Registrarse
                         </a>
