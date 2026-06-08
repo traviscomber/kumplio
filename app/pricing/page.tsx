@@ -35,7 +35,7 @@ const plans = [
     period: '/mes',
     description: 'Para empresas pequeñas (1-50 empleados)',
     example: 'Transporte básico, análisis de obligaciones',
-    cta: 'Empezar Gratis',
+    cta: 'Seleccionar Plan',
     highlighted: false,
     outcomes: [
       { text: 'Hasta 47 obligaciones mapeadas (Transporte)', main: true },
@@ -58,7 +58,7 @@ const plans = [
     period: '/mes',
     description: 'Para empresas medianas (50-500 empleados)',
     example: 'Transporte y minería - Caso Labbe & Goldcorp',
-    cta: 'Empezar Gratis',
+    cta: 'Seleccionar Plan',
     highlighted: true,
     badge: 'Más Popular',
     outcomes: [
@@ -179,7 +179,7 @@ export default function PricingPage() {
                 <Button
                   className="w-full mb-8"
                   variant={plan.highlighted ? 'default' : 'outline'}
-                  onClick={() => router.push('/sign-up')}
+                  onClick={() => router.push(plan.name === 'Gratuito' ? '/sign-up' : '/cart')}
                 >
                   {plan.cta}
                 </Button>
@@ -259,7 +259,7 @@ export default function PricingPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/sign-up')}>
+                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/cart')}>
                     {plans[3].cta}
                   </Button>
                 </div>
