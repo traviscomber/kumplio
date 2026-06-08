@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Shield, CheckCircle, AlertTriangle, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: 'Cumplimiento Ley 21.719 Chile | KUMPLIO - Guía Completa & Solución IA',
@@ -285,14 +286,7 @@ export default function Ley21719Page() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-12 mt-24">
-        <div className="container mx-auto px-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>KUMPLIO © 2024 - Inteligencia Documental para Cumplimiento Normativo en Chile</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Mail, MapPin, Phone } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { Footer } from '@/components/footer'
 
 export default function ContactPage() {
   const router = useRouter()
@@ -295,36 +296,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <p className="font-semibold mb-3">Producto</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/" className="hover:text-foreground transition">Inicio</a></li>
-                <li><a href="/pricing" className="hover:text-foreground transition">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Legal</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Empresa</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, BookOpen, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: 'Blog: Cumplimiento Normativo Chile | Ley 21.719 | KUMPLIO',
@@ -193,14 +194,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-12 mt-24">
-        <div className="container mx-auto px-6">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>KUMPLIO © 2024 - Recursos de Cumplimiento Normativo en Chile</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
