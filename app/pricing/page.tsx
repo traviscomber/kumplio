@@ -1,9 +1,8 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Check } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 
 const plans = [
   {

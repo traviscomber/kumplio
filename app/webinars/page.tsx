@@ -1,9 +1,8 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Calendar, Clock, Users, CheckCircle2 } from 'lucide-react'
-import { useState } from 'react'
+
+export const dynamic = 'force-dynamic'
 
 const webinars = [
   {
