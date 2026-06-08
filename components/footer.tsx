@@ -139,31 +139,31 @@ export function Footer() {
           <h3 className="font-semibold mb-6">Arquitectura IA & LLM</h3>
           <div className="grid grid-cols-1 md:grid-cols-7 gap-4 text-sm">
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Isidora</p>
+              <p className="font-semibold text-primary mb-1">Is1dora</p>
               <p className="text-xs text-muted-foreground">Extracción de Documentos & Obligaciones</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Rodrigo</p>
+              <p className="font-semibold text-primary mb-1">R0drigo</p>
               <p className="text-xs text-muted-foreground">Cuantificación de Riesgo Regulatorio</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Javier</p>
+              <p className="font-semibold text-primary mb-1">Jav1er</p>
               <p className="text-xs text-muted-foreground">Generación de Roadmaps Ejecutables</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Beatriz</p>
+              <p className="font-semibold text-primary mb-1">Be4triz</p>
               <p className="text-xs text-muted-foreground">Monitoreo 24/7 de Cambios Regulatorios</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Verónica</p>
+              <p className="font-semibold text-primary mb-1">Ver0nica</p>
               <p className="text-xs text-muted-foreground">Auditoría de Compliance Real</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Andrés</p>
+              <p className="font-semibold text-primary mb-1">Andr3s</p>
               <p className="text-xs text-muted-foreground">Análisis de Datos Regulatorios</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/30 border border-muted/50">
-              <p className="font-semibold text-primary mb-1">Catalina</p>
+              <p className="font-semibold text-primary mb-1">Cat4lina</p>
               <p className="text-xs text-muted-foreground">Validación Legal & Generación de Reportes</p>
             </div>
           </div>

@@ -230,7 +230,7 @@ export default function HomePage() {
             <div className="md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">7. Catalina</h3>
+                  <h3 className="text-2xl font-bold">7. Cat4lina</h3>
                   <p className="text-sm text-muted-foreground">Validadora Legal (Jurisprudencia SERNAC)</p>
                 </div>
                 <span className="text-3xl text-primary">★</span>
@@ -244,7 +244,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">1. Isidora</h3>
+                  <h3 className="text-2xl font-bold">1. Is1dora</h3>
                   <p className="text-sm text-muted-foreground">Extractora de Documentos</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -258,7 +258,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">2. Rodrigo</h3>
+                  <h3 className="text-2xl font-bold">2. R0drigo</h3>
                   <p className="text-sm text-muted-foreground">Evaluador de Riesgos (en UF reales)</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -272,7 +272,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">4. Beatriz</h3>
+                  <h3 className="text-2xl font-bold">4. Be4triz</h3>
                   <p className="text-sm text-muted-foreground">Monitora Regulatoria</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -286,7 +286,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">3. Javier</h3>
+                  <h3 className="text-2xl font-bold">3. Jav1er</h3>
                   <p className="text-sm text-muted-foreground">Asesor de Cumplimiento</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -300,7 +300,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">5. Verónica</h3>
+                  <h3 className="text-2xl font-bold">5. Ver0nica</h3>
                   <p className="text-sm text-muted-foreground">Auditora de Gap Analysis</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
@@ -314,7 +314,7 @@ export default function HomePage() {
             <div className="p-8 rounded-lg border border-border hover:border-primary transition space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold">6. Andrés</h3>
+                  <h3 className="text-2xl font-bold">6. Andr3s</h3>
                   <p className="text-sm text-muted-foreground">Optimizador de Sistema</p>
                 </div>
                 <span className="text-3xl text-muted-foreground">●</span>
