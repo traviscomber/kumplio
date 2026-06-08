@@ -323,7 +323,7 @@ export default function MineriaDemoPage() {
                 <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </Link>
             </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-black text-black hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>
             </Button>
           </div>

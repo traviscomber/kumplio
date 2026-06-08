@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/footer'
 import { ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function HomePage() {
@@ -465,7 +466,7 @@ export default function HomePage() {
                 <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
               </a>
             </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-black text-black hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
               <a href="/demo/transporte" className="flex items-center justify-center">
                 Ver Sistema en Acción
               </a>
@@ -474,36 +475,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-border py-12 px-6 bg-card">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <p className="font-semibold mb-3">Producto</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/demo/transporte" className="hover:text-foreground transition">Transporte</a></li>
-                <li><a href="/demo/mineria" className="hover:text-foreground transition">Minería</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Legal</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Términos</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-3">Empresa</p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Sobre n3uralia</a></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">© 2026 KUMPLIO by n3uralia.com</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
