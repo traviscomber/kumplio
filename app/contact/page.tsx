@@ -127,7 +127,7 @@ export default function ContactPage() {
                     <div>
                       <p className="font-semibold text-sm mb-1">Teléfono</p>
                       <a href="tel:+56993826127" className="text-sm text-muted-foreground hover:text-primary transition">
-                        +56 9 3826-6127
+                        +56 9 9382-6127
                       </a>
                     </div>
                   </div>
