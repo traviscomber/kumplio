@@ -142,14 +142,14 @@ export default function PricingPage() {
             <p className="text-sm text-muted-foreground">UF Valor: $36.53 (Aproximado Julio 2026)</p>
           </div>
 
-          {/* Plans Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-16">
-            {plans.map((plan, idx) => (
+          {/* Plans Grid - First 3 Plans */}
+          <div className="grid md:grid-cols-3 gap-6 mb-24">
+            {plans.slice(0, 3).map((plan, idx) => (
               <div
                 key={idx}
                 className={`relative rounded-lg border p-8 transition-all ${
                   plan.highlighted
-                    ? 'border-primary bg-primary/5 md:scale-105 shadow-lg'
+                    ? 'border-primary bg-primary/5 shadow-lg'
                     : 'border-border bg-card hover:border-primary/50'
                 }`}
               >
@@ -218,6 +218,53 @@ export default function PricingPage() {
                 )}
               </div>
             ))}
+          </div>
+
+          {/* Enterprise Plan - Separated */}
+          <div className="bg-card border-2 border-border rounded-lg p-12 mb-24">
+            {plans[3] && (
+              <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold mb-2">{plans[3].name}</h2>
+                    <p className="text-muted-foreground">{plans[3].description}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-black">{plans[3].price}</span>
+                      <span className="text-muted-foreground">{plans[3].period}</span>
+                    </div>
+                    {plans[3].usdPrice && (
+                      <p className="text-sm text-muted-foreground">≈ {plans[3].usdPrice}/mes (USD)</p>
+                    )}
+                    {plans[3].example && (
+                      <p className="text-sm text-primary font-semibold italic mt-4">{plans[3].example}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+                      Incluido en Enterprise
+                    </p>
+                    <ul className="space-y-3">
+                      {plans[3].outcomes.map((outcome, oidx) => (
+                        <li key={oidx} className="flex items-start gap-3">
+                          <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${outcome.main ? 'text-primary' : 'text-green-600'}`} />
+                          <span className={outcome.main ? 'font-semibold text-sm' : 'text-sm text-muted-foreground'}>
+                            {outcome.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <Button size="lg" className="w-full bg-primary" onClick={() => router.push('/sign-up')}>
+                    {plans[3].cta}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ROI Section */}
