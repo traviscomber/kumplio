@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
+import Image from 'next/image'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -14,9 +15,13 @@ export function Footer() {
           {/* Brand & Description */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-bold">K</span>
-              </div>
+              <Image 
+                src="/logo-kumplio.svg" 
+                alt="KUMPLIO" 
+                width={32} 
+                height={32}
+                className="w-8 h-8"
+              />
               <span className="font-bold text-lg">KUMPLIO</span>
             </div>
             <p className="text-sm text-muted-foreground mb-6">

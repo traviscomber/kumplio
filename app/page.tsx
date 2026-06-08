@@ -6,6 +6,7 @@ import { TrustSignals } from '@/components/trust-signals'
 import { ConversionCTA } from '@/components/conversion-cta'
 import { SocialProof } from '@/components/social-proof'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
+import Image from 'next/image'
 
 export default function HomePage() {
   return (
@@ -15,9 +16,13 @@ export default function HomePage() {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           {/* LOGO */}
           <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-white text-sm font-bold">K</span>
-            </div>
+            <Image 
+              src="/logo-kumplio.svg" 
+              alt="KUMPLIO" 
+              width={32} 
+              height={32}
+              className="w-8 h-8"
+            />
             <span className="font-bold text-lg">KUMPLIO</span>
           </a>
 
