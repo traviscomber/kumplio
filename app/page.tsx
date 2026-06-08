@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
+import { TrustSignals } from '@/components/trust-signals'
+import { ConversionCTA } from '@/components/conversion-cta'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 
 export default function HomePage() {
@@ -568,6 +570,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* TRUST SIGNALS SECTION */}
+      <TrustSignals />
+
+      {/* CONVERSION CTA SECTION */}
+      <ConversionCTA />
 
       {/* CTA FINAL */}
       <section className="py-24 px-6 bg-primary text-primary-foreground">

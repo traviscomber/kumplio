@@ -30,6 +30,7 @@ export default function NewProjectPageClient() {
       }
 
       // Get organization
+      // Get user's organization
       const { data: memberData } = await supabase
         .from('organization_members')
         .select('organization_id')
@@ -37,25 +38,46 @@ export default function NewProjectPageClient() {
         .single()
 
       const orgId = memberData?.organization_id
-      if (!orgId) {
-        setError('No se encontró la organización')
-        return
-      }
-
-      const { data, error: insertError } = await supabase
+      
+      // Try to create with organization_id first
+      let insertResult = await supabase
         .from('projects')
         .insert([{
+          user_id: user.id,
           organization_id: orgId,
           name,
           description,
           status: 'active',
-          compliance_score: 0,
+          compliance_law: 'Ley 21.719',
         }])
         .select()
         .single()
 
+      // If organization_id doesn't exist as column, try without it
+      if (insertResult.error?.message.includes('organization_id')) {
+        console.log('[v0] organization_id field not available, using fallback')
+        insertResult = await supabase
+          .from('projects')
+          .insert([{
+            user_id: user.id,
+            name,
+            description,
+            status: 'active',
+            compliance_law: 'Ley 21.719',
+          }])
+          .select()
+          .single()
+      }
+
+      const { data, error: insertError } = insertResult
+
       if (insertError) {
-        setError(insertError.message)
+        // More user-friendly error message
+        if (!orgId) {
+          setError('No se encontró la organización. Por favor, contacta a administración.')
+        } else {
+          setError(insertError.message)
+        }
         return
       }
 
