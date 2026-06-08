@@ -61,7 +61,7 @@ export default function MineriaDemoPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80" asChild>
               <Link href="/">Volver</Link>
             </Button>
           </div>
@@ -317,10 +317,10 @@ export default function MineriaDemoPage() {
             180+ obligaciones. 7 agentes. 1 plataforma. Riesgo: 8/100.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90" asChild>
               <Link href="/sign-up">Prueba Gratis para Minería</Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>
             </Button>
           </div>

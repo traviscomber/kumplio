@@ -58,7 +58,7 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80" asChild>
               <a href="/demo/mineria">
                 Demo: Minería
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -459,10 +459,10 @@ export default function HomePage() {
           <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
           <p className="text-lg opacity-90">Sofia, Bruno, Marco, Elena, Laura, Kai y Catarina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90" asChild>
               <a href="/sign-up">Empezar Ahora</a>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
               <a href="/demo/transporte">Ver Sistema en Acción</a>
             </Button>
           </div>

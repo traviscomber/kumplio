@@ -61,7 +61,7 @@ export default function TransporteDemoPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-muted text-foreground hover:bg-muted/80" asChild>
               <Link href="/">Volver</Link>
             </Button>
           </div>
@@ -274,13 +274,13 @@ export default function TransporteDemoPage() {
             Los 7 agentes de KUMPLIO están listos para transporte. Cero multas. Operaciones 24/7. Auditorías listas.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 bg-primary-foreground text-primary hover:bg-white/90" asChild>
               <Link href="/sign-up">
                 Prueba Gratis
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+            <Button size="lg" className="text-lg px-8 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/15" variant="outline" asChild>
               <Link href="/">Volver a Inicio</Link>
             </Button>
           </div>
