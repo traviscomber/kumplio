@@ -10,7 +10,8 @@ import { InteractiveDiagnosis } from '@/components/interactive-diagnosis'
 import { ProcessDiagram } from '@/components/process-diagram'
 import { SystemArchitecture } from '@/components/system-architecture'
 import { SpecialistsGrid } from '@/components/specialists-grid'
-import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
+import { ComparisonRows } from '@/components/comparison-rows'
+import { ArrowRight, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
 export default function HomePage() {
@@ -122,29 +123,7 @@ export default function HomePage() {
       {/* COMPARATIVA - CUMPLIMIENTO MANUAL VS KUMPLIO */}
       <section className="py-24 px-6 bg-card border-t border-border">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-4xl font-bold mb-16">Cumplimiento Manual vs KUMPLIO</h2>
-
-          <div className="space-y-4">
-            {[
-              { problema: "Vencimientos que se pasan", kumplio: "Alertas 30/15/5 días automáticas" },
-              { problema: "Cambios legales que no ves", kumplio: "Monitoreo 24/7 en tiempo real" },
-              { problema: "Riesgos sin cuantificar", kumplio: "Exposición en dinero (UF, $/día)" },
-              { problema: "Recomendaciones vagas", kumplio: "Plan ejecutable mes a mes" },
-              { problema: "Sin auditoría independiente", kumplio: "Verificación objetiva de Ver0nica" },
-              { problema: "Reportes manuales para reguladores", kumplio: "PDF listo en 1 click" },
-            ].map((item, i) => (
-              <div key={i} className="grid md:grid-cols-2 gap-8 p-6 rounded-lg border border-border">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                  <p className="font-semibold text-sm">{item.problema}</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="font-semibold text-sm">{item.kumplio}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ComparisonRows />
         </div>
       </section>
 
