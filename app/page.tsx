@@ -124,40 +124,58 @@ export default function HomePage() {
       {/* TRUST SIGNALS SECTION */}
       <TrustSignals />
 
-      {/* FINAL CTA - CLEAN & SIMPLE */}
-      <section className="py-20 px-6 border-t border-border">
-        <div className="container mx-auto max-w-2xl text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold">¿Listo para Cumplir la Ley 21.719?</h2>
-            <p className="text-xl text-muted-foreground">Diagnóstico gratis en 60 segundos. Sin tarjeta de crédito.</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="outline" className="text-base font-semibold px-8" asChild>
-              <a href="/pricing" className="flex items-center justify-center">
-                Ver Planes y Precios →
-              </a>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* FINAL CTA - CONSOLIDATED */}
+      <section className="px-6 py-24 border-t border-border">
+        <div className="container mx-auto max-w-4xl">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card p-10 text-center sm:p-14">
+            {/* subtle accent glow instead of full-bleed lime */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-48 w-[80%] rounded-full bg-primary/20 blur-3xl"
+            />
+            <div className="relative space-y-8">
+              <div className="space-y-4">
+                <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                  </span>
+                  Diagnóstico gratis en 60 segundos · Sin tarjeta
+                </span>
+                <h2 className="text-balance text-4xl font-bold md:text-5xl">
+                  ¿Listo para cumplir la Ley 21.719?
+                </h2>
+                <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
+                  Un sistema integral de IA con cumplimiento garantizado. El cambio legal no espera. Tampoco deberías.
+                </p>
+              </div>
 
-      {/* CTA FINAL */}
-      <section className="py-24 px-6 bg-primary text-primary-foreground">
-        <div className="container mx-auto max-w-2xl text-center space-y-8">
-          <h2 className="text-5xl font-bold">Un sistema integral de IA. Cumplimiento garantizado.</h2>
-          <p className="text-lg opacity-90">Is1dora, R0drigo, Be4triz, Jav1er, Ver0nica, Andr3s y Cat4lina analizan, validan y optimizan tu cumplimiento 24/7. El cambio legal no espera. Tampoco deberías.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 bg-black text-white hover:bg-black/80 group/btn font-semibold shadow-lg" asChild>
-              <a href="/sign-up" className="flex items-center justify-center">
-                Empezar Ahora
-                <ArrowRight className="ml-3 w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:scale-110 transition-all duration-300" />
-              </a>
-            </Button>
-            <Button size="lg" className="text-lg px-8 border-2 border-black text-primary-foreground bg-black/10 hover:bg-black hover:text-primary-foreground group/btn font-semibold" variant="outline" asChild>
-              <a href="/demo/transporte" className="flex items-center justify-center">
-                Ver Sistema en Acción
-              </a>
-            </Button>
+              {/* agent roster as pills */}
+              <div className="flex flex-wrap justify-center gap-2">
+                {['Is1dora', 'R0drigo', 'Be4triz', 'Jav1er', 'Ver0nica', 'Andr3s', 'Cat4lina'].map((agent) => (
+                  <span
+                    key={agent}
+                    className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
+                  >
+                    {agent}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                <Button size="lg" className="group/btn px-8 text-base font-semibold" asChild>
+                  <a href="/sign-up" className="flex items-center justify-center">
+                    Empezar Ahora
+                    <ArrowRight className="ml-3 h-5 w-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" className="px-8 text-base font-semibold" asChild>
+                  <a href="/demo/transporte" className="flex items-center justify-center">
+                    Ver Sistema en Acción
+                  </a>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
