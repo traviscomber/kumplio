@@ -248,18 +248,18 @@ export function InteractiveDiagnosis() {
                 </div>
               )
             })}
-            {!user && showResults && (
-              <>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/80 pointer-events-none rounded-lg z-10" />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                  <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                    <p className="text-sm font-semibold text-muted-foreground">
-                      Inicia sesión para ver el análisis completo
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
+            <div className={`absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/80 pointer-events-none rounded-lg transition-opacity duration-300 ${
+              !user && showResults ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none z-0'
+            }`} />
+            <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
+              !user && showResults ? 'opacity-100 z-20' : 'opacity-0 z-0'
+            }`}>
+              <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Inicia sesión para ver el análisis completo
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
