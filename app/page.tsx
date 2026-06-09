@@ -7,7 +7,7 @@ import { ConversionCTA } from '@/components/conversion-cta'
 import { SocialProof } from '@/components/social-proof'
 import { CountdownTimer } from '@/components/countdown-timer'
 import { InteractiveDiagnosis } from '@/components/interactive-diagnosis'
-import { DiagnosisDemo } from '@/components/diagnosis-demo'
+import { ProcessDiagram } from '@/components/process-diagram'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
@@ -99,14 +99,7 @@ export default function HomePage() {
       {/* HOW IT WORKS DEMO SECTION */}
       <section className="py-24 px-6 border-t border-border">
         <div className="container mx-auto max-w-7xl">
-          <DiagnosisDemo />
-        </div>
-      </section>
-
-      {/* LEAD MAGNET - FREE DIAGNOSIS */}
-      <section id="diagnostico-gratis" className="py-24 px-6 bg-primary/5 border-t border-primary/30 scroll-mt-24">
-        <div className="container mx-auto max-w-7xl">
-          <InteractiveDiagnosis />
+          <ProcessDiagram />
         </div>
       </section>
 
@@ -443,6 +436,13 @@ export default function HomePage() {
               </a>
             </Button>
           </div>
+        </div>
+      </section>
+
+      {/* LEAD MAGNET - FREE DIAGNOSIS (AT END) */}
+      <section id="diagnostico-gratis" className="py-24 px-6 bg-primary/5 border-t border-primary/30 scroll-mt-24">
+        <div className="container mx-auto max-w-7xl">
+          <InteractiveDiagnosis />
         </div>
       </section>
 
