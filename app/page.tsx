@@ -8,6 +8,7 @@ import { SocialProof } from '@/components/social-proof'
 import { CountdownTimer } from '@/components/countdown-timer'
 import { InteractiveDiagnosis } from '@/components/interactive-diagnosis'
 import { ProcessDiagram } from '@/components/process-diagram'
+import { SystemArchitecture } from '@/components/system-architecture'
 import { ArrowRight, AlertCircle, CheckCircle2, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
@@ -106,59 +107,7 @@ export default function HomePage() {
       {/* SYSTEM ARCHITECTURE - IA FIRST */}
       <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
         <div className="container mx-auto max-w-6xl">
-          <div className="space-y-12">
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold">Sistema Integral de IA First</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                7 agentes especializados trabajando en orquesta. Cada uno alimenta al siguiente. Razonamiento avanzado más validación cruzada igual cumplimiento garantizado.
-              </p>
-            </div>
-
-            {/* SYSTEM FLOW */}
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-5 gap-3 items-center">
-                <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Is1dora</p>
-                  <p className="text-xs text-muted-foreground">Extrae Obligaciones</p>
-                  <p className="text-2xl font-black text-primary mt-3">34</p>
-                </div>
-                <div className="text-center text-muted-foreground text-xl">→</div>
-                <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">R0drigo</p>
-                  <p className="text-xs text-muted-foreground">Cuantifica Riesgos</p>
-                  <p className="text-2xl font-black text-primary mt-3">20K UTM</p>
-                </div>
-                <div className="text-center text-muted-foreground text-xl">→</div>
-                <div className="p-6 rounded-lg border border-border text-center">
-                  <p className="font-bold text-primary mb-2">Jav1er</p>
-                  <p className="text-xs text-muted-foreground">Genera Roadmap</p>
-                  <p className="text-2xl font-black text-primary mt-3">90 D</p>
-                </div>
-              </div>
-
-              <div className="p-6 rounded-lg border border-primary/30 bg-primary/5">
-                <p className="text-center font-semibold text-sm mb-4">Cross-Agent Learning: Cada agente alimenta al siguiente con insights, validación cruzada y mejora continua</p>
-                <div className="grid md:grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-2">
-                    <p className="font-semibold text-primary">1. Isidora → 2. Rodrigo</p>
-                    <p className="text-muted-foreground">Confidence scores de obligaciones informan cálculo de riesgos</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-primary">2. Rodrigo → 3. Javier</p>
-                    <p className="text-muted-foreground">Riesgos priorizan qué obligaciones atacar primero</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-primary">3. Javier → 5. Verónica</p>
-                    <p className="text-muted-foreground">Plan de acción genera checklist para auditoría independiente</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-primary">5. Verónica → 7. Catalina</p>
-                    <p className="text-muted-foreground">Gaps identificados se validan con jurisprudencia SERNAC</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SystemArchitecture />
         </div>
       </section>
 
