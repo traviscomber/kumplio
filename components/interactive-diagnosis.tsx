@@ -4,9 +4,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Upload, CheckCircle2, FileText, TrendingUp, Target, Calendar, Loader, ArrowRight } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
 
 export function InteractiveDiagnosis() {
   const router = useRouter()
+  const { user } = useAuth()
   const [isDragging, setIsDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
@@ -77,6 +79,9 @@ export function InteractiveDiagnosis() {
     { icon: Target, label: 'Prioridades de Acción', desc: 'Top 5 obligaciones críticas para tu empresa', delay: 200 },
     { icon: Calendar, label: 'Roadmap Inicial', desc: 'Plan de 90 días para alcanzar cumplimiento', delay: 300 },
   ]
+
+  // Show only preview (first 2 items) if not logged in
+  const displayedResults = user ? results : results.slice(0, 2)
 
   return (
     <div
@@ -213,10 +218,13 @@ export function InteractiveDiagnosis() {
       }`}>
         <div className="bg-card border border-border rounded-lg p-8 space-y-6 sticky top-20">
           <h3 className="font-bold text-lg">
-            {showResults ? '✓ Qué recibes al terminar:' : 'Qué recibes al terminar:'}
+            {showResults ? (user ? '✓ Análisis completo:' : '✓ Vista previa:') : 'Qué recibes al terminar:'}
           </h3>
-          <div className="space-y-4">
-            {results.map((result, idx) => {
+          <div className="space-y-4 relative">
+            {!user && showResults && (
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/80 pointer-events-none rounded-lg z-10" />
+            )}
+            {displayedResults.map((result, idx) => {
               const Icon = result.icon
               return (
                 <div
@@ -239,10 +247,19 @@ export function InteractiveDiagnosis() {
                   <p className={`text-xs transition ${showResults ? 'text-muted-foreground' : 'text-muted-foreground/50'}`}>
                     {result.desc}
                   </p>
-                  {idx < results.length - 1 && <div className="border-t pt-4" />}
+                  {idx < displayedResults.length - 1 && <div className="border-t pt-4" />}
                 </div>
               )
             })}
+            {!user && showResults && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Inicia sesión para ver el análisis completo
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
