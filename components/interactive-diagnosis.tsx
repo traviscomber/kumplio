@@ -221,9 +221,6 @@ export function InteractiveDiagnosis() {
             {showResults ? (user ? '✓ Análisis completo:' : '✓ Vista previa:') : 'Qué recibes al terminar:'}
           </h3>
           <div className="space-y-4 relative">
-            {!user && showResults && (
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/80 pointer-events-none rounded-lg z-10" />
-            )}
             {displayedResults.map((result, idx) => {
               const Icon = result.icon
               return (
@@ -252,13 +249,16 @@ export function InteractiveDiagnosis() {
               )
             })}
             {!user && showResults && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                  <p className="text-sm font-semibold text-muted-foreground">
-                    Inicia sesión para ver el análisis completo
-                  </p>
+              <>
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/80 pointer-events-none rounded-lg z-10" />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                  <div className="bg-card/95 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                    <p className="text-sm font-semibold text-muted-foreground">
+                      Inicia sesión para ver el análisis completo
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
