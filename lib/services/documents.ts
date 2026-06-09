@@ -191,3 +191,35 @@ export async function getDocumentRisks(supabase: ReturnType<typeof createClient>
   if (error) throw error
   return data || []
 }
+
+/**
+ * Delete a document and its associated storage file
+ */
+export async function deleteDocument(supabase: ReturnType<typeof createClient>, documentId: string): Promise<void> {
+  try {
+    // Get document to find the file_url
+    const { data: doc, error: getError } = await supabase
+      .from('documents')
+      .select('file_url')
+      .eq('id', documentId)
+      .single()
+
+    if (getError) throw getError
+
+    // Delete from storage if file_url exists
+    if (doc?.file_url) {
+      await supabase.storage.from('documents').remove([doc.file_url])
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('documents')
+      .delete()
+      .eq('id', documentId)
+
+    if (deleteError) throw deleteError
+  } catch (error) {
+    console.error('[documents.ts] deleteDocument:', error)
+    throw error
+  }
+}
