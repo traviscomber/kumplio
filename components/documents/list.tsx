@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getUserDocuments, deleteDocument } from '@/lib/services/documents';
 import { Document } from '@/lib/types/documents';
 import { useAuth } from '@/lib/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
 export function DocumentsList() {
   const { user } = useAuth();
@@ -17,8 +18,10 @@ export function DocumentsList() {
 
     const fetchDocuments = async () => {
       try {
-        console.log('[v0] Fetching documents');
-        const docs = await getUserDocuments(user.id);
+        console.log('[v0] Fetching documents for user:', user.id);
+        const supabase = createClient();
+        const docs = await getUserDocuments(supabase, user.id);
+        console.log('[v0] Documents fetched:', docs);
         setDocuments(docs);
         setError(null);
       } catch (err) {
@@ -36,7 +39,8 @@ export function DocumentsList() {
     if (!confirm('¿Estás seguro de que quieres eliminar este documento?')) return;
 
     try {
-      await deleteDocument(docId);
+      const supabase = createClient();
+      await deleteDocument(supabase, docId);
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
     } catch (err) {
       console.error('[v0] Delete error:', err);
@@ -63,41 +67,51 @@ export function DocumentsList() {
 
   return (
     <div className="space-y-3">
-      {documents.map((doc) => (
-        <div
-          key={doc.id}
-          className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-card/80 transition-colors"
-        >
-          <Link href={`/documents/${doc.id}`} className="flex-1 min-w-0">
-            <div className="space-y-1">
-              <div className="font-medium truncate text-foreground">{doc.filename}</div>
-              <div className="text-sm text-muted-foreground flex gap-3">
-                <span>{(doc.file_size / 1024).toFixed(1)} KB</span>
-                <span>
-                  {doc.industry && (
+      {documents.map((doc) => {
+        // Use upload_date or created_at, with safe fallback
+        const dateStr = doc.upload_date || doc.created_at;
+        const dateDisplay = dateStr 
+          ? new Date(dateStr).toLocaleDateString('es-CL', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })
+          : 'Fecha desconocida';
+        
+        return (
+          <div
+            key={doc.id}
+            className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-card/80 transition-colors"
+          >
+            <Link href={`/documents/${doc.id}`} className="flex-1 min-w-0">
+              <div className="space-y-1">
+                <div className="font-medium truncate text-foreground">{doc.name || doc.filename}</div>
+                <div className="text-sm text-muted-foreground flex gap-3">
+                  {doc.file_size && <span>{(doc.file_size / 1024).toFixed(1)} KB</span>}
+                  {doc.document_type && (
                     <span className="px-2 py-0.5 rounded bg-muted text-xs">
-                      {doc.industry}
+                      {doc.document_type}
                     </span>
                   )}
-                </span>
-                <span>{new Date(doc.created_at).toLocaleDateString('es-CL')}</span>
+                  <span>{dateDisplay}</span>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
 
-          <div className="flex items-center gap-2 ml-4">
-            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(doc.status)}`}>
-              {getStatusLabel(doc.status)}
-            </span>
-            <button
-              onClick={() => handleDelete(doc.id)}
-              className="text-muted-foreground hover:text-destructive transition-colors text-sm"
-            >
-              Eliminar
-            </button>
+            <div className="flex items-center gap-2 ml-4">
+              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(doc.status)}`}>
+                {getStatusLabel(doc.status)}
+              </span>
+              <button
+                onClick={() => handleDelete(doc.id)}
+                className="text-muted-foreground hover:text-destructive transition-colors text-sm"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -109,7 +123,7 @@ function getStatusLabel(status: Document['status']): string {
     completed: 'Completado',
     error: 'Error',
   };
-  return labels[status];
+  return labels[status] || status;
 }
 
 function getStatusColor(status: Document['status']): string {
@@ -119,5 +133,5 @@ function getStatusColor(status: Document['status']): string {
     completed: 'bg-green-500/10 text-green-700 dark:text-green-400',
     error: 'bg-red-500/10 text-red-700 dark:text-red-400',
   };
-  return colors[status];
+  return colors[status] || 'bg-gray-500/10 text-gray-700 dark:text-gray-400';
 }
