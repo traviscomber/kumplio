@@ -1,164 +1,169 @@
 // API endpoint for document processing
-// Handles: extract text → extract obligations → generate matrix → update status
+// Handles: download → extract text → extract obligations → insert results → update status
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { extractDocumentText, cleanText, chunkText } from '@/lib/services/pdf-extraction';
-import { extractObligations, generateComplianceMatrix, formatExtractionForStorage } from '@/lib/services/openai-extraction';
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { extractDocumentText, cleanText } from '@/lib/services/pdf-extraction'
+import { extractObligations } from '@/lib/services/openai-extraction'
+import { updateDocumentStatus } from '@/lib/services/documents'
 
 export async function POST(req: NextRequest) {
   try {
-    const { documentId, userId } = await req.json();
+    const { documentId } = await req.json()
 
-    if (!documentId || !userId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    if (!documentId) {
+      return NextResponse.json({ error: 'Missing documentId' }, { status: 400 })
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json(
-        { error: 'Missing Supabase configuration' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Missing Supabase config' }, { status: 500 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Create service-role client for backend operations (INSERT to obligations, risks, roadmaps)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    console.log('[v0] Processing document:', documentId);
+    console.log('[process] Starting document processing:', documentId)
 
-    // Get document info
-    const { data: document, error: docError } = await supabase
+    // 1. Get document info
+    const { data: doc, error: docError } = await supabase
       .from('documents')
-      .select()
+      .select('*, projects(id)')
       .eq('id', documentId)
-      .single();
+      .single()
 
-    if (docError || !document) {
-      console.error('[v0] Document not found:', docError);
-      return NextResponse.json(
-        { error: 'Document not found' },
-        { status: 404 }
-      );
+    if (docError || !doc) {
+      console.error('[process] Document not found:', docError)
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Update status to processing
-    await supabase
-      .from('documents')
-      .update({ status: 'processing' })
-      .eq('id', documentId);
+    const projectId = doc.project_id
 
     try {
-      // 1. Download file from storage
-      console.log('[v0] Downloading file from storage:', document.s3_key);
+      // 2. Download file from storage
+      console.log('[process] Downloading:', doc.file_url)
       const { data: fileData, error: downloadError } = await supabase.storage
         .from('documents')
-        .download(document.s3_key);
+        .download(doc.file_url)
 
       if (downloadError || !fileData) {
-        throw new Error('Failed to download document');
+        throw new Error(`Storage download failed: ${downloadError?.message || 'unknown'}`)
       }
 
-      // 2. Extract text from document
-      console.log('[v0] Extracting text from', document.file_type);
-      const buffer = Buffer.from(await fileData.arrayBuffer());
-      let extractedText = await extractDocumentText(buffer, document.file_type);
+      // 3. Extract text from document
+      const buffer = Buffer.from(await fileData.arrayBuffer())
+      const fileExt = doc.name.split('.').pop()?.toLowerCase() || 'txt'
+      let extractedText = await extractDocumentText(buffer, fileExt)
+      extractedText = cleanText(extractedText)
 
-      // 3. Clean text
-      extractedText = cleanText(extractedText);
+      // 4. Extract obligations using OpenAI GPT-4o
+      console.log('[process] Extracting obligations with GPT-4o...')
+      const extractionResult = await extractObligations(extractedText, doc.document_type)
 
-      // 4. Extract obligations using AI
-      console.log('[v0] Calling AI for obligation extraction');
-      const extractionResult = await extractObligations(extractedText, document.industry);
+      // 5. Insert obligations into the obligations table
+      if (extractionResult.obligations.length > 0) {
+        const obligationsData = extractionResult.obligations.map((o) => ({
+          project_id: projectId,
+          obligation_text: o.obligation_text,
+          type: o.type,
+          severity: o.severity,
+          responsible_party: o.responsible_party,
+          priority: o.priority,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+        }))
 
-      // 5. Save extracted text and content
-      await supabase
-        .from('documents')
-        .update({
-          content_text: extractedText,
-          extraction_complete: true,
-        })
-        .eq('id', documentId);
-
-      // 6. Insert obligations
-      const formattedExtraction = formatExtractionForStorage(extractionResult);
-      const obligationsToInsert = formattedExtraction.obligations.map((o) => ({
-        document_id: documentId,
-        ...o,
-      }));
-
-      if (obligationsToInsert.length > 0) {
         const { error: obligError } = await supabase
           .from('obligations')
-          .insert(obligationsToInsert);
+          .insert(obligationsData)
 
-        if (obligError) console.error('[v0] Error inserting obligations:', obligError);
+        if (obligError) {
+          console.error('[process] Error inserting obligations:', obligError)
+          throw new Error(`Failed to insert obligations: ${obligError.message}`)
+        }
+
+        console.log('[process] Inserted', obligationsData.length, 'obligations')
       }
 
-      // 7. Generate and insert compliance matrix
-      const complianceMatrix = generateComplianceMatrix(extractionResult.obligations);
-      const matrixToInsert = extractionResult.obligations.map((o) => ({
-        document_id: documentId,
-        obligation: o.text,
-        risk_level: o.severity,
-        responsible: o.owner,
-        due_date: o.deadline,
-        evidence: o.evidence_reference,
-        status: 'pending',
-      }));
+      // 6. Insert risks based on high-priority obligations
+      const criticalObligations = extractionResult.obligations.filter(
+        (o) => o.priority === 'critical' || o.severity === 'critical'
+      )
 
-      if (matrixToInsert.length > 0) {
-        const { error: matrixError } = await supabase
-          .from('compliance_matrix')
-          .insert(matrixToInsert);
+      if (criticalObligations.length > 0) {
+        const risksData = criticalObligations.map((o, idx) => ({
+          project_id: projectId,
+          risk_name: `Risk: ${o.obligation_text.slice(0, 80)}`,
+          risk_description: o.obligation_text,
+          impact: 'high',
+          likelihood: 'high',
+          mitigation: `Address: ${o.responsible_party || 'owner'}`,
+          priority: o.priority,
+          status: 'open',
+          created_at: new Date().toISOString(),
+        }))
 
-        if (matrixError) console.error('[v0] Error inserting matrix:', matrixError);
+        const { error: risksError } = await supabase.from('risks').insert(risksData)
+
+        if (risksError) {
+          console.warn('[process] Warning inserting risks:', risksError)
+        } else {
+          console.log('[process] Inserted', risksData.length, 'risks')
+        }
+      }
+
+      // 7. Insert roadmap actions for critical items
+      if (criticalObligations.length > 0) {
+        const roadmapData = criticalObligations.map((o, idx) => ({
+          project_id: projectId,
+          phase: idx < 2 ? 'immediate' : idx < 5 ? 'short-term' : 'long-term',
+          action: o.obligation_text,
+          owner: o.responsible_party || 'TBD',
+          target_date: new Date(Date.now() + (idx + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'pending',
+          created_at: new Date().toISOString(),
+        }))
+
+        const { error: roadmapError } = await supabase
+          .from('roadmaps')
+          .insert(roadmapData)
+
+        if (roadmapError) {
+          console.warn('[process] Warning inserting roadmap:', roadmapError)
+        } else {
+          console.log('[process] Inserted', roadmapData.length, 'roadmap items')
+        }
       }
 
       // 8. Update document status to completed
-      await supabase
-        .from('documents')
-        .update({
-          status: 'completed',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', documentId);
+      await updateDocumentStatus(supabase, documentId, 'completed')
 
-      console.log('[v0] Document processing completed successfully');
+      console.log('[process] Document processing completed')
 
       return NextResponse.json({
         success: true,
         documentId,
-        obligations: extractionResult.obligations.length,
-        complianceScore: complianceMatrix.complianceScore,
-        message: 'Document processed successfully',
-      });
+        obligationsExtracted: extractionResult.obligations.length,
+        riskSummary: extractionResult.riskSummary,
+      })
     } catch (processingError) {
-      console.error('[v0] Processing error:', processingError);
+      const errorMsg = processingError instanceof Error ? processingError.message : 'Unknown error'
+      console.error('[process] Processing error:', errorMsg)
 
       // Update document with error status
-      const errorMessage = processingError instanceof Error ? processingError.message : 'Unknown error';
-      await supabase
-        .from('documents')
-        .update({
-          status: 'error',
-          error_message: errorMessage,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', documentId);
+      await updateDocumentStatus(supabase, documentId, 'error', errorMsg)
 
-      throw processingError;
+      return NextResponse.json(
+        { error: errorMsg, documentId },
+        { status: 500 }
+      )
     }
   } catch (error) {
-    console.error('[v0] API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    console.error('[process] API error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
