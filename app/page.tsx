@@ -11,6 +11,7 @@ import { ProcessDiagram } from '@/components/process-diagram'
 import { SystemArchitecture } from '@/components/system-architecture'
 import { SpecialistsGrid } from '@/components/specialists-grid'
 import { ComparisonRows } from '@/components/comparison-rows'
+import { TechStackCarousel } from '@/components/tech-stack-carousel'
 import { ArrowRight, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
@@ -99,26 +100,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS DEMO SECTION */}
-      <section className="py-24 px-6 border-t border-border">
-        <div className="container mx-auto max-w-7xl">
-          <ProcessDiagram />
-        </div>
-      </section>
-
-      {/* SYSTEM ARCHITECTURE - IA FIRST */}
-      <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
-        <div className="container mx-auto max-w-6xl">
-          <SystemArchitecture />
-        </div>
-      </section>
-
-      {/* 7 AGENTES - OUTCOMES */}
-      <section className="py-24 px-6 border-t border-border">
-        <div className="container mx-auto max-w-6xl">
-          <SpecialistsGrid />
-        </div>
-      </section>
+      {/* TECH STACK CAROUSEL */}
+      <TechStackCarousel />
 
       {/* COMPARATIVA - CUMPLIMIENTO MANUAL VS KUMPLIO */}
       <section className="py-24 px-6 bg-card border-t border-border">
