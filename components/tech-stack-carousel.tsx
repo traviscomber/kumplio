@@ -3,16 +3,56 @@
 import { useEffect, useState } from 'react'
 
 const techs = [
-  { name: 'OpenAI', logo: '🔮' },
-  { name: 'Supabase', logo: '🟢' },
-  { name: 'Vercel', logo: '⚫' },
-  { name: 'Node.js', logo: '💚' },
-  { name: 'Cloudflare', logo: '🟠' },
-  { name: 'PostgreSQL', logo: '🐘' },
-  { name: 'TypeScript', logo: '🔵' },
-  { name: 'React', logo: '⚛️' },
-  { name: 'Next.js', logo: '▲' },
-  { name: 'Tailwind', logo: '💨' },
+  { 
+    name: 'OpenAI', 
+    logo: 'https://thesvg.org/icons/openai/mono.svg',
+    alt: 'OpenAI'
+  },
+  { 
+    name: 'Supabase', 
+    logo: 'https://thesvg.org/icons/supabase/mono.svg',
+    alt: 'Supabase'
+  },
+  { 
+    name: 'Vercel', 
+    logo: 'https://thesvg.org/icons/vercel/mono.svg',
+    alt: 'Vercel'
+  },
+  { 
+    name: 'Node.js', 
+    logo: 'https://thesvg.org/icons/nodejs/mono.svg',
+    alt: 'Node.js'
+  },
+  { 
+    name: 'Cloudflare', 
+    logo: 'https://thesvg.org/icons/cloudflare/mono.svg',
+    alt: 'Cloudflare'
+  },
+  { 
+    name: 'PostgreSQL', 
+    logo: 'https://thesvg.org/icons/postgresql/mono.svg',
+    alt: 'PostgreSQL'
+  },
+  { 
+    name: 'TypeScript', 
+    logo: 'https://thesvg.org/icons/typescript/mono.svg',
+    alt: 'TypeScript'
+  },
+  { 
+    name: 'React', 
+    logo: 'https://thesvg.org/icons/react/mono.svg',
+    alt: 'React'
+  },
+  { 
+    name: 'Next.js', 
+    logo: 'https://thesvg.org/icons/nextjs/mono.svg',
+    alt: 'Next.js'
+  },
+  { 
+    name: 'Tailwind', 
+    logo: 'https://thesvg.org/icons/tailwindcss/mono.svg',
+    alt: 'Tailwind CSS'
+  },
 ]
 
 export function TechStackCarousel() {
@@ -46,7 +86,12 @@ export function TechStackCarousel() {
                 key={`${tech.name}-${i}`}
                 className="flex items-center justify-center gap-3 whitespace-nowrap px-8 py-4 rounded-lg border border-border/50 bg-card/30 hover:bg-card/60 transition-colors duration-300 hover:border-primary/50 flex-shrink-0"
               >
-                <span className="text-3xl">{tech.logo}</span>
+                <img 
+                  src={tech.logo} 
+                  alt={tech.alt}
+                  className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                  loading="lazy"
+                />
                 <span className="font-semibold text-foreground text-sm">{tech.name}</span>
               </div>
             ))}
