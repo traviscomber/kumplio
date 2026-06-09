@@ -1,67 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 const techs = [
-  { 
-    name: 'OpenAI', 
-    logo: 'https://thesvg.org/icons/openai/mono.svg',
-    alt: 'OpenAI'
-  },
-  { 
-    name: 'Supabase', 
-    logo: 'https://thesvg.org/icons/supabase/mono.svg',
-    alt: 'Supabase'
-  },
-  { 
-    name: 'Vercel', 
-    logo: 'https://thesvg.org/icons/vercel/mono.svg',
-    alt: 'Vercel'
-  },
-  { 
-    name: 'Node.js', 
-    logo: 'https://thesvg.org/icons/nodejs/mono.svg',
-    alt: 'Node.js'
-  },
-  { 
-    name: 'Cloudflare', 
-    logo: 'https://thesvg.org/icons/cloudflare/mono.svg',
-    alt: 'Cloudflare'
-  },
-  { 
-    name: 'PostgreSQL', 
-    logo: 'https://thesvg.org/icons/postgresql/mono.svg',
-    alt: 'PostgreSQL'
-  },
-  { 
-    name: 'TypeScript', 
-    logo: 'https://thesvg.org/icons/typescript/mono.svg',
-    alt: 'TypeScript'
-  },
-  { 
-    name: 'React', 
-    logo: 'https://thesvg.org/icons/react/mono.svg',
-    alt: 'React'
-  },
-  { 
-    name: 'Next.js', 
-    logo: 'https://thesvg.org/icons/nextjs/mono.svg',
-    alt: 'Next.js'
-  },
-  { 
-    name: 'Tailwind', 
-    logo: 'https://thesvg.org/icons/tailwindcss/mono.svg',
-    alt: 'Tailwind CSS'
-  },
+  { name: 'OpenAI', logo: '/logos/openai.svg', invert: false },
+  { name: 'Supabase', logo: '/logos/supabase.svg', invert: false },
+  { name: 'Vercel', logo: '/logos/vercel.svg', invert: false },
+  { name: 'Node.js', logo: '/logos/nodedotjs.svg', invert: false },
+  { name: 'Cloudflare', logo: '/logos/cloudflare.svg', invert: false },
+  { name: 'PostgreSQL', logo: '/logos/postgresql.svg', invert: false },
+  { name: 'TypeScript', logo: '/logos/typescript.svg', invert: false },
+  { name: 'React', logo: '/logos/react.svg', invert: false },
+  { name: 'Next.js', logo: '/logos/nextdotjs.svg', invert: true },
+  { name: 'Tailwind', logo: '/logos/tailwind-css.svg', invert: false },
 ]
 
 export function TechStackCarousel() {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   // Duplicate techs for seamless loop
   const displayTechs = [...techs, ...techs]
 
@@ -86,10 +38,11 @@ export function TechStackCarousel() {
                 key={`${tech.name}-${i}`}
                 className="flex items-center justify-center gap-3 whitespace-nowrap px-8 py-4 rounded-lg border border-border/50 bg-card/30 hover:bg-card/60 transition-colors duration-300 hover:border-primary/50 flex-shrink-0"
               >
-                <img 
-                  src={tech.logo} 
-                  alt={tech.alt}
-                  className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                <img
+                  src={tech.logo || "/placeholder.svg"}
+                  alt={tech.name}
+                  className="w-6 h-6 opacity-90 hover:opacity-100 transition-opacity"
+                  style={tech.invert ? { filter: 'brightness(0) invert(1)' } : undefined}
                   loading="lazy"
                 />
                 <span className="font-semibold text-foreground text-sm">{tech.name}</span>
