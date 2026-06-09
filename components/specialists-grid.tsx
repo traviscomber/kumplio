@@ -91,6 +91,7 @@ const hero: Agent = {
 
 export function SpecialistsGrid() {
   const [visible, setVisible] = useState(false)
+  const [active, setActive] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -109,6 +110,15 @@ export function SpecialistsGrid() {
     return () => observer.disconnect()
   }, [])
 
+  // Cycle the "active" agent spotlight through all 7 (6 grid + 1 hero)
+  useEffect(() => {
+    if (!visible) return
+    const id = setInterval(() => {
+      setActive((prev) => (prev + 1) % (agents.length + 1))
+    }, 1800)
+    return () => clearInterval(id)
+  }, [visible])
+
   return (
     <div ref={ref}>
       <h2 className="text-3xl font-bold mb-4 text-balance">Los 7 Especialistas IA del Sistema</h2>
@@ -119,22 +129,42 @@ export function SpecialistsGrid() {
       <div className="grid md:grid-cols-2 gap-6">
         {agents.map((agent, i) => {
           const Icon = agent.icon
+          const isActive = active === i
           return (
             <div
               key={agent.name}
-              className="group relative p-8 rounded-lg border border-border bg-card/40 overflow-hidden transition-all duration-500 hover:border-primary hover:-translate-y-1 hover:shadow-[0_0_30px_-10px_var(--color-primary)]"
+              className={`group relative p-8 rounded-lg border bg-card/40 overflow-hidden transition-all duration-500 hover:border-primary hover:-translate-y-1 hover:shadow-[0_0_30px_-10px_var(--color-primary)] ${
+                isActive
+                  ? 'border-primary -translate-y-1 shadow-[0_0_30px_-10px_var(--color-primary)]'
+                  : 'border-border'
+              }`}
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? 'translateY(0)' : 'translateY(24px)',
                 transition: `opacity 0.6s ease ${i * 0.08}s, transform 0.6s ease ${i * 0.08}s`,
               }}
             >
-              {/* hover glow accent */}
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* hover/active glow accent */}
+              <div
+                className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent transition-opacity duration-500 group-hover:opacity-100 ${
+                  isActive ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
 
-              <div className="flex items-start justify-between mb-4">
+              {/* active scan line */}
+              {isActive && (
+                <div className="pointer-events-none absolute inset-0 opacity-40">
+                  <div className="absolute top-0 h-full w-24 bg-gradient-to-r from-transparent via-primary/25 to-transparent animate-flow" />
+                </div>
+              )}
+
+              <div className="relative flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-background text-primary transition-all duration-300 group-hover:scale-110 group-hover:border-primary/60">
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-lg border bg-background text-primary transition-all duration-300 group-hover:scale-110 group-hover:border-primary/60 ${
+                      isActive ? 'scale-110 border-primary/60' : 'border-border'
+                    }`}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
@@ -146,21 +176,31 @@ export function SpecialistsGrid() {
                 </div>
                 {/* live pulsing status dot */}
                 <span className="relative flex h-3 w-3 mt-1" aria-hidden="true">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-primary" />
+                  <span
+                    className={`absolute inline-flex h-full w-full rounded-full bg-primary ${
+                      isActive ? 'opacity-75 animate-ping' : 'opacity-0'
+                    }`}
+                  />
+                  <span
+                    className={`relative inline-flex h-3 w-3 rounded-full transition-colors duration-300 ${
+                      isActive ? 'bg-primary' : 'bg-primary/40'
+                    }`}
+                  />
                 </span>
               </div>
 
-              <div className="text-3xl font-black text-primary mb-2">{agent.metric}</div>
-              <p className="text-sm mb-1">{agent.highlight}</p>
-              <p className="text-xs text-muted-foreground">{agent.desc}</p>
+              <div className="relative text-3xl font-black text-primary mb-2">{agent.metric}</div>
+              <p className="relative text-sm mb-1">{agent.highlight}</p>
+              <p className="relative text-xs text-muted-foreground">{agent.desc}</p>
             </div>
           )
         })}
 
         {/* HERO AGENT - Catalina */}
         <div
-          className="group relative md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_-10px_var(--color-primary)]"
+          className={`group relative md:col-span-2 p-8 rounded-lg border-2 border-primary bg-primary/5 overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_-10px_var(--color-primary)] ${
+            active === agents.length ? 'shadow-[0_0_40px_-10px_var(--color-primary)]' : ''
+          }`}
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(24px)',
