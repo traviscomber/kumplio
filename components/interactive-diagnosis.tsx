@@ -1,15 +1,33 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Upload, CheckCircle2, FileText, TrendingUp, Target, Calendar, Loader, ArrowRight } from 'lucide-react'
 
 export function InteractiveDiagnosis() {
+  const router = useRouter()
   const [isDragging, setIsDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [showResults, setShowResults] = useState(false)
+  const [isInView, setIsInView] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.15 }
+    )
+    if (containerRef.current) observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault()
@@ -61,31 +79,39 @@ export function InteractiveDiagnosis() {
   ]
 
   return (
-    <div className="grid md:grid-cols-2 gap-12 items-start">
+    <div
+      ref={containerRef}
+      className={`grid md:grid-cols-2 gap-12 items-start transition-all duration-1000 ${
+        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}
+    >
       {/* LEFT SIDE */}
-      <div className="space-y-6">
+      <div className={`space-y-6 transition-all duration-1000 delay-100 ${
+        isInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+      }`}>
         <div>
           <h2 className="text-4xl font-bold mb-2">Diagnóstico Gratis en 60 Segundos</h2>
           <p className="text-lg text-muted-foreground">Sube un documento (contrato, política, RAT) y descubre:</p>
         </div>
 
         <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <span>Todas tus obligaciones según Ley 21.719</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <span>Brecha (gap) exacta de cumplimiento</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <span>Exposición financiera en UF/CLP real</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <span>Reporte ejecutivo (2 páginas) listo para imprimir</span>
-          </li>
+          {[
+            'Todas tus obligaciones según Ley 21.719',
+            'Brecha (gap) exacta de cumplimiento',
+            'Exposición financiera en UF/CLP real',
+            'Reporte ejecutivo (2 páginas) listo para imprimir'
+          ].map((item, idx) => (
+            <li
+              key={idx}
+              className={`flex items-start gap-3 transition-all duration-700 ${
+                isInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'
+              }`}
+              style={isInView ? { transitionDelay: `${200 + idx * 100}ms` } : {}}
+            >
+              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
         </ul>
 
         {!showResults ? (
@@ -157,21 +183,34 @@ export function InteractiveDiagnosis() {
             </Button>
           </>
         ) : (
-          <div className="space-y-4 p-6 rounded-lg bg-primary/5 border border-primary/20">
+          <div className={`space-y-4 p-6 rounded-lg bg-primary/5 border border-primary/20 transition-all duration-500 ${
+            showResults ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}>
             <div className="flex items-center gap-2 text-primary font-semibold">
               <CheckCircle2 className="w-5 h-5" />
               Análisis completado
             </div>
-            <p className="text-sm text-muted-foreground">Tu diagnóstico está listo. Revisa los resultados a continuación.</p>
-            <Button size="sm" className="w-full bg-primary text-black hover:bg-primary/80" asChild>
-              <a href="/sign-up">Ver Reporte Completo</a>
-            </Button>
+            <p className="text-sm text-muted-foreground">Tu diagnóstico está listo. Inicia sesión para ver el reporte completo.</p>
+            <div className="flex gap-3">
+              <Button size="sm" className="flex-1 bg-primary text-black hover:bg-primary/80" onClick={() => router.push('/sign-in')}>
+                Probar Gratis
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+              <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                setShowResults(false)
+                setUploadedFile(null)
+              }}>
+                Otro Documento
+              </Button>
+            </div>
           </div>
         )}
       </div>
 
       {/* RIGHT SIDE */}
-      <div className={`transition-all duration-500 ${showResults ? 'opacity-100 translate-y-0' : 'opacity-50 translate-y-4'}`}>
+      <div className={`transition-all duration-1000 delay-200 ${
+        isInView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+      }`}>
         <div className="bg-card border border-border rounded-lg p-8 space-y-6 sticky top-20">
           <h3 className="font-bold text-lg">
             {showResults ? '✓ Qué recibes al terminar:' : 'Qué recibes al terminar:'}
