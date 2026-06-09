@@ -12,6 +12,7 @@ import { SystemArchitecture } from '@/components/system-architecture'
 import { SpecialistsGrid } from '@/components/specialists-grid'
 import { ComparisonRows } from '@/components/comparison-rows'
 import { TechStackCarousel } from '@/components/tech-stack-carousel'
+import { IaFirstArchitecture } from '@/components/ia-first-architecture'
 import { ArrowRight, FileText, TrendingUp, Target, Calendar } from 'lucide-react'
 import Image from 'next/image'
 
@@ -116,96 +117,7 @@ export default function HomePage() {
       {/* TECHNOLOGY: IA FIRST ARCHITECTURE */}
       <section className="py-24 px-6 border-t border-border bg-surface-dark/30">
         <div className="container mx-auto max-w-6xl">
-          <div className="space-y-12">
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold">IA First: La Tecnología Detrás del Sistema</h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                KUMPLIO no es software que usa IA. Es un sistema architected desde cero con IA como su fundamento.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* REASONING TECHNIQUES */}
-              <div className="p-8 rounded-lg border border-border space-y-4">
-                <h3 className="font-bold text-xl">Razonamiento Avanzado</h3>
-                
-                <div className="space-y-3 text-sm">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Few-Shot Learning</p>
-                    <p className="text-muted-foreground">Cada agente aprende de ejemplos similares a tu caso, no de reglas genéricas.</p>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Analogical Reasoning</p>
-                    <p className="text-muted-foreground">Is1dora compara tu situación con 1000+ casos históricos extrayendo lecciones aplicables.</p>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Causal Reasoning</p>
-                    <p className="text-muted-foreground">R0drigo entiende causas raíz del incumplimiento, no solo calcula multas.</p>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Metacognitive Validation</p>
-                    <p className="text-muted-foreground">El sistema cuestiona sus propias conclusiones e identifica asunciones débiles.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* SYSTEM INTELLIGENCE */}
-              <div className="p-8 rounded-lg border border-border space-y-4">
-                <h3 className="font-bold text-xl">Inteligencia de Sistema</h3>
-                
-                <div className="space-y-3 text-sm">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Multi-Method Validation</p>
-                    <p className="text-muted-foreground">Ninguna conclusión depende de un solo agente. Todo se valida por consenso.</p>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Uncertainty Quantification</p>
-                    <p className="text-muted-foreground">Cada métrica incluye rangos de confianza y evidencia de apoyo completa.</p>
-                  </div>
-                  
-              <div className="space-y-1 p-2">
-                <p className="text-sm font-semibold text-muted-foreground">Pipeline en tiempo real:</p>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Is1dora (extrae obligaciones)</p>
-                  <p className="text-sm text-muted-foreground">↓</p>
-                  <p className="text-sm text-muted-foreground">R0drigo (cuantifica riesgos)</p>
-                  <p className="text-sm text-muted-foreground">↓</p>
-                  <p className="text-sm text-muted-foreground">Cat4lina (valida con SERNAC)</p>
-                  <p className="text-sm text-muted-foreground">↓</p>
-                  <p className="text-sm text-muted-foreground">Todos (reporte ejecutivo)</p>
-                </div>
-              </div>
-                  
-                  <div className="space-y-1">
-                    <p className="font-semibold text-primary">Continuous Learning</p>
-                    <p className="text-muted-foreground">Andr3s recolecta feedback de auditorías y alimenta el sistema. KUMPLIO mejora mensualmente.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* RESULTS */}
-            <div className="p-8 rounded-lg border border-primary/30 bg-primary/5">
-              <div className="grid md:grid-cols-3 gap-6 text-center">
-                <div className="space-y-2">
-                  <div className="text-3xl font-black text-primary">95%</div>
-                  <p className="text-sm text-muted-foreground">Accuracy en análisis de cumplimiento</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-black text-primary">5 meses</div>
-                  <p className="text-sm text-muted-foreground">ROI promedio desde activación</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-black text-primary">40%</div>
-                  <p className="text-sm text-muted-foreground">Menos hallucinating que sistemas estándar</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <IaFirstArchitecture />
         </div>
       </section>
 
