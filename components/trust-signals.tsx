@@ -7,43 +7,38 @@ type Signal = {
   icon: typeof Shield
   label: string
   description: string
-  /** numeric value to count up to, embedded in the label */
-  count?: { to: number; prefix?: string; suffix?: string }
 }
 
 const signals: Signal[] = [
   {
     icon: Shield,
-    label: 'Seguridad Certificada',
-    description: 'ISO 27001 en progress + encriptación bancaria',
+    label: 'Análisis Automatizado',
+    description: 'Procesa PDFs, DOCX, TXT en segundos sin manual review',
   },
   {
     icon: BarChart3,
-    label: 'Empresas Protegidas',
-    description: '$2.5B en riesgos identificados evitados',
-    count: { to: 500, suffix: '+' },
+    label: 'Identifica Obligaciones',
+    description: 'Extrae requisitos legales directamente del documento',
   },
   {
     icon: Users,
-    label: 'Equipo Experto',
-    description: '15+ años en compliance y IA en Chile',
+    label: 'Equipo Chileno',
+    description: 'Expertos locales en Ley 21.719 y cumplimiento regulatorio',
   },
   {
     icon: Award,
-    label: 'Multas',
-    description: 'Clientes KUMPLIO no han recibido multas',
-    count: { to: 0 },
+    label: 'Sin Tarjeta Requerida',
+    description: 'Diagnóstico gratuito antes de cualquier compromiso',
   },
   {
     icon: Zap,
-    label: 'Análisis en Segundos',
-    description: '7 agentes IA trabajando en paralelo',
-    count: { to: 60, suffix: ' seg' },
+    label: 'Resultados en 60 Seg',
+    description: 'Análisis rápido para decisiones inmediatas',
   },
   {
     icon: Headphones,
-    label: 'Soporte 24/7',
-    description: 'Chat Vera + Email + Teléfono directo',
+    label: 'Soporte Directo',
+    description: 'Acceso a especialistas en cumplimiento normativo',
   },
 ]
 
@@ -68,35 +63,6 @@ function useInView<T extends HTMLElement>(threshold = 0.2) {
   return { ref, inView }
 }
 
-function CountUp({ to, prefix = '', suffix = '', run }: { to: number; prefix?: string; suffix?: string; run: boolean }) {
-  const [val, setVal] = useState(0)
-  useEffect(() => {
-    if (!run) return
-    if (to === 0) {
-      setVal(0)
-      return
-    }
-    let raf = 0
-    const start = performance.now()
-    const dur = 1400
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / dur, 1)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setVal(Math.round(eased * to))
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [run, to])
-  return (
-    <span>
-      {prefix}
-      {val}
-      {suffix}
-    </span>
-  )
-}
-
 function SignalCard({ signal, index, show }: { signal: Signal; index: number; show: boolean }) {
   const Icon = signal.icon
   return (
@@ -106,20 +72,12 @@ function SignalCard({ signal, index, show }: { signal: Signal; index: number; sh
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-lg" />
-      <div className="flex items-start gap-4 relative">
-        <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 flex items-center justify-center h-12 w-12">
+      <div className="flex items-start gap-4">
+        <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0 text-primary h-12 w-12 flex items-center justify-center">
           <Icon className="h-6 w-6" />
         </div>
         <div>
-          <h3 className="font-bold text-foreground mb-1 flex items-baseline gap-1.5">
-            {signal.count && (
-              <span className="text-primary">
-                <CountUp to={signal.count.to} prefix={signal.count.prefix} suffix={signal.count.suffix} run={show} />
-              </span>
-            )}
-            <span>{signal.label}</span>
-          </h3>
+          <h3 className="font-bold text-foreground mb-1">{signal.label}</h3>
           <p className="text-sm text-muted-foreground">{signal.description}</p>
         </div>
       </div>
