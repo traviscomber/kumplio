@@ -101,18 +101,18 @@ function SignalCard({ signal, index, show }: { signal: Signal; index: number; sh
   const Icon = signal.icon
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg border border-border bg-card p-6 transition-all duration-700 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_8px_30px_-12px_var(--primary)] ${
+      className={`bg-card border border-border rounded-lg p-6 hover:shadow-lg transition ${
         show ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="relative flex items-start gap-4">
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-lg" />
+      <div className="flex items-start gap-4 relative">
+        <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0 text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 flex items-center justify-center h-12 w-12">
           <Icon className="h-6 w-6" />
         </div>
         <div>
-          <h3 className="mb-1 flex items-baseline gap-1.5 font-bold text-foreground">
+          <h3 className="font-bold text-foreground mb-1 flex items-baseline gap-1.5">
             {signal.count && (
               <span className="text-primary">
                 <CountUp to={signal.count.to} prefix={signal.count.prefix} suffix={signal.count.suffix} run={show} />
@@ -131,10 +131,10 @@ export function TrustSignals() {
   const { ref, inView } = useInView<HTMLDivElement>(0.15)
 
   return (
-    <section className="border-y border-border bg-muted py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-12 text-center text-2xl font-bold text-foreground">Por Qué Confiar en KUMPLIO</h2>
-        <div ref={ref} className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <section className="py-16 bg-muted border-y border-border">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-foreground text-center mb-12">Por Qué Confiar en KUMPLIO</h2>
+        <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {signals.map((signal, idx) => (
             <SignalCard key={signal.label} signal={signal} index={idx} show={inView} />
           ))}
