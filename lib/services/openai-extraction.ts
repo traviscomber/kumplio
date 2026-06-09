@@ -1,39 +1,46 @@
 // OpenAI extraction service for analyzing documents
-// Uses GPT-4 to extract obligations, risks, and requirements
+// Uses GPT-4o to extract obligations, risks, and requirements
 
-import OpenAI from 'openai';
-import { Obligation } from '@/lib/types/documents';
+import OpenAI from 'openai'
+
+export interface Obligation {
+  obligation_text: string
+  type: 'deadline' | 'responsibility' | 'requirement' | 'risk'
+  severity: 'critical' | 'high' | 'medium' | 'low'
+  responsible_party: string | null
+  priority: 'critical' | 'high' | 'medium' | 'low'
+}
 
 interface ExtractionResult {
-  obligations: Obligation[];
-  riskSummary: string;
-  keyPoints: string[];
+  obligations: Obligation[]
+  riskSummary: string
+  keyPoints: string[]
 }
 
 const getOpenAIClient = () => {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
-    throw new Error('Missing OPENAI_API_KEY environment variable');
+    throw new Error('Missing OPENAI_API_KEY environment variable')
   }
-  return new OpenAI({ apiKey });
-};
+  return new OpenAI({ apiKey })
+}
 
-const EXTRACTION_PROMPT = `You are a legal compliance expert analyzing regulatory documents in Spanish.
+const EXTRACTION_PROMPT = `You are a legal compliance expert analyzing regulatory documents in Spanish (especially Ley 21.719 - Chilean data protection law).
 
 Extract the following from the provided document text:
 1. OBLIGATIONS: Identify all obligations, requirements, deadlines, and responsibilities
 2. RISKS: Identify compliance risks and critical issues
 3. KEY POINTS: Summarize the most important aspects
 
-Format your response as JSON with this structure:
+Format your response as valid JSON (no markdown) with this structure:
 {
   "obligations": [
     {
-      "text": "Obligation description",
+      "obligation_text": "Obligation description",
       "type": "deadline|responsibility|requirement|risk",
       "severity": "critical|high|medium|low",
-      "owner": "Responsible person/role or null",
-      "deadline": "YYYY-MM-DD or null"
+      "responsible_party": "Responsible person/role or null",
+      "priority": "critical|high|medium|low"
     }
   ],
   "riskSummary": "Overall risk assessment",
@@ -42,128 +49,92 @@ Format your response as JSON with this structure:
 
 IMPORTANT:
 - Extract ALL obligations, even implicit ones
-- Dates should be in YYYY-MM-DD format, use relative dates if absolute not found
 - Set severity based on consequences of non-compliance
-- Owner should be clear role/person if mentioned, null otherwise
+- responsible_party should be clear role/person if mentioned, null otherwise
 - Be thorough but accurate
-- Respond ONLY with valid JSON, no markdown
-`;
+- Respond ONLY with valid JSON, no markdown or code blocks
+`
 
 /**
- * Extract obligations from document text using GPT-4
+ * Extract obligations from document text using GPT-4o
  */
 export async function extractObligations(
   documentText: string,
-  industry?: string
+  documentType?: string
 ): Promise<ExtractionResult> {
   try {
-    console.log('[v0] Calling OpenAI for obligation extraction');
+    console.log('[openai-extraction] Calling GPT-4o for obligation extraction')
 
-    const openai = getOpenAIClient();
+    const openai = getOpenAIClient()
 
-    const systemPrompt = industry
-      ? `${EXTRACTION_PROMPT}\n\nDOCUMENT TYPE: ${industry} industry document`
-      : EXTRACTION_PROMPT;
+    const systemPrompt = documentType
+      ? `${EXTRACTION_PROMPT}\n\nDOCUMENT TYPE: ${documentType}`
+      : EXTRACTION_PROMPT
 
-    const message = await openai.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 2000,
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
       messages: [
         {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
           role: 'user',
-          content: `${systemPrompt}\n\nDOCUMENT TEXT:\n\n${documentText}`,
+          content: `DOCUMENT TEXT:\n\n${documentText.slice(0, 12000)}`, // Limit to 12K chars for token efficiency
         },
       ],
-    });
+      temperature: 0.3, // Lower temp for more consistent extraction
+      response_format: { type: 'json_object' },
+      max_tokens: 2000,
+    })
 
-    const content = message.content[0];
-    if (content.type !== 'text') {
-      throw new Error('Unexpected response format from OpenAI');
+    const content = response.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('Empty response from GPT-4o')
     }
 
-    console.log('[v0] OpenAI response received, parsing...');
+    console.log('[openai-extraction] GPT-4o response received, parsing...')
 
-    // Parse JSON response
-    let jsonStr = content.text.trim();
+    const result = JSON.parse(content) as ExtractionResult
 
-    // Remove markdown code blocks if present
-    if (jsonStr.includes('```json')) {
-      jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
-    } else if (jsonStr.includes('```')) {
-      jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
+    // Normalize obligations to match schema: map severity → priority
+    const normalizedObligations = result.obligations.map((o) => ({
+      obligation_text: o.obligation_text,
+      type: o.type,
+      severity: o.severity,
+      responsible_party: o.responsible_party || null,
+      priority: o.priority || o.severity, // Use priority if present, else severity
+    }))
+
+    console.log('[openai-extraction] Extracted', normalizedObligations.length, 'obligations')
+
+    return {
+      obligations: normalizedObligations,
+      riskSummary: result.riskSummary,
+      keyPoints: result.keyPoints,
     }
-
-    const result = JSON.parse(jsonStr) as ExtractionResult;
-
-    console.log('[v0] Extracted', result.obligations.length, 'obligations');
-
-    return result;
   } catch (error) {
-    console.error('[v0] OpenAI extraction error:', error);
-    throw new Error('Failed to extract obligations from document');
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[openai-extraction] Error:', message)
+    throw new Error(`Failed to extract obligations: ${message}`)
   }
-}
-
-/**
- * Generate compliance matrix from obligations
- */
-export function generateComplianceMatrix(
-  obligations: Obligation[]
-) {
-  console.log('[v0] Generating compliance matrix');
-
-  // Group by risk level
-  const critical = obligations.filter((o) => o.severity === 'critical');
-  const high = obligations.filter((o) => o.severity === 'high');
-  const medium = obligations.filter((o) => o.severity === 'medium');
-  const low = obligations.filter((o) => o.severity === 'low');
-
-  return {
-    totalObligations: obligations.length,
-    byRisk: {
-      critical: critical.length,
-      high: high.length,
-      medium: medium.length,
-      low: low.length,
-    },
-    criticalObligations: critical,
-    complianceScore: calculateComplianceScore(obligations),
-  };
 }
 
 /**
  * Calculate compliance score (0-100)
  * Based on obligation count and severity distribution
  */
-function calculateComplianceScore(obligations: Obligation[]): number {
-  if (obligations.length === 0) return 100;
+export function calculateComplianceScore(obligations: Obligation[]): number {
+  if (obligations.length === 0) return 100
 
-  const critical = obligations.filter((o) => o.severity === 'critical').length;
-  const high = obligations.filter((o) => o.severity === 'high').length;
+  const critical = obligations.filter((o) => o.priority === 'critical').length
+  const high = obligations.filter((o) => o.priority === 'high').length
 
   // Simple scoring: penalize based on critical/high obligations
-  let score = 100;
-  score -= critical * 15; // Each critical obligation reduces by 15
-  score -= high * 5; // Each high obligation reduces by 5
+  let score = 100
+  score -= critical * 15 // Each critical obligation reduces by 15
+  score -= high * 5 // Each high obligation reduces by 5
 
-  return Math.max(0, score);
+  return Math.max(0, score)
 }
 
-/**
- * Format extraction result for storage
- */
-export function formatExtractionForStorage(result: ExtractionResult) {
-  return {
-    obligations: result.obligations.map((o) => ({
-      obligation_text: o.text,
-      type: o.type,
-      severity: o.severity,
-      owner: o.owner,
-      deadline: o.deadline,
-      evidence_reference: null,
-    })),
-    riskSummary: result.riskSummary,
-    keyPoints: result.keyPoints,
-    extractedAt: new Date().toISOString(),
-  };
-}

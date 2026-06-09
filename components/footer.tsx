@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
+import Image from 'next/image'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -13,11 +14,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand & Description */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-bold">K</span>
-              </div>
-              <span className="font-bold text-lg">KUMPLIO</span>
+            <div className="mb-4">
+              <Image 
+                src="/logo-kumplio.svg" 
+                alt="KUMPLIO" 
+                width={64} 
+                height={64}
+                className="w-16 h-16"
+              />
             </div>
             <p className="text-sm text-muted-foreground mb-6">
               Plataforma IA integral para cumplimiento legal en Chile. 7 agentes expertos analizando, validando y optimizando tu cumplimiento 24/7.

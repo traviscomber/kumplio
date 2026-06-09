@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut, Settings, Menu, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export function TopNav() {
   const router = useRouter()
@@ -22,12 +23,16 @@ export function TopNav() {
 
   return (
     <header className="border-b border-border bg-card fixed top-0 left-0 right-0 z-50">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold">K</span>
-          </div>
-          <h1 className="text-xl font-bold text-foreground">KUMPLIO</h1>
+      <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex-shrink-0">
+          <Image 
+            src="/logo-kumplio.svg" 
+            alt="KUMPLIO" 
+            width={100} 
+            height={100}
+            className="w-24 h-24"
+            priority
+          />
         </div>
 
         <nav className="hidden md:flex items-center gap-6">

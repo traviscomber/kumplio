@@ -1,0 +1,32 @@
+<svg width="100%" viewBox="0 0 690 340" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Logo KUMPLIO dark mode</title>
+  <desc>Logo KUMPLIO con círculo negro y K verde lima, visible en cualquier fondo</desc>
+
+  <!-- Dark circle — always dark, contrasts on any bg -->
+  <circle cx="170" cy="170" r="125" fill="#111111"/>
+
+  <!-- Green ring border -->
+  <circle cx="170" cy="170" r="125" fill="none" stroke="#b8f542" stroke-width="8"/>
+
+  <!-- K - vertical bar — lime green, always visible on dark circle -->
+  <rect x="108" y="82" width="32" height="176" rx="8" fill="#b8f542"/>
+
+  <!-- K - upper arm -->
+  <polygon points="140,170 228,82 268,82 180,170" fill="#b8f542"/>
+
+  <!-- K - lower arm -->
+  <polygon points="140,170 228,258 268,258 180,170" fill="#b8f542"/>
+
+  <!-- UMPLI -->
+  <text x="295.01" y="207" font-family="system-ui, -apple-system, sans-serif" font-size="88" font-weight="500" letter-spacing="-3" fill="#faf9f5" text-anchor="start">UMPLI</text>
+
+  <!-- Ó in green -->
+  <text x="640" y="207" font-family="system-ui, -apple-system, sans-serif" font-size="88" font-weight="500" letter-spacing="-3" fill="#b8f542" text-anchor="end">Ó</text>
+
+  <!-- Green accent line -->
+  <rect x="318" y="218" width="342" height="5" rx="2.5" fill="#b8f542"/>
+
+  <!-- Tagline -->
+  <text x="295.01" y="252" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="400" letter-spacing="5" fill="#c2c0b6" text-anchor="start">CUMPLIMIENTO · LEY 21.719 · CHILE</text>
+
+</svg>
