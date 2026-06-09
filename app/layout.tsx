@@ -156,7 +156,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es-CL" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
+    <html lang="es-CL" data-scroll-behavior="smooth" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
       <head>
         {/* Geographic & Geo Tags for Chile */}
         <meta name="geo.placename" content="Chile" />
