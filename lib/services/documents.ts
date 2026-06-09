@@ -1,6 +1,6 @@
 // Document service for KUMPLIO - aligned with real schema
 import { createClient } from '@supabase/supabase-js'
-import { checkDocumentLimit } from './rate-limit'
+import { checkDocumentLimit } from '../rate-limit'
 
 /**
  * Upload a document to Supabase storage and create a document record.
