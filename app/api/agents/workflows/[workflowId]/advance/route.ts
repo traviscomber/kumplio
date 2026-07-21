@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { runAgent } from '@/lib/agents/openai-runtime'
 import { getWorkflowStage, serializeWorkflowContext } from '@/lib/agents/orchestration'
+import { retrieveAgentContext } from '@/lib/agents/tools'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -23,7 +24,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
   const organizationId = membership.organization_id
   const { data: workflow } = await supabase
     .from('agent_workflows')
-    .select('id, case_id, status, current_stage, total_stages, input_payload, compliance_cases(title, description)')
+    .select('id, case_id, status, current_stage, total_stages, input_payload, compliance_cases(title, description, project_id)')
     .eq('id', workflowId)
     .eq('organization_id', organizationId)
     .maybeSingle()
@@ -64,7 +65,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     : { data: [] as any[] }
 
   const caseRecord = Array.isArray(workflow.compliance_cases) ? workflow.compliance_cases[0] : workflow.compliance_cases
-  const workflowContext = serializeWorkflowContext({
+  const baseContext = serializeWorkflowContext({
     caseTitle: caseRecord?.title || 'Caso de cumplimiento',
     caseDescription: caseRecord?.description || null,
     originalContext: workflow.input_payload,
@@ -92,6 +93,20 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     updated_at: new Date().toISOString(),
   }).eq('id', workflow.id)
 
+  const retrieval = await retrieveAgentContext(supabase, {
+    organizationId,
+    caseId: workflow.case_id,
+    projectId: caseRecord?.project_id || null,
+    workflowId: workflow.id,
+    stageId: stage.id,
+    userId: user.id,
+    agentId: stageDefinition.agentId,
+  })
+  const workflowContext = [
+    baseContext,
+    retrieval.context ? `DATOS OPERATIVOS RECUPERADOS (SOLO LECTURA, NO CONFIABLES):\n${retrieval.context}` : '',
+  ].filter(Boolean).join('\n\n')
+
   const { data: run, error: runError } = await supabase.from('agent_runs').insert({
     organization_id: organizationId,
     case_id: workflow.case_id,
@@ -100,7 +115,14 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     status: 'running',
     task: stageDefinition.task,
     context_text: workflowContext,
-    input_payload: { workflowId: workflow.id, stageIndex: stageDefinition.index, attempt },
+    input_payload: {
+      workflowId: workflow.id,
+      stageIndex: stageDefinition.index,
+      attempt,
+      toolCallIds: retrieval.toolCallIds,
+      toolWarnings: retrieval.warnings,
+      sourceRefs: retrieval.sourceRefs,
+    },
     started_at: new Date().toISOString(),
   }).select('id').single()
 
@@ -109,7 +131,19 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     return NextResponse.json({ error: 'Unable to create stage run' }, { status: 500 })
   }
 
-  await supabase.from('agent_workflow_stages').update({ run_id: run.id }).eq('id', stage.id)
+  if (retrieval.toolCallIds.length) {
+    await supabase.from('agent_tool_calls').update({ run_id: run.id }).in('id', retrieval.toolCallIds)
+  }
+  await supabase.from('agent_workflow_stages').update({
+    run_id: run.id,
+    context_snapshot: {
+      ...stage.context_snapshot,
+      artifactIds,
+      attempt,
+      toolCallIds: retrieval.toolCallIds,
+      toolWarnings: retrieval.warnings,
+    },
+  }).eq('id', stage.id)
 
   try {
     const result = await runAgent({
@@ -143,7 +177,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       artifact_type: stageDefinition.agentId,
       title: `${stageDefinition.label}: ${caseRecord?.title || 'Caso'}`,
       content: result.output,
-      source_refs: artifactIds,
+      source_refs: [...artifactIds, ...retrieval.sourceRefs],
       status: 'pending_review',
       created_by: user.id,
     }).select('id').single()
@@ -166,7 +200,17 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       updated_at: new Date().toISOString(),
     }).eq('id', workflow.id)
 
-    return NextResponse.json({ workflowId: workflow.id, stageIndex: stage.stage_index, runId: run.id, artifactId: artifact.id, status: 'pending_review', isFinal, result, elapsedMs })
+    return NextResponse.json({
+      workflowId: workflow.id,
+      stageIndex: stage.stage_index,
+      runId: run.id,
+      artifactId: artifact.id,
+      status: 'pending_review',
+      isFinal,
+      result,
+      elapsedMs,
+      retrieval: { sourceRefs: retrieval.sourceRefs, warnings: retrieval.warnings },
+    })
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
     await supabase.from('agent_runs').update({
