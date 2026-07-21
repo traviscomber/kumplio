@@ -64,7 +64,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   const [{ data: artifact }, { data: workflowStage }] = await Promise.all([
     supabase
       .from('agent_artifacts')
-      .select('id')
+      .select('id, content_hash, lineage_id, version')
       .eq('run_id', runId)
       .order('version', { ascending: false })
       .limit(1)
@@ -77,24 +77,24 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
       .maybeSingle(),
   ])
 
-  const { data: review, error: reviewError } = await supabase
-    .from('agent_reviews')
-    .insert({
-      organization_id: organizationId,
-      case_id: run.case_id,
-      run_id: runId,
-      artifact_id: artifact?.id || null,
-      reviewer_id: user.id,
-      decision: parsed.data.decision,
-      comment: parsed.data.comment || null,
-      checklist: parsed.data.checklist,
-    })
-    .select('id, decision, comment, created_at')
-    .single()
+  const { data: review, error: reviewError } = await supabase.rpc('record_agent_review', {
+    target_run: runId,
+    target_artifact: artifact?.id || null,
+    target_decision: parsed.data.decision,
+    target_comment: parsed.data.comment || null,
+    target_checklist: parsed.data.checklist,
+  })
 
   if (reviewError || !review) {
-    console.error('[agents/review] unable to create review', reviewError?.code)
-    return NextResponse.json({ error: 'Unable to save review', code: 'review_create_failed' }, { status: 500 })
+    console.error('[agents/review] unable to create integrity review', reviewError?.code)
+    const migrationPending = reviewError?.code === 'PGRST202' || reviewError?.message?.includes('record_agent_review')
+    return NextResponse.json(
+      {
+        error: migrationPending ? 'Artifact integrity migration is required' : 'Unable to save review',
+        code: migrationPending ? 'artifact_integrity_not_ready' : 'review_create_failed',
+      },
+      { status: migrationPending ? 503 : 500 },
+    )
   }
 
   const runStatus = parsed.data.decision === 'approved'
@@ -165,5 +165,16 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     }
   }
 
-  return NextResponse.json({ review, runId, status: runStatus, workflowStageId: workflowStage?.id || null })
+  return NextResponse.json({
+    review,
+    runId,
+    status: runStatus,
+    workflowStageId: workflowStage?.id || null,
+    artifactIntegrity: artifact ? {
+      artifactId: artifact.id,
+      contentHash: artifact.content_hash,
+      lineageId: artifact.lineage_id,
+      version: artifact.version,
+    } : null,
+  })
 }
