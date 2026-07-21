@@ -4,4 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getAgentProfile } from '@/lib/agents/catalog'
 import { prepareAgentInput } from '@/lib/agents/input-security'
 import { AgentRuntimeError, runAgent } from '@/lib/agents/openai-runtime'
-import { retrieveAgentContext } from '@/lib/agents/tools'
+
+export const runtime = 'nodejs'
+export const maxDuration = 300
+
+const requestSchema = z.object({
