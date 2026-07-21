@@ -6,137 +6,81 @@ import { ClientProviders } from '@/app/providers'
 import { VeraFloatingChat } from '@/components/vera-floating-chat'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
+
+const title = 'KUMPLIO | Cumplimiento Ley 21.719 y protección de datos en Chile'
+const description =
+  'Plataforma de cumplimiento continuo para preparar la entrada en vigencia de la Ley 21.719 el 1 de diciembre de 2026. Convierte obligaciones de protección de datos en controles, evidencia, hallazgos y planes de acción.'
 
 export const metadata: Metadata = {
-  title: 'KUMPLIO - Cumplimiento Ley 21.719 Chile | IA & LLM para Compliance Legal',
-  description: 'KUMPLIO: Plataforma con IA y LLM para cumplimiento automático de Ley 21.719 en Chile. 7 agentes expertos, análisis de documentos, cuantificación de riesgos, roadmaps de cumplimiento. Solución enterprise para empresas chilenas. Desarrollado por n3uralia.com',
+  metadataBase: new URL('https://kumplio.app'),
+  title: {
+    default: title,
+    template: '%s | KUMPLIO',
+  },
+  description,
   keywords: [
-    // Compliance General
-    'Cumplimiento Ley 21.719',
-    'Protección de datos Chile',
-    'IA legal Chile',
-    'LLM compliance',
-    'Inteligencia documental',
-    'Auditoría de compliance',
-    'Análisis de documentos IA',
-    'Gestión de obligaciones legales',
-    'Riesgo normativo Chile',
-    'Agentes IA legal',
-    
-    // Regional Keywords - Metropolitan & Major Cities
-    'compliance legal santiago',
-    'ley 21.719 santiago',
-    'compliance valparaíso',
-    'compliance concepción',
-    'compliance puente alto',
-    'compliance maipú',
-    'ley datos viña del mar',
-    
-    // Regional Coverage
-    'cumplimiento legal tarapacá',
-    'compliance legal antofagasta',
-    'cumplimiento atacama',
-    'compliance legal o\'higgins',
-    'cumplimiento legal bío bío',
-    'compliance araucanía',
-    'cumplimiento legal los ríos',
-    'compliance los lagos',
-    'cumplimiento legal aysén',
-    'compliance magallanes',
-    
-    // Industry Specific - Transport
-    'compliance transporte chile',
-    'regulaciones transporte',
-    'ley transporte chile',
-    'cumplimiento transportista',
-    'reglamento vías públicas',
-    
-    // Industry Specific - Mining
-    'compliance minería chile',
-    'regulaciones minería',
-    'ley seguridad minería',
-    'cumplimiento minero',
-    'reglamento minería chile',
-    
-    // Legal Frameworks
-    'ley 19.628 datos',
-    'cumplimiento laboral chile',
-    'regulaciones ambientales',
-    'ley 20.045 sistemas',
-    'decreto 40 seguridad',
-    'ley 20.255 pensiones',
-    
-    // Brand & Organization
-    'n3uralia',
+    'Ley 21.719',
+    'Ley de protección de datos personales Chile',
+    'nueva ley de datos personales Chile',
+    'vigencia Ley 21.719 diciembre 2026',
+    'cumplimiento Ley 21.719',
+    'protección de datos Chile',
+    'privacidad por diseño',
+    'gestión de obligaciones legales',
+    'controles de cumplimiento',
+    'evidencia auditable',
+    'evaluación de impacto datos personales',
+    'compliance Chile',
     'KUMPLIO',
-    'kumplio.app',
+    'n3uralia',
   ],
   generator: 'kumplio.app',
+  applicationName: 'KUMPLIO',
   referrer: 'strict-origin-when-cross-origin',
   authors: [{ name: 'KUMPLIO by n3uralia', url: 'https://www.n3uralia.com' }],
-  creator: 'KUMPLIO (n3uralia.com)',
+  creator: 'KUMPLIO by n3uralia',
   publisher: 'KUMPLIO by n3uralia',
   robots: {
     index: true,
     follow: true,
-    noarchive: false,
     maxSnippet: -1,
     maxImagePreview: 'large',
     maxVideoPreview: -1,
   },
   alternates: {
-    canonical: 'https://kumplio.app',
-    languages: {
-      'es-CL': 'https://kumplio.app',
-      'es-ES': 'https://kumplio.es',
-    },
+    canonical: '/',
+    languages: { 'es-CL': '/' },
   },
   openGraph: {
     type: 'website',
     locale: 'es_CL',
-    url: 'https://kumplio.app',
-    siteName: 'KUMPLIO - Compliance IA para Ley 21.719',
-    title: 'KUMPLIO: Agentes IA para Cumplimiento Ley 21.719 | Desarrollado por n3uralia',
-    description: 'Sistema experto con 7 agentes IA y LLM para automatizar cumplimiento de Ley 21.719. Análisis de documentos, cuantificación de riesgos, recomendaciones estratégicas. Desarrollado por n3uralia.com para empresas chilenas.',
+    url: '/',
+    siteName: 'KUMPLIO',
+    title,
+    description,
     images: [
       {
-        url: 'https://kumplio.app/og-image.png',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'KUMPLIO - Sistema de Compliance IA | n3uralia.com',
+        alt: 'KUMPLIO — Cumplimiento Ley 21.719 y protección de datos en Chile',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KUMPLIO: IA para Cumplimiento Ley 21.719 | n3uralia',
-    description: 'Agentes IA expertos en compliance legal. Análisis automático con LLM. Desarrollado por n3uralia.com',
-    images: ['https://kumplio.app/twitter-image.png'],
-    creator: '@kumplio_cl',
+    title,
+    description,
+    images: ['/twitter-image.png'],
   },
   icons: {
     icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
+      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: '/apple-icon.png',
-  },
-  verification: {
-    google: 'google-site-verification-code',
   },
 }
 
@@ -150,135 +94,62 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'KUMPLIO by n3uralia',
+  url: 'https://kumplio.app',
+  logo: 'https://kumplio.app/logo.png',
+  description,
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'n3uralia',
+    url: 'https://www.n3uralia.com',
+  },
+  areaServed: {
+    '@type': 'Country',
+    name: 'Chile',
+  },
+}
+
+const softwareSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'KUMPLIO',
+  description,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://kumplio.app',
+  areaServed: 'CL',
+  inLanguage: 'es-CL',
+  featureList: [
+    'Mapa de obligaciones de la Ley 21.719',
+    'Controles de protección de datos',
+    'Biblioteca de evidencias',
+    'Gestión de hallazgos y riesgos',
+    'Planes de acción y trazabilidad',
+    'Revisión humana de resultados asistidos por IA',
+  ],
+}
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CL" className={`${geistSans.variable} ${geistMono.variable} bg-background`}>
       <head>
-        {/* Geographic & Geo Tags for Chile */}
         <meta name="geo.placename" content="Chile" />
         <meta name="geo.region" content="CL" />
-        <meta name="geo.position" content="-33.4569;-70.6483" />
-        <meta name="ICBM" content="-33.4569,-70.6483" />
-        
-        {/* Regional Coverage Meta Tags */}
         <meta name="coverage" content="Chile" />
-        <meta name="distribution" content="global" />
-        
-        {/* Structured Data Schemas - Server Only */}
-        
         <script
           type="application/ld+json"
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'KUMPLIO by n3uralia',
-              url: 'https://kumplio.app',
-              parentOrganization: {
-                '@type': 'Organization',
-                name: 'n3uralia',
-                url: 'https://www.n3uralia.com',
-              },
-              logo: 'https://kumplio.app/logo.png',
-              description: 'Plataforma de IA y LLM para cumplimiento automático de Ley 21.719 con 7 agentes expertos. Desarrollado por n3uralia.com',
-              sameAs: [
-                'https://www.linkedin.com/company/kumplio',
-                'https://twitter.com/kumplio_cl',
-                'https://www.n3uralia.com',
-              ],
-              areaServed: {
-                '@type': 'Country',
-                name: 'CL',
-              },
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'Customer Support',
-                email: 'support@kumplio.app',
-                availableLanguage: 'es-CL',
-              },
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <script
           type="application/ld+json"
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'KUMPLIO',
-              description: 'Sistema experto con IA y LLM para cumplimiento automático de Ley 21.719 en Chile',
-              applicationCategory: 'BusinessApplication',
-              url: 'https://kumplio.app',
-              creator: {
-                '@type': 'Organization',
-                name: 'n3uralia',
-                url: 'https://www.n3uralia.com',
-              },
-              operatingSystem: 'Web',
-              areaServed: 'CL',
-              inLanguage: 'es-CL',
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'CLP',
-                description: 'Prueba gratis sin tarjeta de crédito',
-              },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                ratingCount: '150',
-              },
-              featureList: [
-                'Agentes IA expertos',
-                'Análisis automático con LLM',
-                'Cuantificación de riesgos',
-                'Compliance con Ley 21.719',
-                'Razonamiento transparente',
-                'SERNAC precedent database',
-              ],
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'LocalBusiness',
-              name: 'KUMPLIO Chile',
-              url: 'https://kumplio.app',
-              description: 'Cumplimiento legal con IA para empresas chilenas',
-              geo: {
-                '@type': 'GeoShape',
-                box: '-56.5,−27.1 -66.4,−17.5',
-                description: 'Chile (focus area)',
-              },
-              areaServed: {
-                '@type': 'Country',
-                name: 'CL',
-              },
-              parentOrganization: {
-                '@type': 'Organization',
-                name: 'n3uralia',
-                url: 'https://www.n3uralia.com',
-              },
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
         />
         <link rel="sitemap" href="/sitemap.xml" />
-        
-        {/* JSON-LD Schema References */}
-        <link rel="alternate" href="/schema-service.json" type="application/ld+json" />
-        <link rel="alternate" href="/schema-software.json" type="application/ld+json" />
-        <link rel="alternate" href="/schema-industries.json" type="application/ld+json" />
-        <link rel="alternate" href="/schema-regions.json" type="application/ld+json" />
       </head>
       <body className="font-sans antialiased text-foreground" suppressHydrationWarning>
         <ClientProviders>
