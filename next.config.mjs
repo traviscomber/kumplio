@@ -26,6 +26,8 @@ const nextConfig = {
       '/risks/:path*',
       '/roadmaps/:path*',
       '/projects/:path*',
+      '/agents/:path*',
+      '/api/agents/:path*',
       '/sales-kit/:path*',
     ]
 

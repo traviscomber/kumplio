@@ -1,6 +1,3 @@
-// OpenAI extraction service for analyzing documents
-// Uses GPT-4o to extract obligations, risks, and requirements
-
 import OpenAI from 'openai'
 
 export interface Obligation {
@@ -9,109 +6,102 @@ export interface Obligation {
   severity: 'critical' | 'high' | 'medium' | 'low'
   responsible_party: string | null
   priority: 'critical' | 'high' | 'medium' | 'low'
+  source_quote?: string | null
+  confidence?: number
 }
 
 interface ExtractionResult {
   obligations: Obligation[]
   riskSummary: string
   keyPoints: string[]
+  limitations?: string[]
 }
 
-const getOpenAIClient = () => {
+let client: OpenAI | null = null
+
+function getOpenAIClient() {
+  if (client) return client
   const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) {
-    throw new Error('Missing OPENAI_API_KEY environment variable')
-  }
-  return new OpenAI({ apiKey })
+  if (!apiKey) throw new Error('Missing OPENAI_API_KEY environment variable')
+  client = new OpenAI({ apiKey })
+  return client
 }
 
-const EXTRACTION_PROMPT = `You are a legal compliance expert analyzing regulatory documents in Spanish (especially Ley 21.719 - Chilean data protection law).
+const EXTRACTION_PROMPT = `Eres Isidora, analista de obligaciones y evidencia documental de KUMPLIO.
 
-Extract the following from the provided document text:
-1. OBLIGATIONS: Identify all obligations, requirements, deadlines, and responsibilities
-2. RISKS: Identify compliance risks and critical issues
-3. KEY POINTS: Summarize the most important aspects
+Analiza el documento en español y extrae solo obligaciones sustentadas por el texto. Distingue obligaciones, responsabilidades, plazos, requisitos y riesgos. No inventes artículos, sanciones, responsables ni fechas. No conviertas buenas prácticas en obligaciones legales. Cuando una obligación sea inferida, baja la confianza y explica la limitación.
 
-Format your response as valid JSON (no markdown) with this structure:
-{
-  "obligations": [
-    {
-      "obligation_text": "Obligation description",
-      "type": "deadline|responsibility|requirement|risk",
-      "severity": "critical|high|medium|low",
-      "responsible_party": "Responsible person/role or null",
-      "priority": "critical|high|medium|low"
-    }
-  ],
-  "riskSummary": "Overall risk assessment",
-  "keyPoints": ["Point 1", "Point 2", ...]
+Para cada obligación entrega:
+- obligation_text: formulación normalizada
+- type: deadline, responsibility, requirement o risk
+- severity y priority: critical, high, medium o low, justificadas por el texto disponible
+- responsible_party: sujeto indicado o null
+- source_quote: cita breve exacta que sustenta la extracción o null
+- confidence: número entre 0 y 1
+
+Además entrega riskSummary, keyPoints y limitations. La salida debe respetar estrictamente el esquema JSON solicitado.`
+
+const schema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['obligations', 'riskSummary', 'keyPoints', 'limitations'],
+  properties: {
+    obligations: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['obligation_text', 'type', 'severity', 'responsible_party', 'priority', 'source_quote', 'confidence'],
+        properties: {
+          obligation_text: { type: 'string' },
+          type: { type: 'string', enum: ['deadline', 'responsibility', 'requirement', 'risk'] },
+          severity: { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
+          responsible_party: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          priority: { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
+          source_quote: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          confidence: { type: 'number', minimum: 0, maximum: 1 },
+        },
+      },
+    },
+    riskSummary: { type: 'string' },
+    keyPoints: { type: 'array', items: { type: 'string' } },
+    limitations: { type: 'array', items: { type: 'string' } },
+  },
 }
 
-IMPORTANT:
-- Extract ALL obligations, even implicit ones
-- Set severity based on consequences of non-compliance
-- responsible_party should be clear role/person if mentioned, null otherwise
-- Be thorough but accurate
-- Respond ONLY with valid JSON, no markdown or code blocks
-`
-
-/**
- * Extract obligations from document text using GPT-4o
- */
-export async function extractObligations(
-  documentText: string,
-  documentType?: string
-): Promise<ExtractionResult> {
+export async function extractObligations(documentText: string, documentType?: string): Promise<ExtractionResult> {
   try {
-    console.log('[openai-extraction] Calling GPT-4o for obligation extraction')
-
     const openai = getOpenAIClient()
-
-    const systemPrompt = documentType
-      ? `${EXTRACTION_PROMPT}\n\nDOCUMENT TYPE: ${documentType}`
-      : EXTRACTION_PROMPT
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
+    const response = await openai.responses.create({
+      model: process.env.OPENAI_REASONING_MODEL || 'gpt-5.6',
+      instructions: EXTRACTION_PROMPT,
+      input: `TIPO DE DOCUMENTO: ${documentType || 'no especificado'}\n\nTEXTO DEL DOCUMENTO:\n${documentText.slice(0, 120000)}`,
+      reasoning: { effort: 'max', mode: 'pro' },
+      text: {
+        verbosity: 'medium',
+        format: {
+          type: 'json_schema',
+          name: 'kumplio_obligation_extraction',
+          strict: true,
+          schema,
         },
-        {
-          role: 'user',
-          content: `DOCUMENT TEXT:\n\n${documentText.slice(0, 12000)}`, // Limit to 12K chars for token efficiency
-        },
-      ],
-      temperature: 0.3, // Lower temp for more consistent extraction
-      response_format: { type: 'json_object' },
-      max_tokens: 2000,
-    })
+      },
+      max_output_tokens: 12000,
+      store: false,
+    } as any)
 
-    const content = response.choices[0]?.message?.content
-    if (!content) {
-      throw new Error('Empty response from GPT-4o')
-    }
-
-    console.log('[openai-extraction] GPT-4o response received, parsing...')
-
-    const result = JSON.parse(content) as ExtractionResult
-
-    // Normalize obligations to match schema: map severity → priority
-    const normalizedObligations = result.obligations.map((o) => ({
-      obligation_text: o.obligation_text,
-      type: o.type,
-      severity: o.severity,
-      responsible_party: o.responsible_party || null,
-      priority: o.priority || o.severity, // Use priority if present, else severity
-    }))
-
-    console.log('[openai-extraction] Extracted', normalizedObligations.length, 'obligations')
+    if (!response.output_text?.trim()) throw new Error('Empty response from reasoning model')
+    const result = JSON.parse(response.output_text) as ExtractionResult
 
     return {
-      obligations: normalizedObligations,
+      obligations: result.obligations.map((item) => ({
+        ...item,
+        responsible_party: item.responsible_party || null,
+        priority: item.priority || item.severity,
+      })),
       riskSummary: result.riskSummary,
       keyPoints: result.keyPoints,
+      limitations: result.limitations || [],
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
@@ -120,21 +110,9 @@ export async function extractObligations(
   }
 }
 
-/**
- * Calculate compliance score (0-100)
- * Based on obligation count and severity distribution
- */
 export function calculateComplianceScore(obligations: Obligation[]): number {
   if (obligations.length === 0) return 100
-
-  const critical = obligations.filter((o) => o.priority === 'critical').length
-  const high = obligations.filter((o) => o.priority === 'high').length
-
-  // Simple scoring: penalize based on critical/high obligations
-  let score = 100
-  score -= critical * 15 // Each critical obligation reduces by 15
-  score -= high * 5 // Each high obligation reduces by 5
-
-  return Math.max(0, score)
+  const critical = obligations.filter((item) => item.priority === 'critical').length
+  const high = obligations.filter((item) => item.priority === 'high').length
+  return Math.max(0, 100 - critical * 15 - high * 5)
 }
-
