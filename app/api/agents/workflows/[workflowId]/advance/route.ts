@@ -91,7 +91,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     status: 'running',
     attempt_count: attempt,
     source_artifact_ids: artifactIds,
-    context_snapshot: { ...stage.context_snapshot, artifactIds, attempt },
+    context_snapshot: { ...stage.context_snapshot, artifactIds, attempt, supersedesArtifactId: stage.output_artifact_id || null },
     started_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }).eq('id', stage.id)
@@ -127,6 +127,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       workflowId: workflow.id,
       stageIndex: stageDefinition.index,
       attempt,
+      supersedesArtifactId: stage.output_artifact_id || null,
       toolCallIds: retrieval.toolCallIds,
       toolWarnings: retrieval.warnings,
       sourceRefs: retrieval.sourceRefs,
@@ -148,6 +149,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       ...stage.context_snapshot,
       artifactIds,
       attempt,
+      supersedesArtifactId: stage.output_artifact_id || null,
       toolCallIds: retrieval.toolCallIds,
       toolWarnings: retrieval.warnings,
     },
@@ -188,9 +190,22 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       source_refs: [...artifactIds, ...retrieval.sourceRefs],
       status: 'pending_review',
       created_by: user.id,
-    }).select('id').single()
+      supersedes_artifact_id: stage.output_artifact_id || null,
+    }).select('id, lineage_id, version, content_hash, supersedes_artifact_id, integrity_version').single()
 
-    if (artifactError || !artifact) throw new Error('artifact_creation_failed')
+    if (artifactError || !artifact) {
+      const migrationPending = artifactError?.code === 'PGRST204' || artifactError?.message?.includes('supersedes_artifact_id')
+      if (migrationPending) throw new Error('artifact_integrity_migration_required')
+      throw new Error('artifact_creation_failed')
+    }
+
+    if (stage.output_artifact_id) {
+      await supabase
+        .from('agent_artifacts')
+        .update({ status: 'superseded' })
+        .eq('id', stage.output_artifact_id)
+        .eq('organization_id', organizationId)
+    }
 
     const nextStage = stage.stage_index + 1
     const isFinal = nextStage >= workflow.total_stages
@@ -213,6 +228,13 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       stageIndex: stage.stage_index,
       runId: run.id,
       artifactId: artifact.id,
+      artifactIntegrity: {
+        lineageId: artifact.lineage_id,
+        version: artifact.version,
+        contentHash: artifact.content_hash,
+        supersedesArtifactId: artifact.supersedes_artifact_id,
+        integrityVersion: artifact.integrity_version,
+      },
       status: 'pending_review',
       isFinal,
       result,
@@ -221,17 +243,30 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     })
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
+    const migrationPending = error instanceof Error && error.message === 'artifact_integrity_migration_required'
     await supabase.from('agent_runs').update({
       status: 'failed',
-      error_code: 'workflow_stage_failed',
-      error_message: 'The workflow stage could not be completed',
+      error_code: migrationPending ? 'artifact_integrity_not_ready' : 'workflow_stage_failed',
+      error_message: migrationPending ? 'Artifact integrity migration is required' : 'The workflow stage could not be completed',
       elapsed_ms: elapsedMs,
       completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }).eq('id', run.id)
     await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
-    await supabase.from('agent_workflows').update({ status: 'failed', error_code: 'workflow_stage_failed', error_message: 'A workflow stage failed', updated_at: new Date().toISOString() }).eq('id', workflow.id)
+    await supabase.from('agent_workflows').update({
+      status: 'failed',
+      error_code: migrationPending ? 'artifact_integrity_not_ready' : 'workflow_stage_failed',
+      error_message: migrationPending ? 'Artifact integrity migration is required' : 'A workflow stage failed',
+      updated_at: new Date().toISOString(),
+    }).eq('id', workflow.id)
     console.error('[agents/workflows/advance]', error instanceof Error ? error.name : 'unknown')
-    return NextResponse.json({ error: 'The workflow stage could not be completed', runId: run.id }, { status: 502 })
+    return NextResponse.json(
+      {
+        error: migrationPending ? 'Artifact integrity migration is required' : 'The workflow stage could not be completed',
+        code: migrationPending ? 'artifact_integrity_not_ready' : 'workflow_stage_failed',
+        runId: run.id,
+      },
+      { status: migrationPending ? 503 : 502 },
+    )
   }
 }
