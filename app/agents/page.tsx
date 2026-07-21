@@ -26,7 +26,8 @@ export default async function AgentsPage() {
             <p className="mt-2 text-muted-foreground">GPT-5.6 con perfiles delimitados, evidencia explícita y revisión humana obligatoria.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild><Link href="/agents/workflows">Orquestación multiagente</Link></Button>
+            <Button asChild><Link href="/agents/reviews">Revisiones</Link></Button>
+            <Button variant="outline" asChild><Link href="/agents/workflows">Orquestación multiagente</Link></Button>
             <Button variant="outline" asChild><Link href="/dashboard">Volver al dashboard</Link></Button>
           </div>
         </header>
