@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getAgentProfile } from '@/lib/agents/catalog'
+import { prepareAgentInput } from '@/lib/agents/input-security'
 import { AgentRuntimeError, runAgent } from '@/lib/agents/openai-runtime'
 
 export const runtime = 'nodejs'
@@ -58,6 +59,11 @@ export async function POST(req: NextRequest) {
   const profile = getAgentProfile(parsed.data.agentId)
   if (!profile) {
     return NextResponse.json({ error: 'Unknown agent', code: 'unknown_agent' }, { status: 404 })
+  }
+
+  const prepared = prepareAgentInput(parsed.data.task, parsed.data.context)
+  if (prepared.task.length < 10) {
+    return NextResponse.json({ error: 'Task is empty after security processing', code: 'invalid_task' }, { status: 400 })
   }
 
   const { data: membership, error: membershipError } = await supabase
@@ -118,9 +124,15 @@ export async function POST(req: NextRequest) {
       user_id: user.id,
       agent_id: parsed.data.agentId,
       status: 'running',
-      task: parsed.data.task,
-      context_text: parsed.data.context || null,
-      input_payload: { taskLength: parsed.data.task.length, contextLength: parsed.data.context.length },
+      task: prepared.task,
+      context_text: prepared.context || null,
+      input_payload: {
+        taskLength: prepared.task.length,
+        contextLength: prepared.context.length,
+        securityWarnings: prepared.warnings,
+        injectionIndicators: prepared.injectionIndicators,
+        secretsRedacted: prepared.secretsRedacted,
+      },
       started_at: new Date().toISOString(),
     })
     .select('id')
@@ -140,8 +152,8 @@ export async function POST(req: NextRequest) {
   try {
     const result = await runAgent({
       agentId: parsed.data.agentId,
-      task: parsed.data.task,
-      context: parsed.data.context,
+      task: prepared.task,
+      context: prepared.context,
       userId: user.id,
     })
     const elapsedMs = Date.now() - startedAt
@@ -174,7 +186,7 @@ export async function POST(req: NextRequest) {
         case_id: parsed.data.caseId || null,
         run_id: run.id,
         artifact_type: parsed.data.agentId,
-        title: `${profile.name}: ${parsed.data.task.slice(0, 120)}`,
+        title: `${profile.name}: ${prepared.task.slice(0, 120)}`,
         content: result.output,
         source_refs: [],
         status: 'pending_review',
@@ -193,6 +205,11 @@ export async function POST(req: NextRequest) {
       elapsedMs,
       reviewRequired: true,
       status: 'pending_review',
+      security: {
+        warnings: prepared.warnings,
+        injectionIndicators: prepared.injectionIndicators,
+        secretsRedacted: prepared.secretsRedacted,
+      },
     })
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
