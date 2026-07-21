@@ -25,7 +25,10 @@ export default async function AgentsPage() {
             <h1 className="mt-2 text-4xl font-bold">Mesa de agentes especializados</h1>
             <p className="mt-2 text-muted-foreground">GPT-5.6 con perfiles delimitados, evidencia explícita y revisión humana obligatoria.</p>
           </div>
-          <Button variant="outline" asChild><Link href="/dashboard">Volver al dashboard</Link></Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild><Link href="/agents/workflows">Orquestación multiagente</Link></Button>
+            <Button variant="outline" asChild><Link href="/dashboard">Volver al dashboard</Link></Button>
+          </div>
         </header>
         <AgentsWorkbench />
       </div>
