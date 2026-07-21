@@ -15,16 +15,6 @@ const nextConfig = {
     'localhost:3000',
     '127.0.0.1:3000',
   ],
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.kumplio.app' }],
-        destination: 'https://kumplio.app/:path*',
-        permanent: true,
-      },
-    ]
-  },
   async headers() {
     const privateRoutes = [
       '/dashboard/:path*',
