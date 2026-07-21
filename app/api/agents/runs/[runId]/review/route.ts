@@ -45,11 +45,12 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     return NextResponse.json({ error: 'An organization membership is required', code: 'organization_required' }, { status: 403 })
   }
 
+  const organizationId = membership.organization_id
   const { data: run } = await supabase
     .from('agent_runs')
     .select('id, case_id, status')
     .eq('id', runId)
-    .eq('organization_id', membership.organization_id)
+    .eq('organization_id', organizationId)
     .maybeSingle()
 
   if (!run) {
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   const { data: review, error: reviewError } = await supabase
     .from('agent_reviews')
     .insert({
-      organization_id: membership.organization_id,
+      organization_id: organizationId,
       case_id: run.case_id,
       run_id: runId,
       artifact_id: artifact?.id || null,
@@ -94,15 +95,95 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
       ? 'rejected'
       : 'pending_review'
 
-  await supabase.from('agent_runs').update({ status: runStatus, updated_at: new Date().toISOString() }).eq('id', runId)
+  const { error: runUpdateError } = await supabase
+    .from('agent_runs')
+    .update({ status: runStatus, updated_at: new Date().toISOString() })
+    .eq('id', runId)
+    .eq('organization_id', organizationId)
+
+  if (runUpdateError) {
+    console.error('[agents/review] unable to update run', runUpdateError.code)
+    return NextResponse.json({ error: 'Unable to update reviewed run', code: 'run_update_failed' }, { status: 500 })
+  }
+
   if (artifact?.id) {
     const artifactStatus = parsed.data.decision === 'approved'
       ? 'approved'
       : parsed.data.decision === 'rejected'
         ? 'rejected'
         : 'pending_review'
-    await supabase.from('agent_artifacts').update({ status: artifactStatus }).eq('id', artifact.id)
+    await supabase
+      .from('agent_artifacts')
+      .update({ status: artifactStatus })
+      .eq('id', artifact.id)
+      .eq('organization_id', organizationId)
   }
 
-  return NextResponse.json({ review, runId, status: runStatus })
+  const { data: workflowStage } = await supabase
+    .from('agent_workflow_stages')
+    .select('id, workflow_id, stage_index')
+    .eq('run_id', runId)
+    .eq('organization_id', organizationId)
+    .maybeSingle()
+
+  let workflowStatus: string | null = null
+  if (workflowStage) {
+    const stageStatus = parsed.data.decision === 'approved'
+      ? 'approved'
+      : parsed.data.decision === 'rejected'
+        ? 'failed'
+        : parsed.data.decision === 'changes_requested'
+          ? 'changes_requested'
+          : 'pending_review'
+
+    await supabase
+      .from('agent_workflow_stages')
+      .update({ status: stageStatus, updated_at: new Date().toISOString() })
+      .eq('id', workflowStage.id)
+      .eq('organization_id', organizationId)
+
+    const { data: workflow } = await supabase
+      .from('agent_workflows')
+      .select('id, current_stage, total_stages')
+      .eq('id', workflowStage.workflow_id)
+      .eq('organization_id', organizationId)
+      .maybeSingle()
+
+    if (workflow) {
+      const isCurrentStage = workflow.current_stage === workflowStage.stage_index
+      const isFinalStage = workflowStage.stage_index + 1 >= workflow.total_stages
+
+      if (parsed.data.decision === 'approved' && isCurrentStage) {
+        workflowStatus = isFinalStage ? 'completed' : 'running'
+        await supabase
+          .from('agent_workflows')
+          .update({
+            status: workflowStatus,
+            current_stage: isFinalStage ? workflowStage.stage_index : workflowStage.stage_index + 1,
+            completed_at: isFinalStage ? new Date().toISOString() : null,
+            error_code: null,
+            error_message: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', workflow.id)
+          .eq('organization_id', organizationId)
+      } else if (parsed.data.decision === 'changes_requested' || parsed.data.decision === 'rejected') {
+        workflowStatus = 'paused'
+        await supabase
+          .from('agent_workflows')
+          .update({
+            status: 'paused',
+            error_code: parsed.data.decision === 'rejected' ? 'human_rejected' : 'changes_requested',
+            error_message: parsed.data.comment || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', workflow.id)
+          .eq('organization_id', organizationId)
+      } else {
+        workflowStatus = 'pending_review'
+      }
+    }
+  }
+
+  return NextResponse.json({ review, runId, status: runStatus, workflowStatus })
 }
