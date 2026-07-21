@@ -1,271 +1,139 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, CheckCircle2, FileCheck2, Scale, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Users, Target, Zap, ArrowRight } from 'lucide-react'
 import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
-  title: 'Sobre KUMPLIO | Solución Compliance IA para Chile',
-  description: 'KUMPLIO es una plataforma IA para cumplimiento normativo. Conoce nuestra misión, valores y equipo de expertos en compliance y Ley 21.719.',
-  keywords: ['sobre KUMPLIO', 'equipo compliance', 'misión n3uralia', 'solución IA Chile', 'expertos cumplimiento'],
-  alternates: {
-    canonical: 'https://kumplio.cl/about',
+  title: 'Sobre KUMPLIO | Plataforma de cumplimiento continuo',
+  description:
+    'Conoce el enfoque de KUMPLIO para convertir obligaciones regulatorias, contractuales y de política interna en controles, evidencia y acciones verificables.',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'Sobre KUMPLIO | Cumplimiento continuo',
+    description:
+      'Una plataforma de n3uralia para estructurar obligaciones, controles, evidencia, hallazgos y planes de acción.',
+    url: '/about',
+    type: 'website',
   },
 }
 
+const principles = [
+  {
+    icon: Scale,
+    title: 'Trazabilidad',
+    description: 'Cada evaluación debe poder relacionarse con una fuente, un control, evidencia y una decisión responsable.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Revisión humana',
+    description: 'La asistencia mediante IA organiza y propone; las decisiones legales y de cumplimiento permanecen bajo supervisión profesional.',
+  },
+  {
+    icon: FileCheck2,
+    title: 'Evidencia operativa',
+    description: 'El cumplimiento se gestiona como trabajo recurrente, no como una declaración aislada o un diagnóstico estático.',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Aplicación gradual',
+    description: 'La plataforma permite comenzar con un marco prioritario y extender el mismo modelo a otras obligaciones y áreas operativas.',
+  },
+]
+
 export default function AboutPage() {
-  const values = [
-    {
-      icon: Target,
-      title: 'Precisión',
-      description: 'Análisis exacto de cumplimiento normativo con IA de última generación',
-    },
-    {
-      icon: Users,
-      title: 'Transparencia',
-      description: 'Procesos claros y explicables. Cada recomendación está justificada',
-    },
-    {
-      icon: Zap,
-      title: 'Eficiencia',
-      description: 'Automatización inteligente que reduce tiempo de auditoría en 80%',
-    },
-    {
-      icon: CheckCircle,
-      title: 'Confiabilidad',
-      description: 'Conforme con Ley 19.628, 21.719 y estándares internacionales',
-    },
-  ]
-
-  const team = [
-    {
-      name: 'Carlos Jara',
-      role: 'CEO & Founder',
-      expertise: 'Compliance, IA, Estrategia',
-    },
-    {
-      name: 'Equipo n3uralia',
-      role: 'CTO & Engineering',
-      expertise: 'Ingeniería, IA, Infraestructura',
-    },
-    {
-      name: 'Expertos Legal',
-      role: 'Legal Advisory',
-      expertise: 'Ley 21.719, Compliance, Regulación',
-    },
-    {
-      name: 'Especialistas UX',
-      role: 'Product & Design',
-      expertise: 'Producto, Diseño, Usuario',
-    },
-  ]
-
   return (
-    <main className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 sticky top-0 z-50 bg-background/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">K</span>
-            </div>
-            <span className="font-bold hidden sm:inline">KUMPLIO</span>
-          </Link>
-          <div className="flex gap-2">
-            <Button variant="ghost" asChild size="sm">
-              <Link href="/">Volver</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/sign-up">Comenzar</Link>
-            </Button>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Link href="/" className="font-bold">KUMPLIO</Link>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" asChild><Link href="/">Inicio</Link></Button>
+            <Button asChild><Link href="/sign-up">Evaluar cumplimiento</Link></Button>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/10 via-primary/5 to-background border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-              Compliance Inteligente para Chile
+      <main>
+        <section className="border-b border-border px-6 py-24 md:py-32">
+          <div className="mx-auto max-w-5xl">
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Sobre KUMPLIO</p>
+            <h1 className="max-w-4xl text-balance text-5xl font-black tracking-tight md:text-7xl">
+              Cumplimiento continuo con evidencia y responsabilidad humana.
             </h1>
-            <p className="text-xl text-muted-foreground text-pretty">
-              KUMPLIO utiliza IA para analizar cumplimiento normativo, 
-              detectar riesgos y ayudar empresas a cumplir con Ley 21.719 y normativas chilenas.
+            <p className="mt-7 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+              KUMPLIO es una plataforma desarrollada por n3uralia para estructurar obligaciones provenientes de regulaciones, contratos y políticas internas. El sistema ayuda a convertir esas obligaciones en controles, responsables, evidencia, hallazgos y planes de acción.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Misión y Visión */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <section className="border-b border-border bg-muted/30 px-6 py-20">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-4">Nuestra Misión</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Democratizar el acceso a análisis de cumplimiento normativo de clase mundial. 
-                Creemos que empresas de todos los tamaños merecen herramientas IA confiables 
-                para cumplir con regulaciones chilenas sin costos prohibitivos.
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Problema</p>
+              <h2 className="mt-3 text-4xl font-bold">La información regulatoria suele quedar separada de la operación.</h2>
+              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                Documentos, matrices, evidencias, responsables y acciones correctivas suelen administrarse en herramientas distintas. Esa fragmentación dificulta conocer qué obligación está cubierta, qué control debe revisarse y qué evidencia respalda una decisión.
               </p>
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-4">Nuestra Visión</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Ser la plataforma líder de compliance IA en Chile y Latinoamérica. 
-                Transformar cómo empresas gestionan riesgos normativos mediante inteligencia artificial 
-                que es accesible, confiable y eficiente.
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Enfoque</p>
+              <h2 className="mt-3 text-4xl font-bold">Una estructura común para gestionar distintos marcos.</h2>
+              <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                KUMPLIO utiliza un ciclo consistente: mapear obligaciones, asignar controles, vincular evidencia, registrar hallazgos, corregir brechas y preparar revisiones. La Ley 21.719 es un caso prioritario en Chile, pero la plataforma no se limita a una sola regulación.
               </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Valores */}
-      <section className="py-16 bg-muted border-y border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Nuestros Valores</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, idx) => {
-              const Icon = value.icon
-              return (
-                <div key={idx} className="text-center">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">{value.title}</h3>
-                  <p className="text-muted-foreground">{value.description}</p>
-                </div>
-              )
-            })}
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Principios</p>
+              <h2 className="text-4xl font-bold md:text-5xl">Cómo debe operar la plataforma</h2>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {principles.map(({ icon: Icon, title, description }) => (
+                <article key={title} className="rounded-xl border border-border bg-card p-6">
+                  <Icon className="h-7 w-7 text-primary" />
+                  <h3 className="mt-5 text-xl font-bold">{title}</h3>
+                  <p className="mt-3 leading-relaxed text-muted-foreground">{description}</p>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Historia */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-8">Nuestra Historia</h2>
-          <div className="space-y-6 text-muted-foreground leading-relaxed">
-            <p>
-              KUMPLIO nació de una necesidad real. Tras la promulgación de la Ley 21.719 sobre Consentimiento Informado,
-              miles de empresas chilenas enfrentaban un desafío: cómo cumplir con obligaciones complejas sin contratar 
-              consultores caros.
-            </p>
-            <p>
-              El equipo de n3uralia, con años de experiencia en ingeniería y compliance, decidió crear una solución diferente.
-              Una plataforma basada en IA que pudiera analizar documentos, identificar brechas de cumplimiento y proporcionar 
-              recomendaciones claras, todo en cuestión de minutos.
-            </p>
-            <p>
-              Comenzamos a trabajar con empresas piloto en sectores de transporte, minería y retail. Los resultados fueron 
-              impresionantes: 89% de reducción en tiempo de auditoría, 0 multas en empresas usando KUMPLIO, 100% de 
-              satisfacción en clientes iniciales.
-            </p>
-            <p>
-              Hoy, KUMPLIO ayuda a 50 empresas chilenas a cumplir normativas. Nuestro objetivo para 2026 es 
-              expandir a toda Latinoamérica con soluciones multi-país.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Equipo */}
-      <section className="py-16 bg-muted border-y border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Nuestro Equipo</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, idx) => (
-              <div key={idx} className="bg-card border border-border rounded-lg p-6 text-center hover:shadow-lg transition">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/60 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </span>
-                </div>
-                <h3 className="font-bold text-foreground mb-1">{member.name}</h3>
-                <p className="text-sm text-primary font-medium mb-2">{member.role}</p>
-                <p className="text-xs text-muted-foreground">{member.expertise}</p>
+        <section className="border-y border-border bg-muted/30 px-6 py-20">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-4xl font-bold">Alcance y límites</h2>
+            <div className="mt-8 grid gap-5 md:grid-cols-2">
+              <div className="rounded-xl border border-border bg-card p-6">
+                <h3 className="font-bold">KUMPLIO ayuda a</h3>
+                <p className="mt-3 text-muted-foreground">Organizar información, proponer estructuras de control, relacionar evidencia y mantener trazabilidad del trabajo de cumplimiento.</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Hitos */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-12">Nuestros Hitos</h2>
-          <div className="space-y-6">
-            {[
-              { year: '2023', title: 'Lanzamiento KUMPLIO', desc: 'Primera versión en producción con análisis de Ley 21.719' },
-              { year: '2024 Q1', title: '50 Empresas', desc: 'Alcanzamos 50 empresas activas en Chile' },
-              { year: '2024 Q2', title: 'Vera AI Launch', desc: 'Lanzamos asistente IA Vera disponible 24/7' },
-              { year: '2024 Q3', title: 'Expansión Regional', desc: 'Plan de expansión a Colombia y Perú (in progress)' },
-            ].map((milestone, idx) => (
-              <div key={idx} className="flex gap-6 pb-6 border-b border-border last:border-0">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="font-bold text-primary text-sm">{milestone.year}</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-foreground mb-1">{milestone.title}</h3>
-                  <p className="text-muted-foreground">{milestone.desc}</p>
-                </div>
+              <div className="rounded-xl border border-border bg-card p-6">
+                <h3 className="font-bold">KUMPLIO no reemplaza</h3>
+                <p className="mt-3 text-muted-foreground">La asesoría jurídica, la auditoría independiente ni la decisión profesional de responsables legales, de riesgo o cumplimiento.</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Estadísticas */}
-      <section className="py-16 bg-gradient-to-r from-primary/5 to-primary/10 border-y border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
-              <p className="text-muted-foreground">Empresas Activas</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">$2.5B+</div>
-              <p className="text-muted-foreground">En Riesgos Identificados</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">89%</div>
-              <p className="text-muted-foreground">Reducción Tiempo Auditoría</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-primary mb-2">0</div>
-              <p className="text-muted-foreground">Multas Clientes KUMPLIO</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA */}
-      <section className="py-16 border-t border-border/50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4 text-balance">¿Listo para Cumplir?</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Únete a cientos de empresas chilenas que confían en KUMPLIO para cumplimiento normativo
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link href="/sign-up">Comenzar Ahora</Link>
-            </Button>
-            <Button variant="outline" asChild size="lg">
-              <Link href="/contact" className="flex items-center gap-2">
-                Contactar Equipo
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-4xl rounded-2xl border border-primary/30 bg-card p-10 text-center md:p-14">
+            <h2 className="text-4xl font-bold">Convierte un marco regulatorio en trabajo verificable.</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
+              Comienza con un diagnóstico y conserva obligaciones, controles, evidencia y acciones dentro de un mismo espacio de trabajo.
+            </p>
+            <Button size="lg" asChild className="mt-8">
+              <Link href="/sign-up">Evaluar cumplimiento <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
-    </main>
+    </div>
   )
 }

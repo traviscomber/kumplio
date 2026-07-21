@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  typescript: { ignoreBuildErrors: true },
   images: {
     unoptimized: false,
     formats: ['image/avif', 'image/webp'],
@@ -11,70 +9,72 @@ const nextConfig = {
     maxInactiveAge: 60 * 60 * 1000,
     pagesBufferLength: 5,
   },
-  experimental: {
-    // Keep minimal experimental options
-  },
   staticPageGenerationTimeout: 120,
-  // Allow HMR from Vercel Sandbox environment
   allowedDevOrigins: [
     'vm-78e3ge8hc20jbvfj4sutbj03.vusercontent.net',
     'localhost:3000',
     '127.0.0.1:3000',
   ],
-  headers: async () => {
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.kumplio.app' }],
+        destination: 'https://kumplio.app/:path*',
+        permanent: true,
+      },
+    ]
+  },
+  async headers() {
+    const privateRoutes = [
+      '/dashboard/:path*',
+      '/documents/:path*',
+      '/obligations/:path*',
+      '/controls/:path*',
+      '/evidence/:path*',
+      '/findings/:path*',
+      '/risks/:path*',
+      '/roadmaps/:path*',
+      '/projects/:path*',
+      '/sales-kit/:path*',
+    ]
+
     return [
       {
         source: '/:path*',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
-      // Sitemap cache headers for Google
+      ...privateRoutes.map((source) => ({
+        source,
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
+      })),
       {
         source: '/sitemap.xml',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=21600, stale-while-revalidate=43200',
-          },
-          {
-            key: 'Content-Type',
-            value: 'application/xml; charset=utf-8',
-          },
+          { key: 'Cache-Control', value: 'public, s-maxage=21600, stale-while-revalidate=43200' },
+          { key: 'Content-Type', value: 'application/xml; charset=utf-8' },
         ],
       },
-      // robots.txt cache headers
       {
         source: '/robots.txt',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=21600, stale-while-revalidate=43200',
-          },
-          {
-            key: 'Content-Type',
-            value: 'text/plain; charset=utf-8',
-          },
+          { key: 'Cache-Control', value: 'public, s-maxage=21600, stale-while-revalidate=43200' },
+          { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
         ],
+      },
+      {
+        source: '/llms.txt',
+        headers: [{ key: 'Content-Type', value: 'text/plain; charset=utf-8' }],
       },
     ]
   },
-  // Compression for faster delivery
   compress: true,
 }
 

@@ -1,198 +1,124 @@
 import type { Metadata } from 'next'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, BookOpen, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowRight, BookOpen, FileCheck2, Scale, ShieldCheck } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
-  title: 'Blog: Cumplimiento Normativo Chile | Ley 21.719 | KUMPLIO',
-  description: 'Artículos y guías sobre cumplimiento normativo en Chile, Ley 21.719, protección de datos y regulaciones empresariales. Recursos para tu cumplimiento legal.',
-  keywords: [
-    'Blog cumplimiento',
-    'Ley 21.719 artículos',
-    'Regulaciones Chile',
-    'Guías normativas',
-    'Cumplimiento empresarial',
-  ],
-  alternates: {
-    canonical: 'https://kumplio.app/resources/cumplimiento-normativo',
+  title: 'Recursos de cumplimiento normativo | KUMPLIO',
+  description:
+    'Recursos públicos de KUMPLIO sobre cumplimiento continuo, evidencia auditable y preparación para la Ley 21.719 en Chile.',
+  alternates: { canonical: '/resources/cumplimiento-normativo' },
+  openGraph: {
+    title: 'Recursos de cumplimiento normativo | KUMPLIO',
+    description:
+      'Guías públicas sobre obligaciones, controles, evidencia y preparación regulatoria en Chile.',
+    url: '/resources/cumplimiento-normativo',
+    type: 'website',
   },
 }
 
-const articles = [
+const resources = [
   {
-    slug: 'ley-21719-guia-practica',
-    title: 'Ley 21.719: Guía Práctica para Empresas Chilenas',
-    excerpt: 'Todo lo que necesitas saber sobre la Ley 21.719 de protección de datos. Obligaciones, plazos y cómo preparar tu empresa para cumplimiento.',
-    date: '2024-01-15',
-    readTime: '12 min',
-    category: 'Regulación',
+    icon: ShieldCheck,
+    title: 'Ley 21.719: preparación para diciembre de 2026',
+    description:
+      'Resumen práctico de las áreas que una organización debe revisar: gobernanza, bases de licitud, derechos, seguridad, privacidad por diseño y evidencia.',
+    href: '/features/ley-21719',
+    label: 'Ver guía de la Ley 21.719',
   },
   {
-    slug: 'matriz-cumplimiento-documentos',
-    title: '5 Pasos para Crear una Matriz de Cumplimiento Efectiva',
-    excerpt: 'Aprende cómo estructurar tus obligaciones normativas en una matriz ejecutiva. Incluye plantilla descargable.',
-    date: '2024-01-12',
-    readTime: '8 min',
-    category: 'Estrategia',
+    icon: FileCheck2,
+    title: 'Del requisito a la evidencia',
+    description:
+      'Conoce el modelo operativo de KUMPLIO para relacionar una obligación con controles, responsables, documentos, hallazgos y acciones correctivas.',
+    href: '/#flujo',
+    label: 'Ver cómo funciona',
   },
   {
-    slug: 'riesgos-cumplimiento-normativo',
-    title: 'Riesgos de No Cumplir con Ley 21.719 en Chile',
-    excerpt: 'Análisis de multas, sanciones y consecuencias legales por incumplimiento de regulaciones de datos.',
-    date: '2024-01-10',
-    readTime: '10 min',
-    category: 'Riesgos',
-  },
-  {
-    slug: 'seguridad-datos-documentos',
-    title: 'Cómo Automatizar el Análisis de Cumplimiento de Documentos',
-    excerpt: 'Reduce tiempo de auditoría de 40 horas a 2 horas. Inteligencia documental para compliance automatizado.',
-    date: '2024-01-08',
-    readTime: '7 min',
-    category: 'Tecnología',
-  },
-  {
-    slug: 'obligaciones-proteccion-datos',
-    title: 'Tus Obligaciones en Protección de Datos: Checklist Completo',
-    excerpt: 'Lista exhaustiva de 15 obligaciones por Ley 21.719. Verifica si tu empresa cumple todas.',
-    date: '2024-01-05',
-    readTime: '15 min',
-    category: 'Compliance',
-  },
-  {
-    slug: 'inteligencia-documental-compliance',
-    title: 'Inteligencia Documental: El Futuro del Cumplimiento Normativo',
-    excerpt: 'Cómo la IA y análisis automático de documentos revolucionan la gestión de cumplimiento.',
-    date: '2024-01-02',
-    readTime: '9 min',
-    category: 'Innovación',
+    icon: Scale,
+    title: 'Alcance de la plataforma',
+    description:
+      'Revisa el enfoque, los principios de trazabilidad y revisión humana, y los límites de la asistencia mediante inteligencia artificial.',
+    href: '/about',
+    label: 'Conocer KUMPLIO',
   },
 ]
 
-export default function BlogPage() {
+export default function ComplianceResourcesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b border-border/50 sticky top-0 z-50 bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">K</span>
-            </div>
-            <span className="font-bold text-base">KUMPLIO</span>
-          </Link>
-          <div className="hidden md:flex gap-3">
-            <Button variant="ghost" asChild className="text-sm">
-              <Link href="/">Volver</Link>
-            </Button>
-            <Button asChild className="text-sm">
-              <Link href="/sign-up">Comenzar</Link>
-            </Button>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Link href="/" className="font-bold">KUMPLIO</Link>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" asChild><Link href="/">Inicio</Link></Button>
+            <Button asChild><Link href="/sign-up">Evaluar cumplimiento</Link></Button>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="container mx-auto px-6 py-24">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <BookOpen className="w-12 h-12 text-primary" />
+      <main>
+        <section className="border-b border-border px-6 py-24 md:py-32">
+          <div className="mx-auto max-w-5xl text-center">
+            <BookOpen className="mx-auto h-12 w-12 text-primary" />
+            <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Centro de recursos</p>
+            <h1 className="mt-3 text-balance text-5xl font-black tracking-tight md:text-7xl">
+              Información pública para convertir requisitos en trabajo verificable.
+            </h1>
+            <p className="mx-auto mt-7 max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+              Esta sección reúne únicamente recursos publicados y mantenidos por KUMPLIO. No se presentan artículos ficticios, métricas comerciales ni contenido pendiente como si estuviera disponible.
+            </p>
           </div>
-          
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Centro de Recursos de Cumplimiento
-          </h1>
-          
-          <p className="text-xl text-muted-foreground mb-8">
-            Guías, artículos y estrategias para cumplir con Ley 21.719 y regulaciones normativas en Chile.
-          </p>
-        </div>
-      </section>
+        </section>
 
-      {/* Featured Article */}
-      <section className="container mx-auto px-6 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-primary/5 border border-primary/20 rounded-lg overflow-hidden hover:border-primary/50 transition">
-            <Link href={`/resources/${articles[0].slug}`} className="block">
-              <div className="p-8">
-                <div className="flex flex-wrap gap-3 mb-4">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                    {articles[0].category}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(articles[0].date).toLocaleDateString('es-CL')}
-                  </span>
-                  <span className="text-sm text-muted-foreground">{articles[0].readTime}</span>
-                </div>
-                <h2 className="text-3xl font-bold mb-3 hover:text-primary transition">{articles[0].title}</h2>
-                <p className="text-lg text-muted-foreground">{articles[0].excerpt}</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Articles Grid */}
-      <section className="container mx-auto px-6 py-24 border-t border-border/50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12">Últimos Artículos</h2>
-          
-          <div className="space-y-6">
-            {articles.slice(1).map((article) => (
-              <Link 
-                key={article.slug}
-                href={`/resources/${article.slug}`}
-                className="block border border-border/50 rounded-lg p-6 hover:border-primary/30 hover:bg-primary/5 transition group"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary">
-                        {article.category}
-                      </span>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(article.date).toLocaleDateString('es-CL')}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition">
-                      {article.title}
-                    </h3>
-                    
-                    <p className="text-muted-foreground mb-3">{article.excerpt}</p>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
-                    <span>{article.readTime}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" />
-                  </div>
-                </div>
-              </Link>
+        <section className="px-6 py-24">
+          <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-3">
+            {resources.map(({ icon: Icon, title, description, href, label }) => (
+              <article key={title} className="flex flex-col rounded-2xl border border-border bg-card p-7">
+                <Icon className="h-8 w-8 text-primary" />
+                <h2 className="mt-6 text-2xl font-bold">{title}</h2>
+                <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">{description}</p>
+                <Button variant="outline" asChild className="mt-7 justify-between">
+                  <Link href={href}>{label}<ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+              </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Newsletter CTA */}
-      <section className="container mx-auto px-6 py-24 border-t border-border/50">
-        <div className="max-w-2xl mx-auto bg-primary/5 border border-primary/20 rounded-lg p-12 text-center">
-          <h2 className="text-3xl font-bold mb-4">Mantente Actualizado</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Recibe guías sobre cumplimiento normativo en tu email. Solo lo que importa.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input 
-              type="email" 
-              placeholder="tu@email.com"
-              className="flex-1 px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground"
-            />
-            <Button>Suscribirse</Button>
+        <section className="border-y border-border bg-muted/30 px-6 py-20">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-4xl font-bold">Criterios editoriales</h2>
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              <div className="rounded-xl border border-border bg-card p-5">
+                <h3 className="font-bold">Fuentes identificables</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Las afirmaciones regulatorias deben poder relacionarse con fuentes oficiales o referencias claramente indicadas.</p>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <h3 className="font-bold">Sin resultados inventados</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">No se publican ratings, ahorros, clientes, porcentajes ni casos de éxito sin respaldo verificable.</p>
+              </div>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <h3 className="font-bold">Revisión humana</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">El contenido informativo no reemplaza asesoría jurídica ni una evaluación profesional del caso concreto.</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-4xl rounded-2xl border border-primary/30 bg-card p-10 text-center md:p-14">
+            <h2 className="text-4xl font-bold">¿Necesitas estructurar un marco específico?</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
+              Inicia un diagnóstico y organiza obligaciones, controles, evidencia y acciones dentro de un espacio de trabajo.
+            </p>
+            <Button size="lg" asChild className="mt-8">
+              <Link href="/sign-up">Comenzar evaluación <ArrowRight className="ml-2 h-5 w-5" /></Link>
+            </Button>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

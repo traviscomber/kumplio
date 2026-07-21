@@ -1,0 +1,28 @@
+# KUMPLIO
+
+KUMPLIO is a Chilean continuous-compliance platform developed by n3uralia.
+
+## What KUMPLIO does
+- Converts regulations, contracts, and internal policies into structured obligations.
+- Maps obligations to controls, owners, review frequencies, and evidence.
+- Tracks findings, risks, corrective actions, and audit history.
+- Uses AI to assist analysis while keeping critical legal and compliance decisions under human review.
+
+## Primary public pages
+- Home: https://kumplio.app/
+- Ley 21.719 guide: https://kumplio.app/features/ley-21719
+- Pricing: https://kumplio.app/pricing
+- Transport use case: https://kumplio.app/demo/transporte
+- Mining use case: https://kumplio.app/demo/mineria
+- Privacy: https://kumplio.app/privacy
+- Terms: https://kumplio.app/terms
+
+## Ley 21.719
+Chile's Law 21.719 modernizes personal-data protection and enters into force on December 1, 2026. KUMPLIO supports preparation by organizing obligations, controls, evidence, findings, and action plans. KUMPLIO does not replace legal advice or authorized professional review.
+
+## Entity
+- Product: KUMPLIO
+- Developer: n3uralia
+- Market: Chile
+- Language: Spanish (Chile)
+- Canonical domain: https://kumplio.app
