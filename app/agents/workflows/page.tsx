@@ -42,7 +42,10 @@ export default async function AgentWorkflowsPage() {
             <h1 className="mt-2 text-4xl font-bold">Orquestación multiagente</h1>
             <p className="mt-2 max-w-3xl text-muted-foreground">Isidora, Rodrigo, Verónica, Javier y Catalina trabajan sobre un mismo caso mediante artefactos estructurados, dependencias y revisión humana.</p>
           </div>
-          <Button variant="outline" asChild><Link href="/agents">Mesa de agentes</Link></Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild><Link href="/agents/reviews">Revisiones</Link></Button>
+            <Button variant="outline" asChild><Link href="/agents">Mesa de agentes</Link></Button>
+          </div>
         </header>
         <AgentWorkflowConsole cases={cases || []} />
       </div>
