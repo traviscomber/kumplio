@@ -1,57 +1,36 @@
-# Google Crawlers - Aggressive indexing for fast discovery
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-Request-rate: 100/1s
-
-# Bing Crawlers
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 0.5
-Request-rate: 50/1s
-
-# Yahoo Crawlers
-User-agent: Slurp
-Allow: /
-Crawl-delay: 1
-
-# DuckDuckGo
-User-agent: DuckDuckBot
-Allow: /
-Crawl-delay: 1
-
-# Yandex
-User-agent: YandexBot
-Allow: /
-Crawl-delay: 1
-
-# Default for all other crawlers
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /admin/*
-Disallow: /dashboard/*
-Disallow: /.well-known/pki-validation/
-Disallow: /.git/
-Disallow: /node_modules/
-Crawl-delay: 1
+Disallow: /dashboard/
+Disallow: /documents/
+Disallow: /obligations/
+Disallow: /controls/
+Disallow: /evidence/
+Disallow: /findings/
+Disallow: /risks/
+Disallow: /roadmaps/
+Disallow: /projects/
+Disallow: /sales-kit/
 
-# Multiple Sitemaps for comprehensive coverage
-Sitemap: https://kumplio.app/sitemap.xml
-Sitemap: https://kumplio.app/sitemap-main.xml
-Sitemap: https://kumplio.app/sitemap-industries.xml
-Sitemap: https://kumplio.app/sitemap-regions.xml
-
-# Critical Pages - Always Index
+User-agent: GPTBot
 Allow: /
-Allow: /pricing
-Allow: /features/
-Allow: /resources/
-Allow: /contact
-Allow: /about
-Allow: /privacy
-Allow: /terms
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /documents/
+Disallow: /sales-kit/
 
-# Performance: Set max-snippet for fast display
-# max-snippet: -1 (unlimited)
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /documents/
+Disallow: /sales-kit/
 
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /documents/
+Disallow: /sales-kit/
+
+Sitemap: https://kumplio.app/sitemap.xml
