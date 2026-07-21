@@ -31,6 +31,9 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   if (!workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
   if (['completed', 'cancelled'].includes(workflow.status)) return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
+  if (workflow.status === 'pending_review') {
+    return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
+  }
 
   const stageDefinition = getWorkflowStage(workflow.current_stage)
   if (!stageDefinition) return NextResponse.json({ error: 'Workflow stage definition not found' }, { status: 409 })
@@ -44,6 +47,9 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   if (!stage) return NextResponse.json({ error: 'Workflow stage not found' }, { status: 404 })
   if (stage.status === 'running') return NextResponse.json({ error: 'Stage is already running' }, { status: 409 })
+  if (['pending_review', 'approved'].includes(stage.status)) {
+    return NextResponse.json({ error: 'This stage has already produced a result', code: 'stage_already_completed' }, { status: 409 })
+  }
   if (stage.attempt_count >= stage.max_attempts) return NextResponse.json({ error: 'Maximum retry count reached' }, { status: 409 })
 
   const { data: priorStages } = await supabase
@@ -55,9 +61,11 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   const unmet = stageDefinition.dependsOn.filter((index) => {
     const dependency = priorStages?.find((item) => item.stage_index === index)
-    return !dependency || !['pending_review', 'approved'].includes(dependency.status)
+    return !dependency || dependency.status !== 'approved'
   })
-  if (unmet.length) return NextResponse.json({ error: 'Workflow dependencies are not satisfied', unmet }, { status: 409 })
+  if (unmet.length) {
+    return NextResponse.json({ error: 'Approved workflow dependencies are required', code: 'dependency_approval_required', unmet }, { status: 409 })
+  }
 
   const artifactIds = (priorStages || []).map((item) => item.output_artifact_id).filter(Boolean)
   const { data: artifacts } = artifactIds.length
@@ -193,10 +201,10 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       updated_at: new Date().toISOString(),
     }).eq('id', stage.id)
     await supabase.from('agent_workflows').update({
-      status: isFinal ? 'pending_review' : 'running',
+      status: 'pending_review',
       current_stage: isFinal ? stage.stage_index : nextStage,
       final_payload: isFinal ? result.output : null,
-      completed_at: isFinal ? new Date().toISOString() : null,
+      completed_at: null,
       updated_at: new Date().toISOString(),
     }).eq('id', workflow.id)
 
