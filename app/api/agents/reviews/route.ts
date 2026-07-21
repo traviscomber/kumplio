@@ -48,34 +48,56 @@ export async function GET(req: NextRequest) {
   }
 
   const runIds = (runs || []).map((run) => run.id)
-  const [{ data: artifacts }, { data: stages }, { data: reviews }] = await Promise.all([
+  const [artifactResult, stageResult, reviewResult] = await Promise.all([
     runIds.length
       ? supabase
           .from('agent_artifacts')
-          .select('id, run_id, title, artifact_type, version, content, source_refs, status, created_at')
+          .select('id, run_id, title, artifact_type, lineage_id, version, supersedes_artifact_id, content_hash, integrity_version, content, source_refs, status, created_at')
           .in('run_id', runIds)
           .order('version', { ascending: false })
-      : Promise.resolve({ data: [] as any[] }),
+      : Promise.resolve({ data: [] as any[], error: null }),
     runIds.length
       ? supabase
           .from('agent_workflow_stages')
           .select('id, workflow_id, stage_index, agent_id, status, run_id, updated_at, agent_workflows(id, status, current_stage, total_stages)')
           .in('run_id', runIds)
-      : Promise.resolve({ data: [] as any[] }),
+      : Promise.resolve({ data: [] as any[], error: null }),
     runIds.length
       ? supabase
           .from('agent_reviews')
-          .select('id, run_id, reviewer_id, decision, comment, checklist, created_at')
+          .select('id, run_id, reviewer_id, decision, comment, checklist, previous_review_id, decision_hash, integrity_version, signed_at, reviewer_snapshot, created_at')
           .in('run_id', runIds)
           .order('created_at', { ascending: false })
-      : Promise.resolve({ data: [] as any[] }),
+      : Promise.resolve({ data: [] as any[], error: null }),
   ])
 
+  const integrityError = artifactResult.error || reviewResult.error
+  if (integrityError) {
+    const migrationPending = integrityError.code === '42703'
+      || integrityError.code === 'PGRST204'
+      || integrityError.message?.includes('content_hash')
+      || integrityError.message?.includes('decision_hash')
+    return NextResponse.json(
+      {
+        error: migrationPending ? 'Artifact integrity migration is required' : 'Unable to load integrity metadata',
+        code: migrationPending ? 'artifact_integrity_not_ready' : 'integrity_metadata_load_failed',
+      },
+      { status: migrationPending ? 503 : 500 },
+    )
+  }
+
+  if (stageResult.error) {
+    return NextResponse.json({ error: 'Unable to load workflow review metadata', code: 'workflow_review_load_failed' }, { status: 500 })
+  }
+
+  const artifacts = artifactResult.data || []
+  const stages = stageResult.data || []
+  const reviews = reviewResult.data || []
   const items = (runs || []).map((run) => ({
     ...run,
-    artifact: (artifacts || []).find((artifact) => artifact.run_id === run.id) || null,
-    workflowStage: (stages || []).find((stage) => stage.run_id === run.id) || null,
-    reviews: (reviews || []).filter((review) => review.run_id === run.id),
+    artifact: artifacts.find((artifact) => artifact.run_id === run.id) || null,
+    workflowStage: stages.find((stage) => stage.run_id === run.id) || null,
+    reviews: reviews.filter((review) => review.run_id === run.id),
   }))
 
   return NextResponse.json({ items })
