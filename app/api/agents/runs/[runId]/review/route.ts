@@ -156,6 +156,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
         .from('agent_workflows')
         .update({
           status: workflowStatus,
+          current_stage: workflowStatus === 'paused' ? workflowStage.stage_index : workflow.current_stage,
           completed_at: workflowStatus === 'completed' ? new Date().toISOString() : null,
           updated_at: new Date().toISOString(),
         })
