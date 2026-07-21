@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { runAgent } from '@/lib/agents/openai-runtime'
 import { getWorkflowStage, serializeWorkflowContext } from '@/lib/agents/orchestration'
@@ -8,6 +9,10 @@ export const maxDuration = 300
 
 export async function POST(_req: NextRequest, context: { params: Promise<{ workflowId: string }> }) {
   const { workflowId } = await context.params
+  if (!z.string().uuid().safeParse(workflowId).success) {
+    return NextResponse.json({ error: 'Invalid workflow id', code: 'invalid_workflow_id' }, { status: 400 })
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -29,7 +34,9 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
     .maybeSingle()
 
   if (!workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
-  if (['completed', 'cancelled'].includes(workflow.status)) return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
+  if (['completed', 'cancelled', 'pending_review'].includes(workflow.status)) {
+    return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
+  }
 
   const stageDefinition = getWorkflowStage(workflow.current_stage)
   if (!stageDefinition) return NextResponse.json({ error: 'Workflow stage definition not found' }, { status: 409 })
@@ -43,6 +50,12 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   if (!stage) return NextResponse.json({ error: 'Workflow stage not found' }, { status: 404 })
   if (stage.status === 'running') return NextResponse.json({ error: 'Stage is already running' }, { status: 409 })
+  if (stage.status === 'pending_review') {
+    return NextResponse.json({ error: 'Stage requires human review before the workflow can continue' }, { status: 409 })
+  }
+  if (stage.status === 'approved') {
+    return NextResponse.json({ error: 'Approved stage is no longer the active workflow stage' }, { status: 409 })
+  }
   if (stage.attempt_count >= stage.max_attempts) return NextResponse.json({ error: 'Maximum retry count reached' }, { status: 409 })
 
   const { data: priorStages } = await supabase
@@ -54,14 +67,19 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   const unmet = stageDefinition.dependsOn.filter((index) => {
     const dependency = priorStages?.find((item) => item.stage_index === index)
-    return !dependency || !['pending_review', 'approved'].includes(dependency.status)
+    return !dependency || dependency.status !== 'approved'
   })
-  if (unmet.length) return NextResponse.json({ error: 'Workflow dependencies are not satisfied', unmet }, { status: 409 })
+  if (unmet.length) {
+    return NextResponse.json({ error: 'Workflow dependencies require human approval', unmet }, { status: 409 })
+  }
 
-  const artifactIds = (priorStages || []).map((item) => item.output_artifact_id).filter(Boolean)
+  const artifactIds = (priorStages || [])
+    .filter((item) => item.status === 'approved')
+    .map((item) => item.output_artifact_id)
+    .filter((id): id is string => Boolean(id))
   const { data: artifacts } = artifactIds.length
     ? await supabase.from('agent_artifacts').select('id, artifact_type, title, content, status').in('id', artifactIds)
-    : { data: [] as any[] }
+    : { data: [] as Array<{ id: string; artifact_type: string; title: string; content: unknown; status: string }> }
 
   const caseRecord = Array.isArray(workflow.compliance_cases) ? workflow.compliance_cases[0] : workflow.compliance_cases
   const workflowContext = serializeWorkflowContext({
@@ -78,19 +96,34 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   const attempt = stage.attempt_count + 1
   const startedAt = Date.now()
-  await supabase.from('agent_workflow_stages').update({
-    status: 'running',
-    attempt_count: attempt,
-    source_artifact_ids: artifactIds,
-    context_snapshot: { ...stage.context_snapshot, artifactIds, attempt },
-    started_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq('id', stage.id)
+  const { data: claimedStage, error: claimError } = await supabase
+    .from('agent_workflow_stages')
+    .update({
+      status: 'running',
+      attempt_count: attempt,
+      source_artifact_ids: artifactIds,
+      context_snapshot: { ...stage.context_snapshot, artifactIds, attempt },
+      started_at: new Date().toISOString(),
+      completed_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', stage.id)
+    .eq('organization_id', organizationId)
+    .neq('status', 'running')
+    .select('id')
+    .maybeSingle()
+
+  if (claimError || !claimedStage) {
+    return NextResponse.json({ error: 'Stage could not be claimed for execution' }, { status: 409 })
+  }
+
   await supabase.from('agent_workflows').update({
     status: 'running',
     started_at: workflow.status === 'draft' ? new Date().toISOString() : undefined,
+    error_code: null,
+    error_message: null,
     updated_at: new Date().toISOString(),
-  }).eq('id', workflow.id)
+  }).eq('id', workflow.id).eq('organization_id', organizationId)
 
   const { data: run, error: runError } = await supabase.from('agent_runs').insert({
     organization_id: organizationId,
@@ -106,6 +139,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
   if (runError || !run) {
     await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
+    await supabase.from('agent_workflows').update({ status: 'failed', error_code: 'run_create_failed', updated_at: new Date().toISOString() }).eq('id', workflow.id)
     return NextResponse.json({ error: 'Unable to create stage run' }, { status: 500 })
   }
 
@@ -150,8 +184,6 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
 
     if (artifactError || !artifact) throw new Error('artifact_creation_failed')
 
-    const nextStage = stage.stage_index + 1
-    const isFinal = nextStage >= workflow.total_stages
     await supabase.from('agent_workflow_stages').update({
       status: 'pending_review',
       output_artifact_id: artifact.id,
@@ -159,14 +191,24 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ workf
       updated_at: new Date().toISOString(),
     }).eq('id', stage.id)
     await supabase.from('agent_workflows').update({
-      status: isFinal ? 'pending_review' : 'running',
-      current_stage: isFinal ? stage.stage_index : nextStage,
-      final_payload: isFinal ? result.output : null,
-      completed_at: isFinal ? new Date().toISOString() : null,
+      status: 'pending_review',
+      current_stage: stage.stage_index,
+      final_payload: stage.stage_index + 1 >= workflow.total_stages ? result.output : null,
+      completed_at: null,
       updated_at: new Date().toISOString(),
     }).eq('id', workflow.id)
 
-    return NextResponse.json({ workflowId: workflow.id, stageIndex: stage.stage_index, runId: run.id, artifactId: artifact.id, status: 'pending_review', isFinal, result, elapsedMs })
+    return NextResponse.json({
+      workflowId: workflow.id,
+      stageIndex: stage.stage_index,
+      runId: run.id,
+      artifactId: artifact.id,
+      status: 'pending_review',
+      requiresReview: true,
+      isFinalStage: stage.stage_index + 1 >= workflow.total_stages,
+      result,
+      elapsedMs,
+    })
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
     await supabase.from('agent_runs').update({
