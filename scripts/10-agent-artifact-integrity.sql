@@ -74,7 +74,7 @@ begin
     new.version := previous_artifact.version + 1;
   else
     new.lineage_id := coalesce(new.lineage_id, new.id);
-    new.version := coalesce(new.version, 1);
+    new.version := 1;
   end if;
 
   new.content_hash := encode(digest(new.content::text, 'sha256'), 'hex');
@@ -85,7 +85,7 @@ $$;
 
 revoke all on function public.prepare_agent_artifact_integrity() from public;
 
- drop trigger if exists agent_artifact_integrity_guard on public.agent_artifacts;
+drop trigger if exists agent_artifact_integrity_guard on public.agent_artifacts;
 create trigger agent_artifact_integrity_guard
 before insert or update on public.agent_artifacts
 for each row execute function public.prepare_agent_artifact_integrity();
@@ -140,6 +140,98 @@ create index if not exists agent_reviews_previous_idx
 create index if not exists agent_reviews_signed_at_idx
   on public.agent_reviews(organization_id, signed_at desc);
 
+create or replace function public.prepare_agent_review_integrity()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public, pg_temp
+as $$
+declare
+  actor_id uuid := (select auth.uid());
+  run_record public.agent_runs%rowtype;
+  artifact_record public.agent_artifacts%rowtype;
+  previous_review public.agent_reviews%rowtype;
+  signed_timestamp timestamptz := clock_timestamp();
+  hash_payload jsonb;
+begin
+  if actor_id is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if new.decision not in ('approved', 'rejected', 'changes_requested', 'commented') then
+    raise exception 'Invalid review decision';
+  end if;
+
+  select * into run_record
+  from public.agent_runs
+  where id = new.run_id;
+
+  if not found then
+    raise exception 'Agent run not found';
+  end if;
+
+  if new.artifact_id is not null then
+    select * into artifact_record
+    from public.agent_artifacts
+    where id = new.artifact_id
+      and run_id = new.run_id
+      and organization_id = run_record.organization_id;
+
+    if not found then
+      raise exception 'Artifact does not belong to this run';
+    end if;
+  end if;
+
+  perform pg_advisory_xact_lock(hashtextextended(new.run_id::text, 0));
+
+  select * into previous_review
+  from public.agent_reviews
+  where run_id = new.run_id
+  order by created_at desc, id desc
+  limit 1;
+
+  new.organization_id := run_record.organization_id;
+  new.case_id := run_record.case_id;
+  new.reviewer_id := actor_id;
+  new.previous_review_id := previous_review.id;
+  new.signed_at := signed_timestamp;
+  new.created_at := signed_timestamp;
+  new.integrity_version := 'sha256-chain-v1';
+  new.reviewer_snapshot := jsonb_build_object(
+    'reviewerId', actor_id,
+    'sessionId', (select auth.jwt() ->> 'session_id'),
+    'authenticated', true,
+    'signedAt', signed_timestamp
+  );
+
+  hash_payload := jsonb_build_object(
+    'id', new.id,
+    'organizationId', new.organization_id,
+    'caseId', new.case_id,
+    'runId', new.run_id,
+    'artifactId', new.artifact_id,
+    'artifactHash', case when new.artifact_id is null then null else artifact_record.content_hash end,
+    'reviewerId', new.reviewer_id,
+    'decision', new.decision,
+    'comment', new.comment,
+    'checklist', coalesce(new.checklist, '{}'::jsonb),
+    'previousReviewId', new.previous_review_id,
+    'previousDecisionHash', previous_review.decision_hash,
+    'signedAt', new.signed_at
+  );
+
+  new.decision_hash := encode(digest(hash_payload::text, 'sha256'), 'hex');
+  return new;
+end;
+$$;
+
+revoke all on function public.prepare_agent_review_integrity() from public;
+
+drop trigger if exists agent_review_integrity_guard on public.agent_reviews;
+create trigger agent_review_integrity_guard
+before insert on public.agent_reviews
+for each row execute function public.prepare_agent_review_integrity();
+
 create or replace function public.prevent_agent_review_mutation()
 returns trigger
 language plpgsql
@@ -173,19 +265,10 @@ as $$
 declare
   actor_id uuid := (select auth.uid());
   run_record public.agent_runs%rowtype;
-  artifact_record public.agent_artifacts%rowtype;
-  previous_review public.agent_reviews%rowtype;
   inserted_review public.agent_reviews%rowtype;
-  signed_timestamp timestamptz := clock_timestamp();
-  actor_snapshot jsonb;
-  hash_payload jsonb;
 begin
   if actor_id is null then
     raise exception 'Authentication required';
-  end if;
-
-  if target_decision not in ('approved', 'rejected', 'changes_requested', 'commented') then
-    raise exception 'Invalid review decision';
   end if;
 
   select * into run_record
@@ -196,48 +279,6 @@ begin
     raise exception 'Agent run not found';
   end if;
 
-  if target_artifact is not null then
-    select * into artifact_record
-    from public.agent_artifacts
-    where id = target_artifact
-      and run_id = target_run
-      and organization_id = run_record.organization_id;
-
-    if not found then
-      raise exception 'Artifact does not belong to this run';
-    end if;
-  end if;
-
-  perform pg_advisory_xact_lock(hashtextextended(target_run::text, 0));
-
-  select * into previous_review
-  from public.agent_reviews
-  where run_id = target_run
-  order by created_at desc, id desc
-  limit 1;
-
-  actor_snapshot := jsonb_build_object(
-    'reviewerId', actor_id,
-    'sessionId', (select auth.jwt() ->> 'session_id'),
-    'authenticated', true,
-    'signedAt', signed_timestamp
-  );
-
-  hash_payload := jsonb_build_object(
-    'organizationId', run_record.organization_id,
-    'caseId', run_record.case_id,
-    'runId', target_run,
-    'artifactId', target_artifact,
-    'artifactHash', case when target_artifact is null then null else artifact_record.content_hash end,
-    'reviewerId', actor_id,
-    'decision', target_decision,
-    'comment', target_comment,
-    'checklist', coalesce(target_checklist, '{}'::jsonb),
-    'previousReviewId', previous_review.id,
-    'previousDecisionHash', previous_review.decision_hash,
-    'signedAt', signed_timestamp
-  );
-
   insert into public.agent_reviews (
     organization_id,
     case_id,
@@ -247,11 +288,8 @@ begin
     decision,
     comment,
     checklist,
-    previous_review_id,
     decision_hash,
-    integrity_version,
-    signed_at,
-    reviewer_snapshot
+    signed_at
   ) values (
     run_record.organization_id,
     run_record.case_id,
@@ -261,11 +299,8 @@ begin
     target_decision,
     nullif(target_comment, ''),
     coalesce(target_checklist, '{}'::jsonb),
-    previous_review.id,
-    encode(digest(hash_payload::text, 'sha256'), 'hex'),
-    'sha256-chain-v1',
-    signed_timestamp,
-    actor_snapshot
+    repeat('0', 64),
+    clock_timestamp()
   )
   returning * into inserted_review;
 
