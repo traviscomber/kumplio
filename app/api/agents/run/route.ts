@@ -26,6 +26,9 @@ function publicError(error: unknown): PublicError {
     const status = error.code === 'timeout' ? 504 : error.code === 'configuration_error' ? 503 : 502
     return { status, code: error.code, message: error.message }
   }
+  if (error instanceof Error && error.message === 'artifact_integrity_migration_required') {
+    return { status: 503, code: 'artifact_integrity_not_ready', message: 'Artifact integrity migration is required' }
+  }
   return { status: 500, code: 'agent_execution_failed', message: 'No fue posible completar la ejecución del agente' }
 }
 
@@ -192,14 +195,26 @@ export async function POST(req: NextRequest) {
         status: 'pending_review',
         created_by: user.id,
       })
-      .select('id')
+      .select('id, lineage_id, version, content_hash, integrity_version')
       .single()
 
-    if (artifactError) console.error('[agents/run] unable to create artifact', artifactError.code)
+    if (artifactError || !artifact) {
+      const migrationPending = artifactError?.code === 'PGRST204'
+        || artifactError?.code === '42703'
+        || artifactError?.message?.includes('content_hash')
+      if (migrationPending) throw new Error('artifact_integrity_migration_required')
+      console.error('[agents/run] unable to create artifact', artifactError?.code)
+    }
 
     return NextResponse.json({
       runId: run.id,
       artifactId: artifact?.id || null,
+      artifactIntegrity: artifact ? {
+        lineageId: artifact.lineage_id,
+        version: artifact.version,
+        contentHash: artifact.content_hash,
+        integrityVersion: artifact.integrity_version,
+      } : null,
       agent: profile,
       result,
       elapsedMs,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Clock3, FileCheck2, Loader2, RefreshCw, RotateCcw, X } from 'lucide-react'
+import { Check, Clock3, FileCheck2, Fingerprint, Loader2, RefreshCw, RotateCcw, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
 
@@ -22,7 +22,11 @@ type ReviewItem = {
     id: string
     title: string
     artifact_type: string
+    lineage_id: string
     version: number
+    supersedes_artifact_id: string | null
+    content_hash: string
+    integrity_version: string
     content: unknown
     source_refs: unknown
     status: string
@@ -34,7 +38,16 @@ type ReviewItem = {
     status: string
     agent_workflows?: { id?: string; status?: string; current_stage?: number; total_stages?: number } | Array<{ id?: string; status?: string; current_stage?: number; total_stages?: number }> | null
   } | null
-  reviews?: Array<{ id: string; decision: string; comment: string | null; created_at: string }>
+  reviews?: Array<{
+    id: string
+    decision: string
+    comment: string | null
+    previous_review_id: string | null
+    decision_hash: string
+    integrity_version: string
+    signed_at: string
+    created_at: string
+  }>
 }
 
 const FILTERS = [
@@ -43,6 +56,10 @@ const FILTERS = [
   { value: 'rejected', label: 'Rechazados' },
   { value: 'all', label: 'Todos' },
 ] as const
+
+function compactHash(value?: string | null) {
+  return value ? `${value.slice(0, 12)}…${value.slice(-8)}` : '—'
+}
 
 export function AgentReviewInbox() {
   const [status, setStatus] = useState<(typeof FILTERS)[number]['value']>('pending_review')
@@ -166,16 +183,27 @@ export function AgentReviewInbox() {
               </div>
             </header>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 lg:grid-cols-3">
               <div className="rounded-xl border border-border bg-background p-4">
                 <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Trazabilidad</p></div>
                 <dl className="mt-3 space-y-2 text-xs text-muted-foreground">
-                  <div className="flex justify-between gap-4"><dt>Run</dt><dd className="font-mono">{selected.id}</dd></div>
+                  <div className="flex justify-between gap-4"><dt>Run</dt><dd className="max-w-[180px] truncate font-mono" title={selected.id}>{selected.id}</dd></div>
                   {selected.artifact && <div className="flex justify-between gap-4"><dt>Artefacto</dt><dd className="font-mono">v{selected.artifact.version}</dd></div>}
                   {caseData?.priority && <div className="flex justify-between gap-4"><dt>Prioridad</dt><dd>{caseData.priority}</dd></div>}
                   {selected.reviews?.length ? <div className="flex justify-between gap-4"><dt>Revisiones</dt><dd>{selected.reviews.length}</dd></div> : null}
                 </dl>
               </div>
+
+              <div className="rounded-xl border border-border bg-background p-4">
+                <div className="flex items-center gap-2"><Fingerprint className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Integridad del artefacto</p></div>
+                <dl className="mt-3 space-y-2 text-xs text-muted-foreground">
+                  <div className="flex justify-between gap-4"><dt>Hash</dt><dd className="font-mono" title={selected.artifact?.content_hash}>{compactHash(selected.artifact?.content_hash)}</dd></div>
+                  <div className="flex justify-between gap-4"><dt>Linaje</dt><dd className="font-mono" title={selected.artifact?.lineage_id}>{selected.artifact?.lineage_id ? compactHash(selected.artifact.lineage_id.replaceAll('-', '')) : '—'}</dd></div>
+                  <div className="flex justify-between gap-4"><dt>Supersede</dt><dd className="font-mono" title={selected.artifact?.supersedes_artifact_id || undefined}>{selected.artifact?.supersedes_artifact_id ? compactHash(selected.artifact.supersedes_artifact_id.replaceAll('-', '')) : '—'}</dd></div>
+                </dl>
+                <p className="mt-3 text-[10px] leading-4 text-muted-foreground">Huella de integridad SHA-256; no constituye firma electrónica legal.</p>
+              </div>
+
               <div className="rounded-xl border border-border bg-background p-4">
                 <div className="flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Estado de aprobación</p></div>
                 <p className="mt-3 text-xs leading-5 text-muted-foreground">
@@ -193,9 +221,21 @@ export function AgentReviewInbox() {
 
             {selected.reviews?.length ? (
               <details className="rounded-xl border border-border bg-background p-4">
-                <summary className="cursor-pointer text-sm font-semibold">Historial de decisiones</summary>
+                <summary className="cursor-pointer text-sm font-semibold">Cadena de decisiones</summary>
                 <div className="mt-4 space-y-3">
-                  {selected.reviews.map((review) => <div key={review.id} className="rounded-lg bg-muted p-3 text-xs"><p className="font-semibold">{review.decision}</p>{review.comment && <p className="mt-1 text-muted-foreground">{review.comment}</p>}<p className="mt-2 text-[10px] text-muted-foreground">{new Date(review.created_at).toLocaleString('es-CL')}</p></div>)}
+                  {selected.reviews.map((review) => (
+                    <div key={review.id} className="rounded-lg bg-muted p-3 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="font-semibold">{review.decision}</p>
+                        <span className="font-mono text-[10px] text-muted-foreground" title={review.decision_hash}>{compactHash(review.decision_hash)}</span>
+                      </div>
+                      {review.comment && <p className="mt-1 text-muted-foreground">{review.comment}</p>}
+                      <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-muted-foreground">
+                        <span>{new Date(review.signed_at || review.created_at).toLocaleString('es-CL')}</span>
+                        <span>Previo: {review.previous_review_id ? compactHash(review.previous_review_id.replaceAll('-', '')) : 'inicio'}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </details>
             ) : null}
