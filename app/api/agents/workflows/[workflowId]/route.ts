@@ -5,6 +5,8 @@ import { getWorkflowDefinition } from '@/lib/agents/orchestration'
 
 export const runtime = 'nodejs'
 
+const artifactSelect = 'id, run_id, artifact_type, title, version, content, source_refs, confidence, status, created_at, lineage_id, parent_artifact_id, content_hash, approved_by, approved_at, locked_at, superseded_by_artifact_id, superseded_at'
+
 export async function GET(_request: Request, context: { params: Promise<{ workflowId: string }> }) {
   const { workflowId } = await context.params
   if (!z.string().uuid().safeParse(workflowId).success) {
@@ -39,33 +41,60 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     .eq('organization_id', organizationId)
     .order('stage_index', { ascending: true })
 
-  const artifactIds = (stages || []).map((stage) => stage.output_artifact_id).filter((id): id is string => Boolean(id))
-  const runIds = (stages || []).map((stage) => stage.run_id).filter((id): id is string => Boolean(id))
+  const currentArtifactIds = (stages || [])
+    .map((stage) => stage.output_artifact_id)
+    .filter((id): id is string => Boolean(id))
 
-  const [artifactsResult, reviewsResult] = await Promise.all([
-    artifactIds.length
-      ? supabase
-          .from('agent_artifacts')
-          .select('id, run_id, artifact_type, title, version, content, source_refs, confidence, status, created_at')
-          .eq('organization_id', organizationId)
-          .in('id', artifactIds)
-      : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
-    runIds.length
-      ? supabase
-          .from('agent_reviews')
-          .select('id, run_id, artifact_id, reviewer_id, decision, comment, checklist, created_at')
-          .eq('organization_id', organizationId)
-          .in('run_id', runIds)
-          .order('created_at', { ascending: false })
-      : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
-  ])
+  const { data: currentArtifacts, error: currentArtifactError } = currentArtifactIds.length
+    ? await supabase
+        .from('agent_artifacts')
+        .select(artifactSelect)
+        .eq('organization_id', organizationId)
+        .in('id', currentArtifactIds)
+    : { data: [] as Array<Record<string, unknown>>, error: null }
+
+  if (currentArtifactError) {
+    return NextResponse.json({ error: 'Unable to load workflow artifacts', code: 'artifact_query_failed' }, { status: 500 })
+  }
+
+  const lineageIds = [...new Set((currentArtifacts || [])
+    .map((artifact) => artifact.lineage_id)
+    .filter((id): id is string => Boolean(id)))]
+
+  const { data: artifactVersions, error: versionError } = lineageIds.length
+    ? await supabase
+        .from('agent_artifacts')
+        .select(artifactSelect)
+        .eq('organization_id', organizationId)
+        .in('lineage_id', lineageIds)
+        .order('version', { ascending: false })
+    : { data: [] as Array<Record<string, unknown>>, error: null }
+
+  if (versionError) {
+    return NextResponse.json({ error: 'Unable to load artifact versions', code: 'artifact_version_query_failed' }, { status: 500 })
+  }
+
+  const allRunIds = [...new Set([
+    ...(stages || []).map((stage) => stage.run_id),
+    ...(artifactVersions || []).map((artifact) => artifact.run_id),
+  ].filter((id): id is string => Boolean(id)))]
+
+  const { data: reviews } = allRunIds.length
+    ? await supabase
+        .from('agent_reviews')
+        .select('id, run_id, artifact_id, reviewer_id, decision, comment, checklist, created_at')
+        .eq('organization_id', organizationId)
+        .in('run_id', allRunIds)
+        .order('created_at', { ascending: false })
+    : { data: [] as Array<Record<string, unknown>> }
 
   return NextResponse.json({
     workflow,
     template: getWorkflowDefinition(workflow.workflow_type),
     stages: stages || [],
-    artifacts: artifactsResult.data || [],
-    reviews: reviewsResult.data || [],
+    artifacts: artifactVersions || [],
+    currentArtifactIds,
+    reviews: reviews || [],
   }, {
     headers: { 'Cache-Control': 'no-store' },
   })
