@@ -69,7 +69,13 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
     setLoading(true); setError('')
     try {
       const response = await fetch('/api/agents/workflows', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId, context }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId,
+          workflowType: 'compliance_assessment',
+          instructions: context || null,
+        }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'No fue posible crear el workflow')
@@ -85,7 +91,11 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
     if (!selectedId) return
     setLoading(true); setError('')
     try {
-      const response = await fetch(`/api/agents/workflows/${selectedId}/advance`, { method: 'POST' })
+      const response = await fetch(`/api/agents/workflows/${selectedId}/advance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'No fue posible avanzar el workflow')
       await Promise.all([loadWorkflows(), loadDetail(selectedId)])

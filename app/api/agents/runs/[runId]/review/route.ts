@@ -8,6 +8,14 @@ const reviewSchema = z.object({
   decision: z.enum(['approved', 'rejected', 'changes_requested', 'commented']),
   comment: z.string().trim().max(5000).optional(),
   checklist: z.record(z.string(), z.boolean()).optional().default({}),
+}).superRefine((value, context) => {
+  if (['rejected', 'changes_requested'].includes(value.decision) && (!value.comment || value.comment.length < 3)) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['comment'],
+      message: 'A review comment is required for rejected results or requested changes.',
+    })
+  }
 })
 
 export async function POST(req: NextRequest, context: { params: Promise<{ runId: string }> }) {
@@ -31,7 +39,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
 
   const parsed = reviewSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid review', code: 'invalid_review' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid review', code: 'invalid_review', details: parsed.error.flatten() }, { status: 400 })
   }
 
   const { data: membership } = await supabase
@@ -66,6 +74,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
       .from('agent_artifacts')
       .select('id')
       .eq('run_id', runId)
+      .eq('organization_id', organizationId)
       .order('version', { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -119,9 +128,14 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   }
 
   if (artifact?.id) {
-    await supabase.from('agent_artifacts').update({ status: artifactStatus }).eq('id', artifact.id)
+    await supabase
+      .from('agent_artifacts')
+      .update({ status: artifactStatus })
+      .eq('id', artifact.id)
+      .eq('organization_id', organizationId)
   }
 
+  let workflowStatus: string | null = null
   if (workflowStage) {
     const stageStatus = parsed.data.decision === 'approved'
       ? 'approved'
@@ -141,14 +155,14 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
 
     const { data: workflow } = await supabase
       .from('agent_workflows')
-      .select('id, current_stage, total_stages')
+      .select('id, workflow_type, current_stage, total_stages')
       .eq('id', workflowStage.workflow_id)
       .eq('organization_id', organizationId)
       .maybeSingle()
 
     if (workflow) {
       const isFinalStage = workflowStage.stage_index >= workflow.total_stages - 1
-      const workflowStatus = parsed.data.decision === 'approved'
+      workflowStatus = parsed.data.decision === 'approved'
         ? isFinalStage ? 'completed' : 'running'
         : parsed.data.decision === 'commented' ? 'pending_review' : 'paused'
 
@@ -162,8 +176,41 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
         })
         .eq('id', workflow.id)
         .eq('organization_id', organizationId)
+
+      if (run.case_id) {
+        await supabase.from('compliance_case_events').insert({
+          organization_id: organizationId,
+          case_id: run.case_id,
+          actor_id: user.id,
+          event_type: 'workflow_stage_reviewed',
+          summary: parsed.data.decision === 'approved'
+            ? 'Etapa agentic aprobada'
+            : parsed.data.decision === 'commented'
+              ? 'Etapa agentic comentada'
+              : parsed.data.decision === 'rejected'
+                ? 'Etapa agentic rechazada'
+                : 'Se solicitaron cambios a una etapa agentic',
+          changes: {
+            workflow_id: workflow.id,
+            workflow_type: workflow.workflow_type,
+            stage_id: workflowStage.id,
+            stage_index: workflowStage.stage_index,
+            run_id: runId,
+            artifact_id: artifact?.id || null,
+            review_id: review.id,
+            decision: parsed.data.decision,
+            workflow_status: workflowStatus,
+          },
+        })
+      }
     }
   }
 
-  return NextResponse.json({ review, runId, status: runStatus, workflowStageId: workflowStage?.id || null })
+  return NextResponse.json({
+    review,
+    runId,
+    status: runStatus,
+    workflowStageId: workflowStage?.id || null,
+    workflowStatus,
+  })
 }
