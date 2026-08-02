@@ -20,7 +20,7 @@ export type ReadinessSnapshot = {
   expectedOrigin: string
   checks: ReadinessCheck[]
   workspace: {
-    organizationId: string | null
+    hasWorkspace: boolean
     projects: number
     cases: number
     controls: number
@@ -78,7 +78,7 @@ async function requiredDatabaseObjectsWork() {
 
 async function getWorkspaceCounts(user: User | null) {
   const empty = {
-    organizationId: null,
+    hasWorkspace: false,
     projects: 0,
     cases: 0,
     controls: 0,
@@ -110,7 +110,7 @@ async function getWorkspaceCounts(user: User | null) {
   ])
 
   return {
-    organizationId,
+    hasWorkspace: true,
     projects: projects.count || 0,
     cases: cases.count || 0,
     controls: controls.count || 0,
@@ -132,7 +132,7 @@ export async function getReadinessSnapshot(origin: string): Promise<ReadinessSna
 
   const normalizedOrigin = origin.replace(/\/$/, '')
   const isProductionOrigin = normalizedOrigin === EXPECTED_ORIGIN
-  const hasWorkspace = Boolean(workspace.organizationId)
+  const hasWorkspace = workspace.hasWorkspace
   const hasFirstCase = workspace.cases > 0
   const hasOperationalEvidence = workspace.controls > 0 && workspace.evidence > 0
 
