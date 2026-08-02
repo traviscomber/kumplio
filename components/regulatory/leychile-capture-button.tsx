@@ -27,9 +27,12 @@ export function LeyChileCaptureButton({ enabled }: { enabled: boolean }) {
         throw new Error(payload.error || 'No fue posible capturar LeyChile.')
       }
 
-      const articleCount = payload.capture?.articleCount || 0
-      const sectionCount = payload.capture?.sectionCount || 0
-      setMessage(`Captura completada: ${articleCount} artículos y ${sectionCount} secciones.`)
+      const result = payload.result || {}
+      const status = result.status === 'unchanged' ? 'sin cambios' : 'requiere revisión'
+      setMessage(
+        `Captura completada (${status}): ${result.articleSections || 0} artículos, `
+        + `${result.incisoSections || 0} incisos y ${result.totalSections || 0} secciones.`,
+      )
       router.refresh()
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'No fue posible capturar LeyChile.')
@@ -54,7 +57,7 @@ export function LeyChileCaptureButton({ enabled }: { enabled: boolean }) {
           <div>
             <p className="font-semibold">Scraper LeyChile operativo</p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Captura la versión oficial de la Ley 21.719, calcula hash, normaliza artículos e incisos y registra cambios sin sobrescribir versiones anteriores.
+              Consulta el JSON oficial de BCN, conserva el original, calcula hashes y registra artículos e incisos sin duplicar versiones.
             </p>
           </div>
         </div>
