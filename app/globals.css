@@ -5,145 +5,115 @@
 
 @layer base {
   :root {
-    /* N3uralia Premium Portal System - by Irin */
-    
-    /* Primary Colors */
-    --primary-mist-blue: #7496A0;
-    --primary-blue-gray: #4B5F68;
-    --primary-graphite: #2E323D;
-    --primary-deep-navy: #181E2A;
-    
-    /* Neutral Colors */
-    --neutral-black: #010101;
-    --neutral-white: #FFFFFF;
-    --neutral-gray-light: #999999;
-    --neutral-gray-medium: #585858;
-    
-    /* Secondary/Accent Colors */
-    --secondary-lime: #B1D374;
-    --secondary-olive: #80A440;
-    --secondary-violet: #3F3478;
-    --secondary-deep-violet: #171628;
-    
-    /* Backgrounds & Surfaces */
-    --background-main: #010101;
-    --background-soft: #181E2A;
-    --surface-dark: rgba(24, 30, 42, 0.72);
-    --surface-soft: rgba(75, 95, 104, 0.22);
-    
-    /* Accent System */
-    --accent-main: #B1D374;
-    --accent-secondary: #7496A0;
-    --accent-deep: #3F3478;
-    
-    /* Semantic Status Colors */
-    --success: 16 185 129;
-    --warning: 245 158 11;
-    --error: 239 68 68;
-    --info: 59 130 246;
-    
-    /* Risk Levels */
-    --risk-critical: 220 38 38;
-    --risk-high: 249 115 22;
-    --risk-medium: 234 179 8;
-    --risk-low: 132 204 22;
-    
-    /* UI Layer System */
-    --background: 1 1 1;
-    --foreground: 255 255 255;
-    --card: 24 30 42;
-    --card-foreground: 255 255 255;
-    --popover: 24 30 42;
-    --popover-foreground: 255 255 255;
-    
-    --primary: 177 211 116;
-    --primary-foreground: 1 1 1;
-    
-    --secondary: 116 150 160;
+    --kumplio-lima: #b8f542;
+    --kumplio-lima-dark: #88bc22;
+    --kumplio-navy: #111723;
+    --kumplio-graphite: #202733;
+    --kumplio-slate: #46525e;
+    --kumplio-mist: #91a5ad;
+    --kumplio-ivory: #f7f7f2;
+    --kumplio-white: #ffffff;
+    --kumplio-ink: #111318;
+
+    --background: 17 23 35;
+    --foreground: 247 247 242;
+    --card: 32 39 51;
+    --card-foreground: 247 247 242;
+    --popover: 32 39 51;
+    --popover-foreground: 247 247 242;
+    --primary: 184 245 66;
+    --primary-foreground: 17 19 24;
+    --secondary: 70 82 94;
     --secondary-foreground: 255 255 255;
-    
-    --muted: 75 95 104;
-    --muted-foreground: 153 153 153;
-    
-    --accent: 177 211 116;
-    --accent-foreground: 1 1 1;
-    
-    --destructive: 239 68 68;
+    --muted: 38 47 60;
+    --muted-foreground: 164 177 184;
+    --accent: 184 245 66;
+    --accent-foreground: 17 19 24;
+    --destructive: 214 69 69;
     --destructive-foreground: 255 255 255;
-    
-    --border: 46 50 61;
-    --input: 24 30 42;
-    --ring: 177 211 116;
-    
-    /* Spacing & Sizing */
-    --radius: 5px;
-    --radius-xs: 4px;
-    --radius-sm: 5px;
-    --radius-md: 5px;
-    --radius-lg: 5px;
-    --radius-xl: 5px;
-    
-    /* Typography */
-    --font-main: "Montserrat", sans-serif;
+    --border: 58 69 82;
+    --input: 32 39 51;
+    --ring: 184 245 66;
+
+    --success: 34 160 107;
+    --warning: 217 148 20;
+    --info: 47 125 209;
+    --proposal: 123 97 201;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius: 10px;
+    --font-main: var(--font-montserrat), Montserrat, sans-serif;
   }
 
   .light {
-    --background: 248 249 252;
-    --foreground: 1 1 1;
+    --background: 247 247 242;
+    --foreground: 17 19 24;
     --card: 255 255 255;
-    --card-foreground: 1 1 1;
+    --card-foreground: 17 19 24;
     --popover: 255 255 255;
-    --popover-foreground: 1 1 1;
-    
-    --primary: 177 211 116;
-    --primary-foreground: 1 1 1;
-    
-    --secondary: 116 150 160;
-    --secondary-foreground: 1 1 1;
-    
-    --muted: 153 153 153;
-    --muted-foreground: 88 88 88;
-    
-    --accent: 177 211 116;
-    --accent-foreground: 1 1 1;
-    
-    --border: 228 232 240;
-    --input: 248 249 252;
+    --popover-foreground: 17 19 24;
+    --primary: 136 188 34;
+    --primary-foreground: 255 255 255;
+    --secondary: 70 82 94;
+    --secondary-foreground: 255 255 255;
+    --muted: 235 237 232;
+    --muted-foreground: 78 89 98;
+    --accent: 184 245 66;
+    --accent-foreground: 17 19 24;
+    --border: 216 221 215;
+    --input: 255 255 255;
+    --ring: 136 188 34;
   }
 
   * {
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground font-sans;
-    font-family: var(--font-main), sans-serif;
-    font-weight: 300;
-    background-color: var(--background-main);
-  }
-
   html {
     @apply scroll-smooth;
-    background-color: var(--background-main);
+    background: rgb(var(--background));
   }
-  
-  /* Custom scrollbar styling */
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100vh;
+    font-family: var(--font-main);
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    color: var(--kumplio-ink);
+    background: var(--kumplio-lima);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--kumplio-lima);
+    outline-offset: 3px;
+  }
+
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
   }
-  
+
   ::-webkit-scrollbar-track {
-    background: rgba(46, 50, 61, 0.3);
+    background: rgba(32, 39, 51, 0.45);
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    background: rgba(177, 211, 116, 0.5);
-    border-radius: 5px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(184, 245, 66, 0.45);
+    background-clip: padding-box;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(177, 211, 116, 0.8);
+    background: rgba(184, 245, 66, 0.72);
+    background-clip: padding-box;
   }
 }
 
@@ -167,28 +137,32 @@
   --color-border: rgb(var(--border));
   --color-input: rgb(var(--input));
   --color-ring: rgb(var(--ring));
-  
   --radius: var(--radius);
 }
 
-@keyframes flow {
-  0% {
-    left: 0%;
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    left: 100%;
-    opacity: 0;
-  }
+@keyframes kumplio-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1); }
 }
 
-.animate-flow {
-  animation: flow 2.4s ease-in-out infinite;
+@keyframes kumplio-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
 }
 
+.animate-kumplio-pulse {
+  animation: kumplio-pulse 2.8s ease-in-out infinite;
+}
+
+.animate-kumplio-drift {
+  animation: kumplio-drift 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
