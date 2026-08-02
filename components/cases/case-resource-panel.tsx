@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import {
   CheckCircle2,
   Circle,
+  FileCheck2,
   FileText,
   Link2,
   ListChecks,
@@ -13,11 +14,12 @@ import {
   Plus,
   SearchCheck,
   ShieldAlert,
+  ShieldCheck,
   Unlink,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export type CaseResourceType = 'document' | 'obligation' | 'finding' | 'risk' | 'action'
+export type CaseResourceType = 'document' | 'obligation' | 'control' | 'evidence' | 'finding' | 'risk' | 'action'
 
 export type CaseResourceItem = {
   id: string
@@ -58,6 +60,20 @@ const resourceConfig: Record<CaseResourceType, {
     description: 'Requisitos identificados que deben evaluarse dentro del expediente.',
     href: '/obligations',
     icon: ListChecks,
+  },
+  control: {
+    label: 'Controles',
+    singular: 'control',
+    description: 'Actividades verificables diseñadas para cubrir obligaciones y riesgos.',
+    href: '/controls',
+    icon: ShieldCheck,
+  },
+  evidence: {
+    label: 'Evidencias',
+    singular: 'evidencia',
+    description: 'Registros con origen, vigencia e integridad que respaldan los controles.',
+    href: '/evidence',
+    icon: FileCheck2,
   },
   finding: {
     label: 'Hallazgos',
@@ -118,6 +134,8 @@ export function CaseResourcePanel({
   const verificationChecks = [
     { label: 'Existe al menos una fuente vinculada', done: counts.document > 0 },
     { label: 'Existe al menos una obligación vinculada', done: counts.obligation > 0 },
+    { label: 'Existe al menos un control vinculado', done: counts.control > 0 },
+    { label: 'Existe evidencia vinculada al expediente', done: counts.evidence > 0 },
     { label: 'Existe análisis mediante hallazgo o riesgo', done: counts.finding + counts.risk > 0 },
     { label: 'Existe al menos una acción vinculada', done: counts.action > 0 },
     { label: 'Existe artefacto IA o revisión humana', done: artifactCount > 0 || reviewCount > 0 },
@@ -177,7 +195,7 @@ export function CaseResourcePanel({
       <section className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6">
         <h2 className="font-semibold">Define un ámbito antes de integrar recursos</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          El expediente necesita un proyecto asociado para validar que documentos, obligaciones, riesgos y acciones pertenezcan al mismo contexto.
+          El expediente necesita un proyecto asociado para validar que todos los recursos pertenezcan al mismo contexto.
         </p>
       </section>
     )
@@ -215,7 +233,7 @@ export function CaseResourcePanel({
             ))}
           </div>
           <p className="mt-4 text-xs leading-5 text-muted-foreground">
-            Este indicador mide elementos registrados, no certifica cumplimiento legal.
+            Este indicador mide elementos registrados y revisables; no certifica cumplimiento legal.
           </p>
         </div>
       </div>
