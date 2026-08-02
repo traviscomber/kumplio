@@ -118,7 +118,7 @@ begin
     raise exception using errcode = '23514', message = 'Artifact version content and lineage are immutable';
   end if;
 
-  if old.status = 'superseded' and new is distinct from old then
+  if old.status = 'superseded' and row(new.*) is distinct from row(old.*) then
     raise exception using errcode = '23514', message = 'Superseded artifact versions are immutable';
   end if;
 
@@ -148,19 +148,25 @@ create trigger protect_agent_artifact_version
 revoke update, delete on table public.agent_artifacts from authenticated;
 grant select, insert on table public.agent_artifacts to authenticated;
 
-create or replace function public.review_agent_artifact_version(
+create or replace function public.record_agent_artifact_review(
   p_actor_id uuid,
   p_organization_id uuid,
+  p_run_id uuid,
   p_artifact_id uuid,
-  p_decision text
+  p_decision text,
+  p_comment text,
+  p_checklist jsonb
 )
-returns void
+returns uuid
 language plpgsql
 security invoker
 set search_path = ''
 as $$
 declare
   artifact_record public.agent_artifacts;
+  run_case_id uuid;
+  review_id uuid;
+  clean_comment text := nullif(btrim(p_comment), '');
 begin
   if p_actor_id is null or not exists (
     select 1
@@ -171,14 +177,29 @@ begin
     raise exception using errcode = '42501', message = 'Organization membership required';
   end if;
 
-  if p_decision not in ('approved', 'rejected', 'changes_requested') then
+  if p_decision not in ('approved', 'rejected', 'changes_requested', 'commented') then
     raise exception using errcode = '22023', message = 'Invalid artifact review decision';
+  end if;
+
+  if p_decision in ('rejected', 'changes_requested')
+    and (clean_comment is null or char_length(clean_comment) < 3) then
+    raise exception using errcode = '22023', message = 'Review comment is required';
+  end if;
+
+  select run.case_id into run_case_id
+  from public.agent_runs run
+  where run.id = p_run_id
+    and run.organization_id = p_organization_id;
+
+  if not found then
+    raise exception using errcode = '23503', message = 'Agent run not found';
   end if;
 
   select * into artifact_record
   from public.agent_artifacts artifact
   where artifact.id = p_artifact_id
     and artifact.organization_id = p_organization_id
+    and artifact.run_id = p_run_id
   for update;
 
   if artifact_record.id is null then
@@ -187,10 +208,38 @@ begin
 
   if artifact_record.status in ('approved', 'superseded') then
     if artifact_record.status = 'approved' and p_decision = 'approved' then
-      return;
+      select review.id into review_id
+      from public.agent_reviews review
+      where review.organization_id = p_organization_id
+        and review.artifact_id = p_artifact_id
+        and review.decision = 'approved'
+      order by review.created_at desc
+      limit 1;
+      return review_id;
     end if;
     raise exception using errcode = '23514', message = 'Locked artifact version cannot be reviewed again';
   end if;
+
+  insert into public.agent_reviews (
+    organization_id,
+    case_id,
+    run_id,
+    artifact_id,
+    reviewer_id,
+    decision,
+    comment,
+    checklist
+  ) values (
+    p_organization_id,
+    run_case_id,
+    p_run_id,
+    p_artifact_id,
+    p_actor_id,
+    p_decision,
+    clean_comment,
+    coalesce(p_checklist, '{}'::jsonb)
+  )
+  returning id into review_id;
 
   if p_decision = 'approved' then
     update public.agent_artifacts
@@ -207,7 +256,7 @@ begin
     where lineage_id = artifact_record.lineage_id
       and id <> p_artifact_id
       and status = 'approved';
-  else
+  elsif p_decision in ('rejected', 'changes_requested') then
     update public.agent_artifacts
     set status = p_decision,
         approved_by = null,
@@ -215,12 +264,14 @@ begin
         locked_at = null
     where id = p_artifact_id;
   end if;
+
+  return review_id;
 end;
 $$;
 
-revoke all on function public.review_agent_artifact_version(uuid,uuid,uuid,text)
+revoke all on function public.record_agent_artifact_review(uuid,uuid,uuid,uuid,text,text,jsonb)
   from public, anon, authenticated;
-grant execute on function public.review_agent_artifact_version(uuid,uuid,uuid,text)
+grant execute on function public.record_agent_artifact_review(uuid,uuid,uuid,uuid,text,text,jsonb)
   to service_role;
 
 commit;
