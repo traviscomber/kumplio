@@ -24,6 +24,10 @@ create index if not exists compliance_case_events_case_created_idx
 create index if not exists compliance_case_events_org_created_idx
   on public.compliance_case_events (organization_id, created_at desc);
 
+create index if not exists compliance_case_events_actor_idx
+  on public.compliance_case_events (actor_id)
+  where actor_id is not null;
+
 alter table public.compliance_case_events enable row level security;
 
 revoke all on table public.compliance_case_events from anon;
