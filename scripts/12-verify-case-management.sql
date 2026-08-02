@@ -1,5 +1,5 @@
 -- KUMPLIO compliance case management verification
--- Read-only checks for the case event stream, RLS, grants and triggers.
+-- Read-only checks for the case event stream, RLS, grants, indexes and triggers.
 
 do $$
 begin
@@ -44,6 +44,12 @@ begin
     or has_table_privilege('authenticated', 'public.compliance_case_events', 'update')
     or has_table_privilege('authenticated', 'public.compliance_case_events', 'delete') then
     raise exception 'Authenticated role can mutate immutable compliance case events';
+  end if;
+
+  if to_regclass('public.compliance_case_events_case_created_idx') is null
+    or to_regclass('public.compliance_case_events_org_created_idx') is null
+    or to_regclass('public.compliance_case_events_actor_idx') is null then
+    raise exception 'Missing one or more compliance case event indexes';
   end if;
 
   if not exists (
