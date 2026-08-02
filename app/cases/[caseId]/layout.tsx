@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { FileClock } from 'lucide-react'
 import { CaseResourceWorkspace } from '@/components/cases/case-resource-workspace'
+import { CaseWorkflowPanel } from '@/components/cases/case-workflow-panel'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -84,6 +85,8 @@ export default async function ComplianceCaseLayout({
           reviewCount={reviewCountResult.count || 0}
           artifactCount={artifactCountResult.count || 0}
         />
+
+        <CaseWorkflowPanel caseId={caseId} />
       </div>
     </>
   )
