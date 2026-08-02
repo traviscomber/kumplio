@@ -33,6 +33,28 @@ type ObligationRow = {
   due_date: string | null
 }
 
+type ControlRow = {
+  id: string
+  name: string
+  description: string | null
+  control_nature: string
+  execution_mode: string
+  lifecycle_status: string
+  design_effectiveness: string
+  operating_effectiveness: string
+  next_evaluation_at: string | null
+}
+
+type EvidenceRow = {
+  id: string
+  name: string
+  description: string | null
+  evidence_type: string
+  validation_status: string
+  integrity_status: string
+  expires_at: string | null
+}
+
 type FindingRow = {
   id: string
   description: string
@@ -92,7 +114,16 @@ export async function CaseResourceWorkspace({
   }
 
   const supabase = await createClient()
-  const [linksResult, documentsResult, obligationsResult, findingsResult, risksResult, actionsResult] = await Promise.all([
+  const [
+    linksResult,
+    documentsResult,
+    obligationsResult,
+    controlsResult,
+    evidenceResult,
+    findingsResult,
+    risksResult,
+    actionsResult,
+  ] = await Promise.all([
     supabase
       .from('compliance_case_resource_links')
       .select('id, resource_type, resource_id, created_at')
@@ -109,6 +140,20 @@ export async function CaseResourceWorkspace({
     supabase
       .from('obligations')
       .select('id, obligation_text, responsible_party, priority, status, due_date')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false })
+      .limit(200),
+    supabase
+      .from('controls')
+      .select('id, name, description, control_nature, execution_mode, lifecycle_status, design_effectiveness, operating_effectiveness, next_evaluation_at')
+      .eq('organization_id', organizationId)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false })
+      .limit(200),
+    supabase
+      .from('evidence')
+      .select('id, name, description, evidence_type, validation_status, integrity_status, expires_at')
+      .eq('organization_id', organizationId)
       .eq('project_id', projectId)
       .order('created_at', { ascending: false })
       .limit(200),
@@ -141,6 +186,9 @@ export async function CaseResourceWorkspace({
     )
   }
 
+  const controlsAvailable = !controlsResult.error || controlsResult.error.code !== '42P01'
+  const evidenceAvailable = !evidenceResult.error || evidenceResult.error.code !== '42P01'
+
   const resources: CaseResourceItem[] = [
     ...((documentsResult.data || []) as DocumentRow[]).map((row) => ({
       id: row.id,
@@ -159,6 +207,32 @@ export async function CaseResourceWorkspace({
       ]),
       status: row.status || row.priority,
     })),
+    ...(controlsAvailable ? ((controlsResult.data || []) as ControlRow[]).map((row) => ({
+      id: row.id,
+      type: 'control' as const,
+      title: row.name,
+      detail: joinDetails([
+        compact(row.description),
+        `Naturaleza: ${row.control_nature}`,
+        `Ejecución: ${row.execution_mode}`,
+        `Diseño: ${row.design_effectiveness}`,
+        `Operación: ${row.operating_effectiveness}`,
+        row.next_evaluation_at ? `Próxima evaluación: ${new Date(row.next_evaluation_at).toLocaleDateString('es-CL')}` : null,
+      ]),
+      status: row.lifecycle_status,
+    })) : []),
+    ...(evidenceAvailable ? ((evidenceResult.data || []) as EvidenceRow[]).map((row) => ({
+      id: row.id,
+      type: 'evidence' as const,
+      title: row.name,
+      detail: joinDetails([
+        compact(row.description),
+        `Tipo: ${row.evidence_type}`,
+        `Integridad: ${row.integrity_status}`,
+        row.expires_at ? `Vence: ${new Date(row.expires_at).toLocaleDateString('es-CL')}` : 'Sin vencimiento',
+      ]),
+      status: row.validation_status,
+    })) : []),
     ...((findingsResult.data || []) as FindingRow[]).map((row) => ({
       id: row.id,
       type: 'finding' as const,
