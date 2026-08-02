@@ -1,12 +1,13 @@
 'use client'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, Building2, CheckCircle2, Lock, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Mail, Lock, Building2, AlertCircle } from 'lucide-react'
 
 export default function SignUp() {
   const router = useRouter()
@@ -16,17 +17,24 @@ export default function SignUp() {
   const [organizationName, setOrganizationName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [confirmationSent, setConfirmationSent] = useState(false)
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
+  async function handleSignUp(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     setError('')
     setLoading(true)
 
     try {
-      // Sign up user
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email,
+      const callbackUrl = `${window.location.origin}/auth/callback?next=/onboarding`
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
         password,
+        options: {
+          emailRedirectTo: callbackUrl,
+          data: {
+            company_name: organizationName.trim(),
+          },
+        },
       })
 
       if (signUpError) {
@@ -34,139 +42,93 @@ export default function SignUp() {
         return
       }
 
-      if (authData.user) {
-        // Create organization via API
-        try {
-          const response = await fetch('/api/auth/create-organization', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              organizationName,
-              userId: authData.user.id,
-            }),
-          })
-
-          const result = await response.json()
-
-          if (!response.ok) {
-            setError(result.error || 'Error al crear la organización')
-            return
-          }
-
-          router.push('/sign-in?message=Cuenta creada. Por favor inicia sesión.')
-        } catch (err) {
-          setError('Error al crear la organización')
-          return
-        }
+      if (data.session) {
+        router.replace('/onboarding')
+        router.refresh()
+        return
       }
-    } catch (err) {
-      setError('Error durante el registro')
+
+      setConfirmationSent(true)
+    } catch {
+      setError('No fue posible completar el registro.')
     } finally {
       setLoading(false)
     }
   }
 
+  if (confirmationSent) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
+        <section className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-xl shadow-black/5">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+            <CheckCircle2 className="h-7 w-7" />
+          </div>
+          <h1 className="mt-5 text-2xl font-bold">Revisa tu correo</h1>
+          <p className="mt-3 leading-7 text-muted-foreground">
+            Enviamos un enlace de confirmación a <strong className="text-foreground">{email}</strong>. Después de confirmar, continuarás con la configuración segura de tu workspace.
+          </p>
+          <p className="mt-4 text-xs leading-5 text-muted-foreground">El enlace puede tardar unos minutos. Revisa también la carpeta de correo no deseado.</p>
+          <Button asChild variant="outline" className="mt-7 w-full"><Link href="/sign-in">Ya confirmé mi correo</Link></Button>
+        </section>
+      </main>
+    )
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg p-8 space-y-6">
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
-              <span className="text-primary-foreground font-bold text-lg">K</span>
-            </div>
+        <section className="space-y-6 rounded-2xl border border-border bg-card p-8 shadow-xl shadow-black/5">
+          <div className="space-y-3 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">K</div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">KUMPLIO</h1>
-              <p className="text-sm text-muted-foreground">Crear nueva cuenta</p>
+              <h1 className="text-2xl font-bold">Crea tu cuenta KUMPLIO</h1>
+              <p className="mt-1 text-sm text-muted-foreground">El workspace se configurará después de verificar tu identidad.</p>
             </div>
           </div>
 
           <form onSubmit={handleSignUp} className="space-y-4">
             {error && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
                 <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="organization" className="block text-sm font-medium text-foreground">
-                Nombre de la organización
-              </label>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  id="organization"
-                  type="text"
-                  value={organizationName}
-                  onChange={(e) => setOrganizationName(e.target.value)}
-                  placeholder="Mi Empresa"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-              </div>
-            </div>
+            <label className="block space-y-2" htmlFor="organization">
+              <span className="text-sm font-medium">Nombre de la organización</span>
+              <span className="relative block">
+                <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="organization" type="text" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} minLength={2} maxLength={160} placeholder="Mi Empresa SpA" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              </span>
+            </label>
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                Correo electrónico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@empresa.cl"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-              </div>
-            </div>
+            <label className="block space-y-2" htmlFor="email">
+              <span className="text-sm font-medium">Correo electrónico</span>
+              <span className="relative block">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" placeholder="tu@empresa.cl" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              </span>
+            </label>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-foreground">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-              </div>
-            </div>
+            <label className="block space-y-2" htmlFor="password">
+              <span className="text-sm font-medium">Contraseña</span>
+              <span className="relative block">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} minLength={10} autoComplete="new-password" placeholder="Mínimo 10 caracteres" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              </span>
+              <span className="text-xs text-muted-foreground">Usa una contraseña única que no ocupes en otros servicios.</span>
+            </label>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Creando cuenta...' : 'Registrarse'}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'Creando cuenta…' : 'Crear cuenta y verificar correo'}
             </Button>
           </form>
 
-          <div className="space-y-3 border-t border-border pt-6">
-            <p className="text-center text-sm text-muted-foreground">
-              {`¿Ya tienes cuenta?`}
-            </p>
-            <a href="/sign-in" className="inline-flex w-full items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
-              Inicia sesión aquí
-            </a>
+          <div className="border-t border-border pt-6 text-center text-sm text-muted-foreground">
+            ¿Ya tienes cuenta? <Link href="/sign-in" className="font-semibold text-primary hover:underline">Inicia sesión</Link>
           </div>
-        </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          Cumplimiento automático para Ley 21.719 de protección de datos
-        </p>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }
