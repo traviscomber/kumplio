@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import { FileClock } from 'lucide-react'
 import { CaseResourceWorkspace } from '@/components/cases/case-resource-workspace'
 import { createClient } from '@/lib/supabase/server'
 
@@ -60,7 +62,20 @@ export default async function ComplianceCaseLayout({
   return (
     <>
       {children}
-      <div className="container mx-auto px-6 pb-8">
+      <div className="container mx-auto space-y-6 px-6 pb-8">
+        <section className="flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="rounded-xl bg-primary/10 p-3 text-primary"><FileClock className="h-5 w-5" /></div>
+            <div>
+              <h2 className="font-bold">Solicitar respaldo para este expediente</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Asigna responsable y fecha, y registra entrega y revisión en el timeline.</p>
+            </div>
+          </div>
+          <Link href={`/evidence/requests?caseId=${caseId}`} className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground">
+            Crear solicitud
+          </Link>
+        </section>
+
         <CaseResourceWorkspace
           caseId={caseId}
           organizationId={membership.organization_id}
