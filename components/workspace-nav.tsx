@@ -16,6 +16,8 @@ const items = [
   ['/risks', 'Riesgos'],
   ['/roadmaps', 'Acciones'],
   ['/documents', 'Documentos'],
+  ['/regulatory', 'Regulación'],
+  ['/regulatory/capture', 'Scraper'],
 ] as const
 
 export function WorkspaceNav() {
