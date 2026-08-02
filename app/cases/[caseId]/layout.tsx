@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { FileClock } from 'lucide-react'
+import { CaseArtifactHistory } from '@/components/cases/case-artifact-history'
 import { CaseResourceWorkspace } from '@/components/cases/case-resource-workspace'
 import { CaseWorkflowPanel } from '@/components/cases/case-workflow-panel'
 import { createClient } from '@/lib/supabase/server'
@@ -87,6 +88,11 @@ export default async function ComplianceCaseLayout({
         />
 
         <CaseWorkflowPanel caseId={caseId} />
+
+        <CaseArtifactHistory
+          caseId={caseId}
+          organizationId={membership.organization_id}
+        />
       </div>
     </>
   )
