@@ -5,7 +5,7 @@
 > Revisión: 2 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Horizonte principal: KUMPLIO v2.0  
+> Horizonte: KUMPLIO v2.0  
 > Responsable técnico interno: Travis — Arquitecto IA full-stack  
 > Repositorio: `traviscomber/kumplio`
 
@@ -15,37 +15,32 @@
 
 Kumplio construye el sistema de conocimiento regulatorio y cumplimiento verificable más confiable para las organizaciones chilenas.
 
-La plataforma debe permitir:
+La plataforma debe:
 
 1. capturar fuentes oficiales con integridad demostrable;
 2. transformar documentos en conocimiento estructurado;
 3. relacionar obligaciones públicas con la realidad privada de cada organización;
-4. operar controles, evidencias, riesgos, acciones y expedientes;
+4. operar expedientes, controles, evidencias, riesgos y acciones;
 5. ejecutar agentes especializados con citas y revisión humana;
 6. mantener memoria organizacional privada y aislada;
-7. entregar resultados auditables y útiles para gerencia, operaciones y asesoría jurídica;
+7. entregar resultados auditables para gerencia, operaciones y asesoría jurídica;
 8. extenderse a transporte, agro, minería y otras industrias chilenas.
 
-### Propuesta de valor
-
-> **Cumplimiento continuo respaldado por conocimiento y evidencia verificables.**
-
-### Posicionamiento
-
-Kumplio no es un checklist, un repositorio documental ni un chatbot jurídico. Es una plataforma chilena de conocimiento regulatorio, memoria organizacional, evidencia y operación agentic.
+> **Propuesta de valor:** Cumplimiento continuo respaldado por conocimiento y evidencia verificables.
 
 ---
 
 ## 2. Documentos maestros
 
-Los siguientes documentos son vinculantes para producto y arquitectura:
+Son vinculantes para producto, arquitectura, interfaz y agentes:
 
-- `ROADMAP.md`: dirección, hitos, dependencias y gates.
-- `MODELO_CANONICO.md`: significado de nodos, relaciones, versiones, afirmaciones, citas, mapeos y eventos.
-- `LENGUAJE_CANONICO.md`: vocabulario visible oficial en español.
-- `PRINCIPIOS.md`: reglas intransables de producto, conocimiento, IA y seguridad.
-- `ARQUITECTURA_PLATAFORMA_CONOCIMIENTO.md`: diseño físico y adopción progresiva.
-- `AGENTS.md` y la skill de Travis: ejecución técnica.
+- `ROADMAP.md`
+- `MODELO_CANONICO.md`
+- `LENGUAJE_CANONICO.md`
+- `PRINCIPIOS.md`
+- `ARQUITECTURA_PLATAFORMA_CONOCIMIENTO.md`
+- `AGENTS.md`
+- `.agents/skills/travis-kumplio-architect/SKILL.md`
 
 **Regla:** ningún módulo nuevo puede crear una estructura paralela de conocimiento.
 
@@ -55,36 +50,32 @@ Los siguientes documentos son vinculantes para producto y arquitectura:
 
 | Estado | Significado |
 |---|---|
-| `PLANNED` | Definido, todavía sin implementación activa. |
-| `DISCOVERY` | Requerimientos, fuentes y arquitectura en investigación. |
-| `ACTIVE` | Desarrollo en curso mediante issue, rama y PR. |
-| `DEPLOYED` | Código y migraciones en producción; falta validación completa. |
+| `PLANNED` | Definido, sin implementación activa. |
+| `DISCOVERY` | Investigación de requisitos, fuentes o arquitectura. |
+| `ACTIVE` | Desarrollo en issue, rama y PR. |
+| `DEPLOYED` | Código y migraciones en producción; falta validación real. |
 | `VALIDATED` | Flujo probado con datos y usuario real. |
-| `DONE` | Gate cerrado, métricas y documentación actualizadas. |
+| `DONE` | Gate cerrado con métricas y evidencia. |
 | `BLOCKED` | Dependencia externa o decisión pendiente. |
 
 `DEPLOYED` no equivale a `DONE`.
-
-Un objetivo solo puede marcarse `DONE` cuando pasan build, typecheck, migraciones, RLS, advisors, preview, producción, prueba real y evidencia de cierre.
 
 ---
 
 ## 4. Principios estratégicos
 
-1. **Chile primero:** regulación, lenguaje, organismos y operación local.
-2. **Todo visible en español:** sin mezcla innecesaria con inglés.
-3. **Sin fuente no hay afirmación regulatoria.**
-4. **Sin evidencia no hay conclusión de cumplimiento.**
-5. **La IA propone; las personas validan.**
-6. **Conocimiento público y memoria privada están físicamente separados.**
-7. **La memoria de una organización nunca se comparte con otra.**
-8. **Versionado antes que sobrescritura.**
-9. **Citas exactas antes que similitud semántica.**
-10. **Confianza explicable, no porcentaje opaco.**
-11. **Scrapers auditables y operables.**
-12. **Core común y verticales modulares.**
-
-La versión completa está en `PRINCIPIOS.md`.
+1. Chile primero.
+2. Todo contenido visible en español.
+3. Sin fuente no hay afirmación regulatoria.
+4. Sin evidencia no hay conclusión de cumplimiento.
+5. La IA propone; las personas validan.
+6. Conocimiento público y memoria privada están físicamente separados.
+7. La memoria de una organización nunca se comparte con otra.
+8. Versionado antes que sobrescritura.
+9. Citas exactas antes que similitud semántica.
+10. Confianza explicable, no porcentajes opacos.
+11. Scrapers auditables y operables.
+12. Núcleo común y verticales modulares.
 
 ---
 
@@ -96,7 +87,7 @@ Experiencia
 ├── Expedientes
 ├── Controles y evidencias
 ├── Inteligencia regulatoria
-└── Explorador de conocimiento
+└── Explorador del conocimiento
 
 Flujos de trabajo
 ├── Agentes especializados
@@ -108,9 +99,9 @@ Plataforma de Conocimiento
 ├── Grafo Nacional de Conocimiento
 ├── Memoria Organizacional
 ├── Capa de Mapeo
-├── Afirmaciones y citas
 ├── Procedencia y eventos
-└── Nivel de confianza
+├── Motor de confianza
+└── Consulta para agentes
 
 Plataforma de Evidencia
 ├── Documentos y versiones
@@ -132,208 +123,184 @@ Infraestructura
 
 ### Desplegado
 
-- infraestructura Next.js, Vercel y Supabase;
+- Next.js, Vercel y Supabase;
 - organizaciones, perfiles, membresías y onboarding transaccional;
-- expedientes de cumplimiento y línea de tiempo;
-- documentos, obligaciones, riesgos, acciones y vínculos de caso;
+- expedientes y línea de tiempo;
+- documentos, obligaciones, riesgos, acciones y vínculos;
 - controles, evidencias, evaluaciones y solicitudes;
-- plataforma de agentes, herramientas y flujos de trabajo;
-- revisión humana y aprobación obligatoria;
+- agentes, herramientas y flujos con aprobación humana;
 - versionado de artefactos;
-- Regulatory Evidence Engine;
-- LeyChile mediante datos oficiales estructurados;
+- Motor de Evidencia Regulatoria;
+- conector LeyChile mediante JSON oficial;
 - plataforma común de conectores con cola, lease, reintentos, circuit breaker y ejecuciones agotadas;
-- conector Diario Oficial en desarrollo;
-- skill interna Travis.
+- modelo canónico del Grafo Nacional y Memoria Organizacional;
+- servicios internos, RLS, procedencia y eventos.
+
+### En desarrollo
+
+- proyección de la Ley N.º 21.719 al Grafo Nacional — issue #67, PR #68;
+- conector Diario Oficial — issue #63, PR #64 pendiente de actualización;
+- corpus verificado de obligaciones y citas de la Ley N.º 21.719.
 
 ### Pendiente de validación real
 
 - primer workspace productivo creado por un usuario real;
-- prueba completa multiempresa;
-- primer expediente con control, evidencia y flujo agentic real;
-- configuración final de Auth y protección de contraseñas filtradas;
+- prueba multiempresa completa;
+- expediente real con control, evidencia y flujo agentic;
+- configuración final de Auth;
 - primeros pilotos.
 
 ---
 
-# 7. Hitos maestros
+# 7. Programas maestros
 
 ## M0 — Fundación técnica y plataforma agentic
 
-**Estado:** `DEPLOYED`  
-**Issues:** #29 y relacionados.
+**Estado:** `DEPLOYED`
 
-Resultado: infraestructura, agentes, herramientas, flujos, revisión humana, RLS, cuotas y trazabilidad.
+Infraestructura, agentes, herramientas, flujos, revisión humana, RLS, cuotas y trazabilidad.
 
-Pendiente para `DONE`: baseline completo de migraciones y prueba real end-to-end.
+**Gate pendiente:** baseline completo de migraciones y prueba real de extremo a extremo.
 
 ---
 
-## M1 — Fundación de producto y expediente integrado
+## M1 — Plataforma Operacional
 
 **Estado:** `DEPLOYED / ACTIVE`  
-**Issue:** #38.
+**Issue maestro:** #38
 
-### Objetivos
+Objetivos:
 
-- `OBJ-PF-001`: expediente como unidad central.
-- `OBJ-PF-002`: onboarding real.
-- `OBJ-PF-003`: controles y evidencias.
-- `OBJ-PF-004`: aseguramiento de controles y solicitudes de evidencia.
-- `OBJ-PF-005`: flujos agentic desde el expediente.
+- expediente como unidad central;
+- onboarding real;
+- controles y evidencias;
+- aseguramiento de controles;
+- solicitudes de evidencia;
+- flujos agentic desde el expediente.
 
-### Gate M1
-
-- Auth productivo validado;
-- onboarding real completado;
-- expediente real con recursos;
-- control evaluado con evidencia;
-- solicitud cerrada;
-- flujo agentic ejecutado;
-- aprobación humana registrada;
-- experiencia sin entrar a Supabase.
+**Gate M1:** un usuario real completa onboarding, expediente, control, evidencia, solicitud, flujo agentic y aprobación humana sin entrar a Supabase.
 
 ---
 
-## M2 — Motor de Evidencia Regulatoria
+## M2 — Plataforma Regulatoria
 
-**Estado:** `ACTIVE / DEPLOYED PARCIAL`  
-**Issues:** #53, #57, #60 y #63.
+**Estado:** `ACTIVE / DEPLOYED PARCIAL`
 
-### Objetivos
+Objetivos:
 
-- `OBJ-RE-001`: registro de autoridades, fuentes y conectores.
-- `OBJ-RE-002`: captura inmutable, hashes y versionado.
-- `OBJ-RE-003`: comparación determinística y cambios.
-- `OBJ-RE-004`: afirmaciones, citas y revisión humana.
-- `OBJ-RE-005`: aplicabilidad por organización y expediente.
+- registro de autoridades y fuentes;
+- capturas inmutables y hashes;
+- comparación determinística;
+- afirmaciones, citas y revisión;
+- aplicabilidad por organización y expediente;
+- operación de conectores y scrapers.
 
-### Conectores prioritarios
+Conectores prioritarios:
 
-1. LeyChile/BCN.
-2. Diario Oficial.
-3. Consejo para la Transparencia y futura autoridad competente.
+1. LeyChile/BCN — operativo.
+2. Diario Oficial — en desarrollo.
+3. Consejo para la Transparencia y futura autoridad de datos.
 4. CMF.
 5. Dirección del Trabajo.
 6. MTT y Aduanas.
 7. SAG.
 8. Sernageomin, SEA y SMA.
 
-### Gate M2
-
-Kumplio captura una fuente oficial, demuestra integridad, detecta cambios, conserva citas exactas, rechaza afirmaciones sin respaldo y vincula el cambio con una organización o expediente después de revisión humana.
+**Gate M2:** Kumplio captura una fuente oficial, demuestra integridad, detecta cambios, conserva citas y vincula resultados revisados con una organización o expediente.
 
 ---
 
 ## M3 — Plataforma de Conocimiento
 
 **Estado:** `ACTIVE`  
-**Issue:** #65.  
-**Prioridad:** P0.
+**Prioridad:** P0
 
 ### OBJ-KP-001 — Documentos maestros
 
-Entregables:
+**Estado:** `DONE`
 
-- `MODELO_CANONICO.md`;
-- `LENGUAJE_CANONICO.md`;
-- `PRINCIPIOS.md`;
-- `ARQUITECTURA_PLATAFORMA_CONOCIMIENTO.md`;
-- actualización de este roadmap.
+### OBJ-KP-002 — Modelo físico del Grafo Nacional
 
-### OBJ-KP-002 — Grafo Nacional de Conocimiento
+**Estado:** `DEPLOYED`
 
-Conocimiento público, compartido, versionado y revisado:
+Tablas:
 
-- normas;
-- artículos e incisos;
-- organismos;
-- publicaciones oficiales;
-- conceptos;
-- obligaciones;
-- derechos;
-- sanciones;
-- controles y riesgos de referencia;
-- relaciones regulatorias.
+- `public_knowledge_nodes`
+- `public_knowledge_node_versions`
+- `public_knowledge_edges`
+- `public_knowledge_edge_versions`
 
-Tablas iniciales:
+### OBJ-KP-003 — Modelo físico de Memoria Organizacional
 
-- `public_knowledge_nodes`;
-- `public_knowledge_node_versions`;
-- `public_knowledge_edges`;
-- `public_knowledge_edge_versions`.
+**Estado:** `DEPLOYED`
 
-### OBJ-KP-003 — Memoria Organizacional
+Tablas:
 
-Conocimiento privado por organización:
-
-- procesos;
-- sistemas;
-- proveedores;
-- contratos;
-- políticas;
-- tratamientos de datos;
-- activos;
-- controles;
-- evidencias;
-- riesgos;
-- incidentes;
-- decisiones;
-- entidades sectoriales.
-
-Tablas iniciales:
-
-- `organization_memory_nodes`;
-- `organization_memory_node_versions`;
-- `organization_memory_edges`;
-- `organization_memory_edge_versions`.
+- `organization_memory_nodes`
+- `organization_memory_node_versions`
+- `organization_memory_edges`
+- `organization_memory_edge_versions`
 
 ### OBJ-KP-004 — Capa de Mapeo
 
-Relaciona conocimiento público y privado sin mezclarlos físicamente:
+**Estado:** `DEPLOYED / SIN USO REAL`
 
-- obligación → aplica a → proceso o tratamiento;
-- control de referencia → implementado por → control organizacional;
-- artículo → evidenciado por → evidencia;
-- sanción → exposición de → riesgo.
-
-Tabla inicial: `knowledge_mappings`.
+Tabla: `knowledge_mappings`.
 
 ### OBJ-KP-005 — Procedencia y eventos
 
-- `knowledge_provenance`;
-- `knowledge_events`;
-- hashes;
-- origen;
-- proceso;
-- actor;
-- versión;
-- revisión.
+**Estado:** `DEPLOYED`
+
+Tablas:
+
+- `knowledge_provenance`
+- `knowledge_events`
 
 ### OBJ-KP-006 — Integración regulatoria
 
-LeyChile y Diario Oficial alimentan nodos públicos y relaciones revisables. Los textos oficiales permanecen en el Motor de Evidencia Regulatoria y el grafo mantiene identidad, relaciones y procedencia.
+**Estado:** `ACTIVE / VALIDACIÓN TÉCNICA COMPLETA`
 
-### OBJ-KP-007 — Integración de memoria
+Ley N.º 21.719 proyectada desde el Motor de Evidencia Regulatoria:
 
-Documentos, controles, evidencias, riesgos y casos generan nodos privados sin reemplazar las entidades operacionales actuales.
+- 1 nodo de norma;
+- 741 nodos de artículos e incisos;
+- 741 relaciones `CONTIENE`;
+- 742 procedencias verificables;
+- 742 versiones de nodo;
+- 741 versiones de relación;
+- segunda ejecución sin cambios ni versiones duplicadas;
+- historial independiente de ejecuciones;
+- escritura exclusiva por `service_role`.
+
+Pendiente para `DONE`:
+
+- fusionar PR #68;
+- integrar Diario Oficial sobre el mismo contrato;
+- incorporar revisión humana de conocimiento derivado.
+
+### OBJ-KP-007 — Integración de Memoria Organizacional
+
+**Estado:** `PLANNED`
+
+Documentos, controles, evidencias, riesgos, proveedores y expedientes deben generar nodos privados sin reemplazar sus tablas operacionales.
 
 ### OBJ-KP-008 — Consulta para agentes
 
-Los agentes consultan grafo, memoria, evidencia, citas y confianza antes de responder.
+**Estado:** `PLANNED`
 
-### OBJ-KP-009 — Explorador de conocimiento
+Los agentes deben consultar grafo, memoria, evidencia, citas y confianza antes de responder.
+
+### OBJ-KP-009 — Explorador del conocimiento
+
+**Estado:** `PLANNED`
 
 Interfaz en español para navegar nodos, relaciones, versiones, fuentes y aplicabilidad.
 
-### Gate M3
+**Gate M3:**
 
 - documentos maestros fusionados;
-- esquema reproducible;
-- RLS validado;
-- ninguna relación privada cruza organizaciones;
-- servicios internos no expuestos;
-- Ley 21.719 proyectada al grafo;
+- esquema reproducible y seguro;
+- Ley N.º 21.719 proyectada;
 - una organización real con memoria privada;
 - primer mapeo revisado entre obligación y control/evidencia;
 - agentes consultando el modelo;
@@ -341,14 +308,25 @@ Interfaz en español para navegar nodos, relaciones, versiones, fuentes y aplica
 
 ---
 
-## M4 — Datos Personales y Ley N.º 21.719
+## M4 — Plataforma Agentic de Conocimiento
 
-**Estado:** `PLANNED / DISCOVERY`  
-**Ventana:** antes del 1 de diciembre de 2026.
+**Estado:** `PLANNED / BASE DESPLEGADA`
 
-### Objetivos
+- API unificada de consulta;
+- recuperación de subgrafo relevante;
+- uso de memoria privada por organización;
+- respuestas con afirmaciones y citas;
+- aprobación y versionado;
+- observabilidad y evaluaciones.
 
-- mapa y registro de actividades de tratamiento;
+---
+
+## M5 — Datos Personales y Ley N.º 21.719
+
+**Estado:** `DISCOVERY / PLANNED`  
+**Fecha crítica:** 1 de diciembre de 2026.
+
+- registro de actividades de tratamiento;
 - bases de licitud y finalidades;
 - titulares y categorías de datos;
 - encargados y subencargados;
@@ -358,22 +336,15 @@ Interfaz en español para navegar nodos, relaciones, versiones, fuentes y aplica
 - transferencias internacionales;
 - protección de datos desde el diseño y por defecto;
 - decisiones automatizadas;
-- modelo de prevención;
-- informes y evidencia.
-
-### Gate M4
-
-Un piloto gestiona un ciclo completo de preparación para la Ley N.º 21.719 con conocimiento, evidencia y revisión humana.
+- modelo de prevención.
 
 ---
 
-## M5 — Artefactos, firma e informes auditables
+## M6 — Artefactos e informes auditables
 
-**Estado:** `DEPLOYED PARCIAL / ACTIVE`.
+**Estado:** `DEPLOYED PARCIAL / ACTIVE`
 
-### Objetivos
-
-- versiones y comparación de artefactos;
+- versiones y comparación;
 - bloqueo de aprobados;
 - firma lógica;
 - PDF ejecutivo y técnico;
@@ -381,47 +352,36 @@ Un piloto gestiona un ciclo completo de preparación para la Ley N.º 21.719 con
 - paquete auditable;
 - enlace privado con vencimiento.
 
-Gate: un expediente puede presentarse a gerencia, auditoría o asesoría jurídica sin copiar información manualmente.
-
 ---
 
-## M6 — Pilotos y validación de mercado
+## M7 — Pilotos y KUMPLIO v1.0 Chile
 
-**Estado:** `PLANNED`.
+**Estado:** `PLANNED`
 
 - 3 a 5 organizaciones piloto;
-- corpus de al menos 50 a 100 afirmaciones verificadas;
-- medición de precisión, tiempo, costo, falsos positivos y aprobación humana;
-- cero alertas externas sin revisión;
-- claims comerciales respaldados.
-
----
-
-## M7 — KUMPLIO v1.0 Chile
-
-**Estado:** `PLANNED`.
-
-Incluye M1 a M6 utilizables, seguridad, backups, monitoreo, soporte, términos, privacidad, pricing, onboarding y primeros clientes.
+- corpus de 50 a 100 afirmaciones verificadas;
+- métricas de precisión, tiempo, costo y aprobación;
+- seguridad, backups, monitoreo, soporte y pricing;
+- primeros clientes.
 
 ---
 
 ## M8 — Plataforma vertical y aplicación de terreno
 
-**Estado:** `PLANNED`.
+**Estado:** `PLANNED`
 
 - arquitectura modular;
 - permisos por sitio, faena, predio o flota;
 - PWA instalable;
 - cámara, firma y QR;
 - geolocalización opcional;
-- trabajo sin conexión;
-- sincronización segura.
+- operación sin conexión.
 
 ---
 
 ## M9 — KUMPLIO Transporte
 
-**Estado:** `PLANNED`.
+**Estado:** `PLANNED`
 
 Flotas, vehículos, conductores, cargas, rutas, viajes, documentos, previaje, incidentes, contratistas, telemetría y evidencia de terreno.
 
@@ -429,9 +389,9 @@ Flotas, vehículos, conductores, cargas, rutas, viajes, documentos, previaje, in
 
 ## M10 — KUMPLIO Agro
 
-**Estado:** `PLANNED`.
+**Estado:** `PLANNED`
 
-Predios, cuarteles, cultivos, temporadas, lotes, insumos, aplicaciones, trazabilidad, inspecciones, inocuidad, exportación y evidencia de terreno.
+Predios, cuarteles, cultivos, temporadas, lotes, insumos, aplicaciones, trazabilidad, inspecciones, inocuidad y exportación.
 
 ---
 
@@ -439,86 +399,113 @@ Predios, cuarteles, cultivos, temporadas, lotes, insumos, aplicaciones, trazabil
 
 **Estado:** `PLANNED`, condicionado a una empresa asociada de diseño.
 
-Faenas, instalaciones, contratistas, permisos, RCA, controles críticos, fiscalizaciones, incidentes, compromisos y cierre.
+Faenas, instalaciones, contratistas, permisos, RCA, controles críticos, fiscalizaciones, incidentes y compromisos.
 
 ---
 
 ## M12 — KUMPLIO v2.0
 
-**Estado:** objetivo final del roadmap principal.
+**Estado:** objetivo final.
 
-Requiere:
-
-- plataforma SaaS estable;
-- Grafo Nacional de Conocimiento maduro;
-- Memoria Organizacional operativa;
-- Ley N.º 21.719 completa;
-- agentes verificables;
-- informes auditables;
-- PWA;
-- Transporte y Agro en producción;
-- Minería validada;
-- métricas reales y operación comercial repetible.
+Requiere plataforma SaaS estable, Grafo Nacional maduro, Memoria Organizacional operativa, Ley N.º 21.719 completa, agentes consultando conocimiento, al menos una vertical validada y controles de seguridad enterprise.
 
 ---
 
-# 8. Plan inmediato
+# 8. Activos estratégicos
 
-## Bloque actual — Fundación de M3
+No se usan porcentajes subjetivos. Cada índice se calcula con entregables verificables.
 
-1. documentos maestros;
-2. diseño físico;
-3. migraciones y RLS;
-4. verificador y pruebas transaccionales;
-5. proyección inicial de Ley 21.719;
-6. proyección inicial de controles y evidencias;
-7. API de consulta;
-8. integración de agentes;
-9. explorador mínimo.
-
-## Próximas olas de tres sprints
-
-### Ola 4
-
-1. Modelo canónico y migraciones.
-2. Proyección regulatoria de Ley 21.719.
-3. Memoria Organizacional desde documentos, controles y evidencias.
-
-### Ola 5
-
-4. Motor de Mapeo.
-5. API de conocimiento para agentes.
-6. Explorador de conocimiento.
-
-### Ola 6
-
-7. Nivel de confianza descompuesto.
-8. Memoria y recuperación semántica.
-9. Integración completa de agentes.
+| Activo | Entregables del índice | Estado actual |
+|---|---|---|
+| Modelo Canónico | documentos, esquema, verificadores, lenguaje | `4/4 — COMPLETO` |
+| Grafo Nacional | modelo, primera fuente, jerarquía, versionado, procedencia, revisión | `5/6` |
+| Memoria Organizacional | modelo, aislamiento, proyección operativa, relaciones, consulta, piloto | `2/6` |
+| Capa de Mapeo | modelo, validación, propuesta, revisión, primer mapeo real | `2/5` |
+| Motor de Evidencia | documentos, versiones, hashes, citas, controles, solicitudes | `6/6 — DESPLEGADO` |
+| Plataforma de Conectores | registro, cola, lease, reintentos, circuit breaker, panel, conectores reales | `6/7` |
+| Corpus Ley N.º 21.719 | captura, secciones, grafo, afirmaciones, citas revisadas, aplicabilidad | `3/6` |
+| Plataforma Agentic | agentes, herramientas, flujos, aprobación, versiones, conocimiento, evaluaciones | `5/7` |
+| Diario Oficial | parser, modelo, conector, operación, captura real, grafo | `3/6` |
 
 ---
 
-# 9. Ruta crítica
+# 9. Próximas dos olas de tres sprints
 
-```text
-Auth y primer workspace real
-→ Fundación M3
-→ Ley 21.719 en el Grafo Nacional
-→ Memoria Organizacional real
-→ Primer mapeo validado
-→ Agentes consultando conocimiento
-→ Operación completa Ley N.º 21.719
-→ Pilotos
-→ KUMPLIO v1.0
-→ Verticales
-→ KUMPLIO v2.0
-```
+## Ola siguiente
 
-M2 y M3 avanzan en paralelo, pero los conectores alimentan el grafo solo después de pasar integridad y revisión.
+### Sprint A — Cerrar Ley N.º 21.719 en el Grafo Nacional
+
+- fusionar PR #68;
+- confirmar producción;
+- registrar revisión técnica;
+- crear vista de salud del grafo.
+
+### Sprint B — Primera Memoria Organizacional
+
+- proyectar documentos, controles y evidencias;
+- mantener aislamiento por organización;
+- crear relaciones privadas;
+- validar con un workspace real.
+
+### Sprint C — Primer Motor de Mapeo
+
+- obligación pública → control privado;
+- control privado → evidencia;
+- propuesta automática;
+- aprobación humana;
+- historial de decisiones.
+
+## Ola posterior
+
+### Sprint D — Corpus verificado Ley N.º 21.719
+
+### Sprint E — API de conocimiento para agentes
+
+### Sprint F — Explorador mínimo del conocimiento
 
 ---
 
-# 10. Trazabilidad obligatoria
+# 10. Riesgos activos
+
+| ID | Riesgo | Impacto | Mitigación | Estado |
+|---|---|---|---|---|
+| R-001 | Fuente oficial cambia formato o servicio | Alto | fixtures, health checks, circuit breaker y revisión | Activo |
+| R-002 | Conocimiento sin revisión se presenta como obligación | Crítico | estados, citas, aprobación humana | Mitigado técnicamente |
+| R-003 | Cruce de memoria entre organizaciones | Crítico | separación física, RLS y validadores Postgres | Mitigado técnicamente |
+| R-004 | Grafo duplica el texto regulatorio | Medio | identidad y procedencia; texto permanece en Evidence Engine | Mitigado |
+| R-005 | Roadmap avanza sin usuario real | Alto | gate de validación productiva | Activo |
+| R-006 | Scraper Diario Oficial queda desactualizado frente a `main` | Medio | rebase y cierre antes del siguiente conector | Activo |
+| R-007 | Dependencia excesiva de un modelo de IA | Alto | reglas determinísticas, evaluaciones y revisión | Activo |
+
+---
+
+# 11. Deuda técnica
+
+| ID | Deuda | Prioridad | Estado |
+|---|---|---|---|
+| DT-001 | Consolidar baseline histórico de migraciones | Alta | Pendiente |
+| DT-002 | Corregir índice faltante preexistente de aplicabilidad regulatoria | Media | Pendiente |
+| DT-003 | Optimizar políticas duplicadas de `organization_members` | Media | Pendiente |
+| DT-004 | Activar protección de contraseñas filtradas en Supabase Auth | Alta | Manual pendiente |
+| DT-005 | Actualizar o reemplazar PR #64 de Diario Oficial | Alta | Pendiente |
+| DT-006 | Añadir worker programado para proyecciones regulatorias | Media | Pendiente |
+
+---
+
+# 12. Investigación
+
+| ID | Investigación | Resultado esperado | Estado |
+|---|---|---|---|
+| I-001 | Modelo canónico de conocimiento | documentos y esquema | Completado |
+| I-002 | LeyChile oficial | método estructurado y estable | Completado |
+| I-003 | Diario Oficial | ediciones, CVE y PDFs | En curso |
+| I-004 | Agencia de Protección de Datos Personales | fuentes e instrucciones oficiales | Continuo |
+| I-005 | Graph + memoria para agentes | contrato de consulta y evaluación | Próximo |
+| I-006 | Vertical Transporte | design partner y fuentes | Planificado |
+
+---
+
+# 13. Trazabilidad obligatoria
 
 ```text
 VISIÓN
@@ -536,108 +523,19 @@ VISIÓN
 → EVIDENCIA DE CIERRE
 ```
 
-Todo issue debe indicar objetivo, problema, resultado, alcance, dependencias, riesgos, criterios de aceptación y evidencia requerida.
-
-Todo PR debe indicar seguridad, migraciones, pruebas, reversión y estado de producción.
+Todo objetivo debe enlazar issue, PR, commit, migración, prueba y métrica.
 
 ---
 
-# 11. Indicadores
+# 14. Definición de terminado
 
-## Conocimiento
+KUMPLIO v2.0 estará terminado cuando:
 
-- nodos y relaciones publicados;
-- nodos privados por organización;
-- relaciones con procedencia;
-- afirmaciones con cita exacta;
-- mapeos propuestos, aprobados y rechazados;
-- versiones vigentes y reemplazadas;
-- tiempo desde fuente hasta conocimiento revisado.
-
-## Calidad y confianza
-
-- precisión de artículo y versión;
-- citas correctas;
-- afirmaciones rechazadas;
-- divergencia entre agentes;
-- evidencia suficiente, parcial o insuficiente;
-- tasa de aprobación humana;
-- fallas de parser;
-- fuentes desactualizadas.
-
-## Producto
-
-- tiempo a primer valor;
-- expedientes activos;
-- controles evaluados;
-- solicitudes de evidencia cerradas;
-- flujos agentic completados;
-- retención y adopción por organización.
-
-## Operación
-
-- disponibilidad de conectores;
-- ejecuciones exitosas, sin cambios, fallidas y agotadas;
-- uptime;
-- errores P0/P1;
-- incidentes de seguridad;
-- cobertura de backups.
-
----
-
-# 12. Riesgos principales
-
-| Riesgo | Mitigación |
-|---|---|
-| Falsa certeza jurídica | Citas, estados de confianza y revisión humana. |
-| Mezcla de datos entre empresas | Separación física, RLS y pruebas cruzadas. |
-| Grafo paralelo por módulo | Modelo Canónico obligatorio. |
-| Scrapers frágiles | Fixtures, versionado, circuit breaker y salud visible. |
-| Sobredesarrollo | Olas, gates y pilotos. |
-| Memoria basada solo en embeddings | Nodos, relaciones, procedencia y citas exactas. |
-| Migración destructiva | Adopción progresiva y esquema aditivo. |
-| Lenguaje inconsistente | `LENGUAJE_CANONICO.md`. |
-
----
-
-# 13. Gobernanza
-
-Revisión semanal:
-
-- objetivos activos;
-- ruta crítica;
-- bloqueos;
-- PRs y migraciones;
-- métricas;
-- seguridad;
-- siguiente ola.
-
-Revisión mensual:
-
-- avance de hitos;
-- costo de infraestructura e IA;
-- feedback de pilotos;
-- deuda técnica;
-- estrategia comercial y verticales.
-
-Este archivo se actualiza mediante PR cuando cambia un hito, gate, prioridad, riesgo o arquitectura.
-
----
-
-# 14. Referencias internas
-
-- `MODELO_CANONICO.md`
-- `LENGUAJE_CANONICO.md`
-- `PRINCIPIOS.md`
-- `ARQUITECTURA_PLATAFORMA_CONOCIMIENTO.md`
-- `AGENTS.md`
-- `.agents/skills/travis-kumplio-architect/SKILL.md`
-- scripts de plataforma agentic, casos, controles, evidencia y motor regulatorio;
-- `scripts/44-knowledge-platform-core.sql`;
-- `scripts/45-knowledge-platform-services.sql`;
-- `scripts/46-verify-knowledge-platform.sql`;
-- issues #29, #38, #53, #57, #60, #63 y #65.
-
----
-
-> **Regla final:** Kumplio no aprende porque almacena documentos. Aprende cuando puede representar una entidad, relacionarla, demostrar su procedencia, versionarla, revisarla y explicar cómo afecta a una organización chilena.
+1. opere de forma estable como SaaS multiempresa;
+2. el Grafo Nacional contenga fuentes regulatorias relevantes para Chile;
+3. la Memoria Organizacional funcione con aislamiento demostrado;
+4. los agentes consulten conocimiento y devuelvan citas;
+5. la Ley N.º 21.719 pueda gestionarse de extremo a extremo;
+6. al menos una vertical esté validada comercialmente;
+7. existan pilotos, métricas, seguridad, soporte y continuidad operacional;
+8. ninguna conclusión crítica dependa exclusivamente de IA sin revisión humana.
