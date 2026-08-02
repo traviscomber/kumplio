@@ -1,0 +1,48 @@
+{
+  "corpusId": "CL-DATA-21719-FOUNDATION-001",
+  "status": "foundation_only",
+  "jurisdiction": "CL",
+  "document": {
+    "canonicalIdentifier": "LEY-21719",
+    "displayName": "Ley N.º 21.719",
+    "officialAccessSource": "Biblioteca del Congreso Nacional de Chile / LeyChile",
+    "canonicalUrl": "https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idVersion=2026-12-01",
+    "publicationDate": "2024-12-13",
+    "effectiveFrom": "2026-12-01"
+  },
+  "validationTargets": [
+    {
+      "id": "META-001",
+      "type": "document_metadata",
+      "description": "Confirmar identificador, publicación, vigencia y URL canónica contra la fuente oficial.",
+      "requiresExactCitation": false,
+      "status": "pending_capture"
+    },
+    {
+      "id": "STRUCTURE-001",
+      "type": "document_structure",
+      "description": "Capturar y segmentar el texto oficial por títulos, artículos e incisos sin perder numeración.",
+      "requiresExactCitation": true,
+      "status": "pending_capture"
+    },
+    {
+      "id": "CLAIMS-001",
+      "type": "claim_validation",
+      "description": "Crear obligaciones, derechos, prohibiciones, plazos y definiciones solo después de vincular una cita exacta a una versión capturada.",
+      "requiresExactCitation": true,
+      "status": "pending_capture"
+    },
+    {
+      "id": "INFERENCE-001",
+      "type": "prohibited_inference",
+      "description": "No afirmar aplicabilidad, incumplimiento, sanción o fecha operacional específica sin texto oficial, condiciones y revisión humana.",
+      "requiresExactCitation": true,
+      "status": "active_rule"
+    }
+  ],
+  "notes": [
+    "Este archivo no contiene asesoría jurídica ni claims regulatorios aprobados.",
+    "La fuente debe capturarse y hashearse antes de crear secciones o citas.",
+    "Todo claim deberá distinguir texto expreso, inferencia y supuesto de aplicabilidad."
+  ]
+}
