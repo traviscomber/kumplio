@@ -1,5 +1,5 @@
 -- KUMPLIO compliance case management verification
--- Read-only checks for the case event stream, RLS, grants, indexes and triggers.
+-- Read-only checks for case permissions, event stream, RLS, grants, indexes and triggers.
 
 do $$
 begin
@@ -30,6 +30,43 @@ begin
       and policyname = 'compliance_case_events_select_member'
   ) then
     raise exception 'Missing compliance_case_events_select_member policy';
+  end if;
+
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'compliance_cases'
+      and policyname = 'compliance_cases_insert_self'
+      and with_check like '%organization_members%'
+      and with_check like '%projects%'
+  ) then
+    raise exception 'Compliance case insert policy does not validate owner and project tenant scope';
+  end if;
+
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'compliance_cases'
+      and policyname = 'compliance_cases_update_member'
+      and with_check like '%organization_members%'
+      and with_check like '%projects%'
+  ) then
+    raise exception 'Compliance case update policy does not validate owner and project tenant scope';
+  end if;
+
+  if has_column_privilege('authenticated', 'public.compliance_cases', 'organization_id', 'update')
+    or has_column_privilege('authenticated', 'public.compliance_cases', 'created_by', 'update')
+    or has_column_privilege('authenticated', 'public.compliance_cases', 'metadata', 'update') then
+    raise exception 'Authenticated role can mutate protected compliance case columns';
+  end if;
+
+  if not has_column_privilege('authenticated', 'public.compliance_cases', 'title', 'update')
+    or not has_column_privilege('authenticated', 'public.compliance_cases', 'status', 'update')
+    or not has_column_privilege('authenticated', 'public.compliance_cases', 'owner_id', 'update')
+    or not has_column_privilege('authenticated', 'public.compliance_cases', 'due_at', 'update') then
+    raise exception 'Authenticated role is missing operational compliance case update privileges';
   end if;
 
   if has_table_privilege('anon', 'public.compliance_case_events', 'select') then
