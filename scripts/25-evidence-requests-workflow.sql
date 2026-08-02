@@ -30,6 +30,8 @@ create index if not exists evidence_request_events_request_idx
   on public.evidence_request_events (request_id, created_at desc);
 create index if not exists evidence_request_events_org_project_idx
   on public.evidence_request_events (organization_id, project_id, created_at desc);
+create index if not exists evidence_request_events_project_id_idx
+  on public.evidence_request_events (project_id);
 create index if not exists evidence_request_events_actor_idx
   on public.evidence_request_events (actor_id);
 create index if not exists evidence_request_events_evidence_idx
@@ -106,6 +108,10 @@ begin
 
   if char_length(clean_title) < 3 or char_length(clean_title) > 180 then
     raise exception using errcode = '22023', message = 'Invalid request title';
+  end if;
+
+  if p_due_at is not null and p_due_at <= now() then
+    raise exception using errcode = '22023', message = 'Request due date must be in the future';
   end if;
 
   if p_requested_from is not null and not exists (
@@ -386,6 +392,16 @@ begin
     p_organization_id, request_record.project_id, p_request_id, p_actor_id, 'cancelled',
     request_record.status, 'cancelled', nullif(btrim(p_comment), '')
   );
+
+  if request_record.case_id is not null then
+    insert into public.compliance_case_events (
+      organization_id, case_id, actor_id, event_type, summary, changes
+    ) values (
+      p_organization_id, request_record.case_id, p_actor_id, 'evidence_request_cancelled',
+      'Solicitud de evidencia cancelada',
+      jsonb_build_object('request_id', p_request_id, 'comment', nullif(btrim(p_comment), ''))
+    );
+  end if;
 end;
 $$;
 
