@@ -1,7 +1,69 @@
 -- KUMPLIO compliance case management
--- Adds an immutable event stream for compliance case changes.
+-- Adds an immutable event stream and hardens assignment updates.
 
 begin;
+
+-- Members may only update operational case fields. Identity, tenant and audit
+-- columns remain immutable through the Data API.
+revoke update on table public.compliance_cases from authenticated;
+grant update (title, description, status, priority, project_id, owner_id, due_at)
+  on table public.compliance_cases to authenticated;
+
+drop policy if exists compliance_cases_insert_self on public.compliance_cases;
+create policy compliance_cases_insert_self
+  on public.compliance_cases
+  for insert
+  to authenticated
+  with check (
+    (select public.is_organization_member(organization_id))
+    and created_by = (select auth.uid())
+    and (
+      owner_id is null
+      or exists (
+        select 1
+        from public.organization_members member
+        where member.organization_id = compliance_cases.organization_id
+          and member.user_id = compliance_cases.owner_id
+      )
+    )
+    and (
+      project_id is null
+      or exists (
+        select 1
+        from public.projects project
+        where project.id = compliance_cases.project_id
+          and project.organization_id = compliance_cases.organization_id
+      )
+    )
+  );
+
+drop policy if exists compliance_cases_update_member on public.compliance_cases;
+create policy compliance_cases_update_member
+  on public.compliance_cases
+  for update
+  to authenticated
+  using ((select public.is_organization_member(organization_id)))
+  with check (
+    (select public.is_organization_member(organization_id))
+    and (
+      owner_id is null
+      or exists (
+        select 1
+        from public.organization_members member
+        where member.organization_id = compliance_cases.organization_id
+          and member.user_id = compliance_cases.owner_id
+      )
+    )
+    and (
+      project_id is null
+      or exists (
+        select 1
+        from public.projects project
+        where project.id = compliance_cases.project_id
+          and project.organization_id = compliance_cases.organization_id
+      )
+    )
+  );
 
 create schema if not exists private;
 revoke all on schema private from public;
