@@ -10,6 +10,7 @@ const items = [
   ['/obligations', 'Obligaciones'],
   ['/controls', 'Controles'],
   ['/evidence', 'Evidencias'],
+  ['/evidence/requests', 'Solicitudes'],
   ['/findings', 'Hallazgos'],
   ['/risks', 'Riesgos'],
   ['/roadmaps', 'Acciones'],
@@ -18,12 +19,15 @@ const items = [
 
 export function WorkspaceNav() {
   const pathname = usePathname()
+  const activeHref = [...items]
+    .filter(([href]) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort(([left], [right]) => right.length - left.length)[0]?.[0]
 
   return (
     <nav aria-label="Navegación del workspace" className="overflow-x-auto border-b border-border bg-background/95">
       <div className="container mx-auto flex min-w-max gap-1 px-6 py-3">
         {items.map(([href, label]) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`)
+          const active = href === activeHref
           return (
             <Link
               key={href}
