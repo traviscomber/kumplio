@@ -166,7 +166,12 @@ declare
   link_record public.compliance_case_resource_links;
   event_actor uuid;
 begin
-  link_record := case when tg_op = 'DELETE' then old else new end;
+  if tg_op = 'DELETE' then
+    link_record := old;
+  else
+    link_record := new;
+  end if;
+
   event_actor := coalesce(auth.uid(), link_record.created_by);
 
   insert into public.compliance_case_events (
@@ -191,7 +196,11 @@ begin
     )
   );
 
-  return case when tg_op = 'DELETE' then old else new end;
+  if tg_op = 'DELETE' then
+    return old;
+  end if;
+
+  return new;
 end;
 $$;
 
@@ -204,5 +213,53 @@ create trigger compliance_case_resource_link_event
   after insert or delete on public.compliance_case_resource_links
   for each row
   execute function private.record_compliance_case_resource_event();
+
+create or replace function private.cleanup_compliance_case_resource_links()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public
+as $$
+begin
+  delete from public.compliance_case_resource_links
+  where resource_type = tg_argv[0]
+    and resource_id = old.id;
+
+  return old;
+end;
+$$;
+
+revoke all on function private.cleanup_compliance_case_resource_links()
+  from public, anon, authenticated;
+
+drop trigger if exists cleanup_document_case_resource_links on public.documents;
+create trigger cleanup_document_case_resource_links
+  before delete on public.documents
+  for each row
+  execute function private.cleanup_compliance_case_resource_links('document');
+
+drop trigger if exists cleanup_obligation_case_resource_links on public.obligations;
+create trigger cleanup_obligation_case_resource_links
+  before delete on public.obligations
+  for each row
+  execute function private.cleanup_compliance_case_resource_links('obligation');
+
+drop trigger if exists cleanup_finding_case_resource_links on public.audit_findings;
+create trigger cleanup_finding_case_resource_links
+  before delete on public.audit_findings
+  for each row
+  execute function private.cleanup_compliance_case_resource_links('finding');
+
+drop trigger if exists cleanup_risk_case_resource_links on public.risks;
+create trigger cleanup_risk_case_resource_links
+  before delete on public.risks
+  for each row
+  execute function private.cleanup_compliance_case_resource_links('risk');
+
+drop trigger if exists cleanup_action_case_resource_links on public.roadmaps;
+create trigger cleanup_action_case_resource_links
+  before delete on public.roadmaps
+  for each row
+  execute function private.cleanup_compliance_case_resource_links('action');
 
 commit;
