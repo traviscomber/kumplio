@@ -1,12 +1,13 @@
 'use client'
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, Lock, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Mail, Lock, AlertCircle } from 'lucide-react'
 
 export default function SignIn() {
   const router = useRouter()
@@ -16,112 +17,77 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
+  async function handleSignIn(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     setError('')
     setLoading(true)
 
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       })
 
       if (signInError) {
         setError(signInError.message)
-      } else {
-        // Wait for session to be established
-        await new Promise(resolve => setTimeout(resolve, 500))
-        router.push('/dashboard')
+        return
       }
-    } catch (err) {
-      setError('Error al iniciar sesión')
+
+      router.replace('/onboarding')
+      router.refresh()
+    } catch {
+      setError('No fue posible iniciar sesión.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
       <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg p-8 space-y-6">
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-primary">
-              <span className="text-primary-foreground font-bold text-lg">K</span>
-            </div>
+        <section className="space-y-6 rounded-2xl border border-border bg-card p-8 shadow-xl shadow-black/5">
+          <div className="space-y-3 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">K</div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">KUMPLIO</h1>
-              <p className="text-sm text-muted-foreground">Inteligencia documental para Chile</p>
+              <h1 className="text-2xl font-bold">Accede a KUMPLIO</h1>
+              <p className="mt-1 text-sm text-muted-foreground">Cumplimiento continuo respaldado por evidencia.</p>
             </div>
           </div>
 
           <form onSubmit={handleSignIn} className="space-y-4">
             {error && (
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-                <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
                 <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                Correo electrónico
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@empresa.cl"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-              </div>
-            </div>
+            <label className="block space-y-2" htmlFor="email">
+              <span className="text-sm font-medium">Correo electrónico</span>
+              <span className="relative block">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" placeholder="tu@empresa.cl" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              </span>
+            </label>
 
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-foreground">
-                Contraseña
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
-                />
-              </div>
-            </div>
+            <label className="block space-y-2" htmlFor="password">
+              <span className="text-sm font-medium">Contraseña</span>
+              <span className="relative block">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="••••••••••" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              </span>
+            </label>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Iniciando...' : 'Iniciar sesión'}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
             </Button>
           </form>
 
-          <div className="space-y-3 border-t border-border pt-6">
-            <p className="text-center text-sm text-muted-foreground">
-              {`¿No tienes cuenta?`}
-            </p>
-            <a href="/sign-up" className="inline-flex w-full items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
-              Crear una nueva cuenta
-            </a>
+          <div className="border-t border-border pt-6 text-center text-sm text-muted-foreground">
+            ¿No tienes cuenta? <Link href="/sign-up" className="font-semibold text-primary hover:underline">Crea una cuenta</Link>
           </div>
-        </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          Cumplimiento automático para Ley 21.719 de protección de datos
-        </p>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }
