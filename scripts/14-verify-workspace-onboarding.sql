@@ -4,9 +4,23 @@
 do $$
 declare
   onboarding_definition text;
+  onboarding_security_definer boolean;
+  onboarding_config text[];
+  profile_trigger_count integer;
 begin
   if to_regprocedure('public.initialize_workspace(text,text,text,text,text,text,text)') is null then
     raise exception 'Missing public.initialize_workspace(...)';
+  end if;
+
+  select count(*)::integer
+    into profile_trigger_count
+  from pg_trigger
+  where tgrelid = 'auth.users'::regclass
+    and tgname in ('on_auth_user_created', 'on_auth_user_created_profile')
+    and not tgisinternal;
+
+  if profile_trigger_count <> 1 then
+    raise exception 'Expected exactly one auth profile trigger, found %', profile_trigger_count;
   end if;
 
   if exists (
@@ -17,16 +31,6 @@ begin
       and not tgisinternal
   ) then
     raise exception 'Unsafe auto_confirm_email_on_signup trigger is still installed';
-  end if;
-
-  if exists (
-    select 1
-    from pg_trigger
-    where tgrelid = 'auth.users'::regclass
-      and tgname = 'on_auth_user_created_profile'
-      and not tgisinternal
-  ) then
-    raise exception 'Duplicate profile creation trigger is still installed';
   end if;
 
   if not exists (
@@ -68,16 +72,30 @@ begin
     raise exception 'Authenticated role is missing required workspace privileges';
   end if;
 
-  select pg_get_functiondef('public.initialize_workspace(text,text,text,text,text,text,text)'::regprocedure)
-    into onboarding_definition;
+  select
+    pg_get_functiondef(procedure.oid),
+    procedure.prosecdef,
+    procedure.proconfig
+  into
+    onboarding_definition,
+    onboarding_security_definer,
+    onboarding_config
+  from pg_proc procedure
+  where procedure.oid = 'public.initialize_workspace(text,text,text,text,text,text,text)'::regprocedure;
 
-  if onboarding_definition not like '%SECURITY DEFINER%'
-    or onboarding_definition not like '%SET search_path TO%'
-    or onboarding_definition not like '%auth.uid()%'
+  if not onboarding_security_definer then
+    raise exception 'initialize_workspace must be SECURITY DEFINER';
+  end if;
+
+  if onboarding_config is null or not ('search_path=""' = any(onboarding_config)) then
+    raise exception 'initialize_workspace must have an empty fixed search_path';
+  end if;
+
+  if onboarding_definition not like '%auth.uid()%'
     or onboarding_definition not like '%pg_advisory_xact_lock%'
     or onboarding_definition not like '%organization_members%'
     or onboarding_definition not like '%compliance_cases%' then
-    raise exception 'initialize_workspace is missing required security or atomicity controls';
+    raise exception 'initialize_workspace is missing required authentication or atomicity controls';
   end if;
 
   if exists (
