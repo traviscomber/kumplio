@@ -61,13 +61,32 @@ begin
   if has_table_privilege('authenticated', 'public.organizations', 'insert')
     or has_table_privilege('authenticated', 'public.organization_members', 'insert')
     or has_table_privilege('authenticated', 'public.organization_members', 'update')
-    or has_table_privilege('authenticated', 'public.organization_members', 'delete') then
-    raise exception 'Authenticated role can bypass controlled workspace or membership creation';
+    or has_table_privilege('authenticated', 'public.organization_members', 'delete')
+    or has_table_privilege('authenticated', 'public.profiles', 'insert') then
+    raise exception 'Authenticated role can bypass controlled workspace, membership or profile creation';
+  end if;
+
+  if has_column_privilege('authenticated', 'public.profiles', 'role', 'update')
+    or has_column_privilege('authenticated', 'public.profiles', 'subscription_tier', 'update')
+    or has_column_privilege('authenticated', 'public.profiles', 'organization_id', 'update')
+    or has_column_privilege('authenticated', 'public.profiles', 'email', 'update') then
+    raise exception 'Authenticated role can modify protected profile columns';
+  end if;
+
+  if not has_column_privilege('authenticated', 'public.profiles', 'first_name', 'update')
+    or not has_column_privilege('authenticated', 'public.profiles', 'last_name', 'update')
+    or not has_column_privilege('authenticated', 'public.profiles', 'company_name', 'update') then
+    raise exception 'Authenticated role is missing editable profile fields';
+  end if;
+
+  if has_column_privilege('authenticated', 'public.organizations', 'id', 'update')
+    or has_column_privilege('authenticated', 'public.organizations', 'created_at', 'update') then
+    raise exception 'Authenticated role can modify protected organization columns';
   end if;
 
   if not has_table_privilege('authenticated', 'public.organizations', 'select')
     or not has_table_privilege('authenticated', 'public.organization_members', 'select')
-    or not has_table_privilege('authenticated', 'public.profiles', 'select,update')
+    or not has_table_privilege('authenticated', 'public.profiles', 'select')
     or not has_table_privilege('authenticated', 'public.projects', 'select,insert,update,delete') then
     raise exception 'Authenticated role is missing required workspace privileges';
   end if;
@@ -116,6 +135,16 @@ begin
       and policyname = 'members_insert_authenticated'
   ) then
     raise exception 'Unsafe direct membership insert policy remains';
+  end if;
+
+  if exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'profiles'
+      and policyname = 'profiles_insert_own'
+  ) then
+    raise exception 'Direct profile insert policy remains';
   end if;
 
   raise notice 'KUMPLIO workspace onboarding verification passed.';
