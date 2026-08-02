@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   const [{ data: artifact }, { data: workflowStage }] = await Promise.all([
     supabase
       .from('agent_artifacts')
-      .select('id')
+      .select('id, status, version, lineage_id')
       .eq('run_id', runId)
       .eq('organization_id', organizationId)
       .order('version', { ascending: false })
@@ -86,32 +87,42 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
       .maybeSingle(),
   ])
 
-  const { data: review, error: reviewError } = await supabase
-    .from('agent_reviews')
-    .insert({
-      organization_id: organizationId,
-      case_id: run.case_id,
-      run_id: runId,
-      artifact_id: artifact?.id || null,
-      reviewer_id: user.id,
-      decision: parsed.data.decision,
-      comment: parsed.data.comment || null,
-      checklist: parsed.data.checklist,
-    })
-    .select('id, decision, comment, created_at')
-    .single()
-
-  if (reviewError || !review) {
-    console.error('[agents/review] unable to create review', reviewError?.code)
-    return NextResponse.json({ error: 'Unable to save review', code: 'review_create_failed' }, { status: 500 })
+  if (!artifact) {
+    return NextResponse.json({ error: 'This run has no reviewable artifact', code: 'artifact_required' }, { status: 409 })
   }
 
+  let reviewId: string
+  try {
+    const admin = createAdminClient()
+    const { data, error } = await admin.rpc('record_agent_artifact_review', {
+      p_actor_id: user.id,
+      p_organization_id: organizationId,
+      p_run_id: runId,
+      p_artifact_id: artifact.id,
+      p_decision: parsed.data.decision,
+      p_comment: parsed.data.comment || null,
+      p_checklist: parsed.data.checklist,
+    })
+
+    if (error || !data) {
+      console.error('[agents/review/transaction]', error?.code)
+      const status = error?.code === '23514' ? 409 : error?.code === '42501' ? 403 : 500
+      return NextResponse.json({ error: 'Unable to record artifact review', code: 'artifact_review_failed' }, { status })
+    }
+    reviewId = data
+  } catch (error) {
+    console.error('[agents/review/configuration]', error instanceof Error ? error.message : 'unknown')
+    return NextResponse.json({ error: 'Artifact review service is not configured', code: 'review_service_unavailable' }, { status: 503 })
+  }
+
+  const { data: review } = await supabase
+    .from('agent_reviews')
+    .select('id, decision, comment, created_at')
+    .eq('id', reviewId)
+    .eq('organization_id', organizationId)
+    .maybeSingle()
+
   const runStatus = parsed.data.decision === 'approved'
-    ? 'approved'
-    : parsed.data.decision === 'rejected'
-      ? 'rejected'
-      : 'pending_review'
-  const artifactStatus = parsed.data.decision === 'approved'
     ? 'approved'
     : parsed.data.decision === 'rejected'
       ? 'rejected'
@@ -125,14 +136,6 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
 
   if (runUpdateError) {
     return NextResponse.json({ error: 'Review saved but run status could not be updated', code: 'run_review_sync_failed' }, { status: 500 })
-  }
-
-  if (artifact?.id) {
-    await supabase
-      .from('agent_artifacts')
-      .update({ status: artifactStatus })
-      .eq('id', artifact.id)
-      .eq('organization_id', organizationId)
   }
 
   let workflowStatus: string | null = null
@@ -196,8 +199,10 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
             stage_id: workflowStage.id,
             stage_index: workflowStage.stage_index,
             run_id: runId,
-            artifact_id: artifact?.id || null,
-            review_id: review.id,
+            artifact_id: artifact.id,
+            artifact_lineage_id: artifact.lineage_id,
+            artifact_version: artifact.version,
+            review_id: reviewId,
             decision: parsed.data.decision,
             workflow_status: workflowStatus,
           },
@@ -207,7 +212,18 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   }
 
   return NextResponse.json({
-    review,
+    review: review || {
+      id: reviewId,
+      decision: parsed.data.decision,
+      comment: parsed.data.comment || null,
+      created_at: new Date().toISOString(),
+    },
+    artifact: {
+      id: artifact.id,
+      lineageId: artifact.lineage_id,
+      version: artifact.version,
+      decision: parsed.data.decision,
+    },
     runId,
     status: runStatus,
     workflowStageId: workflowStage?.id || null,
