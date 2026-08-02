@@ -2,6 +2,8 @@
 -- Read-only checks for schema, RLS, grants, policies, functions, triggers and indexes.
 
 do $$
+declare
+  cleanup_trigger_count integer;
 begin
   if to_regclass('public.compliance_case_resource_links') is null then
     raise exception 'Missing public.compliance_case_resource_links';
@@ -13,6 +15,21 @@ begin
 
   if to_regprocedure('private.record_compliance_case_resource_event()') is null then
     raise exception 'Missing private.record_compliance_case_resource_event()';
+  end if;
+
+  if to_regprocedure('private.cleanup_compliance_case_resource_links()') is null then
+    raise exception 'Missing private.cleanup_compliance_case_resource_links()';
+  end if;
+
+  if not exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'compliance_case_resource_links'
+      and column_name = 'created_by'
+      and is_nullable = 'YES'
+  ) then
+    raise exception 'created_by must be nullable to preserve links when users are deleted';
   end if;
 
   if not exists (
@@ -72,6 +89,22 @@ begin
       and not tgisinternal
   ) then
     raise exception 'Missing case resource event trigger';
+  end if;
+
+  select count(*)::integer
+    into cleanup_trigger_count
+  from pg_trigger
+  where not tgisinternal
+    and tgname in (
+      'cleanup_document_case_resource_links',
+      'cleanup_obligation_case_resource_links',
+      'cleanup_finding_case_resource_links',
+      'cleanup_risk_case_resource_links',
+      'cleanup_action_case_resource_links'
+    );
+
+  if cleanup_trigger_count <> 5 then
+    raise exception 'Expected five source cleanup triggers, found %', cleanup_trigger_count;
   end if;
 
   if not exists (
