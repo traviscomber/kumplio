@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/regulatory/leychile",
+      "schedule": "15 10 * * *"
+    },
+    {
+      "path": "/api/cron/regulatory/leychile-retry",
+      "schedule": "15 12 * * *"
+    }
+  ]
+}
