@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
 
-const resourceTypeSchema = z.enum(['document', 'obligation', 'finding', 'risk', 'action'])
+const resourceTypeSchema = z.enum(['document', 'obligation', 'finding', 'risk', 'action', 'control', 'evidence'])
 
 const linkResourceSchema = z.object({
   resourceType: resourceTypeSchema,
@@ -22,6 +22,8 @@ const resourceTables: Record<z.infer<typeof resourceTypeSchema>, string> = {
   finding: 'audit_findings',
   risk: 'risks',
   action: 'roadmaps',
+  control: 'controls',
+  evidence: 'evidence',
 }
 
 async function resolveContext(caseId: string) {
