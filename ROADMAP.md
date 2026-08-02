@@ -12,7 +12,11 @@
 
 - **M0 / Agent Operating System:** issue #29.
 - **M1 / Product Foundation:** issue #38.
-- Todo nuevo issue debe incluir el identificador del objetivo de este documento, por ejemplo `OBJ-PF-001` u `OBJ-RE-001`.
+- **M2 / Regulatory Evidence Engine:** crear epic al iniciar el diseño técnico.
+- **M3 / Data & Privacy:** crear epic después de aprobar el modelo de evidencia.
+- **M8 / Transporte, M9 / Agro y M10 / Minería:** crear cada epic al comenzar discovery con un piloto o design partner.
+
+Todo nuevo issue debe incluir el identificador del objetivo de este documento, por ejemplo `OBJ-PF-001` u `OBJ-RE-001`.
 
 ---
 
