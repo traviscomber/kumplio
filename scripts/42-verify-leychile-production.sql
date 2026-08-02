@@ -1,5 +1,5 @@
 -- KUMPLIO LeyChile production verification
--- Run after scripts 37, 38, 41 and the first official capture.
+-- Run after scripts 37, 38, 40, 41 and the first official capture.
 
 do $$
 declare
@@ -33,10 +33,15 @@ begin
     raise exception 'Ley 21.719 document was not captured';
   end if;
 
-  select count(*), max(version.id)
-  into version_count, version_id
+  select count(*) into version_count
   from public.regulatory_document_versions version
   where version.document_id = document_id;
+
+  select version.id into version_id
+  from public.regulatory_document_versions version
+  where version.document_id = document_id
+  order by version.version_number desc
+  limit 1;
 
   if version_count <> 1 or version_id is null then
     raise exception 'Expected exactly one captured Ley 21.719 version, found %', version_count;
