@@ -46,16 +46,20 @@ revoke all on function public.handle_new_user() from public, anon, authenticated
 -- Reduce Data API privileges. Workspace creation and membership insertion are
 -- available only through initialize_workspace() or a future audited invitation RPC.
 revoke all on table public.organizations from anon;
-revoke insert, delete, truncate, trigger, references on table public.organizations from authenticated;
-grant select, update on table public.organizations to authenticated;
+revoke insert, update, delete, truncate, trigger, references on table public.organizations from authenticated;
+grant select on table public.organizations to authenticated;
+grant update (name, country, industry, size, updated_at)
+  on table public.organizations to authenticated;
 
 revoke all on table public.organization_members from anon;
 revoke insert, update, delete, truncate, trigger, references on table public.organization_members from authenticated;
 grant select on table public.organization_members to authenticated;
 
 revoke all on table public.profiles from anon;
-revoke delete, truncate, trigger, references on table public.profiles from authenticated;
-grant select, insert, update on table public.profiles to authenticated;
+revoke insert, update, delete, truncate, trigger, references on table public.profiles from authenticated;
+grant select on table public.profiles to authenticated;
+grant update (first_name, last_name, company_name, updated_at)
+  on table public.profiles to authenticated;
 
 revoke all on table public.projects from anon;
 revoke truncate, trigger, references on table public.projects from authenticated;
@@ -65,6 +69,7 @@ drop policy if exists org_insert_authenticated on public.organizations;
 drop policy if exists members_insert_authenticated on public.organization_members;
 drop policy if exists members_update_as_owner on public.organization_members;
 drop policy if exists members_update_by_owner on public.organization_members;
+drop policy if exists profiles_insert_own on public.profiles;
 
 create or replace function public.initialize_workspace(
   organization_name text,
