@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { runLeyChileScraper } from '@/lib/regulatory/services/run-leychile-scraper'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -30,44 +30,20 @@ export async function POST() {
     )
   }
 
-  const admin = createAdminClient()
+  const result = await runLeyChileScraper('manual')
 
-  try {
-    const { data, error } = await admin.functions.invoke('leychile-bootstrap', {
-      body: {},
-    })
-
-    if (error) {
-      throw new Error(`leychile_edge_function_failed:${error.message}`)
-    }
-
-    if (!data?.ok) {
-      throw new Error(`leychile_capture_failed:${data?.error || 'unknown'}`)
-    }
-
-    return NextResponse.json({
-      ok: true,
-      law: '21.719',
-      ...data,
-    }, {
-      headers: { 'Cache-Control': 'no-store' },
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'unknown_error'
-    console.error('[regulatory/leychile/capture]', message)
-
-    await admin
-      .from('regulatory_sources')
-      .update({
-        health_status: 'failed',
-        last_error_at: new Date().toISOString(),
-        last_error_code: message.split(':')[0] || 'capture_failed',
-      })
-      .eq('canonical_url', 'https://www.bcn.cl/leychile/')
-
+  if (result.status === 'failed') {
     return NextResponse.json(
-      { error: 'LeyChile capture failed', code: message.split(':')[0] || 'capture_failed' },
+      { error: 'LeyChile capture failed', code: result.error?.split(':')[0] || 'capture_failed', result },
       { status: 502 },
     )
   }
+
+  return NextResponse.json({
+    ok: true,
+    law: '21.719',
+    result,
+  }, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }
