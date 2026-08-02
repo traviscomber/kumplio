@@ -16,7 +16,7 @@ create table if not exists public.compliance_case_resource_links (
   ),
   resource_id uuid not null,
   note text,
-  created_by uuid not null references auth.users(id) on delete restrict,
+  created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   unique (case_id, resource_type, resource_id)
 );
@@ -164,15 +164,13 @@ set search_path = pg_catalog, public
 as $$
 declare
   link_record public.compliance_case_resource_links;
-  event_actor uuid;
+  event_actor uuid := auth.uid();
 begin
   if tg_op = 'DELETE' then
     link_record := old;
   else
     link_record := new;
   end if;
-
-  event_actor := coalesce(auth.uid(), link_record.created_by);
 
   insert into public.compliance_case_events (
     organization_id,
