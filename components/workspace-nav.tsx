@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 
 const items = [
   ['/dashboard', 'Resumen'],
+  ['/readiness', 'Estado'],
   ['/cases', 'Casos'],
   ['/obligations', 'Obligaciones'],
   ['/controls', 'Controles'],
