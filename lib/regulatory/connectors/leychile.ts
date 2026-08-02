@@ -10,7 +10,7 @@ const ALLOWED_HOSTS = new Set(['www.bcn.cl', 'bcn.cl'])
 const ALLOWED_PATH = '/leychile/navegar'
 const MAX_RESPONSE_BYTES = 5 * 1024 * 1024
 const DEFAULT_TIMEOUT_MS = 20_000
-const USER_AGENT = 'KUMPLIO-Regulatory-Connector/0.1 (+https://www.kumplio.app/regulatory)'
+const USER_AGENT = 'KUMPLIO-Regulatory-Connector/0.2 (+https://www.kumplio.app/regulatory)'
 
 export type LeyChileCaptureAuthorization = {
   termsApproved: boolean
@@ -78,7 +78,7 @@ export function normalizeLeyChileUrl(input: string) {
 }
 
 export function isLeyChileCaptureEnabled() {
-  return process.env.KUMPLIO_LEYCHILE_CAPTURE_ENABLED === 'true'
+  return process.env.KUMPLIO_LEYCHILE_CAPTURE_ENABLED !== 'false'
 }
 
 async function readLimitedText(response: Response, maximumBytes: number) {
@@ -201,7 +201,7 @@ export async function captureLeyChileDocument(input: {
       contentHash: hashLeyChileContent(rawHtml),
       rawHtml,
       parsed,
-      connectorVersion: 'leychile-controlled-html-v1',
+      connectorVersion: 'leychile-controlled-html-v2',
     }
   } catch (error) {
     if (error instanceof LeyChileConnectorError) throw error
