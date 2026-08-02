@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { getWorkflowDefinition } from '@/lib/agents/orchestration'
 
 export const runtime = 'nodejs'
 
 export async function GET(_request: Request, context: { params: Promise<{ workflowId: string }> }) {
   const { workflowId } = await context.params
+  if (!z.string().uuid().safeParse(workflowId).success) {
+    return NextResponse.json({ error: 'Invalid workflow id', code: 'invalid_workflow_id' }, { status: 400 })
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -17,24 +23,50 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     .maybeSingle()
   if (!membership?.organization_id) return NextResponse.json({ error: 'Organization required' }, { status: 403 })
 
+  const organizationId = membership.organization_id
   const { data: workflow, error } = await supabase
     .from('agent_workflows')
-    .select('*, compliance_cases(id, title, description, status, priority)')
+    .select('id, organization_id, case_id, workflow_type, status, current_stage, total_stages, input_payload, final_payload, error_code, error_message, started_at, completed_at, created_at, updated_at, compliance_cases(id, title, description, status, priority)')
     .eq('id', workflowId)
-    .eq('organization_id', membership.organization_id)
+    .eq('organization_id', organizationId)
     .maybeSingle()
   if (error || !workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
 
   const { data: stages } = await supabase
     .from('agent_workflow_stages')
-    .select('id, stage_index, agent_id, status, run_id, output_artifact_id, attempt_count, max_attempts, context_snapshot, started_at, completed_at, updated_at')
+    .select('id, stage_index, agent_id, status, run_id, source_artifact_ids, output_artifact_id, attempt_count, max_attempts, task_template, context_snapshot, started_at, completed_at, updated_at')
     .eq('workflow_id', workflowId)
+    .eq('organization_id', organizationId)
     .order('stage_index', { ascending: true })
 
-  const artifactIds = (stages || []).map((stage) => stage.output_artifact_id).filter(Boolean)
-  const { data: artifacts } = artifactIds.length
-    ? await supabase.from('agent_artifacts').select('id, run_id, artifact_type, title, content, status, created_at').in('id', artifactIds)
-    : { data: [] as any[] }
+  const artifactIds = (stages || []).map((stage) => stage.output_artifact_id).filter((id): id is string => Boolean(id))
+  const runIds = (stages || []).map((stage) => stage.run_id).filter((id): id is string => Boolean(id))
 
-  return NextResponse.json({ workflow, stages: stages || [], artifacts: artifacts || [] })
+  const [artifactsResult, reviewsResult] = await Promise.all([
+    artifactIds.length
+      ? supabase
+          .from('agent_artifacts')
+          .select('id, run_id, artifact_type, title, version, content, source_refs, confidence, status, created_at')
+          .eq('organization_id', organizationId)
+          .in('id', artifactIds)
+      : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
+    runIds.length
+      ? supabase
+          .from('agent_reviews')
+          .select('id, run_id, artifact_id, reviewer_id, decision, comment, checklist, created_at')
+          .eq('organization_id', organizationId)
+          .in('run_id', runIds)
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
+  ])
+
+  return NextResponse.json({
+    workflow,
+    template: getWorkflowDefinition(workflow.workflow_type),
+    stages: stages || [],
+    artifacts: artifactsResult.data || [],
+    reviews: reviewsResult.data || [],
+  }, {
+    headers: { 'Cache-Control': 'no-store' },
+  })
 }
