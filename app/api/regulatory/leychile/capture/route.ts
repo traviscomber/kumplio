@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { runControlledLeyChileCapture } from '@/lib/regulatory/services/leychile-capture-pipeline'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
-
-const LEY_21719_VERSION = '2026-12-01'
-const LEY_21719_URL = `https://www.bcn.cl/leychile/navegar?idNorma=1209272&idVersion=${LEY_21719_VERSION}`
 
 export async function POST() {
   const supabase = await createClient()
@@ -35,54 +31,39 @@ export async function POST() {
   }
 
   const admin = createAdminClient()
-  const { data: source, error: sourceError } = await admin
-    .from('regulatory_sources')
-    .select('id, terms_review_status, health_status')
-    .eq('canonical_url', 'https://www.bcn.cl/leychile/')
-    .maybeSingle()
-
-  if (sourceError || !source) {
-    return NextResponse.json(
-      { error: 'LeyChile source is not registered', code: 'source_not_registered' },
-      { status: 503 },
-    )
-  }
 
   try {
-    const result = await runControlledLeyChileCapture({
-      sourceId: source.id,
-      url: LEY_21719_URL,
-      authorization: {
-        termsApproved: true,
-        approvedMethod: 'controlled_html',
-        approvalReference: 'BCN linked open data and LeyChile public interoperability documentation',
-      },
-      document: {
-        canonicalIdentifier: 'LEY-21719',
-        title: 'Ley 21.719 — Protección y tratamiento de datos personales',
-        documentType: 'law',
-        canonicalUrl: LEY_21719_URL,
-        externalReference: '1209272',
-        publicationDate: '2024-12-13',
-        effectiveFrom: LEY_21719_VERSION,
-        effectiveTo: null,
-        status: 'published',
-        versionLabel: `Vigencia diferida ${LEY_21719_VERSION}`,
-        versionDate: LEY_21719_VERSION,
-      },
+    const { data, error } = await admin.functions.invoke('leychile-bootstrap', {
+      body: {},
     })
+
+    if (error) {
+      throw new Error(`leychile_edge_function_failed:${error.message}`)
+    }
+
+    if (!data?.ok) {
+      throw new Error(`leychile_capture_failed:${data?.error || 'unknown'}`)
+    }
 
     return NextResponse.json({
       ok: true,
-      sourceId: source.id,
       law: '21.719',
-      ...result,
+      ...data,
     }, {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'unknown_error'
     console.error('[regulatory/leychile/capture]', message)
+
+    await admin
+      .from('regulatory_sources')
+      .update({
+        health_status: 'failed',
+        last_error_at: new Date().toISOString(),
+        last_error_code: message.split(':')[0] || 'capture_failed',
+      })
+      .eq('canonical_url', 'https://www.bcn.cl/leychile/')
 
     return NextResponse.json(
       { error: 'LeyChile capture failed', code: message.split(':')[0] || 'capture_failed' },
