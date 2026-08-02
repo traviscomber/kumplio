@@ -1,8 +1,9 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CalendarClock, CheckCircle2, Loader2, Plus, ShieldCheck } from 'lucide-react'
+import { ArrowRight, CalendarClock, CheckCircle2, Loader2, Plus, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 type Project = { id: string; name: string }
@@ -226,14 +227,20 @@ export function ControlsWorkspace({ projects, obligations, members, controls }: 
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
           {controls.map((control) => (
-            <article key={control.id} className="rounded-2xl border border-border bg-card p-5">
-              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{natureLabels[control.nature] || control.nature}</span>
-                <span className="rounded-full bg-muted px-2.5 py-1">{modeLabels[control.mode] || control.mode}</span>
-                <span className="rounded-full bg-muted px-2.5 py-1">{control.lifecycleStatus}</span>
+            <Link key={control.id} href={`/controls/${control.id}`} className="group rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-sm">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">{natureLabels[control.nature] || control.nature}</span>
+                    <span className="rounded-full bg-muted px-2.5 py-1">{modeLabels[control.mode] || control.mode}</span>
+                    <span className="rounded-full bg-muted px-2.5 py-1">{control.lifecycleStatus}</span>
+                  </div>
+                  <h3 className="mt-3 text-lg font-bold group-hover:text-primary">{control.name}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">{control.projectName}</p>
+                </div>
+                <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
               </div>
-              <h3 className="mt-3 text-lg font-bold">{control.name}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{control.projectName}</p>
+
               {control.description && <p className="mt-3 text-sm leading-6 text-muted-foreground">{control.description}</p>}
               {control.objective && <p className="mt-3 rounded-lg bg-muted/50 p-3 text-xs leading-5"><strong>Objetivo:</strong> {control.objective}</p>}
 
@@ -248,7 +255,7 @@ export function ControlsWorkspace({ projects, obligations, members, controls }: 
                 {control.nextEvaluationAt ? <CalendarClock className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                 {control.nextEvaluationAt ? `Próxima evaluación: ${new Date(control.nextEvaluationAt).toLocaleDateString('es-CL')}` : 'Evaluación aún no programada'}
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       )}
