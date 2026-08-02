@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { FileClock } from 'lucide-react'
+import { CaseMemoryPanel } from '@/components/cases/case-memory-panel'
 import { CaseResourceWorkspace } from '@/components/cases/case-resource-workspace'
 import { CaseWorkflowPanel } from '@/components/cases/case-workflow-panel'
 import { createClient } from '@/lib/supabase/server'
@@ -23,7 +24,7 @@ export default async function ComplianceCaseLayout({
 
   const { data: membership } = await supabase
     .from('organization_members')
-    .select('organization_id')
+    .select('organization_id, role')
     .eq('user_id', user.id)
     .limit(1)
     .maybeSingle()
@@ -39,7 +40,7 @@ export default async function ComplianceCaseLayout({
 
   if (!complianceCase) notFound()
 
-  const [projectResult, reviewCountResult, artifactCountResult] = await Promise.all([
+  const [projectResult, reviewCountResult, artifactCountResult, memoryNodeResult, memoryEdgeResult, memoryRunResult] = await Promise.all([
     complianceCase.project_id
       ? supabase
           .from('projects')
@@ -58,6 +59,21 @@ export default async function ComplianceCaseLayout({
       .select('id', { count: 'exact', head: true })
       .eq('case_id', caseId)
       .eq('organization_id', membership.organization_id),
+    supabase
+      .from('organization_memory_nodes')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', membership.organization_id),
+    supabase
+      .from('organization_memory_edges')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', membership.organization_id),
+    supabase
+      .from('organization_memory_projection_runs')
+      .select('status, completed_at')
+      .eq('organization_id', membership.organization_id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
   return (
@@ -76,6 +92,15 @@ export default async function ComplianceCaseLayout({
             Crear solicitud
           </Link>
         </section>
+
+        <CaseMemoryPanel
+          caseId={caseId}
+          nodeCount={memoryNodeResult.count || 0}
+          edgeCount={memoryEdgeResult.count || 0}
+          latestStatus={memoryRunResult.data?.status || null}
+          latestCompletedAt={memoryRunResult.data?.completed_at || null}
+          canRefresh={['owner', 'admin'].includes(membership.role || '')}
+        />
 
         <CaseResourceWorkspace
           caseId={caseId}
