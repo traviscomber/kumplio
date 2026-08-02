@@ -8,6 +8,12 @@
 > Responsable técnico interno: Travis — Arquitecto IA full-stack  
 > Repositorio: `traviscomber/kumplio`
 
+## Seguimiento activo en GitHub
+
+- **M0 / Agent Operating System:** issue #29.
+- **M1 / Product Foundation:** issue #38.
+- Todo nuevo issue debe incluir el identificador del objetivo de este documento, por ejemplo `OBJ-PF-001` u `OBJ-RE-001`.
+
 ---
 
 ## 0. Propósito de este documento
