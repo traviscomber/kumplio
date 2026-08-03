@@ -1,18 +1,12 @@
-name: Public discovery validation
+name: Application validation
 
 on:
   pull_request:
-    paths:
-      - 'app/**'
-      - 'components/**'
-      - 'lib/chile-compliance-content.ts'
-      - 'lib/public-site.ts'
-      - 'lib/services/**'
-      - 'scripts/check-public-discovery.mjs'
-      - 'scripts/check-client-boundaries.mjs'
-      - 'package.json'
-      - '.github/workflows/public-discovery.yml'
   workflow_dispatch:
+
+concurrency:
+  group: application-validation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -45,6 +39,9 @@ jobs:
 
       - name: Validate client-server boundaries
         run: npm run check:boundaries
+
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Build Next.js
         run: npm run build
