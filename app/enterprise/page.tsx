@@ -20,6 +20,8 @@ export const metadata = {
   description: 'Diseñamos e implementamos una plataforma organizacional personalizada sobre el núcleo de Kumplio, desde $5.000.000 CLP + IVA.',
 }
 
+const enterpriseContactHref = '/contact?service=enterprise'
+
 const beforeAfter = [
   ['Procesos dispersos en Excel, correo y documentos', 'Un espacio único con contexto, responsables y trazabilidad'],
   ['Integraciones manuales y doble digitación', 'Conectores y automatizaciones diseñados para tu operación'],
@@ -55,7 +57,7 @@ export default function EnterprisePage() {
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild className="h-13 rounded-xl px-7 font-bold">
-                <Link href="/sign-up?interest=enterprise">Solicitar diagnóstico <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href={enterpriseContactHref}>Solicitar diagnóstico <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="h-13 rounded-xl border-white/15 bg-white/[0.025] px-7 font-semibold">
                 <Link href="/demo">Ver una demo de Kumplio</Link>
@@ -135,7 +137,7 @@ export default function EnterprisePage() {
           <ShieldCheck className="mx-auto h-10 w-10 text-primary" />
           <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">Primero entendemos el problema. Después definimos si necesitas Fullstack.</h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/55">El diagnóstico debe confirmar el resultado, alcance, riesgos y costo antes de proponer un proyecto.</p>
-          <Button size="lg" asChild className="mt-8 h-13 rounded-xl px-8 font-bold"><Link href="/sign-up?interest=enterprise">Solicitar diagnóstico <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+          <Button size="lg" asChild className="mt-8 h-13 rounded-xl px-8 font-bold"><Link href={enterpriseContactHref}>Solicitar diagnóstico <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
         </section>
       </main>
       <Footer />
