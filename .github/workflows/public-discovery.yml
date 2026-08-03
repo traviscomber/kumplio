@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'app/**'
-      - 'components/footer.tsx'
+      - 'components/**'
       - 'lib/chile-compliance-content.ts'
       - 'lib/public-site.ts'
+      - 'lib/services/**'
       - 'scripts/check-public-discovery.mjs'
+      - 'scripts/check-client-boundaries.mjs'
       - 'package.json'
       - '.github/workflows/public-discovery.yml'
   workflow_dispatch:
@@ -40,6 +42,9 @@ jobs:
 
       - name: Validate public discovery surface
         run: npm run check:discovery
+
+      - name: Validate client-server boundaries
+        run: npm run check:boundaries
 
       - name: Build Next.js
         run: npm run build
