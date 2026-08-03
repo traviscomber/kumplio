@@ -149,7 +149,7 @@ function PublicNav() {
       <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link href="/" className="font-extrabold tracking-[0.2em]">KUMPLIO</Link>
         <div className="hidden items-center gap-7 md:flex">
-          <Link href="/cases" className="text-sm text-white/65 hover:text-white">Casos</Link>
+          <Link href="/use-cases" className="text-sm text-white/65 hover:text-white">Casos</Link>
           <Link href="/demo" className="text-sm text-white/65 hover:text-white">Demo</Link>
           <Link href="/pricing" className="text-sm text-white/65 hover:text-white">Planes</Link>
         </div>
