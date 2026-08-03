@@ -1,122 +1,160 @@
-// API endpoint for exporting documents to various formats
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { generateCSVReport, generateExcelReport, generatePDFReport } from '@/lib/services/export'
+import { createClient } from '@/lib/supabase/server'
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { generateExcelReport, generateCSVReport, generatePDFReport } from '@/lib/services/export';
+export const runtime = 'nodejs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const formatSchema = z.enum(['pdf', 'excel', 'csv'])
 
-export async function GET(req: NextRequest) {
-  try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { data: { user } } = await supabase.auth.getUser();
+function safeBaseName(value: string) {
+  const cleaned = value
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/[\\/:*?"<>|]/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120)
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+  return cleaned || 'documento'
+}
 
-    const documentId = req.nextUrl.searchParams.get('documentId');
-    const format = req.nextUrl.searchParams.get('format') || 'pdf';
+function encodeRFC5987(value: string) {
+  return encodeURIComponent(value).replace(/['()*]/g, (character) =>
+    `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
+  )
+}
 
-    if (!documentId) {
-      return NextResponse.json(
-        { error: 'Missing documentId' },
-        { status: 400 }
-      );
-    }
+function downloadHeaders(filename: string, contentType: string) {
+  const asciiFilename = filename
+    .normalize('NFKD')
+    .replace(/[^\x20-\x7E]/g, '')
+    .replace(/["\\]/g, '_') || 'reporte'
 
-    // Get document
-    const { data: document } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('id', documentId)
-      .single();
+  return {
+    'Cache-Control': 'private, no-store',
+    'Content-Disposition': `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodeRFC5987(filename)}`,
+    'Content-Type': contentType,
+    'X-Content-Type-Options': 'nosniff',
+  }
+}
 
-    if (!document || document.user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Document not found' },
-        { status: 404 }
-      );
-    }
+export async function GET(request: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    // Get obligations
-    const { data: obligations } = await supabase
-      .from('obligations')
-      .select('*')
-      .eq('document_id', documentId);
-
-    // Get matrix
-    const { data: matrix } = await supabase
-      .from('compliance_matrix')
-      .select('*')
-      .eq('document_id', documentId);
-
-    // Calculate stats
-    const matrixData = matrix || [];
-    const criticalCount = matrixData.filter(m => m.risk_level === 'critical').length;
-    const highCount = matrixData.filter(m => m.risk_level === 'high').length;
-    const completedCount = matrixData.filter(m => m.status === 'completed').length;
-    const totalCount = matrixData.length;
-    const complianceScore = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-    const stats = {
-      complianceScore,
-      totalObligations: obligations?.length || 0,
-      criticalItems: criticalCount,
-      highRiskItems: highCount,
-    };
-
-    let blob: Blob | Buffer;
-    let contentType: string;
-    let filename: string;
-
-    const timestamp = new Date().toISOString().split('T')[0];
-    const baseName = `reporte-${document.filename}-${timestamp}`;
-
-    if (format === 'excel') {
-      const buffer = generateExcelReport(
-        document.filename,
-        obligations || [],
-        matrix || [],
-        stats
-      );
-      blob = new Blob([buffer], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      filename = `${baseName}.xlsx`;
-    } else if (format === 'csv') {
-      const csv = generateCSVReport(obligations || [], matrix || []);
-      blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      contentType = 'text/csv';
-      filename = `${baseName}.csv`;
-    } else {
-      // PDF format (default)
-      blob = await generatePDFReport(
-        document.filename,
-        obligations || [],
-        matrix || [],
-        stats
-      );
-      contentType = 'application/pdf';
-      filename = `${baseName}.pdf`;
-    }
-
-    return new NextResponse(blob, {
-      headers: {
-        'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${filename}"`,
-      },
-    });
-  } catch (error) {
-    console.error('[v0] Export API error:', error);
+  if (authError || !user) {
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
+  }
+
+  const documentId = request.nextUrl.searchParams.get('documentId')?.trim()
+  if (!documentId || documentId.length > 128) {
+    return NextResponse.json(
+      { error: 'Invalid documentId', code: 'invalid_document_id' },
+      { status: 400 },
+    )
+  }
+
+  const parsedFormat = formatSchema.safeParse(request.nextUrl.searchParams.get('format') || 'pdf')
+  if (!parsedFormat.success) {
+    return NextResponse.json(
+      { error: 'Unsupported export format', code: 'unsupported_format' },
+      { status: 400 },
+    )
+  }
+
+  const { data: document, error: documentError } = await supabase
+    .from('documents')
+    .select('id, filename')
+    .eq('id', documentId)
+    .maybeSingle()
+
+  if (documentError) {
+    console.error('[export] document lookup failed', documentError.code)
+    return NextResponse.json(
+      { error: 'No fue posible consultar el documento.', code: 'document_lookup_failed' },
+      { status: 500 },
+    )
+  }
+
+  if (!document) {
+    return NextResponse.json(
+      { error: 'Documento no encontrado.', code: 'document_not_found' },
+      { status: 404 },
+    )
+  }
+
+  const [obligationsResult, matrixResult] = await Promise.all([
+    supabase
+      .from('obligations')
+      .select('obligation_text, type, severity, owner, deadline, evidence_reference')
+      .eq('document_id', documentId),
+    supabase
+      .from('compliance_matrix')
+      .select('obligation, risk_level, responsible, due_date, status, evidence')
+      .eq('document_id', documentId),
+  ])
+
+  if (obligationsResult.error || matrixResult.error) {
+    console.error(
+      '[export] related data lookup failed',
+      obligationsResult.error?.code || matrixResult.error?.code,
+    )
+    return NextResponse.json(
+      { error: 'No fue posible preparar los datos del reporte.', code: 'export_data_failed' },
+      { status: 500 },
+    )
+  }
+
+  const obligations = obligationsResult.data || []
+  const matrix = matrixResult.data || []
+  const completedCount = matrix.filter((item) => item.status === 'completed').length
+  const complianceScore = matrix.length > 0
+    ? Math.round((completedCount / matrix.length) * 100)
+    : 0
+
+  const stats = {
+    complianceScore,
+    totalObligations: obligations.length,
+    criticalItems: matrix.filter((item) => item.risk_level === 'critical').length,
+    highRiskItems: matrix.filter((item) => item.risk_level === 'high').length,
+  }
+
+  const timestamp = new Date().toISOString().slice(0, 10)
+  const baseName = `reporte-${safeBaseName(document.filename || 'documento')}-${timestamp}`
+
+  try {
+    if (parsedFormat.data === 'excel') {
+      const body = generateExcelReport(document.filename || 'Documento', obligations, matrix, stats)
+      const filename = `${baseName}.xlsx`
+      return new NextResponse(body, {
+        headers: downloadHeaders(
+          filename,
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ),
+      })
+    }
+
+    if (parsedFormat.data === 'csv') {
+      const body = generateCSVReport(obligations, matrix)
+      const filename = `${baseName}.csv`
+      return new NextResponse(body, {
+        headers: downloadHeaders(filename, 'text/csv; charset=utf-8'),
+      })
+    }
+
+    const body = await generatePDFReport(document.filename || 'Documento', obligations, matrix, stats)
+    const filename = `${baseName}.pdf`
+    return new NextResponse(body, {
+      headers: downloadHeaders(filename, 'application/pdf'),
+    })
+  } catch (error) {
+    console.error('[export] generation failed', error instanceof Error ? error.message : 'unknown_error')
+    return NextResponse.json(
+      { error: 'No fue posible generar el reporte.', code: 'export_generation_failed' },
+      { status: 500 },
+    )
   }
 }
