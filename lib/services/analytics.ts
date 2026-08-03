@@ -1,180 +1,164 @@
-// Analytics service for KUMPLIO compliance platform
-// Generates charts data and insights from compliance data
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-import { createClient } from '@supabase/supabase-js';
+type AnalyticsDocument = {
+  id: string
+  filename: string
+  status: string
+  created_at: string
+}
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+type MatrixItem = {
+  document_id: string
+  risk_level: string | null
+  status: string | null
+  due_date: string | null
+  obligation: string | null
+}
 
-export async function getAnalyticsData(userId: string) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+type ObligationItem = {
+  document_id: string
+  type: string | null
+}
 
-  try {
-    // Get all documents for user
-    const { data: documents } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('user_id', userId);
+const emptyAnalytics = {
+  totalDocuments: 0,
+  completedDocuments: 0,
+  averageComplianceScore: 0,
+  riskDistribution: [
+    { name: 'Crítico', value: 0, fill: 'var(--chart-1)' },
+    { name: 'Alto', value: 0, fill: 'var(--chart-2)' },
+    { name: 'Medio', value: 0, fill: 'var(--chart-3)' },
+    { name: 'Bajo', value: 0, fill: 'var(--chart-4)' },
+  ],
+  documentTimeline: [] as Array<{ name: string; uploaded: number; analyzed: number; date: string }>,
+  obligationsByType: [] as Array<{ type: string; count: number; fill: string }>,
+  upcomingDeadlines: [] as Array<{ obligation: string; dueDate: string; status: string | null; risk: string | null }>,
+}
 
-    if (!documents || documents.length === 0) {
-      return {
-        totalDocuments: 0,
-        completedDocuments: 0,
-        averageComplianceScore: 0,
-        riskDistribution: [],
-        documentTimeline: [],
-        obligationsByType: [],
-        upcomingDeadlines: [],
-      };
-    }
+const emptyStats = {
+  totalDocuments: 0,
+  totalObligations: 0,
+  criticalItems: 0,
+  highRiskItems: 0,
+  pendingItems: 0,
+  lastUpdated: null as string | null,
+}
 
-    // Get compliance matrix data
-    const docIds = documents.map(d => d.id);
-    const { data: matrixData } = await supabase
+async function loadDocuments(supabase: SupabaseClient, userId: string) {
+  const { data, error } = await supabase
+    .from('documents')
+    .select('id, filename, status, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  return (data || []) as AnalyticsDocument[]
+}
+
+async function loadRelatedData(supabase: SupabaseClient, documentIds: string[]) {
+  if (!documentIds.length) {
+    return { matrix: [] as MatrixItem[], obligations: [] as ObligationItem[] }
+  }
+
+  const [matrixResult, obligationsResult] = await Promise.all([
+    supabase
       .from('compliance_matrix')
-      .select('*')
-      .in('document_id', docIds);
-
-    const { data: obligationsData } = await supabase
+      .select('document_id, risk_level, status, due_date, obligation')
+      .in('document_id', documentIds),
+    supabase
       .from('obligations')
-      .select('*')
-      .in('document_id', docIds);
+      .select('document_id, type')
+      .in('document_id', documentIds),
+  ])
 
-    // Calculate metrics
-    const completedDocs = documents.filter(d => d.status === 'completed').length;
-    const totalRisks = matrixData || [];
-    
-    // Risk distribution
-    const riskDistribution = [
-      {
-        name: 'Crítico',
-        value: totalRisks.filter(r => r.risk_level === 'critical').length,
-        fill: 'var(--chart-1)',
-      },
-      {
-        name: 'Alto',
-        value: totalRisks.filter(r => r.risk_level === 'high').length,
-        fill: 'var(--chart-2)',
-      },
-      {
-        name: 'Medio',
-        value: totalRisks.filter(r => r.risk_level === 'medium').length,
-        fill: 'var(--chart-3)',
-      },
-      {
-        name: 'Bajo',
-        value: totalRisks.filter(r => r.risk_level === 'low').length,
-        fill: 'var(--chart-4)',
-      },
-    ];
+  if (matrixResult.error) throw matrixResult.error
+  if (obligationsResult.error) throw obligationsResult.error
 
-    // Document timeline
-    const documentTimeline = documents
-      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-      .map(doc => ({
-        name: doc.filename.substring(0, 15),
-        uploaded: 1,
-        analyzed: doc.status === 'completed' ? 1 : 0,
-        date: new Date(doc.created_at).toLocaleDateString('es-CL'),
-      }));
-
-    // Obligations by type
-    const typeCount = new Map<string, number>();
-    (obligationsData || []).forEach(obl => {
-      const type = obl.type || 'General';
-      typeCount.set(type, (typeCount.get(type) || 0) + 1);
-    });
-
-    const obligationsByType = Array.from(typeCount.entries()).map(([type, count]) => ({
-      type,
-      count,
-      fill: `var(--chart-${Math.floor(Math.random() * 4) + 1})`,
-    }));
-
-    // Upcoming deadlines
-    const upcoming = totalRisks
-      .filter(r => r.due_date && new Date(r.due_date) > new Date())
-      .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
-      .slice(0, 5)
-      .map(r => ({
-        obligation: r.obligation.substring(0, 40),
-        dueDate: r.due_date,
-        status: r.status,
-        risk: r.risk_level,
-      }));
-
-    // Average compliance score
-    const completedWithMatrix = documents.filter(d => 
-      d.status === 'completed' && 
-      (matrixData || []).some(m => m.document_id === d.id)
-    );
-    
-    let averageScore = 0;
-    if (completedWithMatrix.length > 0) {
-      const totalCompleted = (matrixData || [])
-        .filter(m => 
-          completedWithMatrix.some(d => d.id === m.document_id) &&
-          m.status === 'completed'
-        ).length;
-      
-      const totalObligs = (matrixData || [])
-        .filter(m => completedWithMatrix.some(d => d.id === m.document_id)).length;
-      
-      averageScore = totalObligs > 0 
-        ? Math.round((totalCompleted / totalObligs) * 100) 
-        : 0;
-    }
-
-    return {
-      totalDocuments: documents.length,
-      completedDocuments: completedDocs,
-      averageComplianceScore: averageScore,
-      riskDistribution,
-      documentTimeline,
-      obligationsByType,
-      upcomingDeadlines: upcoming,
-    };
-  } catch (error) {
-    console.error('[v0] Analytics error:', error);
-    throw error;
+  return {
+    matrix: (matrixResult.data || []) as MatrixItem[],
+    obligations: (obligationsResult.data || []) as ObligationItem[],
   }
 }
 
-export async function getDashboardStats(userId: string) {
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export async function getAnalyticsData(supabase: SupabaseClient, userId: string) {
+  const documents = await loadDocuments(supabase, userId)
+  if (!documents.length) return emptyAnalytics
 
-  try {
-    const { data: documents } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('user_id', userId);
+  const documentIds = documents.map((document) => document.id)
+  const { matrix, obligations } = await loadRelatedData(supabase, documentIds)
 
-    const docIds = documents?.map(d => d.id) || [];
-    
-    const { data: matrixData } = await supabase
-      .from('compliance_matrix')
-      .select('*')
-      .in('document_id', docIds);
+  const riskDistribution = [
+    { name: 'Crítico', value: matrix.filter((item) => item.risk_level === 'critical').length, fill: 'var(--chart-1)' },
+    { name: 'Alto', value: matrix.filter((item) => item.risk_level === 'high').length, fill: 'var(--chart-2)' },
+    { name: 'Medio', value: matrix.filter((item) => item.risk_level === 'medium').length, fill: 'var(--chart-3)' },
+    { name: 'Bajo', value: matrix.filter((item) => item.risk_level === 'low').length, fill: 'var(--chart-4)' },
+  ]
 
-    const { data: obligationsData } = await supabase
-      .from('obligations')
-      .select('*')
-      .in('document_id', docIds);
+  const documentTimeline = documents.map((document) => ({
+    name: document.filename.slice(0, 15),
+    uploaded: 1,
+    analyzed: document.status === 'completed' ? 1 : 0,
+    date: new Date(document.created_at).toLocaleDateString('es-CL'),
+  }))
 
-    const critical = (matrixData || []).filter(m => m.risk_level === 'critical').length;
-    const high = (matrixData || []).filter(m => m.risk_level === 'high').length;
-    const pending = (matrixData || []).filter(m => m.status === 'pending').length;
+  const typeCount = new Map<string, number>()
+  for (const obligation of obligations) {
+    const type = obligation.type || 'General'
+    typeCount.set(type, (typeCount.get(type) || 0) + 1)
+  }
 
-    return {
-      totalDocuments: documents?.length || 0,
-      totalObligations: obligationsData?.length || 0,
-      criticalItems: critical,
-      highRiskItems: high,
-      pendingItems: pending,
-      lastUpdated: new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error('[v0] Dashboard stats error:', error);
-    throw error;
+  const chartFills = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)']
+  const obligationsByType = Array.from(typeCount.entries())
+    .sort(([left], [right]) => left.localeCompare(right, 'es'))
+    .map(([type, count], index) => ({ type, count, fill: chartFills[index % chartFills.length] }))
+
+  const now = Date.now()
+  const upcomingDeadlines = matrix
+    .filter((item) => item.due_date && new Date(item.due_date).getTime() > now)
+    .sort((left, right) => new Date(left.due_date!).getTime() - new Date(right.due_date!).getTime())
+    .slice(0, 5)
+    .map((item) => ({
+      obligation: (item.obligation || 'Obligación sin título').slice(0, 80),
+      dueDate: item.due_date!,
+      status: item.status,
+      risk: item.risk_level,
+    }))
+
+  const completedDocumentIds = new Set(
+    documents.filter((document) => document.status === 'completed').map((document) => document.id),
+  )
+  const evaluatedItems = matrix.filter((item) => completedDocumentIds.has(item.document_id))
+  const completedItems = evaluatedItems.filter((item) => item.status === 'completed').length
+  const averageComplianceScore = evaluatedItems.length
+    ? Math.round((completedItems / evaluatedItems.length) * 100)
+    : 0
+
+  return {
+    totalDocuments: documents.length,
+    completedDocuments: documents.filter((document) => document.status === 'completed').length,
+    averageComplianceScore,
+    riskDistribution,
+    documentTimeline,
+    obligationsByType,
+    upcomingDeadlines,
+  }
+}
+
+export async function getDashboardStats(supabase: SupabaseClient, userId: string) {
+  const documents = await loadDocuments(supabase, userId)
+  if (!documents.length) return emptyStats
+
+  const { matrix, obligations } = await loadRelatedData(
+    supabase,
+    documents.map((document) => document.id),
+  )
+
+  return {
+    totalDocuments: documents.length,
+    totalObligations: obligations.length,
+    criticalItems: matrix.filter((item) => item.risk_level === 'critical').length,
+    highRiskItems: matrix.filter((item) => item.risk_level === 'high').length,
+    pendingItems: matrix.filter((item) => item.status === 'pending').length,
+    lastUpdated: new Date().toISOString(),
   }
 }
