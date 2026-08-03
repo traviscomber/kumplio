@@ -10,7 +10,6 @@ import { AlertTriangle, CheckCircle, Clock, FileText } from 'lucide-react';
 import { getAnalyticsData, getDashboardStats } from '@/lib/services/analytics';
 
 export default function AnalyticsDashboardClient() {
-  const [userId, setUserId] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -27,14 +26,12 @@ export default function AnalyticsDashboardClient() {
           return;
         }
 
-        setUserId(user.id);
-
         // Load analytics data
-        const analyticsData = await getAnalyticsData(user.id);
+        const analyticsData = await getAnalyticsData(supabase, user.id);
         setAnalytics(analyticsData);
 
         // Load dashboard stats
-        const dashboardStats = await getDashboardStats(user.id);
+        const dashboardStats = await getDashboardStats(supabase, user.id);
         setStats(dashboardStats);
       } catch (err) {
         console.error('[v0] Error loading analytics:', err);
