@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/app/providers'
-import { VeraFloatingChat } from '@/components/vera-floating-chat'
 
 const montserrat = Montserrat({
   variable: '--font-montserrat',
@@ -116,10 +115,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="sitemap" href="/sitemap.xml" />
       </head>
       <body className="font-sans antialiased text-foreground" suppressHydrationWarning>
-        <ClientProviders>
-          {children}
-          <VeraFloatingChat />
-        </ClientProviders>
+        <ClientProviders>{children}</ClientProviders>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
