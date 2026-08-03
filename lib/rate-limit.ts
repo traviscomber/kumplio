@@ -1,45 +1,47 @@
-import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+type AppSupabaseClient = SupabaseClient<any, any, any>
 
 /**
  * Check if a free-tier user can upload a document.
- * Free tier: 1 document per 7-day rolling window
- * Paid tiers: unlimited
+ * Free tier: 1 document per 7-day rolling window.
+ * Paid tiers: unlimited.
  */
-export async function checkDocumentLimit(userId: string, supabase: ReturnType<typeof createClient>) {
-  // Get user's subscription tier
+export async function checkDocumentLimit(userId: string, supabase: AppSupabaseClient) {
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('subscription_tier')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
   if (profileError) throw new Error(`Failed to fetch profile: ${profileError.message}`)
 
-  // If not free tier, no limit
-  if (profile?.subscription_tier !== 'free') {
-    return { allowed: true, remaining: Infinity, nextResetAt: null }
+  const subscriptionTier = typeof profile?.subscription_tier === 'string'
+    ? profile.subscription_tier
+    : 'free'
+
+  if (subscriptionTier !== 'free') {
+    return { allowed: true, remaining: Number.POSITIVE_INFINITY, nextResetAt: null as Date | null }
   }
 
-  // Free tier: check documents uploaded in the last 7 days
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 
   const { data: recentDocs, error: docsError, count } = await supabase
     .from('documents')
-    .select('id', { count: 'exact' })
+    .select('id, upload_date', { count: 'exact' })
     .eq('user_id', userId)
     .gte('upload_date', sevenDaysAgo.toISOString())
+    .order('upload_date', { ascending: true })
+    .limit(1)
 
   if (docsError) throw new Error(`Failed to fetch recent documents: ${docsError.message}`)
 
   const uploaded = count || 0
-  const allowed = uploaded < 1 // 1 document per week
-
-  // Calculate next reset time (7 days after the oldest document)
-  let nextResetAt: Date | null = null
-  if (uploaded >= 1 && recentDocs && recentDocs.length > 0) {
-    const oldestDocTime = new Date(recentDocs[0].upload_date)
-    nextResetAt = new Date(oldestDocTime.getTime() + 7 * 24 * 60 * 60 * 1000)
-  }
+  const allowed = uploaded < 1
+  const oldestUpload = recentDocs?.[0]?.upload_date
+  const nextResetAt = !allowed && oldestUpload
+    ? new Date(new Date(oldestUpload).getTime() + 7 * 24 * 60 * 60 * 1000)
+    : null
 
   return {
     allowed,
