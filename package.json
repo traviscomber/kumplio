@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit --pretty false",
     "check:discovery": "node scripts/check-public-discovery.mjs",
     "check:boundaries": "node scripts/check-client-boundaries.mjs"
   },
