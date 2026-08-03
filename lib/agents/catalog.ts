@@ -80,8 +80,9 @@ export const AGENT_CATALOG: AgentProfile[] = [
     reviewRequired: 'No debe atribuir causalidad sin evidencia suficiente ni usar datos personales innecesarios.',
   },
   {
+    // Se conserva el identificador histórico para no romper ejecuciones, filtros ni datos persistidos.
     id: 'catalina',
-    name: 'Catalina',
+    name: 'Julieta',
     role: 'Revisora jurídica y de calidad de decisiones',
     mission: 'Revisar conclusiones de otros agentes, identificar afirmaciones no sustentadas y emitir una recomendación con fuentes, reservas y puntos de escalamiento.',
     skills: ['revisión jurídica', 'control de calidad', 'consistencia', 'evaluación de fuentes', 'detección de alucinaciones', 'redacción ejecutiva'],
