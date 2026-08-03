@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "check:discovery": "node scripts/check-public-discovery.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
