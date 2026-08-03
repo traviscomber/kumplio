@@ -1,10 +1,5 @@
-import { redirect } from 'next/navigation'
-
-export const metadata = {
-  title: 'Minería | Casos de uso de Kumplio',
-  robots: { index: false, follow: true },
-}
+import { permanentRedirect } from 'next/navigation'
 
 export default function MineriaDemoPage() {
-  redirect('/use-cases')
+  permanentRedirect('/use-cases')
 }

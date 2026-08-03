@@ -16,9 +16,6 @@ const privatePaths = [
   '/sign-in/',
   '/sign-up/',
   '/update-password/',
-  '/sales-kit/',
-  '/demo/transporte/',
-  '/demo/mineria/',
 ]
 
 const discoveryAgents = [
