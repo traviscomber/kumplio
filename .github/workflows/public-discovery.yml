@@ -18,7 +18,13 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+      OPENAI_API_KEY: test-openai-key
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,3 +40,6 @@ jobs:
 
       - name: Validate public discovery surface
         run: npm run check:discovery
+
+      - name: Build Next.js
+        run: npm run build
