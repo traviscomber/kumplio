@@ -16,11 +16,11 @@ type EntityConfig = {
 }
 
 const configs: Record<EntityType, EntityConfig> = {
-  control: { table: 'controls', label: 'Control', titleFields: ['name', 'title'], descriptionFields: ['description', 'objective'] },
-  evidence: { table: 'evidence', label: 'Evidencia', titleFields: ['title', 'name'], descriptionFields: ['description', 'notes'] },
-  risk: { table: 'risks', label: 'Riesgo', titleFields: ['title', 'name'], descriptionFields: ['description', 'impact'] },
-  document: { table: 'documents', label: 'Documento', titleFields: ['name', 'file_name', 'title'], descriptionFields: ['description', 'summary'] },
-  playbook: { table: 'mission_playbooks', label: 'Playbook', titleFields: ['name', 'title'], descriptionFields: ['objective', 'description'] },
+  control: { table: 'controls', label: 'Control', titleFields: ['name'], descriptionFields: ['description', 'control_objective'] },
+  evidence: { table: 'evidence', label: 'Evidencia', titleFields: ['name'], descriptionFields: ['description', 'source'] },
+  risk: { table: 'risks', label: 'Riesgo', titleFields: ['risk_description'], descriptionFields: ['impact', 'mitigation_status'] },
+  document: { table: 'documents', label: 'Documento', titleFields: ['name'], descriptionFields: ['document_type', 'status'] },
+  playbook: { table: 'mission_playbooks', label: 'Playbook', titleFields: ['name'], descriptionFields: ['objective', 'description'] },
 }
 
 export default async function EntityWorkspacePage({ params }: { params: Promise<{ type: string; id: string }> }) {
@@ -37,12 +37,22 @@ export default async function EntityWorkspacePage({ params }: { params: Promise<
 
   const { data: entity } = await supabase.from(config.table).select('*').eq('id', id).maybeSingle()
   if (!entity) notFound()
-  if (type !== 'playbook' && entity.organization_id && entity.organization_id !== membership.organization_id) notFound()
+
+  if (type !== 'playbook') {
+    if (entity.organization_id) {
+      if (entity.organization_id !== membership.organization_id) notFound()
+    } else if (entity.project_id) {
+      const { data: project } = await supabase.from('projects').select('organization_id').eq('id', entity.project_id).maybeSingle()
+      if (!project || project.organization_id !== membership.organization_id) notFound()
+    } else {
+      notFound()
+    }
+  }
 
   const title = pick(entity, config.titleFields) || config.label
   const description = pick(entity, config.descriptionFields) || `Información conectada de ${config.label.toLowerCase()} dentro de tu organización.`
-  const status = entity.status || entity.state || 'Disponible'
-  const createdAt = entity.created_at || null
+  const status = entity.status || entity.validation_status || entity.mitigation_status || 'Disponible'
+  const createdAt = entity.created_at || entity.upload_date || null
   const updatedAt = entity.updated_at || createdAt
 
   return (
@@ -60,6 +70,7 @@ export default async function EntityWorkspacePage({ params }: { params: Promise<
                   <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">{String(status)}</span>
                   {entity.priority && <span className="rounded-full bg-muted px-3 py-1">Prioridad: {String(entity.priority)}</span>}
                   {entity.version && <span className="rounded-full bg-muted px-3 py-1">Versión: {String(entity.version)}</span>}
+                  {entity.risk_score != null && <span className="rounded-full bg-muted px-3 py-1">Score: {String(entity.risk_score)}</span>}
                 </div>
               </div>
               <Link href={`/missions/new?sourceType=${encodeURIComponent(type)}&sourceId=${encodeURIComponent(id)}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-sm">
