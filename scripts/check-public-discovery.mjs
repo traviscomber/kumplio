@@ -16,6 +16,7 @@ const requiredFiles = [
   'app/feed.xml/route.ts',
   'app/api/indexnow/route.ts',
   'app/indexnow-key.txt/route.ts',
+  'app/.well-known/security.txt/route.ts',
 ]
 
 const failures = []
