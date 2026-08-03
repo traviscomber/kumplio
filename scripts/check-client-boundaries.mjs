@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 
+// Evita que servicios importados por componentes cliente vuelvan a depender de credenciales privilegiadas.
 const failures = []
 
 const analyticsService = await readFile('lib/services/analytics.ts', 'utf8')
