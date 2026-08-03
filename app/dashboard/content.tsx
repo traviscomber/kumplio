@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   Clock3,
   FileCheck2,
-  PlayCircle,
   Sparkles,
   Target,
 } from 'lucide-react'
