@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { TopNav } from '@/components/layout/top-nav';
+import { WorkspaceNav } from '@/components/workspace-nav';
 import { RiskDistributionChart } from '@/components/analytics/risk-chart';
 import { DocumentTimelineChart } from '@/components/analytics/timeline-chart';
 import { ObligationsByTypeChart } from '@/components/analytics/obligations-chart';
@@ -50,7 +50,7 @@ export default function AnalyticsDashboardClient() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <TopNav />
+        <WorkspaceNav />
         <div className="container mx-auto px-6 py-8">
           <p className="text-muted-foreground">Cargando análisis...</p>
         </div>
@@ -61,7 +61,7 @@ export default function AnalyticsDashboardClient() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <TopNav />
+        <WorkspaceNav />
         <div className="container mx-auto px-6 py-8">
           <p className="text-destructive">{error}</p>
         </div>
@@ -71,14 +71,14 @@ export default function AnalyticsDashboardClient() {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopNav />
+      <WorkspaceNav />
       <main className="container mx-auto px-6 py-8">
         <div className="space-y-8">
           {/* Header */}
           <div>
-            <h1 className="text-3xl font-bold mb-2">Analytics</h1>
+            <h1 className="text-3xl font-bold mb-2">Análisis</h1>
             <p className="text-muted-foreground">
-              Dashboard de cumplimiento y análisis de riesgos
+              Indicadores de cumplimiento, riesgos y desempeño operativo
             </p>
           </div>
 
