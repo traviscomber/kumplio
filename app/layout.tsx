@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
-    languages: { 'es-CL': '/' },
+    languages: { 'es-CL': '/', 'x-default': '/' },
     types: {
       'text/plain': '/llms.txt',
       'application/rss+xml': '/feed.xml',
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: SITE_LOCALE.replace('-', '_'),
     url: '/',
-    siteName: 'Kumplio — powered by n3uralia',
+    siteName: SITE_NAME,
     title,
     description,
     images: [
@@ -155,7 +155,6 @@ const graph = {
       url: SITE_URL,
       slogan: 'Del conocimiento a la ejecución verificable',
       logo: `${SITE_URL}/logo-kumplio.svg`,
-      parentOrganization: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
     },
     {
       '@type': 'WebSite',
@@ -184,14 +183,32 @@ const graph = {
       creator: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
       provider: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
       featureList: CORE_CAPABILITIES,
-      offers: {
-        '@type': 'AggregateOffer',
-        url: `${SITE_URL}/pricing`,
-        priceCurrency: 'CLP',
-        lowPrice: '79990',
-        highPrice: '699990',
-        offerCount: '3',
-      },
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Plan Esencial',
+          url: `${SITE_URL}/pricing`,
+          price: '79990',
+          priceCurrency: 'CLP',
+          availability: 'https://schema.org/InStock',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Plan Profesional',
+          url: `${SITE_URL}/pricing`,
+          price: '249990',
+          priceCurrency: 'CLP',
+          availability: 'https://schema.org/InStock',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Plan Acompañado',
+          url: `${SITE_URL}/pricing`,
+          price: '699990',
+          priceCurrency: 'CLP',
+          availability: 'https://schema.org/InStock',
+        },
+      ],
     },
   ],
 }
