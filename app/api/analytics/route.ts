@@ -1,38 +1,41 @@
-// API endpoint for analytics data
+import { NextRequest, NextResponse } from 'next/server'
+import { getAnalyticsData, getDashboardStats } from '@/lib/services/analytics'
+import { createClient } from '@/lib/supabase/server'
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getAnalyticsData, getDashboardStats } from '@/lib/services/analytics';
-import { createClient } from '@supabase/supabase-js';
+export const runtime = 'nodejs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+export async function GET(request: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-export async function GET(req: NextRequest) {
-  try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const type = req.nextUrl.searchParams.get('type') || 'full';
-
-    if (type === 'stats') {
-      const stats = await getDashboardStats(user.id);
-      return NextResponse.json(stats);
-    }
-
-    const analytics = await getAnalyticsData(user.id);
-    return NextResponse.json(analytics);
-  } catch (error) {
-    console.error('[v0] Analytics API error:', error);
+  if (authError || !user) {
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
+  }
+
+  const type = request.nextUrl.searchParams.get('type') || 'full'
+  if (type !== 'full' && type !== 'stats') {
+    return NextResponse.json(
+      { error: 'Unsupported analytics type', code: 'unsupported_analytics_type' },
+      { status: 400 },
+    )
+  }
+
+  try {
+    const payload = type === 'stats'
+      ? await getDashboardStats(supabase, user.id)
+      : await getAnalyticsData(supabase, user.id)
+
+    return NextResponse.json(payload, {
+      headers: { 'Cache-Control': 'private, no-store' },
+    })
+  } catch (error) {
+    console.error('[analytics] request failed', error instanceof Error ? error.message : 'unknown_error')
+    return NextResponse.json(
+      { error: 'No fue posible obtener Analytics.', code: 'analytics_failed' },
+      { status: 500 },
+    )
   }
 }
