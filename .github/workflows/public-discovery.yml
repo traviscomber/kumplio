@@ -10,6 +10,7 @@ on:
       - 'lib/services/**'
       - 'scripts/check-public-discovery.mjs'
       - 'scripts/check-client-boundaries.mjs'
+      - 'supabase/migrations/**'
       - 'package.json'
       - '.github/workflows/public-discovery.yml'
   workflow_dispatch:
