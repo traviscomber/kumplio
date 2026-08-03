@@ -13,7 +13,6 @@ import {
   Target,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 import { cn } from '@/lib/utils'
 
 type Mission = {
@@ -105,7 +104,6 @@ const statusLabels: Record<string, string> = {
 
 export function DashboardContent() {
   const [data, setData] = useState<DashboardData>(emptyData)
-  const [showOnboarding, setShowOnboarding] = useState(false)
   const [loading, setLoading] = useState(true)
   const [warning, setWarning] = useState<string | null>(null)
 
@@ -127,9 +125,7 @@ export function DashboardContent() {
           .maybeSingle()
 
         if (!membership?.organization_id) {
-          const { data: documents } = await supabase.from('documents').select('id').eq('user_id', auth.user.id).limit(1)
-          setShowOnboarding(!documents?.length)
-          if (documents?.length) setWarning('Tu cuenta todavía no está vinculada a una organización.')
+          window.location.href = '/onboarding'
           return
         }
 
@@ -221,21 +217,6 @@ export function DashboardContent() {
   }).length
 
   if (loading) return <div className="py-20 text-center text-muted-foreground">Preparando tu Centro de Operaciones…</div>
-
-  if (showOnboarding) {
-    return (
-      <div className="space-y-8">
-        <div>
-          <p className="text-sm font-semibold text-primary">Comienza con contexto real</p>
-          <h1 className="mt-2 text-3xl font-bold">Prepara tu primera misión</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Carga una fuente regulatoria, contrato o política para que Kumplio comprenda tu organización.
-          </p>
-        </div>
-        <OnboardingFlow onComplete={() => (window.location.href = '/dashboard')} />
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-8 pb-12">
