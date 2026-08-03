@@ -82,3 +82,5 @@ jobs:
           git add app/dashboard/content.tsx app/analytics/client.tsx
           git commit -m "Unifica onboarding y navegación de análisis"
           git push origin HEAD:agent/product-ux-002
+
+# Segunda publicación para activar el workflow ya registrado en la rama.
