@@ -1,46 +1,74 @@
 'use client'
 
-import { useState } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { ChangeEvent, FormEvent, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Mail, MapPin, Phone, CheckCircle2 } from 'lucide-react'
 import { Footer } from '@/components/footer'
 
+const serviceLabels: Record<string, string> = {
+  enterprise: 'Kumplio Enterprise Studio',
+  fullstack: 'Solución Fullstack',
+  acompanado: 'Plan Acompañado',
+}
+
+const inputClass = 'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary'
+
+type ContactForm = {
+  nombre: string
+  email: string
+  empresa: string
+  industria: string
+  empleados: string
+  telefono: string
+  mensaje: string
+}
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const searchParams = useSearchParams()
+  const service = searchParams.get('service') || ''
+  const selectedService = serviceLabels[service]
+  const [formData, setFormData] = useState<ContactForm>({
     nombre: '',
     email: '',
     empresa: '',
     industria: '',
     empleados: '',
     telefono: '',
-    mensaje: '',
+    mensaje: selectedService ? `Me interesa conversar sobre ${selectedService}.` : '',
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
 
-  const handleChange = (e: any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name, value } = event.target
+    setFormData((current) => ({ ...current, [name]: value }))
     setError('')
   }
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    
-    // Validation
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
     if (!formData.nombre || !formData.email || !formData.empresa || !formData.industria || !formData.empleados) {
-      setError('Por favor completa todos los campos obligatorios.')
+      setError('Completa todos los campos obligatorios.')
       return
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Por favor ingresa un email válido.')
+      setError('Ingresa un correo electrónico válido.')
       return
     }
 
     setLoading(true)
     setError('')
+
+    const commercialContext = selectedService
+      ? `[Interés: ${selectedService}] ${formData.mensaje}`.trim()
+      : formData.mensaje
 
     try {
       const response = await fetch('/api/leads', {
@@ -48,294 +76,151 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          mensaje: commercialContext,
           timestamp: new Date().toISOString(),
-          source: 'contact-page',
+          source: service ? `contact-${service}` : 'contact-page',
         }),
       })
+      const payload = await response.json().catch(() => ({}))
 
-      if (response.ok) {
-        setSuccess(true)
-        setFormData({ nombre: '', email: '', empresa: '', industria: '', empleados: '', telefono: '', mensaje: '' })
-        setTimeout(() => setSuccess(false), 5000)
-      } else {
-        setError('Error al enviar el formulario. Por favor intenta de nuevo.')
+      if (!response.ok) {
+        throw new Error(payload.error || 'No fue posible registrar tu solicitud.')
       }
-    } catch (error) {
-      console.error('[v0] Contact form error:', error)
-      setError('Ocurrió un error. Por favor intenta de nuevo.')
+
+      setSuccess(true)
+      setFormData({ nombre: '', email: '', empresa: '', industria: '', empleados: '', telefono: '', mensaje: '' })
+    } catch (submissionError) {
+      setError(submissionError instanceof Error ? submissionError.message : 'Ocurrió un error. Intenta nuevamente.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 sticky top-0 z-50 bg-background/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-xs font-bold">K</span>
-            </div>
-            <span className="font-bold hidden sm:inline">KUMPLIO</span>
-          </Link>
-          <div className="flex gap-2">
-            <Button variant="ghost" asChild size="sm">
-              <Link href="/">Volver</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/sign-up">Comenzar</Link>
-            </Button>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+          <Link href="/" className="flex items-center gap-2 font-extrabold tracking-[0.16em] hover:opacity-80">KUMPLIO</Link>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" asChild size="sm"><Link href="/pricing">Planes</Link></Button>
+            <Button asChild size="sm"><Link href="/sign-up">Comenzar</Link></Button>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/10 via-primary/5 to-background border-b border-border/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-              Hablemos de tu Cumplimiento
-            </h1>
-            <p className="text-xl text-muted-foreground text-pretty">
-              Un especialista de KUMPLIO te contactará en 24 horas para diseñar una solución a tu medida.
-            </p>
+      <main>
+        <section className="border-b border-border/50 bg-gradient-to-b from-primary/10 via-primary/5 to-background px-5 py-20 sm:px-8 md:py-28">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Contacto</p>
+            <h1 className="mt-4 max-w-4xl text-balance text-5xl font-extrabold tracking-tight md:text-6xl">Conversemos sobre el resultado que necesitas.</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">Cuéntanos el problema, el contexto de tu organización y qué esperas conseguir. Revisaremos la solicitud antes de recomendar un plan o un proyecto.</p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Contact Section */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Left: Info */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold mb-6">Contacto Directo</h3>
-                <div className="space-y-4">
+        <section className="px-5 py-16 sm:px-8 md:py-24">
+          <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.72fr_1.28fr]">
+            <aside className="space-y-6">
+              {selectedService && (
+                <div className="rounded-2xl border border-primary/25 bg-primary/5 p-5">
                   <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <div>
-                      <p className="font-semibold text-sm mb-1">Email</p>
-                      <a href="mailto:info@kumplio.cl" className="text-sm text-muted-foreground hover:text-primary transition">
-                        info@kumplio.cl
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-sm mb-1">Teléfono</p>
-                      <a href="tel:+56993826127" className="text-sm text-muted-foreground hover:text-primary transition">
-                        +56 9 9382-6127
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-sm mb-1">Ubicación</p>
-                      <p className="text-sm text-muted-foreground">Santiago, Chile</p>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Interés identificado</p>
+                      <p className="mt-2 font-bold">{selectedService}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">La conversación parte con este contexto, pero confirmaremos primero si es la alternativa correcta.</p>
                     </div>
                   </div>
                 </div>
+              )}
+
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <h2 className="text-xl font-bold">Contacto directo</h2>
+                <ul className="mt-6 space-y-5 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" /><a href="mailto:info@kumplio.app" className="hover:text-primary">info@kumplio.app</a></li>
+                  <li className="flex items-center gap-3"><Phone className="h-4 w-4 text-primary" /><a href="tel:+56993826127" className="hover:text-primary">+56 9 9382 6127</a></li>
+                  <li className="flex items-center gap-3"><MapPin className="h-4 w-4 text-primary" /><span>Santiago, Chile</span></li>
+                </ul>
               </div>
 
-              <div className="bg-primary/5 border border-primary/10 rounded-lg p-6 space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Nuestro Compromiso</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Respuesta en máximo 24 horas</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Análisis personalizado por industria</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span>Sin compromisos ni costo inicial</span>
-                  </div>
+              <div className="rounded-2xl border border-border bg-card p-6">
+                <h2 className="font-bold">Qué ocurre después</h2>
+                <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
+                  {[
+                    'Revisamos el objetivo y el contexto informado.',
+                    'Definimos si corresponde una suscripción, acompañamiento o Enterprise.',
+                    'Acordamos alcance, responsables, precio y próximos pasos antes de iniciar.',
+                  ].map((item) => <li key={item} className="flex gap-2"><CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-primary" />{item}</li>)}
+                </ul>
+              </div>
+            </aside>
+
+            <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+              {success ? (
+                <div className="py-12 text-center">
+                  <CheckCircle2 className="mx-auto h-14 w-14 text-emerald-600" />
+                  <h2 className="mt-5 text-2xl font-bold">Solicitud registrada</h2>
+                  <p className="mx-auto mt-3 max-w-md leading-7 text-muted-foreground">Gracias. Revisaremos la información antes de contactarte para que la conversación parta con contexto.</p>
+                  <Button variant="outline" onClick={() => setSuccess(false)} className="mt-7">Enviar otra solicitud</Button>
                 </div>
-              </div>
-            </div>
-
-            {/* Right: Form */}
-            <div className="md:col-span-2">
-              <div className="bg-card border border-border/50 rounded-lg p-8 space-y-6">
-                {success && (
-                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-green-700">¡Gracias por tu mensaje!</p>
-                      <p className="text-sm text-green-600">Un especialista te contactará en 24 horas.</p>
-                    </div>
-                  </div>
-                )}
-
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex gap-3">
-                    <div className="flex-shrink-0">✕</div>
-                    <div>
-                      <p className="text-sm font-semibold text-red-700">Oops, algo salió mal</p>
-                      <p className="text-sm text-red-600">{error}</p>
-                    </div>
-                  </div>
-                )}
-
+              ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Nombre *</label>
-                      <input
-                        type="text"
-                        name="nombre"
-                        value={formData.nombre}
-                        onChange={handleChange}
-                        placeholder="Tu nombre completo"
-                        required
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Email *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="tu@empresa.cl"
-                        required
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                      />
-                    </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">Cuéntanos sobre tu organización</h2>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">Los campos marcados con * son necesarios para registrar la solicitud.</p>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Empresa *</label>
-                      <input
-                        type="text"
-                        name="empresa"
-                        value={formData.empresa}
-                        onChange={handleChange}
-                        placeholder="Nombre de tu empresa"
-                        required
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Industria *</label>
-                      <select
-                        name="industria"
-                        value={formData.industria}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                        required
-                      >
-                        <option value="">Selecciona tu industria</option>
-                        <option value="transporte">Transporte y Logística</option>
-                        <option value="mineria">Minería</option>
+                  {error && <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Field label="Nombre *"><input name="nombre" value={formData.nombre} onChange={handleChange} required maxLength={120} className={inputClass} placeholder="Tu nombre" /></Field>
+                    <Field label="Correo *"><input name="email" type="email" value={formData.email} onChange={handleChange} required maxLength={180} className={inputClass} placeholder="tu@empresa.cl" /></Field>
+                    <Field label="Empresa *"><input name="empresa" value={formData.empresa} onChange={handleChange} required maxLength={180} className={inputClass} placeholder="Nombre de la empresa" /></Field>
+                    <Field label="Industria *">
+                      <select name="industria" value={formData.industria} onChange={handleChange} required className={inputClass}>
+                        <option value="">Selecciona</option>
+                        <option value="servicios">Servicios profesionales</option>
+                        <option value="tecnologia">Tecnología</option>
+                        <option value="financiero">Financiero y seguros</option>
+                        <option value="salud">Salud</option>
+                        <option value="retail">Retail y comercio</option>
+                        <option value="transporte">Transporte y logística</option>
                         <option value="construccion">Construcción</option>
-                        <option value="salud">Salud y Farmacéutica</option>
-                        <option value="financiero">Financiero y Seguros</option>
-                        <option value="retail">Retail y E-commerce</option>
-                        <option value="tecnologia">Tecnología e Innovación</option>
+                        <option value="mineria">Minería</option>
+                        <option value="agro">Agro</option>
                         <option value="otro">Otra</option>
                       </select>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Tamaño empresa *</label>
-                      <select
-                        name="empleados"
-                        value={formData.empleados}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                        required
-                      >
-                        <option value="">Selecciona rango de empleados</option>
-                        <option value="1-50">1-50 empleados</option>
-                        <option value="50-200">50-200 empleados</option>
-                        <option value="200-500">200-500 empleados</option>
-                        <option value="500-1000">500-1000 empleados</option>
-                        <option value="1000+">1000+ empleados</option>
+                    </Field>
+                    <Field label="Tamaño *">
+                      <select name="empleados" value={formData.empleados} onChange={handleChange} required className={inputClass}>
+                        <option value="">Selecciona</option>
+                        <option value="1-9">1–9 personas</option>
+                        <option value="10-49">10–49 personas</option>
+                        <option value="50-199">50–199 personas</option>
+                        <option value="200-999">200–999 personas</option>
+                        <option value="1000+">1.000 o más</option>
                       </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold mb-2 block">Teléfono</label>
-                      <input
-                        type="tel"
-                        name="telefono"
-                        value={formData.telefono}
-                        onChange={handleChange}
-                        placeholder="+56 9 XXXX XXXX"
-                        className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition"
-                      />
-                    </div>
+                    </Field>
+                    <Field label="Teléfono"><input name="telefono" type="tel" value={formData.telefono} onChange={handleChange} maxLength={40} className={inputClass} placeholder="+56 9..." /></Field>
                   </div>
 
-                  <div>
-                    <label className="text-sm font-semibold mb-2 block">¿Cuál es tu mayor desafío en cumplimiento?</label>
-                    <textarea
-                      name="mensaje"
-                      value={formData.mensaje}
-                      onChange={handleChange}
-                      placeholder="Ej: Automatizar auditorías, gestionar plazos de Ley 21.719, implementar control de datos..."
-                      className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary/50 outline-none transition min-h-24"
-                    />
-                  </div>
+                  <Field label="Resultado o desafío">
+                    <textarea name="mensaje" value={formData.mensaje} onChange={handleChange} maxLength={3000} rows={6} className={`${inputClass} resize-none`} placeholder="Describe qué necesitas ordenar, ejecutar, integrar o demostrar." />
+                  </Field>
 
-                  <Button type="submit" className="w-full group" disabled={loading || success}>
-                    {loading ? 'Enviando...' : success ? 'Enviado!' : 'Enviar Mensaje'}
-                    {!loading && !success && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
-                  </Button>
+                  <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Registrando solicitud…' : <>Enviar solicitud <ArrowRight className="ml-2 h-4 w-4" /></>}</Button>
+                  <p className="text-center text-xs leading-5 text-muted-foreground">Al enviar aceptas que utilicemos estos datos para responder tu solicitud, según nuestra <Link href="/privacy" className="font-semibold text-primary hover:underline">Política de Privacidad</Link>.</p>
                 </form>
-
-                <p className="text-xs text-muted-foreground text-center">
-                  Protegemos tu privacidad. Ver nuestra <Link href="/privacy" className="hover:text-primary transition">política de privacidad</Link>.
-                </p>
-              </div>
-            </div>
+              )}
+            </section>
           </div>
-        </div>
-      </section>
-
-      {/* FAQs */}
-      <section className="px-6 py-24 border-t border-border">
-        <div className="container mx-auto max-w-4xl">
-          <h2 className="text-3xl font-bold mb-12">Preguntas Frecuentes</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                q: '¿Cuánto tarda la respuesta?',
-                a: 'Entre 2-24 horas hábiles. Si es urgente, llama directamente.'
-              },
-              {
-                q: '¿Sin compromisos?',
-                a: 'Correcto. Primero hablamos de tu situación, luego decidimos juntos.'
-              },
-              {
-                q: '¿Costo de la consulta inicial?',
-                a: 'Gratis. La consulta es sin costo. Solo después hablamos de pricing.'
-              },
-              {
-                q: '¿Qué datos necesitan?',
-                a: 'Solo lo básico: Empresa, industria, empleados, y tu mayor dolor.'
-              },
-            ].map((faq, idx) => (
-              <div key={idx} className="space-y-2">
-                <h4 className="font-semibold">{faq.q}</h4>
-                <p className="text-sm text-muted-foreground">{faq.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>
   )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="block space-y-2"><span className="text-sm font-semibold">{label}</span>{children}</label>
 }
