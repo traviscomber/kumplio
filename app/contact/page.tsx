@@ -13,6 +13,8 @@ const serviceLabels: Record<string, string> = {
   acompanado: 'Plan Acompañado',
 }
 
+const inputClass = 'w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary'
+
 type ContactForm = {
   nombre: string
   email: string
@@ -168,11 +170,11 @@ export default function ContactPage() {
                   {error && <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}
 
                   <div className="grid gap-4 md:grid-cols-2">
-                    <Field label="Nombre *"><input name="nombre" value={formData.nombre} onChange={handleChange} required maxLength={120} className="input" placeholder="Tu nombre" /></Field>
-                    <Field label="Correo *"><input name="email" type="email" value={formData.email} onChange={handleChange} required maxLength={180} className="input" placeholder="tu@empresa.cl" /></Field>
-                    <Field label="Empresa *"><input name="empresa" value={formData.empresa} onChange={handleChange} required maxLength={180} className="input" placeholder="Nombre de la empresa" /></Field>
+                    <Field label="Nombre *"><input name="nombre" value={formData.nombre} onChange={handleChange} required maxLength={120} className={inputClass} placeholder="Tu nombre" /></Field>
+                    <Field label="Correo *"><input name="email" type="email" value={formData.email} onChange={handleChange} required maxLength={180} className={inputClass} placeholder="tu@empresa.cl" /></Field>
+                    <Field label="Empresa *"><input name="empresa" value={formData.empresa} onChange={handleChange} required maxLength={180} className={inputClass} placeholder="Nombre de la empresa" /></Field>
                     <Field label="Industria *">
-                      <select name="industria" value={formData.industria} onChange={handleChange} required className="input">
+                      <select name="industria" value={formData.industria} onChange={handleChange} required className={inputClass}>
                         <option value="">Selecciona</option>
                         <option value="servicios">Servicios profesionales</option>
                         <option value="tecnologia">Tecnología</option>
@@ -187,7 +189,7 @@ export default function ContactPage() {
                       </select>
                     </Field>
                     <Field label="Tamaño *">
-                      <select name="empleados" value={formData.empleados} onChange={handleChange} required className="input">
+                      <select name="empleados" value={formData.empleados} onChange={handleChange} required className={inputClass}>
                         <option value="">Selecciona</option>
                         <option value="1-9">1–9 personas</option>
                         <option value="10-49">10–49 personas</option>
@@ -196,11 +198,11 @@ export default function ContactPage() {
                         <option value="1000+">1.000 o más</option>
                       </select>
                     </Field>
-                    <Field label="Teléfono"><input name="telefono" type="tel" value={formData.telefono} onChange={handleChange} maxLength={40} className="input" placeholder="+56 9..." /></Field>
+                    <Field label="Teléfono"><input name="telefono" type="tel" value={formData.telefono} onChange={handleChange} maxLength={40} className={inputClass} placeholder="+56 9..." /></Field>
                   </div>
 
                   <Field label="Resultado o desafío">
-                    <textarea name="mensaje" value={formData.mensaje} onChange={handleChange} maxLength={3000} rows={6} className="input resize-none" placeholder="Describe qué necesitas ordenar, ejecutar, integrar o demostrar." />
+                    <textarea name="mensaje" value={formData.mensaje} onChange={handleChange} maxLength={3000} rows={6} className={`${inputClass} resize-none`} placeholder="Describe qué necesitas ordenar, ejecutar, integrar o demostrar." />
                   </Field>
 
                   <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Registrando solicitud…' : <>Enviar solicitud <ArrowRight className="ml-2 h-4 w-4" /></>}</Button>
@@ -213,7 +215,6 @@ export default function ContactPage() {
       </main>
 
       <Footer />
-      <style jsx>{`.input{width:100%;border-radius:.75rem;border:1px solid hsl(var(--border));background:hsl(var(--background));padding:.75rem 1rem;font-size:.875rem;outline:none}.input:focus{box-shadow:0 0 0 2px hsl(var(--primary))}`}</style>
     </div>
   )
 }
