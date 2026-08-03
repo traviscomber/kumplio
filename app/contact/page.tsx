@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react'
@@ -27,7 +27,7 @@ type ContactForm = {
   mensaje: string
 }
 
-export default function ContactPage() {
+function ContactContent() {
   const searchParams = useSearchParams()
   const service = searchParams.get('service') || ''
   const selectedService = serviceLabels[service]
@@ -218,6 +218,14 @@ export default function ContactPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-background" />}>
+      <ContactContent />
+    </Suspense>
   )
 }
 
