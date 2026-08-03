@@ -2,16 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart3, Bot, BookOpen, Home, Settings, Target } from 'lucide-react'
+import { BriefcaseBusiness, Building2, Settings, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
-  { href: '/dashboard', label: 'Centro de Operaciones', icon: Home },
-  { href: '/missions', label: 'Misiones', icon: Target },
-  { href: '/regulatory', label: 'Conocimiento', icon: BookOpen },
-  { href: '/agents', label: 'IA', icon: Bot },
-  { href: '/analytics', label: 'Reportes', icon: BarChart3 },
-  { href: '/settings', label: 'Configuración', icon: Settings },
+  { href: '/dashboard', label: 'Mi Empresa', icon: Building2 },
+  { href: '/missions', label: 'Mi Trabajo', icon: BriefcaseBusiness },
+  { href: '/analytics', label: 'Mi Crecimiento', icon: TrendingUp },
 ] as const
 
 export function WorkspaceNav() {
@@ -21,30 +19,30 @@ export function WorkspaceNav() {
     .sort((left, right) => right.href.length - left.href.length)[0]?.href
 
   return (
-    <nav
-      aria-label="Navegación principal de Kumplio"
-      className="sticky top-0 z-40 overflow-x-auto border-b border-border/70 bg-background/90 backdrop-blur-xl"
-    >
-      <div className="container mx-auto flex min-w-max items-center gap-1 px-4 py-3 sm:px-6">
-        {items.map(({ href, label, icon: Icon }) => {
-          const active = href === activeHref
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-current={active ? 'page' : undefined}
-              className={cn(
-                'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
-                active
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-              )}
-            >
-              <Icon className="h-4 w-4" aria-hidden="true" />
-              {label}
-            </Link>
-          )
-        })}
+    <nav aria-label="Navegación principal de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+      <div className="container mx-auto flex items-center gap-3 px-4 py-3 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+          {items.map(({ href, label, icon: Icon }) => {
+            const active = href === activeHref
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+                  active ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                {label}
+              </Link>
+            )
+          })}
+        </div>
+        <div className="hidden md:block"><UniversalSearch /></div>
+        <button type="button" className="md:hidden" aria-label="Abrir búsqueda"><UniversalSearch /></button>
+        <Link href="/settings" aria-label="Configuración" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"><Settings className="h-4 w-4" /></Link>
       </div>
     </nav>
   )
