@@ -2,30 +2,93 @@
 
 export const dynamic = 'force-dynamic'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { AlertCircle, Building2, CheckCircle2, Lock, Mail } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import {
+  AlertCircle,
+  Building2,
+  Check,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  ShieldCheck,
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
+const plans = {
+  esencial: {
+    id: 'esencial',
+    name: 'Esencial',
+    price: '$79.990 al mes + IVA',
+    description: 'Hasta 5 usuarios, misiones guiadas, evidencias, decisiones y trazabilidad.',
+  },
+  profesional: {
+    id: 'profesional',
+    name: 'Profesional',
+    price: '$249.990 al mes + IVA',
+    description: 'Hasta 20 usuarios, monitoreo regulatorio, automatizaciones y soporte prioritario.',
+  },
+} as const
+
+type PlanKey = keyof typeof plans
+
+function safeNext(value: string | null) {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/onboarding'
+  return value
+}
+
+function passwordScore(password: string) {
+  return [
+    password.length >= 10,
+    /[a-z]/.test(password),
+    /[A-Z]/.test(password),
+    /\d/.test(password),
+    /[^A-Za-z0-9]/.test(password),
+  ].filter(Boolean).length
+}
+
 export default function SignUp() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [supabase] = useState(() => createClient())
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [organizationName, setOrganizationName] = useState('')
+  const [acceptedLegal, setAcceptedLegal] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [confirmationSent, setConfirmationSent] = useState(false)
 
+  const planKey = searchParams.get('plan') as PlanKey | null
+  const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
+  const next = safeNext(searchParams.get('next'))
+  const strength = useMemo(() => passwordScore(password), [password])
+  const passwordReady = password.length >= 10 && strength >= 3
+
   async function handleSignUp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
+
+    if (!acceptedLegal) {
+      setError('Debes aceptar los Términos de Servicio y la Política de Privacidad.')
+      return
+    }
+
+    if (!passwordReady) {
+      setError('La contraseña debe tener al menos 10 caracteres y combinar distintos tipos de caracteres.')
+      return
+    }
+
     setLoading(true)
 
     try {
-      const callbackUrl = `${window.location.origin}/auth/callback?next=/onboarding`
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+      const acceptedAt = new Date().toISOString()
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -33,6 +96,11 @@ export default function SignUp() {
           emailRedirectTo: callbackUrl,
           data: {
             company_name: organizationName.trim(),
+            selected_plan: selectedPlan?.id || null,
+            signup_source: selectedPlan ? 'pricing' : 'direct',
+            terms_version: '2026-08-03',
+            privacy_version: '2026-08-03',
+            legal_accepted_at: acceptedAt,
           },
         },
       })
@@ -43,7 +111,7 @@ export default function SignUp() {
       }
 
       if (data.session) {
-        router.replace('/onboarding')
+        router.replace(next)
         router.refresh()
         return
       }
@@ -67,8 +135,15 @@ export default function SignUp() {
           <p className="mt-3 leading-7 text-muted-foreground">
             Enviamos un enlace de confirmación a <strong className="text-foreground">{email}</strong>. Después de confirmar, continuarás con la configuración segura de tu workspace.
           </p>
+          {selectedPlan && (
+            <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
+              Conservamos tu interés en el plan <strong className="text-foreground">{selectedPlan.name}</strong> para continuar después de verificar tu correo.
+            </p>
+          )}
           <p className="mt-4 text-xs leading-5 text-muted-foreground">El enlace puede tardar unos minutos. Revisa también la carpeta de correo no deseado.</p>
-          <Button asChild variant="outline" className="mt-7 w-full"><Link href="/sign-in">Ya confirmé mi correo</Link></Button>
+          <Button asChild variant="outline" className="mt-7 w-full">
+            <Link href={`/sign-in?next=${encodeURIComponent(next)}`}>Ya confirmé mi correo</Link>
+          </Button>
         </section>
       </main>
     )
@@ -81,10 +156,24 @@ export default function SignUp() {
           <div className="space-y-3 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">K</div>
             <div>
-              <h1 className="text-2xl font-bold">Crea tu cuenta KUMPLIO</h1>
-              <p className="mt-1 text-sm text-muted-foreground">El workspace se configurará después de verificar tu identidad.</p>
+              <h1 className="text-2xl font-bold">Crea tu cuenta Kumplio</h1>
+              <p className="mt-1 text-sm text-muted-foreground">Verifica tu correo y configura después el primer objetivo de tu organización.</p>
             </div>
           </div>
+
+          {selectedPlan && (
+            <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Plan seleccionado</p>
+                  <p className="mt-1 font-bold">{selectedPlan.name} · {selectedPlan.price}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{selectedPlan.description}</p>
+                  <Link href="/pricing" className="mt-2 inline-block text-xs font-semibold text-primary hover:underline">Cambiar plan</Link>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSignUp} className="space-y-4">
             {error && (
@@ -114,18 +203,36 @@ export default function SignUp() {
               <span className="text-sm font-medium">Contraseña</span>
               <span className="relative block">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} minLength={10} autoComplete="new-password" placeholder="Mínimo 10 caracteres" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+                <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} minLength={10} autoComplete="new-password" placeholder="Mínimo 10 caracteres" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+                <button type="button" onClick={() => setShowPassword((current) => !current)} aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </span>
-              <span className="text-xs text-muted-foreground">Usa una contraseña única que no ocupes en otros servicios.</span>
+              <div className="grid grid-cols-5 gap-1" aria-label="Fortaleza de contraseña">
+                {[1, 2, 3, 4, 5].map((level) => <span key={level} className={`h-1.5 rounded-full ${strength >= level ? 'bg-primary' : 'bg-muted'}`} />)}
+              </div>
+              <span className="text-xs text-muted-foreground">Usa 10 o más caracteres y combina mayúsculas, minúsculas, números o símbolos.</span>
             </label>
 
-            <Button type="submit" disabled={loading} className="w-full">
+            <label className="flex items-start gap-3 rounded-xl border border-border bg-muted/20 p-3 text-sm">
+              <input type="checkbox" checked={acceptedLegal} onChange={(event) => setAcceptedLegal(event.target.checked)} className="mt-1 h-4 w-4 accent-primary" required />
+              <span className="leading-6 text-muted-foreground">
+                Acepto los <Link href="/terms" target="_blank" className="font-semibold text-primary hover:underline">Términos de Servicio</Link> y la <Link href="/privacy" target="_blank" className="font-semibold text-primary hover:underline">Política de Privacidad</Link>.
+              </span>
+            </label>
+
+            <div className="flex items-start gap-2 text-xs leading-5 text-muted-foreground">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>La creación de cuenta no inicia un cobro automático. La contratación y facturación se confirman por separado.</span>
+            </div>
+
+            <Button type="submit" disabled={loading || !passwordReady || !acceptedLegal} className="w-full">
               {loading ? 'Creando cuenta…' : 'Crear cuenta y verificar correo'}
             </Button>
           </form>
 
           <div className="border-t border-border pt-6 text-center text-sm text-muted-foreground">
-            ¿Ya tienes cuenta? <Link href="/sign-in" className="font-semibold text-primary hover:underline">Inicia sesión</Link>
+            ¿Ya tienes cuenta? <Link href={`/sign-in?next=${encodeURIComponent(next)}`} className="font-semibold text-primary hover:underline">Inicia sesión</Link>
           </div>
         </section>
       </div>
