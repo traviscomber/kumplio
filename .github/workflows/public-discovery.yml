@@ -1,0 +1,36 @@
+name: Public discovery validation
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'components/footer.tsx'
+      - 'lib/chile-compliance-content.ts'
+      - 'lib/public-site.ts'
+      - 'scripts/check-public-discovery.mjs'
+      - 'package.json'
+      - '.github/workflows/public-discovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate public discovery surface
+        run: npm run check:discovery
