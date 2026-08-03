@@ -12,7 +12,8 @@ export const N3URALIA_REFERRAL_URL = `${N3URALIA_URL}?utm_source=kumplio&utm_med
 export const N3URALIA_SOLUTIONS_REFERRAL_URL = `${N3URALIA_SOLUTIONS_URL}?utm_source=kumplio&utm_medium=referral&utm_campaign=kumplio_product`
 export const N3URALIA_CONTACT_REFERRAL_URL = `${N3URALIA_CONTACT_URL}?utm_source=kumplio&utm_medium=referral&utm_campaign=kumplio_enterprise`
 
-export const OFFICIAL_LEY_21719_URL = 'https://www.bcn.cl/leychile/navegar?idNorma=1209272'
+export const OFFICIAL_LEY_21719_URL =
+  'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
   'Kumplio es un software chileno de cumplimiento normativo e inteligencia regulatoria que convierte fuentes, obligaciones y contexto organizacional en controles, misiones, evidencia y decisiones revisables.'
