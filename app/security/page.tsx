@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Database, Eye, KeyRound, LockKeyhole, ShieldCheck, UserCheck } from 'lucide-react'
+import { Database, ExternalLink, Eye, KeyRound, LockKeyhole, ShieldCheck, UserCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
+import { N3URALIA_CANONICAL_URL, SITE_URL } from '@/lib/public-site'
 
 export const metadata: Metadata = {
-  title: 'Seguridad',
-  description: 'Enfoque de seguridad, aislamiento de organizaciones y revisión humana en Kumplio.',
+  title: 'Seguridad y aislamiento de datos',
+  description: 'Enfoque de seguridad, aislamiento de organizaciones, trazabilidad y revisión humana en Kumplio.',
   alternates: { canonical: '/security' },
 }
 
@@ -44,6 +45,17 @@ const controls = [
 ]
 
 export default function SecurityPage() {
+  const graph = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${SITE_URL}/security#page`,
+    url: `${SITE_URL}/security`,
+    name: 'Seguridad y aislamiento de datos en Kumplio',
+    description: metadata.description,
+    inLanguage: 'es-CL',
+    publisher: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-background/90 backdrop-blur-xl">
@@ -86,9 +98,15 @@ export default function SecurityPage() {
             <p className="mt-4 leading-7 text-muted-foreground">
               Esta página describe controles y principios actualmente aplicados por Kumplio. No afirma certificaciones externas, disponibilidad garantizada ni cumplimiento de estándares que todavía no hayan sido auditados formalmente.
             </p>
-            <p className="mt-4 leading-7 text-muted-foreground">
-              Para consultas de seguridad, privacidad o evaluación de proveedores, escribe a <a className="font-semibold text-primary hover:underline" href="mailto:info@kumplio.app">info@kumplio.app</a>.
-            </p>
+            <div className="mt-6 rounded-2xl border border-border bg-card p-5">
+              <p className="font-bold">Reporte de seguridad</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Para reportar una vulnerabilidad o incidente potencial, escribe a <a className="font-semibold text-primary hover:underline" href="mailto:security@kumplio.app">security@kumplio.app</a>. Para privacidad o evaluación de proveedores, utiliza <a className="font-semibold text-primary hover:underline" href="mailto:info@kumplio.app">info@kumplio.app</a>.
+              </p>
+              <a href="/.well-known/security.txt" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                Ver security.txt <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </section>
 
@@ -98,6 +116,7 @@ export default function SecurityPage() {
         </section>
       </main>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
       <Footer />
     </div>
   )
