@@ -1,114 +1,89 @@
-// PDF extraction service for KUMPLIO
-// Extracts text from PDF and DOCX files
+import { PDFParse } from 'pdf-parse'
 
-import * as pdfParse from 'pdf-parse';
-import { DocumentFormat } from '@/lib/types/documents';
-
-/**
- * Extract text from a PDF buffer
- */
 export async function extractPDFText(buffer: Buffer): Promise<string> {
+  const parser = new PDFParse({ data: buffer })
+
   try {
-    console.log('[v0] Starting PDF extraction');
-    
-    const data = await pdfParse(buffer);
-    const text = data.text;
-    
-    console.log('[v0] PDF extracted:', text.length, 'characters');
-    return text;
+    const result = await parser.getText()
+    return result.text
   } catch (error) {
-    console.error('[v0] PDF extraction error:', error);
-    throw new Error('Failed to extract PDF text');
+    console.error('[pdf-extraction]', error instanceof Error ? error.message : 'unknown_error')
+    throw new Error('Failed to extract PDF text')
+  } finally {
+    await parser.destroy()
   }
 }
 
-/**
- * Extract text from DOCX file
- * Note: For now, we'll use a simple approach. 
- * Consider using mammoth.js for better DOCX support
- */
-export async function extractDOCXText(buffer: Buffer): Promise<string> {
-  try {
-    console.log('[v0] Starting DOCX extraction');
-    
-    // TODO: Implement proper DOCX parsing with mammoth.js
-    // For MVP, convert to text via simple parsing
-    const text = buffer.toString('utf-8');
-    
-    console.log('[v0] DOCX extracted:', text.length, 'characters');
-    return text;
-  } catch (error) {
-    console.error('[v0] DOCX extraction error:', error);
-    throw new Error('Failed to extract DOCX text');
-  }
+export async function extractDOCXText(_buffer: Buffer): Promise<string> {
+  throw new Error('DOCX extraction is not available yet. Upload a PDF or TXT file.')
 }
 
-/**
- * Extract text from TXT file
- */
 export async function extractTXTText(buffer: Buffer): Promise<string> {
   try {
-    const text = buffer.toString('utf-8');
-    console.log('[v0] TXT extracted:', text.length, 'characters');
-    return text;
+    return buffer.toString('utf-8')
   } catch (error) {
-    console.error('[v0] TXT extraction error:', error);
-    throw new Error('Failed to extract TXT text');
+    console.error('[txt-extraction]', error instanceof Error ? error.message : 'unknown_error')
+    throw new Error('Failed to extract TXT text')
   }
 }
 
-/**
- * Main extraction function that handles all formats
- */
 export async function extractDocumentText(
   buffer: Buffer,
-  fileType: string
+  fileType: string,
 ): Promise<string> {
-  console.log('[v0] Extracting document text, format:', fileType);
-
-  switch (fileType.toLowerCase()) {
+  switch (fileType.trim().toLowerCase()) {
     case 'pdf':
-      return extractPDFText(buffer);
+    case 'application/pdf':
+      return extractPDFText(buffer)
     case 'docx':
     case 'doc':
-      return extractDOCXText(buffer);
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    case 'application/msword':
+      return extractDOCXText(buffer)
     case 'txt':
-      return extractTXTText(buffer);
+    case 'text/plain':
+      return extractTXTText(buffer)
     default:
-      throw new Error(`Unsupported file type: ${fileType}`);
+      throw new Error(`Unsupported file type: ${fileType}`)
   }
 }
 
-/**
- * Clean and normalize extracted text
- */
 export function cleanText(text: string): string {
   return text
-    .replace(/\s+/g, ' ') // Replace multiple spaces
-    .replace(/\n+/g, '\n') // Replace multiple newlines
-    .trim();
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\t ]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
-/**
- * Split text into chunks for AI processing
- * Avoids token limits by splitting large documents
- */
-export function chunkText(text: string, chunkSize: number = 3000): string[] {
-  const chunks: string[] = [];
-  let currentChunk = '';
+export function chunkText(text: string, chunkSize = 3000): string[] {
+  if (!Number.isFinite(chunkSize) || chunkSize < 100) {
+    throw new Error('chunkSize must be at least 100 characters')
+  }
 
-  const sentences = text.split(/([.!?]+)/);
+  const chunks: string[] = []
+  let currentChunk = ''
+  const segments = text.split(/(?<=[.!?])\s+/)
 
-  for (const sentence of sentences) {
-    if ((currentChunk + sentence).length > chunkSize) {
-      if (currentChunk) chunks.push(currentChunk);
-      currentChunk = sentence;
+  for (const segment of segments) {
+    if (segment.length > chunkSize) {
+      if (currentChunk.trim()) chunks.push(currentChunk.trim())
+      currentChunk = ''
+      for (let index = 0; index < segment.length; index += chunkSize) {
+        chunks.push(segment.slice(index, index + chunkSize).trim())
+      }
+      continue
+    }
+
+    const candidate = currentChunk ? `${currentChunk} ${segment}` : segment
+    if (candidate.length > chunkSize) {
+      if (currentChunk.trim()) chunks.push(currentChunk.trim())
+      currentChunk = segment
     } else {
-      currentChunk += sentence;
+      currentChunk = candidate
     }
   }
 
-  if (currentChunk) chunks.push(currentChunk);
-
-  return chunks.filter((chunk) => chunk.trim().length > 0);
+  if (currentChunk.trim()) chunks.push(currentChunk.trim())
+  return chunks.filter(Boolean)
 }
