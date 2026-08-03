@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BriefcaseBusiness, Building2, Settings, TrendingUp } from 'lucide-react'
+import { BarChart3, BriefcaseBusiness, Building2, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
   { href: '/dashboard', label: 'Empresa', icon: Building2 },
   { href: '/missions', label: 'Trabajo', icon: BriefcaseBusiness },
-  { href: '/analytics', label: 'Crecimiento', icon: TrendingUp },
+  { href: '/analytics', label: 'Análisis', icon: BarChart3 },
 ] as const
 
 export function WorkspaceNav() {
@@ -40,8 +40,7 @@ export function WorkspaceNav() {
             )
           })}
         </div>
-        <div className="hidden md:block"><UniversalSearch /></div>
-        <div className="md:hidden"><UniversalSearch /></div>
+        <UniversalSearch />
         <Link href="/settings" aria-label="Configuración" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"><Settings className="h-4 w-4" /></Link>
       </div>
     </nav>
