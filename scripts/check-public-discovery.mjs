@@ -66,9 +66,9 @@ if (poweredMentions !== 1) {
 }
 
 const publicClaims = [
-  ['app/software-cumplimiento-chile/page.tsx', 'cumplimiento automático'],
-  ['app/resources/ley-21719/page.tsx', 'asesoría jurídica'],
-  ['app/faq/page.tsx', 'declara automáticamente'],
+  ['app/software-cumplimiento-chile/page.tsx', 'declara automáticamente'],
+  ['app/resources/ley-21719/page.tsx', 'No reemplazan'],
+  ['app/faq/page.tsx', 'revisión humana'],
 ]
 
 for (const [file, requiredGuardrail] of publicClaims) {
