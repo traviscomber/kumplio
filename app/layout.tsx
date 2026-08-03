@@ -12,18 +12,18 @@ const montserrat = Montserrat({
   weight: ['300', '400', '500', '600', '700', '800'],
 })
 
-const title = 'Kumplio | Conocimiento regulatorio y cumplimiento verificable'
-const description = 'Plataforma chilena que conecta normativa oficial, controles, evidencia y decisiones para construir cumplimiento verificable con trazabilidad y revisión humana.'
+const title = 'Kumplio | Del conocimiento a la ejecución verificable'
+const description = 'Kumplio ayuda a las organizaciones a entender qué cambió, decidir qué importa y ejecutar misiones con evidencia, responsables y revisión humana.'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kumplio.app'),
   title: { default: title, template: '%s | Kumplio' },
   description,
   keywords: [
+    'inteligencia organizacional',
     'cumplimiento verificable',
     'software compliance Chile',
-    'conocimiento regulatorio Chile',
-    'gestión de obligaciones',
+    'gestión de misiones',
     'evidencia auditable',
     'Ley 21.719',
     'Kumplio',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: 'Kumplio',
     title,
     description,
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kumplio — Cumplimiento verificable para organizaciones chilenas' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Kumplio — Del conocimiento a la ejecución verificable' }],
   },
   twitter: { card: 'summary_large_image', title, description, images: ['/twitter-image'] },
   icons: {
@@ -95,12 +95,11 @@ const graph = {
       areaServed: 'CL',
       creator: { '@id': 'https://kumplio.app/#organization' },
       featureList: [
-        'Grafo Nacional de Conocimiento',
-        'Memoria Organizacional',
-        'Mapa de obligaciones',
-        'Controles de cumplimiento',
-        'Biblioteca de evidencias',
-        'Agentes con revisión humana',
+        'Conocimiento regulatorio con fuentes identificables',
+        'Contexto privado de la organización',
+        'Misiones con responsables y criterios de éxito',
+        'Resultados y evidencias trazables',
+        'Revisión y decisiones humanas',
         'Preparación para la Ley 21.719',
       ],
     },

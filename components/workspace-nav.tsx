@@ -7,9 +7,9 @@ import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
-  { href: '/dashboard', label: 'Mi Empresa', icon: Building2 },
-  { href: '/missions', label: 'Mi Trabajo', icon: BriefcaseBusiness },
-  { href: '/analytics', label: 'Mi Crecimiento', icon: TrendingUp },
+  { href: '/dashboard', label: 'Empresa', icon: Building2 },
+  { href: '/missions', label: 'Trabajo', icon: BriefcaseBusiness },
+  { href: '/analytics', label: 'Crecimiento', icon: TrendingUp },
 ] as const
 
 export function WorkspaceNav() {
@@ -41,7 +41,7 @@ export function WorkspaceNav() {
           })}
         </div>
         <div className="hidden md:block"><UniversalSearch /></div>
-        <button type="button" className="md:hidden" aria-label="Abrir búsqueda"><UniversalSearch /></button>
+        <div className="md:hidden"><UniversalSearch /></div>
         <Link href="/settings" aria-label="Configuración" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"><Settings className="h-4 w-4" /></Link>
       </div>
     </nav>
