@@ -67,14 +67,14 @@ with mission_costs as (
   select
     m.id as mission_id,
     m.organization_id,
-    m.playbook_version_id,
+    m.playbook_id,
     coalesce(sum(j.total_cost_microusd),0)::bigint as cost_microusd,
     coalesce(sum(j.total_input_tokens),0)::bigint as input_tokens,
     coalesce(sum(j.total_output_tokens),0)::bigint as output_tokens,
     coalesce(sum(j.total_latency_ms),0)::bigint as latency_ms
   from public.missions m
   left join public.mission_execution_jobs j on j.mission_id=m.id
-  group by m.id,m.organization_id,m.playbook_version_id
+  group by m.id,m.organization_id,m.playbook_id
 ), rated as (
   select mc.*,
     fx.rate as usd_clp_rate,
