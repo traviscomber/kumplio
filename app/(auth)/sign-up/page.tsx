@@ -17,6 +17,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
 
 const plans = {
@@ -35,11 +36,6 @@ const plans = {
 } as const
 
 type PlanKey = keyof typeof plans
-
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/onboarding'
-  return value
-}
 
 function passwordScore(password: string) {
   return [
@@ -66,7 +62,7 @@ export default function SignUp() {
 
   const planKey = searchParams.get('plan') as PlanKey | null
   const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
-  const next = safeNext(searchParams.get('next'))
+  const next = safeInternalPath(searchParams.get('next'))
   const strength = useMemo(() => passwordScore(password), [password])
   const passwordReady = password.length >= 10 && strength >= 3
 
