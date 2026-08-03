@@ -1,60 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
+const leadSchema = z.object({
+  nombre: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(254),
+  empresa: z.string().trim().min(2).max(160),
+  industria: z.string().trim().min(2).max(80),
+  empleados: z.string().trim().min(1).max(40),
+  telefono: z.string().trim().max(40).optional().default(''),
+  mensaje: z.string().trim().max(3000).optional().default(''),
+  source: z.string().trim().max(80).optional().default('contact-page'),
+  timestamp: z.string().datetime().optional(),
+})
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, email, empresa, industria, empleados, telefono, mensaje } = await req.json()
-
-    // Validate required fields
-    if (!nombre || !email || !empresa || !industria || !empleados) {
+    const parsed = leadSchema.safeParse(await req.json())
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Faltan campos requeridos' },
-        { status: 400 }
+        { error: 'Revisa los datos ingresados e intenta nuevamente.' },
+        { status: 400 },
       )
     }
 
-    // Here you would integrate with Pipedrive or HubSpot
-    // Example for Pipedrive webhook:
     const pipedriveWebhook = process.env.PIPEDRIVE_WEBHOOK_URL
-    if (pipedriveWebhook) {
-      await fetch(pipedriveWebhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          person_name: nombre,
-          person_email: email,
-          org_name: empresa,
-          custom_properties: {
-            industria,
-            empleados,
-            telefono,
-            pain_point: mensaje,
-          },
-        }),
-      })
+    if (!pipedriveWebhook) {
+      console.error('[LEAD_CAPTURE_FAILED] PIPEDRIVE_WEBHOOK_URL no está configurado')
+      return NextResponse.json(
+        { error: 'El canal de contacto no está disponible temporalmente.' },
+        { status: 503 },
+      )
     }
 
-    // Store in database if you have one
-    // Example with Supabase:
-    // const supabase = createClient()
-    // await supabase.from('leads').insert({ nombre, email, empresa, industria, empleados, telefono, mensaje })
+    const lead = parsed.data
+    const response = await fetch(pipedriveWebhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        person_name: lead.nombre,
+        person_email: lead.email,
+        org_name: lead.empresa,
+        custom_properties: {
+          industria: lead.industria,
+          empleados: lead.empleados,
+          telefono: lead.telefono,
+          pain_point: lead.mensaje,
+          source: lead.source,
+          submitted_at: lead.timestamp || new Date().toISOString(),
+        },
+      }),
+      cache: 'no-store',
+    })
 
-    // For now, just log it
-    console.log('[LEAD_CAPTURED]', { nombre, email, empresa, industria })
+    if (!response.ok) {
+      console.error('[LEAD_CAPTURE_FAILED]', {
+        status: response.status,
+        statusText: response.statusText,
+      })
+      return NextResponse.json(
+        { error: 'No fue posible registrar tu solicitud. Intenta nuevamente.' },
+        { status: 502 },
+      )
+    }
 
-    // Send confirmation email (you would use SendGrid, Mailgun, etc)
-    // Example:
-    // await sendEmail({
-    //   to: email,
-    //   subject: 'Hemos recibido tu solicitud - KUMPLIO',
-    //   template: 'contact_confirmation',
-    // })
+    console.info('[LEAD_CAPTURED]', {
+      empresa: lead.empresa,
+      industria: lead.industria,
+      source: lead.source,
+    })
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    console.error('Error in /api/leads:', error)
+    console.error('[LEAD_CAPTURE_ERROR]', error)
     return NextResponse.json(
-      { error: 'Error procesando solicitud' },
-      { status: 500 }
+      { error: 'Error procesando la solicitud.' },
+      { status: 500 },
     )
   }
 }
