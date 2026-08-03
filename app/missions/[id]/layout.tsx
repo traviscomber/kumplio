@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { ExecutionArtifacts } from './execution-artifacts'
 import { MissionControl } from './mission-control'
 
 type LayoutParams = Promise<{ id: string }>
@@ -72,6 +73,7 @@ export default async function MissionLayout({ children, params }: { children: Re
         decisions={(decisionsResult.data || []) as Decision[]}
         capabilityActions={(runsResult.data || []) as unknown as CapabilityAction[]}
       />
+      <ExecutionArtifacts missionId={id} />
       {children}
     </>
   )
