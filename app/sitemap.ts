@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/about`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/resources/cumplimiento-normativo`, lastModified, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/contact`, lastModified, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${baseUrl}/security`, lastModified, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${baseUrl}/privacy`, lastModified, changeFrequency: 'yearly', priority: 0.4 },
     { url: `${baseUrl}/terms`, lastModified, changeFrequency: 'yearly', priority: 0.4 },
   ]
