@@ -7,12 +7,8 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
-
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/onboarding'
-  return value
-}
 
 const successMessages: Record<string, string> = {
   'password-updated': 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.',
@@ -29,7 +25,7 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const next = safeNext(searchParams.get('next'))
+  const next = safeInternalPath(searchParams.get('next'))
   const successMessage = successMessages[searchParams.get('message') || '']
 
   async function handleSignIn(event: FormEvent<HTMLFormElement>) {
