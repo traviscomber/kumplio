@@ -25,6 +25,7 @@ type ContactForm = {
   empleados: string
   telefono: string
   mensaje: string
+  website: string
 }
 
 function ContactContent() {
@@ -39,6 +40,7 @@ function ContactContent() {
     empleados: '',
     telefono: '',
     mensaje: selectedService ? `Me interesa conversar sobre ${selectedService}.` : '',
+    website: '',
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -88,7 +90,7 @@ function ContactContent() {
       }
 
       setSuccess(true)
-      setFormData({ nombre: '', email: '', empresa: '', industria: '', empleados: '', telefono: '', mensaje: '' })
+      setFormData({ nombre: '', email: '', empresa: '', industria: '', empleados: '', telefono: '', mensaje: '', website: '' })
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : 'Ocurrió un error. Intenta nuevamente.')
     } finally {
@@ -201,6 +203,19 @@ function ContactContent() {
                       </select>
                     </Field>
                     <Field label="Teléfono"><input name="telefono" type="tel" value={formData.telefono} onChange={handleChange} maxLength={40} className={inputClass} placeholder="+56 9..." /></Field>
+                  </div>
+
+                  <div className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                    <label htmlFor="website">Sitio web</label>
+                    <input
+                      id="website"
+                      name="website"
+                      type="text"
+                      value={formData.website}
+                      onChange={handleChange}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
                   </div>
 
                   <Field label="Resultado o desafío">
