@@ -2,6 +2,18 @@ name: Application validation
 
 on:
   pull_request:
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - 'supabase/migrations/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.mjs'
+      - 'tsconfig.json'
+      - '.github/workflows/public-discovery.yml'
+      - '.github/workflows/indexnow.yml'
   workflow_dispatch:
 
 concurrency:
