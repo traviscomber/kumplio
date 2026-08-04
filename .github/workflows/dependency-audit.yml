@@ -1,0 +1,78 @@
+name: Dependency security audit
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/dependency-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Collect npm audit report
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm audit --json > /tmp/npm-audit.json || true
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const report = JSON.parse(fs.readFileSync('/tmp/npm-audit.json', 'utf8'))
+          const totals = report.metadata?.vulnerabilities || {}
+          console.log('AUDIT_TOTALS', JSON.stringify(totals))
+
+          const vulnerabilities = Object.entries(report.vulnerabilities || {})
+            .map(([name, vulnerability]) => ({ name, ...vulnerability }))
+            .sort((left, right) => {
+              const rank = { critical: 4, high: 3, moderate: 2, low: 1, info: 0 }
+              return (rank[right.severity] || 0) - (rank[left.severity] || 0) || left.name.localeCompare(right.name)
+            })
+
+          for (const vulnerability of vulnerabilities) {
+            const advisories = (vulnerability.via || []).map((via) => {
+              if (typeof via === 'string') return via
+              return `${via.source}:${via.title} (${via.url}) range=${via.range}`
+            })
+            console.log(JSON.stringify({
+              package: vulnerability.name,
+              severity: vulnerability.severity,
+              direct: vulnerability.isDirect,
+              range: vulnerability.range,
+              effects: vulnerability.effects,
+              fixAvailable: vulnerability.fixAvailable,
+              advisories,
+            }))
+          }
+          NODE
+
+      - name: List outdated direct dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm outdated --json > /tmp/npm-outdated.json || true
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const outdated = JSON.parse(fs.readFileSync('/tmp/npm-outdated.json', 'utf8') || '{}')
+          console.log('OUTDATED_DIRECT_DEPENDENCIES')
+          for (const [name, value] of Object.entries(outdated)) {
+            console.log(JSON.stringify({ package: name, current: value.current, wanted: value.wanted, latest: value.latest, type: value.type }))
+          }
+          NODE
