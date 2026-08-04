@@ -62,6 +62,9 @@ jobs:
       - name: Validate LeyChile parser
         run: npm run check:leychile
 
+      - name: Validate Ley 21.719 claim rules
+        run: npm run check:claims
+
       - name: Typecheck
         run: npm run typecheck
 
