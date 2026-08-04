@@ -7,7 +7,7 @@ import {
 } from "./core.mjs";
 
 const CONNECTOR_KEY = "direccion-trabajo-doctrina";
-const CONNECTOR_VERSION = "direccion-trabajo-doctrina-v1";
+const CONNECTOR_VERSION = "direccion-trabajo-doctrina-v2";
 const USER_AGENT = "KUMPLIO-Regulatory-Connector/1.0 (+https://kumplio.app/regulatory)";
 const MAX_BYTES = 3 * 1024 * 1024;
 const REQUEST_DELAY_MS = 350;
@@ -26,20 +26,8 @@ function json(body: unknown, status = 200) {
   });
 }
 
-function jwtRole(request: Request) {
-  const authorization = request.headers.get("authorization") || "";
-  const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
-  const encoded = token.split(".")[1];
-  if (!encoded) return null;
-
-  try {
-    const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
-    const claims = JSON.parse(atob(padded)) as Record<string, unknown>;
-    return typeof claims.role === "string" ? claims.role : null;
-  } catch {
-    return null;
-  }
+function serviceRoleAuthorized(request: Request, serviceKey: string) {
+  return request.headers.get("authorization") === `Bearer ${serviceKey}`;
 }
 
 function delay(milliseconds: number) {
@@ -168,7 +156,10 @@ async function recordIndexFetch(
 }
 
 Deno.serve(async (request) => {
-  if (jwtRole(request) !== "service_role") {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) return json({ error: "missing_configuration" }, 500);
+  if (!serviceRoleAuthorized(request, serviceKey)) {
     return json({ error: "service_role_required" }, 403);
   }
 
@@ -180,10 +171,6 @@ Deno.serve(async (request) => {
   if (year !== 2026 || !Number.isInteger(month) || month < 1 || month > 12) {
     return json({ error: "invalid_capture_period" }, 400);
   }
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceKey) return json({ error: "missing_configuration" }, 500);
 
   const admin = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -214,7 +201,7 @@ Deno.serve(async (request) => {
       target_trigger_type: triggerType,
       target_requested_url: requestedUrl,
       target_canonical_url: INDEX_URLS.dictamen,
-      target_idempotency_key: `direccion-trabajo:${year}-${String(month).padStart(2, "0")}:edge-v1`,
+      target_idempotency_key: `direccion-trabajo:${year}-${String(month).padStart(2, "0")}:edge-v2`,
       target_parent_run: null,
     });
     if (enqueueError || !queuedRun) {
@@ -258,6 +245,7 @@ Deno.serve(async (request) => {
     ];
 
     let captured = 0;
+    let reparsed = 0;
     let unchanged = 0;
     let totalBlocks = 0;
     let totalTopics = 0;
@@ -265,8 +253,7 @@ Deno.serve(async (request) => {
     let totalRelations = 0;
     const documents: Array<Record<string, unknown>> = [];
 
-    for (let index = 0; index < discoveries.length; index += 1) {
-      const discovery = discoveries[index];
+    for (const discovery of discoveries) {
       await delay(REQUEST_DELAY_MS);
       const detailCapture = await fetchOfficialHtml(discovery.detailUrl);
       const parsed = await parseDtDetailPage(detailCapture.rawHtml, discovery);
@@ -299,12 +286,38 @@ Deno.serve(async (request) => {
         p_normalized_content: parsed.normalizedContent,
         p_parser_version: CONNECTOR_VERSION,
       });
-      if (captureError || !captureData?.versionId) {
-        throw new Error(`dt_document_persistence_failed:${captureError?.message || "missing_version"}`);
+      if (captureError || !captureData?.documentId || !captureData?.versionId || !captureData?.fetchId) {
+        throw new Error(`dt_document_persistence_failed:${captureError?.message || "missing_capture_identity"}`);
+      }
+
+      const sectionHash = await sha256(`document|${parsed.normalizedContent}`);
+      const { data: parserData, error: parserError } = await admin.rpc("record_regulatory_parser_revision", {
+        p_document_id: captureData.documentId,
+        p_source_fetch_id: captureData.fetchId,
+        p_source_content_hash: detailCapture.contentHash,
+        p_parser_version: CONNECTOR_VERSION,
+        p_normalized_content: parsed.normalizedContent,
+        p_sections: [{
+          key: "document",
+          type: "article",
+          ordinal: 1,
+          referenceLabel: parsed.officialNumber,
+          heading: parsed.title,
+          bodyText: parsed.normalizedContent,
+          normalizedText: parsed.normalizedContent,
+          hash: sectionHash,
+          metadata: {
+            source: "direccion-trabajo",
+            parserVersion: CONNECTOR_VERSION,
+          },
+        }],
+      });
+      if (parserError || !parserData?.versionId) {
+        throw new Error(`dt_parser_revision_failed:${parserError?.message || "missing_parser_version"}`);
       }
 
       const { data: metadataData, error: metadataError } = await admin.rpc("record_dt_pronouncement_metadata", {
-        p_version_id: captureData.versionId,
+        p_version_id: parserData.versionId,
         p_details: {
           pronouncementType: parsed.pronouncementType,
           officialNumber: parsed.officialNumber,
@@ -327,9 +340,14 @@ Deno.serve(async (request) => {
         throw new Error(`dt_metadata_persistence_failed:${metadataError.message}`);
       }
 
-      const isUnchanged = captureData.status === "unchanged" && metadataData?.status === "unchanged";
+      const isUnchanged = captureData.status === "unchanged"
+        && parserData.status === "unchanged"
+        && metadataData?.status === "unchanged";
+      const isReparsed = parserData.status === "reparsed";
       if (isUnchanged) unchanged += 1;
+      else if (isReparsed) reparsed += 1;
       else captured += 1;
+
       totalBlocks += parsed.blocks.length;
       totalTopics += parsed.topics.length;
       totalReferences += parsed.legalReferences.length;
@@ -339,15 +357,19 @@ Deno.serve(async (request) => {
         number: parsed.officialNumber,
         type: parsed.pronouncementType,
         publicationDate: parsed.publicationDate,
-        status: isUnchanged ? "unchanged" : "captured",
-        versionId: captureData.versionId,
+        status: isUnchanged ? "unchanged" : isReparsed ? "reparsed" : "captured",
+        versionId: parserData.versionId,
+        versionNumber: parserData.versionNumber,
+        parserStatus: parserData.status,
+        parserVersion: CONNECTOR_VERSION,
         topics: parsed.topics.length,
         legalReferences: parsed.legalReferences.length,
         relations: parsed.relations.length,
       });
     }
 
-    const completionStatus = captured === 0 ? "unchanged" : "requires_review";
+    const changes = captured + reparsed;
+    const completionStatus = changes === 0 ? "unchanged" : "requires_review";
     const { error: completionError } = await admin.rpc("complete_scraper_run", {
       target_run: runId,
       target_status: completionStatus,
@@ -359,7 +381,7 @@ Deno.serve(async (request) => {
       target_version: null,
       target_change: null,
       target_sections: discoveries.length,
-      target_changes: captured,
+      target_changes: changes,
       target_metrics: {
         year,
         month,
@@ -367,11 +389,13 @@ Deno.serve(async (request) => {
         dictamenes: dictamenEntries.length,
         ordinarios: ordinarioEntries.length,
         captured,
+        reparsed,
         unchanged,
         blocks: totalBlocks,
         topics: totalTopics,
         legalReferences: totalReferences,
         relations: totalRelations,
+        parserVersion: CONNECTOR_VERSION,
         indexFetches,
         documents,
         humanReviewRequired: true,
@@ -383,12 +407,15 @@ Deno.serve(async (request) => {
     await admin
       .from("scraper_connectors")
       .update({
+        connector_version: CONNECTOR_VERSION,
         metadata: {
           ...(connector.metadata || {}),
           initialPeriod: capturePeriod,
           lastCapturedPeriod: capturePeriod,
           verifiedCaptureCount: Number(connector.metadata?.verifiedCaptureCount || 0) + (captured > 0 ? 1 : 0),
           lastDocumentCount: discoveries.length,
+          lastParserRevisionCount: reparsed,
+          parserVersion: CONNECTOR_VERSION,
           schedulingReadiness: "first_capture_verified",
           schedulingStatus: "manual_until_two_verified_captures",
           humanReviewRequired: true,
@@ -399,11 +426,13 @@ Deno.serve(async (request) => {
     await admin
       .from("regulatory_sources")
       .update({
+        connector_version: CONNECTOR_VERSION,
         metadata: {
           ...(source.metadata || {}),
           lastCapturedPeriod: capturePeriod,
           lastDocumentCount: discoveries.length,
           lastCaptureRunId: runId,
+          parserVersion: CONNECTOR_VERSION,
           humanReviewRequired: true,
         },
       })
@@ -418,11 +447,13 @@ Deno.serve(async (request) => {
       dictamenes: dictamenEntries.length,
       ordinarios: ordinarioEntries.length,
       captured,
+      reparsed,
       unchanged,
       blocks: totalBlocks,
       topics: totalTopics,
       legalReferences: totalReferences,
       relations: totalRelations,
+      parserVersion: CONNECTOR_VERSION,
       documents,
     });
   } catch (error) {
