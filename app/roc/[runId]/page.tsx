@@ -12,6 +12,7 @@ import {
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createActionPlan } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -152,14 +153,16 @@ export default async function ImpactDetailPage({ params }: PageProps) {
 
           <aside className="space-y-4">
             <div className="rounded-2xl border bg-card p-5">
-              <h2 className="font-bold">Decisión pendiente</h2>
+              <h2 className="font-bold">Convertir impacto en trabajo</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Este impacto fue detectado y explicado, pero no se transformó en cumplimiento, controles ni tareas. El siguiente paso será convertirlo en un plan de acción revisable.
+                Crea un plan en borrador con una tarea revisable por cada objetivo afectado. Nada se aprueba ni se asigna automáticamente.
               </p>
-              <button type="button" disabled className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground opacity-60">
-                Crear plan de acción <ArrowRight className="h-4 w-4" />
-              </button>
-              <p className="mt-2 text-center text-xs text-muted-foreground">Se habilitará en la Épica 2.</p>
+              <form action={createActionPlan}>
+                <input type="hidden" name="runId" value={run.id} />
+                <button type="submit" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:opacity-90">
+                  Crear plan de acción <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
             </div>
 
             <div className="rounded-2xl border bg-card p-5">
