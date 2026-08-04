@@ -1,6 +1,8 @@
 import { access, readFile } from 'node:fs/promises'
 import process from 'node:process'
 
+const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
+
 const requiredFiles = [
   'app/layout.tsx',
   'app/robots.ts',
@@ -16,7 +18,10 @@ const requiredFiles = [
   'app/feed.xml/route.ts',
   'app/api/indexnow/route.ts',
   'app/indexnow-key.txt/route.ts',
+  `app/${indexNowKey}.txt/route.ts`,
   'app/.well-known/security.txt/route.ts',
+  'lib/indexnow.ts',
+  '.github/workflows/indexnow.yml',
 ]
 
 const failures = []
@@ -78,6 +83,46 @@ for (const [file, requiredGuardrail] of publicClaims) {
     failures.push(`${file} no contiene el guardrail esperado: ${requiredGuardrail}`)
   }
 }
+
+const indexNowConfig = await expectIncludes('lib/indexnow.ts', [
+  indexNowKey,
+  'INDEXNOW_KEY_PATH',
+  'DEPRECATED_PUBLIC_URLS',
+  '/sales-kit',
+  '/demo/transporte',
+  '/demo/mineria',
+])
+
+if (!/INDEXNOW_KEY = '[A-Za-z0-9-]{8,128}'/.test(indexNowConfig)) {
+  failures.push('La clave IndexNow no cumple el formato de 8 a 128 caracteres permitido')
+}
+
+await expectIncludes(`app/${indexNowKey}.txt/route.ts`, [
+  'INDEXNOW_KEY',
+  "'force-static'",
+  "'text/plain; charset=utf-8'",
+])
+
+const indexNowApi = await expectIncludes('app/api/indexnow/route.ts', [
+  'INDEXNOW_KEY',
+  'INDEXNOW_KEY_URL',
+  '10000',
+  'api.indexnow.org/indexnow',
+])
+if (indexNowApi.includes('process.env.INDEXNOW_KEY')) {
+  failures.push('El endpoint IndexNow no debe depender de INDEXNOW_KEY en Vercel')
+}
+
+await expectIncludes('.github/workflows/indexnow.yml', [
+  'Wait for production deployment and key verification',
+  `INDEXNOW_KEY: ${indexNowKey}`,
+  '$INDEXNOW_KEY.txt',
+  'sitemap.xml',
+  'sales-kit',
+  'demo/transporte',
+  'demo/mineria',
+  "status\" = '202'",
+])
 
 if (failures.length) {
   console.error('\nPublic discovery validation failed:\n')
