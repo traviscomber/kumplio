@@ -11,6 +11,7 @@ import {
 
 export const LEYCHILE_CONNECTOR_KEY = 'leychile-official-json'
 export const LEYCHILE_CONNECTOR_VERSION = 'leychile-official-json-v3'
+export const LEY21719_CLAIM_EXTRACTOR_VERSION = 'ley21719-claims-v1'
 export const LEYCHILE_API_URL = 'https://servicios-leychile.bcn.cl/Navegar/get_norma_json?idNorma=1209272&idVersion=2026-12-01&idLey=&tipoVersion=&cve=&agrupa_partes=1&r='
 
 export type LeyChileTriggerType = 'manual' | 'schedule' | 'retry' | 'reprocess'
@@ -88,6 +89,24 @@ export async function runLeyChileOfficialJson(input: {
     const versionId = typeof record.versionId === 'string' ? record.versionId : null
     const changeId = typeof record.changeId === 'string' ? record.changeId : null
 
+    let claimExtraction: Record<string, unknown> | null = null
+
+    if (versionId) {
+      const { data: extractionData, error: extractionError } = await admin.rpc(
+        'extract_regulatory_claims_deterministic',
+        {
+          p_version_id: versionId,
+          p_extractor_version: LEY21719_CLAIM_EXTRACTOR_VERSION,
+        },
+      )
+
+      if (extractionError) {
+        throw new Error(`leychile_claim_extraction_failed:${extractionError.code || extractionError.message}`)
+      }
+
+      claimExtraction = (extractionData || {}) as Record<string, unknown>
+    }
+
     await completeScraperRun({
       runId,
       status,
@@ -106,6 +125,8 @@ export async function runLeyChileOfficialJson(input: {
         incisoSections: Number(data.incisoSections || 0),
         documentHash: data.documentHash || null,
         connectorVersion: LEYCHILE_CONNECTOR_VERSION,
+        claimExtractorVersion: LEY21719_CLAIM_EXTRACTOR_VERSION,
+        claimExtraction,
       },
     })
 
@@ -123,6 +144,7 @@ export async function runLeyChileOfficialJson(input: {
       versionId,
       changeId,
       versionNumber: typeof record.versionNumber === 'number' ? record.versionNumber : null,
+      claimExtraction,
     }
   } catch (error) {
     const classified = classifyScraperError(error)
