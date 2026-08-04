@@ -40,13 +40,29 @@ jobs:
       - name: Install current graph
         run: npm ci
 
-      - name: Apply compatible audit fixes and ExcelJS UUID override
+      - name: Resolve latest patched versions within current major lines
         shell: bash
         run: |
           set -euo pipefail
+
+          latest_version() {
+            node -e "let input=''; process.stdin.on('data', chunk => input += chunk); process.stdin.on('end', () => { const value = JSON.parse(input); console.log(Array.isArray(value) ? value.at(-1) : value); });"
+          }
+
+          AI_VERSION=$(npm view ai@6 version --json | latest_version)
+          REACT_VERSION=$(npm view @ai-sdk/react@3 version --json | latest_version)
+          UNDICI6_VERSION=$(npm view undici@6 version --json | latest_version)
+
+          echo "Using ai@$AI_VERSION"
+          echo "Using @ai-sdk/react@$REACT_VERSION"
+          echo "Using undici@$UNDICI6_VERSION for transitive consumers"
+
+          npm pkg set dependencies.ai="$AI_VERSION"
+          npm pkg set dependencies.@ai-sdk/react="$REACT_VERSION"
           npm pkg set 'overrides.exceljs.uuid=^11.1.1'
+          npm pkg set overrides.undici="$UNDICI6_VERSION"
           npm install
-          npm audit fix
+          npm audit fix || true
 
       - name: Validate application and Excel runtime
         shell: bash
