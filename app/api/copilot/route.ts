@@ -6,6 +6,7 @@ import {
   classifyCopilotIntent,
   type CopilotResponse,
 } from '@/lib/compliance-copilot/engine'
+import { writeGroundedCopilotAnswer } from '@/lib/compliance-copilot/grounded-writer'
 
 export const runtime = 'nodejs'
 
@@ -137,6 +138,16 @@ export async function POST(request: Request) {
     actions.push({ label: 'Abrir ROC', href: '/roc' })
   }
 
-  const response: CopilotResponse = { intent, answer, facts, sources, actions, plan }
+  const deterministic: CopilotResponse = {
+    intent,
+    answer,
+    facts,
+    sources,
+    actions,
+    plan,
+    generation: { mode: 'deterministic' },
+  }
+
+  const response = await writeGroundedCopilotAnswer({ userMessage: message, deterministic })
   return NextResponse.json(response)
 }
