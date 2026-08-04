@@ -22,6 +22,7 @@ const requiredFiles = [
   'app/.well-known/security.txt/route.ts',
   'lib/indexnow.ts',
   '.github/workflows/indexnow.yml',
+  '.github/workflows/public-discovery.yml',
 ]
 
 const failures = []
@@ -114,6 +115,13 @@ if (indexNowApi.includes('process.env.INDEXNOW_KEY')) {
 }
 
 await expectIncludes('.github/workflows/indexnow.yml', [
+  'statuses: write',
+  'STATUS_CONTEXT: IndexNow production',
+  'Mark IndexNow notification pending',
+  'Mark IndexNow notification successful',
+  'Mark IndexNow notification failed',
+  'Waiting for the Kumplio production deployment',
+  'IndexNow accepted the Kumplio production URLs',
   'Wait for production deployment and key verification',
   `INDEXNOW_KEY: ${indexNowKey}`,
   '$INDEXNOW_KEY.txt',
@@ -122,6 +130,11 @@ await expectIncludes('.github/workflows/indexnow.yml', [
   'demo/transporte',
   'demo/mineria',
   "status\" = '202'",
+])
+
+await expectIncludes('.github/workflows/public-discovery.yml', [
+  'node-version: 24',
+  "'.github/workflows/indexnow.yml'",
 ])
 
 if (failures.length) {
