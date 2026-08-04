@@ -26,7 +26,7 @@ export function DocumentsList() {
       setLoading(true)
       try {
         const supabase = createClient()
-        const rows = await getUserDocuments(supabase, user!.id)
+        const rows = await getUserDocuments(supabase, user.id)
         if (!cancelled) {
           setDocuments(rows as Document[])
           setError(null)
@@ -77,56 +77,59 @@ export function DocumentsList() {
 
   return (
     <div className="space-y-3">
-      {documents.map((document) => (
-        <div
-          key={document.id}
-          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition-colors hover:bg-card/80"
-        >
-          <Link href={`/documents/${document.id}`} className="min-w-0 flex-1">
-            <div className="space-y-1">
-              <div className="truncate font-medium text-foreground">{document.filename}</div>
-              <div className="flex gap-3 text-sm text-muted-foreground">
-                <span>{((document.file_size || 0) / 1024).toFixed(1)} KB</span>
-                {document.industry && (
-                  <span className="rounded bg-muted px-2 py-0.5 text-xs">{document.industry}</span>
-                )}
-                <span>{new Date(document.created_at).toLocaleDateString('es-CL')}</span>
+      {documents.map((document) => {
+        const uploadedAt = document.upload_date || document.created_at
+        return (
+          <div
+            key={document.id}
+            className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition-colors hover:bg-card/80"
+          >
+            <Link href={`/documents/${document.id}`} className="min-w-0 flex-1">
+              <div className="space-y-1">
+                <div className="truncate font-medium text-foreground">{document.name}</div>
+                <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                  {document.document_type && (
+                    <span className="rounded bg-muted px-2 py-0.5 text-xs">{document.document_type}</span>
+                  )}
+                  {document.projects?.name && <span>{document.projects.name}</span>}
+                  {uploadedAt && <span>{new Date(uploadedAt).toLocaleDateString('es-CL')}</span>}
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
 
-          <div className="ml-4 flex items-center gap-2">
-            <span className={`rounded px-2 py-1 text-xs ${getStatusColor(document.status)}`}>
-              {getStatusLabel(document.status)}
-            </span>
-            <button
-              type="button"
-              onClick={() => void handleDelete(document.id)}
-              className="text-sm text-muted-foreground transition-colors hover:text-destructive"
-            >
-              Eliminar
-            </button>
+            <div className="ml-4 flex items-center gap-2">
+              <span className={`rounded px-2 py-1 text-xs ${getStatusColor(document.status)}`}>
+                {getStatusLabel(document.status)}
+              </span>
+              <button
+                type="button"
+                onClick={() => void handleDelete(document.id)}
+                className="text-sm text-muted-foreground transition-colors hover:text-destructive"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
 
 function getStatusLabel(status: Document['status']) {
   return {
-    uploading: 'Cargando',
-    processing: 'Procesando',
-    completed: 'Completado',
+    pending: 'Pendiente',
+    analyzing: 'Analizando',
+    analyzed: 'Analizado',
     error: 'Error',
   }[status]
 }
 
 function getStatusColor(status: Document['status']) {
   return {
-    uploading: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
-    processing: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400',
-    completed: 'bg-green-500/10 text-green-700 dark:text-green-400',
+    pending: 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
+    analyzing: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400',
+    analyzed: 'bg-green-500/10 text-green-700 dark:text-green-400',
     error: 'bg-red-500/10 text-red-700 dark:text-red-400',
   }[status]
 }
