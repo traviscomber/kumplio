@@ -22,6 +22,12 @@ export type CopilotResponse = {
     mode: 'deterministic' | 'llm_grounded'
     model?: string
     fallbackReason?: string
+    usage?: {
+      inputTokens?: number | null
+      outputTokens?: number | null
+      totalTokens?: number | null
+      estimatedCostUsd?: number | null
+    }
   }
   caveats?: string[]
 }
