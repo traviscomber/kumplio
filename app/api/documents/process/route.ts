@@ -1,169 +1,186 @@
-// API endpoint for document processing
-// Handles: download → extract text → extract obligations → insert results → update status
-
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { extractDocumentText, cleanText } from '@/lib/services/pdf-extraction'
+import { z } from 'zod'
+import { cleanText, extractDocumentText } from '@/lib/services/pdf-extraction'
 import { extractObligations } from '@/lib/services/openai-extraction'
-import { updateDocumentStatus } from '@/lib/services/documents'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
-export async function POST(req: NextRequest) {
-  try {
-    const { documentId } = await req.json()
+export const runtime = 'nodejs'
+export const maxDuration = 300
 
-    if (!documentId) {
-      return NextResponse.json({ error: 'Missing documentId' }, { status: 400 })
-    }
+const requestSchema = z.object({
+  documentId: z.string().uuid(),
+})
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return NextResponse.json({ error: 'Missing Supabase config' }, { status: 500 })
-    }
-
-    // Create service-role client for backend operations (INSERT to obligations, risks, roadmaps)
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    console.log('[process] Starting document processing:', documentId)
-
-    // 1. Get document info
-    const { data: doc, error: docError } = await supabase
-      .from('documents')
-      .select('*, projects(id)')
-      .eq('id', documentId)
-      .single()
-
-    if (docError || !doc) {
-      console.error('[process] Document not found:', docError)
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 })
-    }
-
-    const projectId = doc.project_id
-
-    try {
-      // 2. Download file from storage
-      console.log('[process] Downloading:', doc.file_url)
-      const { data: fileData, error: downloadError } = await supabase.storage
-        .from('documents')
-        .download(doc.file_url)
-
-      if (downloadError || !fileData) {
-        throw new Error(`Storage download failed: ${downloadError?.message || 'unknown'}`)
-      }
-
-      // 3. Extract text from document
-      const buffer = Buffer.from(await fileData.arrayBuffer())
-      const fileExt = doc.name.split('.').pop()?.toLowerCase() || 'txt'
-      let extractedText = await extractDocumentText(buffer, fileExt)
-      extractedText = cleanText(extractedText)
-
-      // 4. Extract obligations using OpenAI GPT-4o
-      console.log('[process] Extracting obligations with GPT-4o...')
-      const extractionResult = await extractObligations(extractedText, doc.document_type)
-
-      // 5. Insert obligations into the obligations table
-      if (extractionResult.obligations.length > 0) {
-        const obligationsData = extractionResult.obligations.map((o) => ({
-          project_id: projectId,
-          obligation_text: o.obligation_text,
-          type: o.type,
-          severity: o.severity,
-          responsible_party: o.responsible_party,
-          priority: o.priority,
-          status: 'pending',
-          created_at: new Date().toISOString(),
-        }))
-
-        const { error: obligError } = await supabase
-          .from('obligations')
-          .insert(obligationsData)
-
-        if (obligError) {
-          console.error('[process] Error inserting obligations:', obligError)
-          throw new Error(`Failed to insert obligations: ${obligError.message}`)
-        }
-
-        console.log('[process] Inserted', obligationsData.length, 'obligations')
-      }
-
-      // 6. Insert risks based on high-priority obligations
-      const criticalObligations = extractionResult.obligations.filter(
-        (o) => o.priority === 'critical' || o.severity === 'critical'
-      )
-
-      if (criticalObligations.length > 0) {
-        const risksData = criticalObligations.map((o, idx) => ({
-          project_id: projectId,
-          risk_name: `Risk: ${o.obligation_text.slice(0, 80)}`,
-          risk_description: o.obligation_text,
-          impact: 'high',
-          likelihood: 'high',
-          mitigation: `Address: ${o.responsible_party || 'owner'}`,
-          priority: o.priority,
-          status: 'open',
-          created_at: new Date().toISOString(),
-        }))
-
-        const { error: risksError } = await supabase.from('risks').insert(risksData)
-
-        if (risksError) {
-          console.warn('[process] Warning inserting risks:', risksError)
-        } else {
-          console.log('[process] Inserted', risksData.length, 'risks')
-        }
-      }
-
-      // 7. Insert roadmap actions for critical items
-      if (criticalObligations.length > 0) {
-        const roadmapData = criticalObligations.map((o, idx) => ({
-          project_id: projectId,
-          phase: idx < 2 ? 'immediate' : idx < 5 ? 'short-term' : 'long-term',
-          action: o.obligation_text,
-          owner: o.responsible_party || 'TBD',
-          target_date: new Date(Date.now() + (idx + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'pending',
-          created_at: new Date().toISOString(),
-        }))
-
-        const { error: roadmapError } = await supabase
-          .from('roadmaps')
-          .insert(roadmapData)
-
-        if (roadmapError) {
-          console.warn('[process] Warning inserting roadmap:', roadmapError)
-        } else {
-          console.log('[process] Inserted', roadmapData.length, 'roadmap items')
-        }
-      }
-
-      // 8. Update document status to completed
-      await updateDocumentStatus(supabase, documentId, 'completed')
-
-      console.log('[process] Document processing completed')
-
-      return NextResponse.json({
-        success: true,
-        documentId,
-        obligationsExtracted: extractionResult.obligations.length,
-        riskSummary: extractionResult.riskSummary,
-      })
-    } catch (processingError) {
-      const errorMsg = processingError instanceof Error ? processingError.message : 'Unknown error'
-      console.error('[process] Processing error:', errorMsg)
-
-      // Update document with error status
-      await updateDocumentStatus(supabase, documentId, 'error', errorMsg)
-
-      return NextResponse.json(
-        { error: errorMsg, documentId },
-        { status: 500 }
-      )
-    }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error'
-    console.error('[process] API error:', message)
-    return NextResponse.json({ error: message }, { status: 500 })
-  }
+function fileFormat(name: string, path: string | null) {
+  const value = `${name} ${path || ''}`.toLowerCase()
+  if (value.includes('.pdf')) return 'pdf'
+  if (value.includes('.txt')) return 'txt'
+  return null
 }
 
+export async function POST(request: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
+  }
+
+  let payload: unknown
+  try {
+    payload = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid JSON request', code: 'invalid_json' },
+      { status: 400 },
+    )
+  }
+
+  const parsed = requestSchema.safeParse(payload)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid documentId', code: 'invalid_document_id' },
+      { status: 400 },
+    )
+  }
+
+  const { data: document, error: documentError } = await supabase
+    .from('documents')
+    .select('id, project_id, name, file_url, document_type, status')
+    .eq('id', parsed.data.documentId)
+    .maybeSingle()
+
+  if (documentError) {
+    console.error('[documents/process] lookup failed', documentError.code)
+    return NextResponse.json(
+      { error: 'No fue posible consultar el documento.', code: 'document_lookup_failed' },
+      { status: 500 },
+    )
+  }
+
+  if (!document) {
+    return NextResponse.json(
+      { error: 'Documento no encontrado.', code: 'document_not_found' },
+      { status: 404 },
+    )
+  }
+
+  if (document.status === 'analyzing') {
+    return NextResponse.json(
+      { error: 'El documento ya está siendo analizado.', code: 'analysis_in_progress' },
+      { status: 409 },
+    )
+  }
+
+  if (document.status === 'analyzed') {
+    return NextResponse.json(
+      { error: 'El documento ya fue analizado.', code: 'already_analyzed' },
+      { status: 409 },
+    )
+  }
+
+  if (!document.file_url) {
+    return NextResponse.json(
+      { error: 'El documento no tiene un archivo asociado.', code: 'missing_file' },
+      { status: 422 },
+    )
+  }
+
+  const format = fileFormat(document.name, document.file_url)
+  if (!format) {
+    return NextResponse.json(
+      { error: 'Actualmente solo se procesan archivos PDF y TXT.', code: 'unsupported_file_type' },
+      { status: 415 },
+    )
+  }
+
+  const { error: analyzingError } = await supabase
+    .from('documents')
+    .update({ status: 'analyzing' })
+    .eq('id', document.id)
+
+  if (analyzingError) {
+    console.error('[documents/process] status update failed', analyzingError.code)
+    return NextResponse.json(
+      { error: 'No fue posible iniciar el análisis.', code: 'analysis_start_failed' },
+      { status: 500 },
+    )
+  }
+
+  try {
+    const { data: fileData, error: downloadError } = await supabase.storage
+      .from('documents')
+      .download(document.file_url)
+
+    if (downloadError || !fileData) {
+      throw new Error(downloadError?.message || 'missing storage object')
+    }
+
+    const buffer = Buffer.from(await fileData.arrayBuffer())
+    const extractedText = cleanText(await extractDocumentText(buffer, format))
+    if (extractedText.length < 20) {
+      throw new Error('El archivo no contiene texto suficiente para analizar.')
+    }
+
+    const result = await extractObligations(extractedText, document.document_type || undefined)
+    const obligations = result.obligations.slice(0, 500)
+    const admin = createAdminClient()
+
+    const { error: cleanupError } = await admin
+      .from('obligations')
+      .delete()
+      .eq('document_id', document.id)
+
+    if (cleanupError) throw cleanupError
+
+    if (obligations.length > 0) {
+      const { error: insertError } = await admin
+        .from('obligations')
+        .insert(obligations.map((item) => ({
+          project_id: document.project_id,
+          document_id: document.id,
+          obligation_text: item.obligation_text,
+          responsible_party: item.responsible_party,
+          due_date: null,
+          priority: item.priority,
+          status: 'identified',
+          is1dora_confidence: item.confidence ?? null,
+        })))
+
+      if (insertError) throw insertError
+    }
+
+    const { error: completedError } = await supabase
+      .from('documents')
+      .update({ status: 'analyzed' })
+      .eq('id', document.id)
+
+    if (completedError) throw completedError
+
+    return NextResponse.json({
+      success: true,
+      documentId: document.id,
+      obligationsCreated: obligations.length,
+      limitations: result.limitations || [],
+    }, {
+      headers: { 'Cache-Control': 'private, no-store' },
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'unknown_error'
+    console.error('[documents/process] failed', message)
+
+    await supabase
+      .from('documents')
+      .update({ status: 'error' })
+      .eq('id', document.id)
+
+    return NextResponse.json(
+      { error: 'No fue posible procesar el documento.', code: 'document_processing_failed' },
+      { status: 500 },
+    )
+  }
+}
