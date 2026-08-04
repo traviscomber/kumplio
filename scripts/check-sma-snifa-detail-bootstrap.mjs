@@ -11,6 +11,7 @@ const unitHelpers = await readFile('supabase/migrations/20260804071040_sma_snifa
 const documentHelpers = await readFile('supabase/migrations/20260804071042_sma_snifa_detail_document_fact_helpers.sql', 'utf8')
 const sanctionHelpers = await readFile('supabase/migrations/20260804071044_sma_snifa_detail_association_sanction_helpers.sql', 'utf8')
 const persistence = await readFile('supabase/migrations/20260804071050_sma_snifa_detail_persistence.sql', 'utf8')
+const sourceIdFix = await readFile('supabase/migrations/20260804071055_sma_snifa_detail_source_id_fix.sql', 'utf8')
 const guard = await readFile('supabase/migrations/20260804070900_sma_snifa_detail_user_agent_guard.sql', 'utf8')
 const cleanup = await readFile('supabase/migrations/20260804071100_sma_snifa_detail_user_agent_guard_cleanup.sql', 'utf8')
 const metadataGuard = await readFile('supabase/migrations/20260804071200_sma_snifa_detail_metadata_guard.sql', 'utf8')
@@ -24,6 +25,9 @@ assert.match(entrypoint, /headers:\s*\{\s*Accept:\s*["']text\/html["']/)
 assert.match(entrypoint, /sma_sanctioning_proceedings/)
 assert.match(entrypoint, /record_sma_sanctioning_detail/)
 assert.match(entrypoint, /target_status:\s*completionStatus/)
+assert.match(entrypoint, /\.from\(["']regulatory_sources["']\)[\s\S]*?\.eq\(["']is_active["'],\s*true\)/)
+assert.match(entrypoint, /\.eq\(["']source_id["'],\s*source\.id\)/)
+assert.doesNotMatch(entrypoint, /\.eq\(["']source_id["'],\s*\(await/)
 assert.doesNotMatch(entrypoint, /input\?\.url|body\?\.url|requestedUrl/)
 assert.doesNotMatch(entrypoint, /["']User-Agent["']\s*:/)
 assert.doesNotMatch(entrypoint, /redirect:\s*["']follow["']/)
@@ -70,7 +74,16 @@ assert.match(persistence, /perform private[.]insert_sma_detail_units/)
 assert.match(persistence, /perform private[.]insert_sma_detail_sanctions/)
 assert.match(persistence, /revoke all on function public[.]record_sma_sanctioning_detail/)
 assert.match(persistence, /to service_role/)
-assert.doesNotMatch([connector,tables,access,helpers,persistence,guard,cleanup,metadataGuard].join('\n'), /security definer/i)
+
+assert.match(sourceIdFix, /target_source_id uuid/)
+assert.match(sourceIdFix, /select source[.]id into target_source_id/)
+assert.match(sourceIdFix, /source_fetch[.]source_id = target_source_id/)
+assert.doesNotMatch(sourceIdFix, /source_fetch[.]source_id = source_id/)
+
+assert.doesNotMatch(
+  [connector,tables,access,helpers,persistence,sourceIdFix,guard,cleanup,metadataGuard].join('\n'),
+  /security definer/i,
+)
 assert.doesNotMatch(persistence, /grant\s+execute[\s\S]*\bto\s+(?:public|anon|authenticated)\b/i)
 
 assert.match(guard, /normalize_sma_snifa_detail_user_agent/)
