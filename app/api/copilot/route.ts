@@ -6,7 +6,7 @@ import {
   classifyCopilotIntent,
   type CopilotResponse,
 } from '@/lib/compliance-copilot/engine'
-import { writeGroundedCopilotAnswer } from '@/lib/compliance-copilot/grounded-writer'
+import { orchestrateGroundedResponse } from '@/lib/ai-platform/orchestrator'
 
 export const runtime = 'nodejs'
 
@@ -148,6 +148,6 @@ export async function POST(request: Request) {
     generation: { mode: 'deterministic' },
   }
 
-  const response = await writeGroundedCopilotAnswer({ userMessage: message, deterministic })
+  const response = await orchestrateGroundedResponse({ userMessage: message, deterministic })
   return NextResponse.json(response)
 }
