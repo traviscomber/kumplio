@@ -6,7 +6,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
-export const maxDuration = 300
+// Mantener compatibilidad con proyectos Hobby antiguos sin Fluid Compute.
+export const maxDuration = 60
 
 const requestSchema = z.object({
   documentId: z.string().uuid(),
