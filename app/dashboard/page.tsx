@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { DashboardContent } from './content'
+import { DailyComplianceContent } from './daily-content'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -11,7 +11,7 @@ export default function DashboardPage() {
       <WorkspaceNav />
       <main className="container mx-auto px-6 py-8">
         <Suspense fallback={<DashboardSkeleton />}>
-          <DashboardContent />
+          <DailyComplianceContent />
         </Suspense>
       </main>
     </>
@@ -20,16 +20,12 @@ export default function DashboardPage() {
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-8">
-      <Skeleton className="h-12 w-64" />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        {Array(4).fill(0).map((_, i) => (
-          <Skeleton key={i} className="h-24" />
+    <div className="mx-auto max-w-5xl space-y-8">
+      <Skeleton className="h-52 rounded-3xl" />
+      <div className="space-y-4">
+        {Array(3).fill(0).map((_, index) => (
+          <Skeleton key={index} className="h-36 rounded-2xl" />
         ))}
-      </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Skeleton className="h-96 lg:col-span-2" />
-        <Skeleton className="h-96" />
       </div>
     </div>
   )
