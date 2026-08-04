@@ -99,8 +99,11 @@ export function CopilotClient() {
           ) : (
             <div className="space-y-7">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                  <ShieldCheck className="h-4 w-4" /> {response.intent.replaceAll('_', ' ')}
+                <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                  <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> {response.intent.replaceAll('_', ' ')}</span>
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] tracking-normal">
+                    {response.generation?.mode === 'llm_grounded' ? 'Redacción IA grounded' : 'Respuesta determinística'}
+                  </span>
                 </div>
                 <p className="mt-4 text-xl font-semibold leading-8">{response.answer}</p>
               </div>
@@ -113,6 +116,15 @@ export function CopilotClient() {
                   </article>
                 ))}
               </div>
+
+              {response.caveats && response.caveats.length > 0 && (
+                <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4">
+                  <h3 className="text-sm font-bold text-amber-100">Límites y revisión</h3>
+                  <ul className="mt-2 space-y-1 text-sm leading-6 text-amber-100/75">
+                    {response.caveats.map((caveat) => <li key={caveat}>• {caveat}</li>)}
+                  </ul>
+                </div>
+              )}
 
               {response.sources.length > 0 && (
                 <div>
