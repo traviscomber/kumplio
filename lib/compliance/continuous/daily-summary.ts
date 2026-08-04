@@ -28,6 +28,15 @@ export type DailyComplianceSummary = {
   engineVersion: string
 }
 
+export type ComplianceTimelineItem = {
+  id: string
+  date: string
+  status: ComplianceStatus
+  headline: string
+  changesFound: number
+  criticalItems: number
+}
+
 type DailyRunRow = {
   id: string
   organization_id: string
@@ -83,6 +92,34 @@ export async function getLatestDailyComplianceSummary(
   return data ? mapDailyRun(data as DailyRunRow) : null
 }
 
+export async function getComplianceTimeline(
+  admin: SupabaseClient,
+  organizationId: string,
+  limit = 7,
+): Promise<ComplianceTimelineItem[]> {
+  const { data, error } = await admin
+    .from('compliance_daily_runs')
+    .select('id,overall_status,headline,changes_found,critical_items,finished_at,started_at')
+    .eq('organization_id', organizationId)
+    .eq('status', 'completed')
+    .order('run_date', { ascending: false })
+    .order('finished_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    throw new Error(`No fue posible cargar la actividad reciente: ${error.message}`)
+  }
+
+  return (data || []).map((row) => ({
+    id: String(row.id),
+    date: String(row.finished_at || row.started_at),
+    status: normalizeStatus(row.overall_status),
+    headline: String(row.headline || 'Revisión de cumplimiento completada.'),
+    changesFound: Number(row.changes_found || 0),
+    criticalItems: Number(row.critical_items || 0),
+  }))
+}
+
 function mapDailyRun(row: DailyRunRow): DailyComplianceSummary {
   return {
     id: row.id,
@@ -123,4 +160,9 @@ function normalizePriorities(value: unknown): DailyPriority[] {
 function normalizeSeverity(value: unknown): FindingSeverity {
   if (value === 'critical' || value === 'high' || value === 'medium' || value === 'low') return value
   return 'medium'
+}
+
+function normalizeStatus(value: unknown): ComplianceStatus {
+  if (value === 'healthy' || value === 'attention' || value === 'critical') return value
+  return 'attention'
 }
