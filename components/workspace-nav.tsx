@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart3, BriefcaseBusiness, Building2, Radar, Settings } from 'lucide-react'
+import { BarChart3, Bot, BriefcaseBusiness, Building2, Radar, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
   { href: '/roc', label: 'ROC', icon: Radar },
+  { href: '/copilot', label: 'Copilot', icon: Bot },
   { href: '/dashboard', label: 'Empresa', icon: Building2 },
   { href: '/missions', label: 'Trabajo', icon: BriefcaseBusiness },
   { href: '/analytics', label: 'Análisis', icon: BarChart3 },
