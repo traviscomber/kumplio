@@ -23,6 +23,13 @@ export type AIPlatformPlanStep = {
   purpose: string
 }
 
+export type AIPlatformUsage = {
+  inputTokens?: number | null
+  outputTokens?: number | null
+  totalTokens?: number | null
+  estimatedCostUsd?: number | null
+}
+
 export type AIPlatformGroundedResponse = {
   intent: AIPlatformIntent
   answer: string
@@ -35,6 +42,7 @@ export type AIPlatformGroundedResponse = {
     mode: 'deterministic' | 'llm_grounded'
     model?: string
     fallbackReason?: string
+    usage?: AIPlatformUsage
   }
 }
 
