@@ -1,4 +1,5 @@
 const BASE_URL = 'https://www.dt.gob.cl/legislacion/1624/'
+const PARSER_VERSION = 'direccion-trabajo-doctrina-v2'
 
 const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -109,6 +110,11 @@ export function normalizeOfficialNumber(value = '') {
     .replace(/[^0-9A-Z./-]/g, '')
 }
 
+function normalizeReferenceNumber(value = '') {
+  return normalizeOfficialNumber(value)
+    .replace(/^(\d+)\/0+(\d+)$/, '$1/$2')
+}
+
 export function dtCanonicalIdentifier(pronouncementType, officialNumber) {
   const normalized = normalizeOfficialNumber(officialNumber).toLocaleLowerCase('es-CL')
   if (!normalized) throw new Error('dt_number_missing')
@@ -150,11 +156,11 @@ export function parseDtIndexPage(html, options) {
   for (const cardSegment of cards) {
     const card = cardSegment.split('</div>')[0]
     const link = card.match(/<h3[^>]*class=["'][^"']*titulo[^"']*["'][^>]*>\s*<a[^>]*href=["']([^"']*w3-article-[0-9]+[.]html)["'][^>]*>([\s\S]*?)<\/a>\s*<\/h3>/i)
-    const date = card.match(/<p[^>]*class=["'][^"']*fecha[^"']*["'][^>]*>([\s\S]*?)<\/p>/gi)
+    const dates = card.match(/<p[^>]*class=["'][^"']*fecha[^"']*["'][^>]*>([\s\S]*?)<\/p>/gi)
     const abstractMatch = card.match(/<p[^>]*class=["'][^"']*abstract[^"']*["'][^>]*>([\s\S]*?)<\/p>/i)
-    if (!link || !date?.length) continue
+    if (!link || !dates?.length) continue
 
-    const dateText = htmlToText(date[date.length - 1])
+    const dateText = htmlToText(dates[dates.length - 1])
     const publicationDate = parseIsoDateFromIndex(dateText)
     if (!publicationDate || !publicationDate.startsWith(`${year}-${String(month).padStart(2, '0')}`)) continue
 
@@ -186,6 +192,9 @@ function parseSpanishDate(value = '') {
     return month ? `${short[3]}-${month}-${short[1].padStart(2, '0')}` : null
   }
 
+  const numeric = String(value).match(/\b(\d{1,2})[./-](\d{1,2})[./-](\d{4})\b/)
+  if (numeric) return `${numeric[3]}-${numeric[2].padStart(2, '0')}-${numeric[1].padStart(2, '0')}`
+
   const long = String(value).match(/\b(\d{1,2})\s+de?\s*([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(?:de\s+)?(\d{4})\b/i)
     || String(value).match(/\b(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(\d{4})\b/i)
   if (!long) return null
@@ -200,19 +209,25 @@ function normalizeLabel(value = '') {
     .toUpperCase()
 }
 
-function extractLabeledBlock(lines, startAt, label, allLabels) {
-  const normalizedLabel = normalizeLabel(label)
-  const index = lines.findIndex((line, position) => position >= startAt && normalizeLabel(line).startsWith(`${normalizedLabel}:`))
+function startsWithLabel(line, label) {
+  const normalizedLine = normalizeLabel(line)
+  const normalizedLabel = normalizeLabel(label).replace(/[.:]+$/, '')
+  return new RegExp(`^${normalizedLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[.:]+`).test(normalizedLine)
+}
+
+function extractLabeledBlock(lines, startAt, aliases, stopAliases) {
+  const labelList = Array.isArray(aliases) ? aliases : [aliases]
+  const index = lines.findIndex((line, position) => position >= startAt && labelList.some((label) => startsWithLabel(line, label)))
   if (index < 0) return ''
 
-  const first = lines[index].replace(new RegExp(`^${label}:?`, 'i'), '').trim()
+  const first = lines[index].replace(/^[^:]{1,30}:[.:]?\s*/i, '').trim()
   const output = first ? [first] : []
 
   for (let position = index + 1; position < lines.length; position += 1) {
     const line = lines[position]
     const normalized = normalizeLabel(line)
-    if (allLabels.some((candidate) => normalized.startsWith(`${normalizeLabel(candidate)}:`))) break
-    if (/^SANTIAGO,?\s+\d{1,2}\s+/i.test(line)) break
+    if (stopAliases.some((candidate) => startsWithLabel(line, candidate))) break
+    if (/^SANTIAGO,?\s*\d{1,2}(?:[./-]|\s+)/i.test(line)) break
     if (normalized === 'MINISTERIO DEL TRABAJO Y PREVISION SOCIAL') break
     output.push(line)
   }
@@ -248,7 +263,17 @@ function parseMentionDate(value = '') {
   return match ? `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}` : null
 }
 
-function extractRelationsFromText(text, defaultRelationType = null) {
+function canonicalMentionIdentifier(targetType, rawNumber, mentionDate, sourcePublicationDate) {
+  let normalized = normalizeReferenceNumber(rawNumber)
+  const referenceYear = mentionDate?.slice(0, 4) || sourcePublicationDate?.slice(0, 4) || null
+  const operational = normalized.match(/^(\d{4})[/-](\d{5})$/)
+  if (targetType === 'ordinario' && operational && referenceYear) {
+    normalized = `${operational[1]}-${operational[2]}/${referenceYear}`
+  }
+  return normalized ? `dt:${targetType}:${normalized.toLocaleLowerCase('es-CL')}` : null
+}
+
+function extractRelationsFromText(text, options = {}) {
   const source = String(text || '')
   const relations = []
   const pattern = /\b(Dictamen(?:es)?|Ord(?:inario|inarios)?[.]?)\s*(?:N(?:[°º]|ro[.]?)?s?[.]?\s*)?([0-9][0-9./-]*(?:\/[0-9]{4})?)(?:\s*,?\s*de\s*(\d{1,2}[./-]\d{1,2}[./-]\d{4}))?/gi
@@ -256,16 +281,20 @@ function extractRelationsFromText(text, defaultRelationType = null) {
   for (const match of source.matchAll(pattern)) {
     const word = match[1].toLocaleLowerCase('es-CL')
     const targetType = word.startsWith('dictamen') ? 'dictamen' : 'ordinario'
-    const officialCore = normalizeOfficialNumber(match[2])
-    if (!officialCore) continue
+    const mentionDate = match[3] ? parseMentionDate(match[3]) : null
+    const targetIdentifier = canonicalMentionIdentifier(targetType, match[2], mentionDate, options.sourcePublicationDate)
+    if (!targetIdentifier || targetIdentifier === options.currentIdentifier) continue
     const context = source.slice(Math.max(0, match.index - 180), Math.min(source.length, match.index + match[0].length + 40))
     relations.push({
-      type: defaultRelationType || relationTypeFromContext(context),
+      type: options.defaultRelationType || relationTypeFromContext(context),
       targetLabel: normalizeWhitespace(match[0]),
-      targetIdentifier: `dt:${targetType}:${officialCore.toLocaleLowerCase('es-CL')}`,
-      targetPublicationDate: match[3] ? parseMentionDate(match[3]) : null,
+      targetIdentifier,
+      targetPublicationDate: mentionDate,
       confidence: 1,
-      metadata: { extraction: 'deterministic_text_relation_v1' },
+      metadata: {
+        extraction: 'deterministic_text_relation_v2',
+        sourceBlock: options.sourceBlock || 'unknown',
+      },
     })
   }
 
@@ -293,7 +322,7 @@ export async function parseDtDetailPage(html, discovery) {
   })
   if (numberIndex < 0) throw new Error('dt_detail_number_missing')
 
-  const dateCandidate = lines.slice(numberIndex, numberIndex + 12).map(parseSpanishDate).find(Boolean)
+  const dateCandidate = lines.slice(numberIndex, numberIndex + 16).map(parseSpanishDate).find(Boolean)
     || lines.slice(numberIndex).map(parseSpanishDate).find(Boolean)
   if (!dateCandidate) throw new Error('dt_detail_date_missing')
   if (dateCandidate !== discovery.publicationDate) throw new Error('dt_detail_date_mismatch')
@@ -304,14 +333,18 @@ export async function parseDtDetailPage(html, discovery) {
     throw new Error('dt_detail_pdf_host_invalid')
   }
 
-  const labels = ['ACTUACIÓN', 'MATERIAS', 'RESUMEN', 'ANTECEDENTES', 'FUENTES', 'CONCORDANCIA', 'CATALOGACIÓN']
-  const actionText = extractLabeledBlock(lines, numberIndex, 'ACTUACIÓN', labels)
-  const mattersText = extractLabeledBlock(lines, numberIndex, 'MATERIAS', labels)
-  const summaryText = extractLabeledBlock(lines, numberIndex, 'RESUMEN', labels) || discovery.abstract
-  const antecedentsText = extractLabeledBlock(lines, numberIndex, 'ANTECEDENTES', labels)
-  const sourcesText = extractLabeledBlock(lines, numberIndex, 'FUENTES', labels)
-  const concordanceText = extractLabeledBlock(lines, numberIndex, 'CONCORDANCIA', labels)
-  const catalogText = extractLabeledBlock(lines, numberIndex, 'CATALOGACIÓN', labels)
+  const stopLabels = [
+    'ACTUACIÓN', 'MATERIAS', 'RESUMEN', 'ANTECEDENTES', 'FUENTES', 'CONCORDANCIA', 'CATALOGACIÓN',
+    'ACT.', 'MAT.', 'ANT.', 'DE', 'A',
+  ]
+  const actionText = extractLabeledBlock(lines, numberIndex, ['ACTUACIÓN', 'ACT.'], stopLabels)
+  const mattersText = extractLabeledBlock(lines, numberIndex, ['MATERIAS'], stopLabels)
+  const matText = extractLabeledBlock(lines, numberIndex, ['MAT.'], stopLabels)
+  const summaryText = extractLabeledBlock(lines, numberIndex, ['RESUMEN'], stopLabels) || matText || discovery.abstract
+  const antecedentsText = extractLabeledBlock(lines, numberIndex, ['ANTECEDENTES', 'ANT.'], stopLabels)
+  const sourcesText = extractLabeledBlock(lines, numberIndex, ['FUENTES'], stopLabels)
+  const concordanceText = extractLabeledBlock(lines, numberIndex, ['CONCORDANCIA'], stopLabels)
+  const catalogText = extractLabeledBlock(lines, numberIndex, ['CATALOGACIÓN'], stopLabels)
 
   const catalogLine = lines
     .slice(Math.max(0, numberIndex - 8), numberIndex)
@@ -352,7 +385,7 @@ export async function parseDtDetailPage(html, discovery) {
       bodyText: String(body).trim(),
       normalizedText,
       hash: await sha256(`${type}|${normalizedText}`),
-      metadata: { source: 'direccion-trabajo-html-v1' },
+      metadata: { source: PARSER_VERSION },
     })
   }
 
@@ -384,10 +417,18 @@ export async function parseDtDetailPage(html, discovery) {
   }
 
   const relationInputs = [
-    ...extractRelationsFromText(actionText),
-    ...extractRelationsFromText(catalogLine),
-    ...extractRelationsFromText(summaryText),
-    ...extractRelationsFromText(concordanceText, 'concordance'),
+    ...extractRelationsFromText(actionText, {
+      sourceBlock: 'actuacion', currentIdentifier: discovery.canonicalIdentifier, sourcePublicationDate: discovery.publicationDate,
+    }),
+    ...extractRelationsFromText(catalogLine, {
+      sourceBlock: 'catalogacion', currentIdentifier: discovery.canonicalIdentifier, sourcePublicationDate: discovery.publicationDate,
+    }),
+    ...extractRelationsFromText(summaryText, {
+      sourceBlock: 'resumen', currentIdentifier: discovery.canonicalIdentifier, sourcePublicationDate: discovery.publicationDate,
+    }),
+    ...extractRelationsFromText(concordanceText, {
+      sourceBlock: 'concordancia', defaultRelationType: 'concordance', currentIdentifier: discovery.canonicalIdentifier, sourcePublicationDate: discovery.publicationDate,
+    }),
   ]
   const uniqueRelations = uniqueBy(
     relationInputs,
@@ -417,11 +458,12 @@ export async function parseDtDetailPage(html, discovery) {
     ...detailsCore,
     hash: await sha256(JSON.stringify(detailsCore)),
     metadata: {
-      parserVersion: 'direccion-trabajo-doctrina-v1',
+      parserVersion: PARSER_VERSION,
       discoveryAbstract: discovery.abstract,
       catalogTopics: catalogLine,
       requiresHumanReview: true,
     },
+    parserVersion: PARSER_VERSION,
     normalizedContent,
     title: summaryText
       ? `${discovery.officialNumber}: ${normalizeWhitespace(summaryText).slice(0, 220)}`
