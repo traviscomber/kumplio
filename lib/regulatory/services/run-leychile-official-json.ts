@@ -10,7 +10,7 @@ import {
 } from '@/lib/regulatory/scraper-platform'
 
 export const LEYCHILE_CONNECTOR_KEY = 'leychile-official-json'
-export const LEYCHILE_CONNECTOR_VERSION = 'leychile-official-json-v2'
+export const LEYCHILE_CONNECTOR_VERSION = 'leychile-official-json-v3'
 export const LEYCHILE_API_URL = 'https://servicios-leychile.bcn.cl/Navegar/get_norma_json?idNorma=1209272&idVersion=2026-12-01&idLey=&tipoVersion=&cve=&agrupa_partes=1&r='
 
 export type LeyChileTriggerType = 'manual' | 'schedule' | 'retry' | 'reprocess'
