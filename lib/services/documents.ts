@@ -1,12 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { DocumentStatus } from '@/lib/types/documents'
 import { checkDocumentLimit } from '../rate-limit'
 
 type AppSupabaseClient = SupabaseClient<any, any, any>
 
-/**
- * Upload a document to Supabase storage and create a document record.
- * Handles rate limiting, project auto-creation and storage upload.
- */
 export async function uploadDocument(
   supabase: AppSupabaseClient,
   file: File,
@@ -22,7 +19,7 @@ export async function uploadDocument(
       const resetDate = limitCheck.nextResetAt
         ? new Date(limitCheck.nextResetAt).toLocaleDateString('es-CL')
         : 'N/A'
-      throw new Error(`Free tier: 1 document per week. Next scan available: ${resetDate}.`)
+      throw new Error(`Plan gratuito: un documento cada siete días. Próxima carga: ${resetDate}.`)
     }
 
     let projectId: string
@@ -44,14 +41,14 @@ export async function uploadDocument(
         .insert({
           user_id: userId,
           name: 'Default',
-          description: 'Default project for document uploads',
+          description: 'Ámbito predeterminado para documentos',
           status: 'active',
         })
         .select('id')
         .single()
 
       if (createError || !newProject?.id) {
-        throw new Error(`Failed to create project: ${createError?.message || 'missing project id'}`)
+        throw new Error(`No fue posible crear el ámbito: ${createError?.message || 'missing project id'}`)
       }
       projectId = String(newProject.id)
     }
@@ -62,9 +59,12 @@ export async function uploadDocument(
 
     const { error: storageError } = await supabase.storage
       .from('documents')
-      .upload(uploadPath, file, { upsert: false })
+      .upload(uploadPath, file, {
+        upsert: false,
+        contentType: file.type || undefined,
+      })
 
-    if (storageError) throw new Error(`Storage upload failed: ${storageError.message}`)
+    if (storageError) throw new Error(`No fue posible almacenar el archivo: ${storageError.message}`)
 
     const { data: docData, error: dbError } = await supabase
       .from('documents')
@@ -72,7 +72,7 @@ export async function uploadDocument(
         name: file.name,
         file_url: uploadPath,
         document_type: documentType,
-        status: 'processing',
+        status: 'pending',
         project_id: projectId,
         user_id: userId,
         upload_date: new Date().toISOString(),
@@ -82,7 +82,7 @@ export async function uploadDocument(
 
     if (dbError || !docData?.id) {
       await supabase.storage.from('documents').remove([uploadPath])
-      throw new Error(`Database insert failed: ${dbError?.message || 'missing document id'}`)
+      throw new Error(`No fue posible registrar el documento: ${dbError?.message || 'missing document id'}`)
     }
 
     return { documentId: String(docData.id), projectId }
@@ -96,7 +96,7 @@ export async function uploadDocument(
 export async function getUserDocuments(supabase: AppSupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from('documents')
-    .select('*, projects(name)')
+    .select('id, project_id, user_id, name, file_url, document_type, upload_date, status, created_at, projects(name)')
     .eq('user_id', userId)
     .order('upload_date', { ascending: false })
 
@@ -107,7 +107,7 @@ export async function getUserDocuments(supabase: AppSupabaseClient, userId: stri
 export async function getDocument(supabase: AppSupabaseClient, documentId: string) {
   const { data, error } = await supabase
     .from('documents')
-    .select('*, projects(name)')
+    .select('id, project_id, user_id, name, file_url, document_type, upload_date, status, created_at, projects(name)')
     .eq('id', documentId)
     .single()
 
@@ -118,15 +118,11 @@ export async function getDocument(supabase: AppSupabaseClient, documentId: strin
 export async function updateDocumentStatus(
   supabase: AppSupabaseClient,
   documentId: string,
-  status: 'processing' | 'completed' | 'error',
-  errorMessage?: string,
+  status: DocumentStatus,
 ): Promise<void> {
   const { error } = await supabase
     .from('documents')
-    .update({
-      status,
-      ...(errorMessage ? { error_message: errorMessage } : {}),
-    })
+    .update({ status })
     .eq('id', documentId)
 
   if (error) throw error
@@ -136,18 +132,10 @@ export async function getDocumentObligations(
   supabase: AppSupabaseClient,
   documentId: string,
 ) {
-  const { data: document, error: documentError } = await supabase
-    .from('documents')
-    .select('project_id')
-    .eq('id', documentId)
-    .single()
-
-  if (documentError || !document?.project_id) throw documentError || new Error('Document has no project')
-
   const { data, error } = await supabase
     .from('obligations')
-    .select('*')
-    .eq('project_id', document.project_id)
+    .select('id, project_id, document_id, obligation_text, responsible_party, due_date, priority, status, is1dora_confidence, created_at')
+    .eq('document_id', documentId)
     .order('created_at', { ascending: false })
 
   if (error) throw error
