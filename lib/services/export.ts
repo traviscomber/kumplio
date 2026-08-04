@@ -1,5 +1,5 @@
+import ExcelJS from 'exceljs'
 import jsPDF from 'jspdf'
-import * as XLSX from 'xlsx'
 
 function neutralizeSpreadsheetFormula(value: unknown) {
   const text = value == null ? '' : String(value)
@@ -22,13 +22,42 @@ function csvRow(values: unknown[]) {
   return values.map(escapeCsvCell).join(',')
 }
 
-export function generateExcelReport(
+function addWorksheet(
+  workbook: ExcelJS.Workbook,
+  name: string,
+  rows: Array<Array<string | number | boolean>>,
+  widths: number[],
+) {
+  const worksheet = workbook.addWorksheet(name, {
+    properties: { defaultRowHeight: 18 },
+    views: [{ state: 'frozen', ySplit: 1 }],
+  })
+
+  worksheet.addRows(rows)
+  worksheet.columns = widths.map((width) => ({ width }))
+
+  const header = worksheet.getRow(1)
+  header.font = { bold: true }
+  header.alignment = { vertical: 'middle', wrapText: true }
+
+  worksheet.eachRow((row) => {
+    row.alignment = { vertical: 'top', wrapText: true }
+  })
+
+  return worksheet
+}
+
+export async function generateExcelReport(
   documentName: string,
   obligations: any[],
   matrix: any[],
   stats: any,
-): ArrayBuffer {
-  const workbook = XLSX.utils.book_new()
+): Promise<Uint8Array> {
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Kumplio'
+  workbook.company = 'n3uralia'
+  workbook.created = new Date()
+  workbook.modified = new Date()
 
   const summaryData = [
     ['KUMPLIO - Reporte de Cumplimiento', ''],
@@ -43,9 +72,7 @@ export function generateExcelReport(
     ['Riesgos Altos', matrix.filter((item: any) => item.risk_level === 'high').length],
   ]
 
-  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-  summarySheet['!cols'] = [{ wch: 30 }, { wch: 24 }]
-  XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen')
+  addWorksheet(workbook, 'Resumen', summaryData, [30, 24])
 
   if (obligations.length > 0) {
     const obligationsRows = [
@@ -60,16 +87,7 @@ export function generateExcelReport(
       ]),
     ]
 
-    const obligationsSheet = XLSX.utils.aoa_to_sheet(obligationsRows)
-    obligationsSheet['!cols'] = [
-      { wch: 60 },
-      { wch: 18 },
-      { wch: 14 },
-      { wch: 24 },
-      { wch: 18 },
-      { wch: 45 },
-    ]
-    XLSX.utils.book_append_sheet(workbook, obligationsSheet, 'Obligaciones')
+    addWorksheet(workbook, 'Obligaciones', obligationsRows, [60, 18, 14, 24, 18, 45])
   }
 
   if (matrix.length > 0) {
@@ -85,19 +103,11 @@ export function generateExcelReport(
       ]),
     ]
 
-    const matrixSheet = XLSX.utils.aoa_to_sheet(matrixRows)
-    matrixSheet['!cols'] = [
-      { wch: 60 },
-      { wch: 18 },
-      { wch: 24 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 45 },
-    ]
-    XLSX.utils.book_append_sheet(workbook, matrixSheet, 'Matriz Cumplimiento')
+    addWorksheet(workbook, 'Matriz Cumplimiento', matrixRows, [60, 18, 24, 18, 18, 45])
   }
 
-  return XLSX.write(workbook, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+  const output = await workbook.xlsx.writeBuffer()
+  return new Uint8Array(output)
 }
 
 export function generateCSVReport(obligations: any[], matrix: any[]) {
