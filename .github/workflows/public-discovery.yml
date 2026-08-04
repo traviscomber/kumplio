@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -39,6 +39,9 @@ jobs:
 
       - name: Validate client-server boundaries
         run: npm run check:boundaries
+
+      - name: Validate authentication password policy
+        run: npm run check:auth
 
       - name: Typecheck
         run: npm run typecheck
