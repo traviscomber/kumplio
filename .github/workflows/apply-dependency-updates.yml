@@ -94,3 +94,5 @@ jobs:
           git add package.json package-lock.json
           git commit -m "Actualiza dependencias vulnerables compatibles"
           git push origin HEAD:agent/dependency-security-001
+
+# Segunda publicación para activar el workflow ya registrado en la rama.
