@@ -5,7 +5,7 @@ import { parsePayload, sha256 } from "./parser.mjs";
 const API_URL = "https://servicios-leychile.bcn.cl/Navegar/get_norma_json?idNorma=1209272&idVersion=2026-12-01&idLey=&tipoVersion=&cve=&agrupa_partes=1&r=";
 const PUBLIC_URL = "https://www.bcn.cl/leychile/navegar?idNorma=1209272&idVersion=2026-12-01";
 const MAX_BYTES = 5 * 1024 * 1024;
-const CONNECTOR_VERSION = "leychile-official-json-v2";
+const CONNECTOR_VERSION = "leychile-official-json-v3";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -63,7 +63,7 @@ Deno.serve(async (request) => {
     const response = await fetch(API_URL, {
       headers: {
         accept: "application/json",
-        "user-agent": "KUMPLIO-Regulatory-Connector/2.0 (+https://www.kumplio.app/regulatory)",
+        "user-agent": "KUMPLIO-Regulatory-Connector/3.0 (+https://www.kumplio.app/regulatory)",
       },
     });
 
