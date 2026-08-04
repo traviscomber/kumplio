@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-interface VulnerabilityFinding {
+export interface VulnerabilityFinding {
   title: string
   description: string
   severity: 'critical' | 'high' | 'medium' | 'low' | 'info'
@@ -9,17 +9,11 @@ interface VulnerabilityFinding {
   remediation: string
 }
 
-interface ScanResult {
-  findings: VulnerabilityFinding[]
-  score: number
-  timestamp: Date
-}
+type AppSupabaseClient = SupabaseClient<any, any, any>
 
-// Simple SAST scanner - checks for common vulnerabilities
 export function performSASTScan(code: string): VulnerabilityFinding[] {
   const findings: VulnerabilityFinding[] = []
 
-  // SQL Injection patterns
   if (
     /query\s*=\s*['"]\s*\+\s*user/i.test(code) ||
     /sql\s*=\s*['"]\s*\+\s*\w+/i.test(code) ||
@@ -34,7 +28,6 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // Hardcoded secrets
   if (
     /api[_-]?key\s*=\s*['"](sk_|pk_|AIza)/i.test(code) ||
     /password\s*=\s*['"]\w+['"];/i.test(code) ||
@@ -49,7 +42,6 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // Missing input validation
   if (
     /JSON\.parse\s*\(\s*user/i.test(code) ||
     /eval\s*\(/i.test(code) ||
@@ -64,7 +56,6 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // Weak cryptography
   if (/md5|sha1|crypt/i.test(code) && !/hmac/i.test(code)) {
     findings.push({
       title: 'Criptografía débil detectada',
@@ -75,11 +66,7 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // Missing authentication/authorization checks
-  if (
-    /app\.get\s*\(\s*['"]/i.test(code) &&
-    !/(requireAuth|middleware|auth\(|jwt)/i.test(code)
-  ) {
+  if (/app\.get\s*\(\s*['"]/i.test(code) && !/(requireAuth|middleware|auth\(|jwt)/i.test(code)) {
     findings.push({
       title: 'Endpoint sin autenticación detectado',
       description: 'Se encontró un endpoint HTTP sin verificación de autenticación',
@@ -89,7 +76,6 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // Insecure random generation
   if (/Math\.random|random\(\)/i.test(code) && /token|session|password/i.test(code)) {
     findings.push({
       title: 'Generación de números aleatorios insegura',
@@ -100,8 +86,7 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
     })
   }
 
-  // CORS misconfiguration
-  if (/\*|Access-Control-Allow-Origin/i.test(code)) {
+  if (/Access-Control-Allow-Origin\s*[:=]\s*['"]\*/i.test(code)) {
     findings.push({
       title: 'CORS potencialmente inseguro',
       description: 'Se detectó CORS configurado de manera muy permisiva',
@@ -114,49 +99,43 @@ export function performSASTScan(code: string): VulnerabilityFinding[] {
   return findings
 }
 
-// Dependency scan - simulates checking for known vulnerabilities
 export function performDependencyScan(dependencies: Record<string, string>): VulnerabilityFinding[] {
   const findings: VulnerabilityFinding[] = []
-
-  // Common vulnerable packages (mock data)
-  const vulnerablePackages: Record<string, { version: string; vulnerability: string; severity: 'critical' | 'high' | 'medium' | 'low' | 'info' }[]> = {
-    'lodash': [
-      {
-        version: '<4.17.21',
-        vulnerability: 'Prototype Pollution en _.zipObjectDeep',
-        severity: 'high',
-      },
-    ],
-    'axios': [
-      {
-        version: '<0.21.1',
-        vulnerability: 'Acceso inseguro a datos de otros hosts',
-        severity: 'medium',
-      },
-    ],
-    'express': [
-      {
-        version: '<4.17.1',
-        vulnerability: 'Vulnerabilidad de caché abierto',
-        severity: 'medium',
-      },
-    ],
+  const vulnerablePackages: Record<string, Array<{
+    version: string
+    vulnerability: string
+    severity: VulnerabilityFinding['severity']
+  }>> = {
+    lodash: [{
+      version: '<4.17.21',
+      vulnerability: 'Prototype Pollution en _.zipObjectDeep',
+      severity: 'high',
+    }],
+    axios: [{
+      version: '<0.21.1',
+      vulnerability: 'Acceso inseguro a datos de otros hosts',
+      severity: 'medium',
+    }],
+    express: [{
+      version: '<4.17.1',
+      vulnerability: 'Vulnerabilidad de caché abierto',
+      severity: 'medium',
+    }],
   }
 
-  for (const [pkg, vulns] of Object.entries(vulnerablePackages)) {
-    if (dependencies[pkg]) {
-      const version = dependencies[pkg]
-      for (const vuln of vulns) {
-        // Simple version comparison (not real semver)
-        if (version.replace(/[^0-9]/g, '') < vuln.version.replace(/[^0-9]/g, '')) {
-          findings.push({
-            title: `Vulnerabilidad en dependencia: ${pkg}`,
-            description: `${vuln.vulnerability} (versión actual: ${version})`,
-            severity: vuln.severity,
-            category: 'dependency',
-            remediation: `Actualiza ${pkg} a una versión más reciente`,
-          })
-        }
+  for (const [packageName, vulnerabilities] of Object.entries(vulnerablePackages)) {
+    const installedVersion = dependencies[packageName]
+    if (!installedVersion) continue
+
+    for (const vulnerability of vulnerabilities) {
+      if (installedVersion.replace(/[^0-9]/g, '') < vulnerability.version.replace(/[^0-9]/g, '')) {
+        findings.push({
+          title: `Vulnerabilidad en dependencia: ${packageName}`,
+          description: `${vulnerability.vulnerability} (versión actual: ${installedVersion})`,
+          severity: vulnerability.severity,
+          category: 'dependency',
+          remediation: `Actualiza ${packageName} a una versión más reciente`,
+        })
       }
     }
   }
@@ -164,11 +143,9 @@ export function performDependencyScan(dependencies: Record<string, string>): Vul
   return findings
 }
 
-// Configuration scan - checks for common misconfigurations
 export function performConfigScan(config: Record<string, any>): VulnerabilityFinding[] {
   const findings: VulnerabilityFinding[] = []
 
-  // Check for debug mode in production
   if (config.debug === true && config.environment === 'production') {
     findings.push({
       title: 'Modo de depuración habilitado en producción',
@@ -179,11 +156,7 @@ export function performConfigScan(config: Record<string, any>): VulnerabilityFin
     })
   }
 
-  // Check for default credentials
-  if (
-    config.database?.password === 'password' ||
-    config.admin?.username === 'admin'
-  ) {
+  if (config.database?.password === 'password' || config.admin?.username === 'admin') {
     findings.push({
       title: 'Credenciales por defecto detectadas',
       description: 'Se utilizan credenciales por defecto que son públicamente conocidas',
@@ -193,7 +166,6 @@ export function performConfigScan(config: Record<string, any>): VulnerabilityFin
     })
   }
 
-  // Check for insecure SSL configuration
   if (config.ssl?.enabled === false && config.environment === 'production') {
     findings.push({
       title: 'SSL/TLS no está habilitado en producción',
@@ -204,7 +176,6 @@ export function performConfigScan(config: Record<string, any>): VulnerabilityFin
     })
   }
 
-  // Check for missing security headers
   if (!config.securityHeaders?.['Strict-Transport-Security']) {
     findings.push({
       title: 'Headers de seguridad faltantes',
@@ -218,83 +189,77 @@ export function performConfigScan(config: Record<string, any>): VulnerabilityFin
   return findings
 }
 
-// Data protection compliance check
 export function performDataProtectionScan(): VulnerabilityFinding[] {
-  const findings: VulnerabilityFinding[] = []
-
-  // These are general compliance recommendations for Ley 21.719
-  findings.push({
-    title: 'Política de retención de datos',
-    description: 'Debe existir una política clara de retención y disposición de datos personales',
-    severity: 'high',
-    category: 'data-protection',
-    remediation: 'Implementa políticas de retención según Ley 21.719',
-  })
-
-  findings.push({
-    title: 'Cifrado de datos en tránsito',
-    description: 'Todos los datos personales en tránsito deben estar cifrados',
-    severity: 'high',
-    category: 'data-protection',
-    remediation: 'Usa HTTPS/TLS para todas las comunicaciones de datos personales',
-  })
-
-  findings.push({
-    title: 'Cifrado de datos en reposo',
-    description: 'Los datos personales sensibles deben estar cifrados en la base de datos',
-    severity: 'high',
-    category: 'data-protection',
-    remediation: 'Implementa cifrado de base de datos para datos personales',
-  })
-
-  findings.push({
-    title: 'Registro de auditoría',
-    description: 'Se debe mantener un registro de acceso a datos personales',
-    severity: 'medium',
-    category: 'data-protection',
-    remediation: 'Implementa logging de auditoría para acceso a datos sensibles',
-  })
-
-  return findings
+  return [
+    {
+      title: 'Política de retención de datos',
+      description: 'Debe existir una política clara de retención y disposición de datos personales',
+      severity: 'high',
+      category: 'data-protection',
+      remediation: 'Implementa políticas de retención según Ley 21.719',
+    },
+    {
+      title: 'Cifrado de datos en tránsito',
+      description: 'Todos los datos personales en tránsito deben estar cifrados',
+      severity: 'high',
+      category: 'data-protection',
+      remediation: 'Usa HTTPS/TLS para todas las comunicaciones de datos personales',
+    },
+    {
+      title: 'Cifrado de datos en reposo',
+      description: 'Los datos personales sensibles deben estar cifrados en la base de datos',
+      severity: 'high',
+      category: 'data-protection',
+      remediation: 'Implementa cifrado de base de datos para datos personales',
+    },
+    {
+      title: 'Registro de auditoría',
+      description: 'Se debe mantener un registro de acceso a datos personales',
+      severity: 'medium',
+      category: 'data-protection',
+      remediation: 'Implementa logging de auditoría para acceso a datos sensibles',
+    },
+  ]
 }
 
 export async function saveScanResults(
-  supabase: ReturnType<typeof createClient>,
+  supabase: AppSupabaseClient,
   projectId: string,
-  findings: VulnerabilityFinding[]
+  findings: VulnerabilityFinding[],
 ): Promise<void> {
-  for (const finding of findings) {
-    await supabase
+  if (findings.length > 0) {
+    const { error: findingsError } = await supabase
       .from('vulnerabilities')
-      .insert([{
+      .insert(findings.map((finding) => ({
         project_id: projectId,
         title: finding.title,
         description: finding.description,
         severity: finding.severity,
         category: finding.category,
-        cve_id: finding.cve_id,
+        cve_id: finding.cve_id || null,
         remediation: finding.remediation,
         status: 'open',
-      }])
+      })))
+
+    if (findingsError) throw findingsError
   }
 
-  // Calculate compliance score
-  const criticalCount = findings.filter(f => f.severity === 'critical').length
-  const highCount = findings.filter(f => f.severity === 'high').length
-  const mediumCount = findings.filter(f => f.severity === 'medium').length
-
-  // Score formula: 100 - (critical*20 + high*10 + medium*5)
+  const criticalCount = findings.filter((finding) => finding.severity === 'critical').length
+  const highCount = findings.filter((finding) => finding.severity === 'high').length
+  const mediumCount = findings.filter((finding) => finding.severity === 'medium').length
   const score = Math.max(0, 100 - (criticalCount * 20 + highCount * 10 + mediumCount * 5))
+  const scannedAt = new Date().toISOString()
 
-  await supabase
+  const { error: projectError } = await supabase
     .from('projects')
-    .update({ compliance_score: score, last_scan_date: new Date() })
+    .update({ compliance_score: score, last_scan_date: scannedAt })
     .eq('id', projectId)
 
-  // Save scan history
-  await supabase
+  if (projectError) throw projectError
+
+  const { error: historyError } = await supabase
     .from('scan_history')
-    .insert([{
+    .insert({
       project_id: projectId,
       vulnerability_count: findings.length,
       critical_count: criticalCount,
@@ -302,5 +267,8 @@ export async function saveScanResults(
       compliance_score: score,
       scan_type: 'full',
       status: 'completed',
-    }])
+      scan_date: scannedAt,
+    })
+
+  if (historyError) throw historyError
 }

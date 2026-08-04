@@ -1,44 +1,28 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
-import { NextRequest, NextResponse } from 'next/server'
-import { legalExpertInterpret } from '@/lib/agents/legal-expert'
+export async function POST() {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { legalQuestion, context } = body
-
-    if (!legalQuestion) {
-      return NextResponse.json(
-        { error: 'Legal question is required' },
-        { status: 400 }
-      )
-    }
-
-    const opinion = await legalExpertInterpret(legalQuestion, context)
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        caseId: opinion.caseId,
-        legalQuestion: opinion.legalQuestion,
-        articlesCited: opinion.articlesCited,
-        legalInterpretation: opinion.legalInterpretation,
-        sernacPrecedents: opinion.sernacPrecedents,
-        analogousCases: opinion.analogousCases,
-        applicablePatterns: opinion.applicablePatterns,
-        estimatedPenalty: opinion.estimatedPenalty,
-        rootCauses: opinion.rootCauses,
-        strategicRecommendations: opinion.strategicRecommendations,
-        confidence: opinion.confidence,
-        reasoningTrace: opinion.reasoningTrace.getFullTrace()
-      }
-    })
-  } catch (error) {
-    console.error('[legal-expert] Error:', error)
+  if (authError || !user) {
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
     )
   }
+
+  return NextResponse.json(
+    {
+      error: 'El análisis jurídico automatizado está deshabilitado hasta contar con un corpus oficial, versionado y verificable.',
+      code: 'legal_expert_not_verified',
+    },
+    {
+      status: 503,
+      headers: { 'Cache-Control': 'private, no-store' },
+    },
+  )
 }

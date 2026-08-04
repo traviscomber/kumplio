@@ -1,22 +1,24 @@
-name: Public discovery validation
+name: Application validation
 
 on:
   pull_request:
     paths:
       - 'app/**'
       - 'components/**'
-      - 'lib/auth/**'
-      - 'lib/chile-compliance-content.ts'
-      - 'lib/public-site.ts'
-      - 'lib/services/**'
-      - 'scripts/check-public-discovery.mjs'
-      - 'scripts/check-client-boundaries.mjs'
-      - 'scripts/check-auth-password-policy.mjs'
+      - 'lib/**'
+      - 'scripts/**'
       - 'supabase/migrations/**'
       - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.mjs'
+      - 'tsconfig.json'
       - '.github/workflows/public-discovery.yml'
       - '.github/workflows/indexnow.yml'
   workflow_dispatch:
+
+concurrency:
+  group: application-validation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -52,6 +54,9 @@ jobs:
 
       - name: Validate authentication password policy
         run: npm run check:auth
+
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Build Next.js
         run: npm run build
