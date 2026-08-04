@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: { ignoreBuildErrors: true },
   images: {
     unoptimized: false,
     formats: ['image/avif', 'image/webp'],
@@ -27,6 +26,13 @@ const nextConfig = {
       '/roadmaps/:path*',
       '/projects/:path*',
       '/agents/:path*',
+      '/analytics/:path*',
+      '/cases/:path*',
+      '/missions/:path*',
+      '/onboarding/:path*',
+      '/readiness/:path*',
+      '/regulations/:path*',
+      '/settings/:path*',
       '/api/agents/:path*',
       '/sales-kit/:path*',
     ]
