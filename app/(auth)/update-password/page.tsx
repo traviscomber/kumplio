@@ -2,22 +2,14 @@
 
 export const dynamic = 'force-dynamic'
 
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AlertCircle, Eye, EyeOff, Loader2, Lock } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-
-function passwordScore(password: string) {
-  return [
-    password.length >= 10,
-    /[a-z]/.test(password),
-    /[A-Z]/.test(password),
-    /\d/.test(password),
-    /[^A-Za-z0-9]/.test(password),
-  ].filter(Boolean).length
-}
+import { PasswordRequirements } from '@/components/auth/password-requirements'
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, authErrorMessage, isStrongPassword } from '@/lib/auth/password-policy'
 
 export default function UpdatePasswordPage() {
   const router = useRouter()
@@ -30,8 +22,7 @@ export default function UpdatePasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const strength = useMemo(() => passwordScore(password), [password])
-  const passwordReady = password.length >= 10 && strength >= 3 && password === confirmation
+  const passwordReady = isStrongPassword(password) && password === confirmation
 
   useEffect(() => {
     let active = true
@@ -53,7 +44,7 @@ export default function UpdatePasswordPage() {
     }
 
     if (!passwordReady) {
-      setError('La contraseña debe tener al menos 10 caracteres y combinar distintos tipos de caracteres.')
+      setError(PASSWORD_POLICY_MESSAGE)
       return
     }
 
@@ -61,7 +52,7 @@ export default function UpdatePasswordPage() {
     try {
       const { error: updateError } = await supabase.auth.updateUser({ password })
       if (updateError) {
-        setError(updateError.message)
+        setError(authErrorMessage(updateError))
         return
       }
       await supabase.auth.signOut()
@@ -107,17 +98,17 @@ export default function UpdatePasswordPage() {
             <span className="text-sm font-medium">Nueva contraseña</span>
             <span className="relative block">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} minLength={10} autoComplete="new-password" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} minLength={PASSWORD_MIN_LENGTH} autoComplete="new-password" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm outline-none focus:ring-2 focus:ring-primary" required />
               <button type="button" onClick={() => setShowPassword((current) => !current)} aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
             </span>
-            <div className="grid grid-cols-5 gap-1">{[1, 2, 3, 4, 5].map((level) => <span key={level} className={`h-1.5 rounded-full ${strength >= level ? 'bg-primary' : 'bg-muted'}`} />)}</div>
+            <PasswordRequirements password={password} />
           </label>
 
           <label className="block space-y-2" htmlFor="confirmation">
             <span className="text-sm font-medium">Confirma la contraseña</span>
             <span className="relative block">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input id="confirmation" type={showPassword ? 'text' : 'password'} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} minLength={10} autoComplete="new-password" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+              <input id="confirmation" type={showPassword ? 'text' : 'password'} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} minLength={PASSWORD_MIN_LENGTH} autoComplete="new-password" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
             </span>
             {confirmation && password !== confirmation && <span className="text-xs text-destructive">Las contraseñas no coinciden.</span>}
           </label>
