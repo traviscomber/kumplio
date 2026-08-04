@@ -2,12 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, Radar, Settings } from 'lucide-react'
+import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, Gauge, Library, Network, Radar, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
   { href: '/roc', label: 'ROC', icon: Radar },
+  { href: '/executive', label: 'Ejecutivo', icon: Gauge },
+  { href: '/digital-twin', label: 'Gemelo', icon: Network },
+  { href: '/libraries', label: 'Bibliotecas', icon: Library },
   { href: '/copilot', label: 'Copilot', icon: Bot },
   { href: '/ai-platform', label: 'IA', icon: Activity },
   { href: '/dashboard', label: 'Empresa', icon: Building2 },
