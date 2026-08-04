@@ -13,11 +13,10 @@ const responseSchema = {
   additionalProperties: false,
   required: ['answer', 'caveats'],
   properties: {
-    answer: { type: 'string', minLength: 1, maxLength: 1800 },
+    answer: { type: 'string' },
     caveats: {
       type: 'array',
-      maxItems: 4,
-      items: { type: 'string', minLength: 1, maxLength: 240 },
+      items: { type: 'string' },
     },
   },
 } as const
@@ -97,7 +96,7 @@ export async function writeGroundedCopilotAnswer({
     return {
       ...deterministic,
       answer: parsed.answer,
-      caveats: parsed.caveats,
+      caveats: parsed.caveats.slice(0, 4),
       generation: { mode: 'llm_grounded', model },
     }
   } catch (error) {
