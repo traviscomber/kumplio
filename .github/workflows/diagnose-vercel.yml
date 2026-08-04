@@ -14,62 +14,11 @@ permissions:
   contents: read
 
 jobs:
-  npm-install-build:
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [22, 24]
+  authenticated-vercel-diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
-      SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
-      OPENAI_API_KEY: test-openai-key
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node ${{ matrix.node }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Show runtime versions
-        run: |
-          node --version
-          npm --version
-
-      - name: Install like Vercel
-        run: npm install
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Inspect export dependencies and server output
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo '===== PACKAGE SIZES ====='
-          du -sh node_modules/exceljs node_modules/jspdf node_modules/html2canvas 2>/dev/null || true
-          echo '===== EXPORT SERVER FILES ====='
-          find .next/server -path '*api*export*' -type f -print -exec du -h {} \; || true
-          echo '===== LARGEST SERVER FILES ====='
-          find .next/server -type f -printf '%s %p\n' | sort -nr | head -30 | numfmt --field=1 --to=iec || true
-
-  vercel-cli-build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
-      SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
-      OPENAI_API_KEY: test-openai-key
-      VERCEL_ORG_ID: team_VvIPBATpeoA0eQw8fIx4rhan
-      VERCEL_PROJECT_ID: prj_wrTFzldPtqMjFGItE1Bd6BoeZztm
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,25 +29,83 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Create local Vercel link
+      - name: Require Vercel token
         shell: bash
         run: |
-          mkdir -p .vercel
-          cat > .vercel/project.json <<'JSON'
-          {"orgId":"team_VvIPBATpeoA0eQw8fIx4rhan","projectId":"prj_wrTFzldPtqMjFGItE1Bd6BoeZztm"}
-          JSON
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo 'VERCEL_TOKEN is not configured in GitHub Actions.'
+            exit 1
+          fi
 
-      - name: Run Vercel build locally
+      - name: Inspect failed Kumplio deployment logs
         shell: bash
         run: |
           set -o pipefail
-          npx --yes vercel@latest build --yes --debug 2>&1 | tee /tmp/vercel-build.log
+          npx --yes vercel@latest inspect GuM6xkoic4w8emuyzwGmUzstNmtw --logs \
+            --scope team_VvIPBATpeoA0eQw8fIx4rhan \
+            --token "$VERCEL_TOKEN" 2>&1 | tee /tmp/kumplio-deployment.log
 
-      - name: Inspect Vercel function output
+      - name: Inspect failed v0 deployment logs
         if: always()
         shell: bash
         run: |
-          echo '===== VERCEL OUTPUT ====='
-          find .vercel/output -maxdepth 4 -type f -printf '%s %p\n' 2>/dev/null | sort -nr | head -50 | numfmt --field=1 --to=iec || true
-          echo '===== LOG TAIL ====='
-          tail -200 /tmp/vercel-build.log 2>/dev/null || true
+          set -o pipefail
+          npx --yes vercel@latest inspect 4HaQxKssqkVwoUwMrXmZGGeNW8w4 --logs \
+            --scope team_T9u1mifn68sCOcUK9HbvDdGk \
+            --token "$VERCEL_TOKEN" 2>&1 | tee /tmp/v0-deployment.log
+
+      - name: Pull exact Kumplio preview settings
+        if: always()
+        shell: bash
+        env:
+          VERCEL_ORG_ID: team_VvIPBATpeoA0eQw8fIx4rhan
+          VERCEL_PROJECT_ID: prj_wrTFzldPtqMjFGItE1Bd6BoeZztm
+        run: |
+          set -euo pipefail
+          rm -rf .vercel
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          npx --yes vercel@latest pull --yes --environment=preview --token "$VERCEL_TOKEN"
+
+      - name: Build with exact Kumplio preview settings
+        if: always()
+        shell: bash
+        env:
+          VERCEL_ORG_ID: team_VvIPBATpeoA0eQw8fIx4rhan
+          VERCEL_PROJECT_ID: prj_wrTFzldPtqMjFGItE1Bd6BoeZztm
+        run: |
+          set -o pipefail
+          npx --yes vercel@latest build --yes --debug --token "$VERCEL_TOKEN" 2>&1 | tee /tmp/kumplio-vercel-build.log
+
+      - name: Pull exact v0 preview settings
+        if: always()
+        shell: bash
+        env:
+          VERCEL_ORG_ID: team_T9u1mifn68sCOcUK9HbvDdGk
+          VERCEL_PROJECT_ID: prj_rqkB0DbDafZE6jQfQq4YofUeHyTm
+        run: |
+          set -euo pipefail
+          rm -rf .vercel
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          npx --yes vercel@latest pull --yes --environment=preview --token "$VERCEL_TOKEN"
+
+      - name: Build with exact v0 preview settings
+        if: always()
+        shell: bash
+        env:
+          VERCEL_ORG_ID: team_T9u1mifn68sCOcUK9HbvDdGk
+          VERCEL_PROJECT_ID: prj_rqkB0DbDafZE6jQfQq4YofUeHyTm
+        run: |
+          set -o pipefail
+          npx --yes vercel@latest build --yes --debug --token "$VERCEL_TOKEN" 2>&1 | tee /tmp/v0-vercel-build.log
+
+      - name: Summarize diagnostic logs
+        if: always()
+        shell: bash
+        run: |
+          for file in /tmp/kumplio-deployment.log /tmp/v0-deployment.log /tmp/kumplio-vercel-build.log /tmp/v0-vercel-build.log; do
+            echo "===== $file ====="
+            tail -250 "$file" 2>/dev/null || true
+          done
