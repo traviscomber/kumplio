@@ -32,6 +32,18 @@ function safeContext(response: CopilotResponse) {
   }
 }
 
+function optionalPositiveNumber(value: unknown) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null
+}
+
+function estimateCostUsd(inputTokens: number | null, outputTokens: number | null) {
+  const inputRate = optionalPositiveNumber(process.env.OPENAI_INPUT_COST_PER_MILLION_USD)
+  const outputRate = optionalPositiveNumber(process.env.OPENAI_OUTPUT_COST_PER_MILLION_USD)
+  if (inputTokens === null || outputTokens === null || inputRate === null || outputRate === null) return null
+  return ((inputTokens * inputRate) + (outputTokens * outputRate)) / 1_000_000
+}
+
 export async function writeGroundedCopilotAnswer({
   userMessage,
   deterministic,
@@ -93,11 +105,25 @@ export async function writeGroundedCopilotAnswer({
     })
 
     const parsed = JSON.parse(response.output_text) as { answer: string; caveats: string[] }
+    const usage = response.usage as { input_tokens?: number; output_tokens?: number; total_tokens?: number } | undefined
+    const inputTokens = optionalPositiveNumber(usage?.input_tokens)
+    const outputTokens = optionalPositiveNumber(usage?.output_tokens)
+    const totalTokens = optionalPositiveNumber(usage?.total_tokens)
+
     return {
       ...deterministic,
       answer: parsed.answer,
       caveats: parsed.caveats.slice(0, 4),
-      generation: { mode: 'llm_grounded', model },
+      generation: {
+        mode: 'llm_grounded',
+        model,
+        usage: {
+          inputTokens,
+          outputTokens,
+          totalTokens,
+          estimatedCostUsd: estimateCostUsd(inputTokens, outputTokens),
+        },
+      },
     }
   } catch (error) {
     const fallbackReason = error instanceof Error ? error.message.slice(0, 240) : 'Fallo desconocido del modelo'
