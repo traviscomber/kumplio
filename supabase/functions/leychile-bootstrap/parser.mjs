@@ -175,7 +175,7 @@ export async function parsePayload(payload) {
         heading: part.name,
         bodyText,
         normalizedText: normalizedBody,
-        hash: await sha256(normalizedBody),
+        hash: await sha256(`${articleKey}\n${normalizedBody}`),
         parentKey: null,
       })
 
@@ -184,16 +184,17 @@ export async function parsePayload(payload) {
         const incisoText = normalizeText(paragraph)
         if (!incisoText) continue
 
+        const incisoKey = `${articleKey}:inciso:${index + 1}`
         ordinal += 1
         sections.push({
-          key: `${articleKey}:inciso:${index + 1}`,
+          key: incisoKey,
           type: 'inciso',
           ordinal,
           referenceLabel: `${referenceLabel}, inciso ${index + 1}`,
           heading: null,
           bodyText: paragraph,
           normalizedText: incisoText,
-          hash: await sha256(incisoText),
+          hash: await sha256(`${incisoKey}\n${incisoText}`),
           parentKey: articleKey,
         })
       }
