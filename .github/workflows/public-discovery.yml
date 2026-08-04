@@ -68,6 +68,12 @@ jobs:
       - name: Validate Dirección del Trabajo internal runner
         run: npm run check:dt-bootstrap
 
+      - name: Validate SMA SNIFA parser
+        run: npm run check:sma
+
+      - name: Validate SMA SNIFA internal runner
+        run: npm run check:sma-bootstrap
+
       - name: Validate LeyChile parser
         run: npm run check:leychile
 
