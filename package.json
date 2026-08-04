@@ -11,7 +11,8 @@
     "check:discovery": "node scripts/check-public-discovery.mjs",
     "check:boundaries": "node scripts/check-client-boundaries.mjs",
     "check:auth": "node scripts/check-auth-password-policy.mjs",
-    "check:diario": "node scripts/test-diario-oficial-fixtures.mjs"
+    "check:diario": "node scripts/test-diario-oficial-fixtures.mjs",
+    "check:leychile": "node scripts/test-leychile-parser-v2.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
