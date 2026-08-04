@@ -32,6 +32,7 @@ export async function orchestrateGroundedResponse(input: {
       userMessage: input.userMessage,
       deterministic: normalized,
     })
+    const usage = response.generation?.usage
 
     await recordAIPlatformTelemetry({
       actorUserId: input.actorUserId,
@@ -41,6 +42,10 @@ export async function orchestrateGroundedResponse(input: {
       response,
       latencyMs: performance.now() - startedAt,
       success: true,
+      inputTokens: usage?.inputTokens,
+      outputTokens: usage?.outputTokens,
+      totalTokens: usage?.totalTokens,
+      estimatedCostUsd: usage?.estimatedCostUsd,
     })
 
     return response
