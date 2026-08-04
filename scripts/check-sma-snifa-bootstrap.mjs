@@ -47,6 +47,17 @@ assert.match(corrections, /drop not null/)
 assert.match(integrity, /sma_batch_duplicate_row_numbers/)
 assert.match(integrity, /persisted_count <> batch_size/)
 assert.doesNotMatch(migrations, /security definer/i)
-assert.doesNotMatch(migrations, /grant\s+execute[\s\S]*\b(?:anon|authenticated)\b/i)
+
+const executeGrants = migrations
+  .split(';')
+  .map((statement) => statement.trim())
+  .filter((statement) => /^grant\s+execute\s+on\s+function/i.test(statement))
+assert.ok(executeGrants.length >= 3)
+assert.ok(
+  executeGrants.every(
+    (statement) => /\bto\s+service_role\s*$/i.test(statement)
+      && !/\bto\s+(?:public|anon|authenticated)\b/i.test(statement),
+  ),
+)
 
 console.log('SMA SNIFA internal runner validation passed')
