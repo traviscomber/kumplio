@@ -55,6 +55,9 @@ jobs:
       - name: Validate authentication password policy
         run: npm run check:auth
 
+      - name: Validate Excel export and formula neutralization
+        run: npm run check:export
+
       - name: Typecheck
         run: npm run typecheck
 
