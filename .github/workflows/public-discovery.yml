@@ -59,6 +59,9 @@ jobs:
       - name: Validate Diario Oficial parser
         run: npm run check:diario
 
+      - name: Validate Diario Oficial internal runner
+        run: npm run check:diario-bootstrap
+
       - name: Validate LeyChile parser
         run: npm run check:leychile
 
