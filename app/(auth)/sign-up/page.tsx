@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -19,6 +19,8 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
+import { PasswordRequirements } from '@/components/auth/password-requirements'
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, authErrorMessage, isStrongPassword } from '@/lib/auth/password-policy'
 
 const plans = {
   esencial: {
@@ -37,16 +39,6 @@ const plans = {
 
 type PlanKey = keyof typeof plans
 
-function passwordScore(password: string) {
-  return [
-    password.length >= 10,
-    /[a-z]/.test(password),
-    /[A-Z]/.test(password),
-    /\d/.test(password),
-    /[^A-Za-z0-9]/.test(password),
-  ].filter(Boolean).length
-}
-
 export default function SignUp() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -63,8 +55,7 @@ export default function SignUp() {
   const planKey = searchParams.get('plan') as PlanKey | null
   const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
   const next = safeInternalPath(searchParams.get('next'))
-  const strength = useMemo(() => passwordScore(password), [password])
-  const passwordReady = password.length >= 10 && strength >= 3
+  const passwordReady = isStrongPassword(password)
 
   async function handleSignUp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -76,7 +67,7 @@ export default function SignUp() {
     }
 
     if (!passwordReady) {
-      setError('La contraseña debe tener al menos 10 caracteres y combinar distintos tipos de caracteres.')
+      setError(PASSWORD_POLICY_MESSAGE)
       return
     }
 
@@ -102,7 +93,7 @@ export default function SignUp() {
       })
 
       if (signUpError) {
-        setError(signUpError.message)
+        setError(authErrorMessage(signUpError))
         return
       }
 
@@ -199,15 +190,12 @@ export default function SignUp() {
               <span className="text-sm font-medium">Contraseña</span>
               <span className="relative block">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} minLength={10} autoComplete="new-password" placeholder="Mínimo 10 caracteres" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+                <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} minLength={PASSWORD_MIN_LENGTH} autoComplete="new-password" placeholder="Mínimo 12 caracteres" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-11 text-sm outline-none focus:ring-2 focus:ring-primary" required />
                 <button type="button" onClick={() => setShowPassword((current) => !current)} aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </span>
-              <div className="grid grid-cols-5 gap-1" aria-label="Fortaleza de contraseña">
-                {[1, 2, 3, 4, 5].map((level) => <span key={level} className={`h-1.5 rounded-full ${strength >= level ? 'bg-primary' : 'bg-muted'}`} />)}
-              </div>
-              <span className="text-xs text-muted-foreground">Usa 10 o más caracteres y combina mayúsculas, minúsculas, números o símbolos.</span>
+              <PasswordRequirements password={password} />
             </label>
 
             <label className="flex items-start gap-3 rounded-xl border border-border bg-muted/20 p-3 text-sm">
