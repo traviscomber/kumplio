@@ -13,6 +13,8 @@
     "check:auth": "node scripts/check-auth-password-policy.mjs",
     "check:diario": "node scripts/test-diario-oficial-fixtures.mjs",
     "check:diario-bootstrap": "node scripts/check-diario-oficial-bootstrap.mjs",
+    "check:dt": "node scripts/test-direccion-trabajo-fixtures.mjs && node scripts/test-direccion-trabajo-pdf-variants.mjs && node scripts/test-direccion-trabajo-v2-boundaries.mjs",
+    "check:dt-bootstrap": "node scripts/check-direccion-trabajo-bootstrap.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs"
   },
