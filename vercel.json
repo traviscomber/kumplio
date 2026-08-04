@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
+      "path": "/api/cron/compliance-daily",
+      "schedule": "0 12 * * *"
+    },
+    {
       "path": "/api/cron/regulatory/leychile",
       "schedule": "15 10 * * *"
     },
