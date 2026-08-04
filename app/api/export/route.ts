@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { generateCSVReport, generateExcelReport, generatePDFReport } from '@/lib/services/export'
 import { createClient } from '@/lib/supabase/server'
+import type { Obligation } from '@/lib/types/documents'
 
 export const runtime = 'nodejs'
 
 const formatSchema = z.enum(['pdf', 'excel', 'csv'])
+const documentIdSchema = z.string().uuid()
 
 function safeBaseName(value: string) {
   const cleaned = value
@@ -49,8 +51,10 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const documentId = request.nextUrl.searchParams.get('documentId')?.trim()
-  if (!documentId || documentId.length > 128) {
+  const parsedDocumentId = documentIdSchema.safeParse(
+    request.nextUrl.searchParams.get('documentId')?.trim(),
+  )
+  if (!parsedDocumentId.success) {
     return NextResponse.json(
       { error: 'Invalid documentId', code: 'invalid_document_id' },
       { status: 400 },
@@ -65,9 +69,10 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  const documentId = parsedDocumentId.data
   const { data: document, error: documentError } = await supabase
     .from('documents')
-    .select('id, filename')
+    .select('id, name, status')
     .eq('id', documentId)
     .maybeSingle()
 
@@ -86,48 +91,40 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const [obligationsResult, matrixResult] = await Promise.all([
-    supabase
-      .from('obligations')
-      .select('obligation_text, type, severity, owner, deadline, evidence_reference')
-      .eq('document_id', documentId),
-    supabase
-      .from('compliance_matrix')
-      .select('obligation, risk_level, responsible, due_date, status, evidence')
-      .eq('document_id', documentId),
-  ])
-
-  if (obligationsResult.error || matrixResult.error) {
-    console.error(
-      '[export] related data lookup failed',
-      obligationsResult.error?.code || matrixResult.error?.code,
+  if (document.status !== 'analyzed') {
+    return NextResponse.json(
+      { error: 'El documento debe estar analizado antes de exportarlo.', code: 'document_not_analyzed' },
+      { status: 409 },
     )
+  }
+
+  const { data: obligationRows, error: obligationsError } = await supabase
+    .from('obligations')
+    .select('id, project_id, document_id, obligation_text, responsible_party, due_date, priority, status, is1dora_confidence, created_at')
+    .eq('document_id', documentId)
+    .order('created_at', { ascending: false })
+
+  if (obligationsError) {
+    console.error('[export] obligations lookup failed', obligationsError.code)
     return NextResponse.json(
       { error: 'No fue posible preparar los datos del reporte.', code: 'export_data_failed' },
       { status: 500 },
     )
   }
 
-  const obligations = obligationsResult.data || []
-  const matrix = matrixResult.data || []
-  const completedCount = matrix.filter((item) => item.status === 'completed').length
-  const complianceScore = matrix.length > 0
-    ? Math.round((completedCount / matrix.length) * 100)
-    : 0
-
+  const obligations = (obligationRows || []) as Obligation[]
   const stats = {
-    complianceScore,
     totalObligations: obligations.length,
-    criticalItems: matrix.filter((item) => item.risk_level === 'critical').length,
-    highRiskItems: matrix.filter((item) => item.risk_level === 'high').length,
+    criticalItems: obligations.filter((item) => item.priority === 'critical').length,
+    highPriorityItems: obligations.filter((item) => item.priority === 'high').length,
   }
 
   const timestamp = new Date().toISOString().slice(0, 10)
-  const baseName = `reporte-${safeBaseName(document.filename || 'documento')}-${timestamp}`
+  const baseName = `reporte-${safeBaseName(document.name || 'documento')}-${timestamp}`
 
   try {
     if (parsedFormat.data === 'excel') {
-      const body = generateExcelReport(document.filename || 'Documento', obligations, matrix, stats)
+      const body = generateExcelReport(document.name || 'Documento', obligations, stats)
       const filename = `${baseName}.xlsx`
       return new NextResponse(body, {
         headers: downloadHeaders(
@@ -138,14 +135,14 @@ export async function GET(request: NextRequest) {
     }
 
     if (parsedFormat.data === 'csv') {
-      const body = generateCSVReport(obligations, matrix)
+      const body = generateCSVReport(obligations)
       const filename = `${baseName}.csv`
       return new NextResponse(body, {
         headers: downloadHeaders(filename, 'text/csv; charset=utf-8'),
       })
     }
 
-    const body = await generatePDFReport(document.filename || 'Documento', obligations, matrix, stats)
+    const body = await generatePDFReport(document.name || 'Documento', obligations, stats)
     const filename = `${baseName}.pdf`
     return new NextResponse(body, {
       headers: downloadHeaders(filename, 'application/pdf'),
