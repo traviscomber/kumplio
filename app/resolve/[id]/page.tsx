@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { ArrowLeft, ArrowRight, CheckCircle2, FileCheck2, Scale } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, FileCheck2, Scale, ShieldQuestion } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { buildMissionExplanation } from '@/lib/explainability/engine'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,18 @@ type MissionResult = {
   status: string
   result_type: string
   created_at: string
+  summary: string | null
+  evidence_ids: string[] | null
+}
+
+type Evidence = {
+  id: string
+  name: string
+  source: string | null
+  issued_at: string | null
+  expires_at: string | null
+  validation_status: string | null
+  metadata: Record<string, unknown> | null
 }
 
 export default async function ResolvePage({ params }: PageProps) {
@@ -48,7 +61,7 @@ export default async function ResolvePage({ params }: PageProps) {
 
   if (!membership?.organization_id) redirect('/onboarding')
 
-  const [{ data: mission, error: missionError }, { data: runRows }, { data: resultRows }] = await Promise.all([
+  const [{ data: mission, error: missionError }, { data: runRows, error: runsError }, { data: resultRows, error: resultsError }] = await Promise.all([
     admin
       .from('missions')
       .select('id,title,objective,status,due_at,organization_id')
@@ -62,25 +75,65 @@ export default async function ResolvePage({ params }: PageProps) {
       .order('sequence'),
     admin
       .from('mission_results')
-      .select('id,title,status,result_type,created_at')
+      .select('id,title,status,result_type,created_at,summary,evidence_ids')
       .eq('mission_id', id)
       .order('created_at', { ascending: false }),
   ])
 
   if (missionError) throw new Error(`No fue posible cargar la situación: ${missionError.message}`)
+  if (runsError) throw new Error(`No fue posible cargar la trazabilidad: ${runsError.message}`)
+  if (resultsError) throw new Error(`No fue posible cargar los resultados: ${resultsError.message}`)
   if (!mission) notFound()
 
   const typedMission = mission as Mission
   const runs = (runRows || []) as CapabilityRun[]
   const results = (resultRows || []) as MissionResult[]
-  const reviewRuns = runs.filter((run) => run.status === 'review_required')
-  const pendingResults = results.filter((result) => ['proposed', 'in_review'].includes(result.status))
+  const evidenceIds = [...new Set(results.flatMap((result) => result.evidence_ids || []))]
+  let evidence: Evidence[] = []
 
-  const finding = buildFinding(typedMission, reviewRuns.length, pendingResults.length)
-  const prepared = buildPrepared(reviewRuns.length, pendingResults)
-  const primaryHref = pendingResults.length > 0 || reviewRuns.length > 0
-    ? `/missions/${typedMission.id}`
-    : `/missions/${typedMission.id}`
+  if (evidenceIds.length > 0) {
+    const { data: evidenceRows, error: evidenceError } = await admin
+      .from('evidence')
+      .select('id,name,source,issued_at,expires_at,validation_status,metadata')
+      .eq('organization_id', membership.organization_id)
+      .in('id', evidenceIds)
+
+    if (evidenceError) throw new Error(`No fue posible cargar la evidencia: ${evidenceError.message}`)
+    evidence = (evidenceRows || []) as Evidence[]
+  }
+
+  const explanation = buildMissionExplanation({
+    mission: {
+      id: typedMission.id,
+      title: typedMission.title,
+      objective: typedMission.objective,
+      status: typedMission.status,
+      dueAt: typedMission.due_at,
+    },
+    runs: runs.map((run) => ({
+      id: run.id,
+      status: run.status,
+      capabilityId: run.capability_id,
+    })),
+    results: results.map((result) => ({
+      id: result.id,
+      title: result.title,
+      status: result.status,
+      resultType: result.result_type,
+      createdAt: result.created_at,
+      summary: result.summary,
+      evidenceIds: result.evidence_ids || [],
+    })),
+    evidence: evidence.map((item) => ({
+      id: item.id,
+      name: item.name,
+      source: item.source,
+      issuedAt: item.issued_at,
+      expiresAt: item.expires_at,
+      validationStatus: item.validation_status,
+      metadata: item.metadata,
+    })),
+  })
 
   return (
     <>
@@ -99,8 +152,8 @@ export default async function ResolvePage({ params }: PageProps) {
         <div className="mt-8 space-y-6">
           <section className="rounded-2xl border bg-card p-6">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Encontré</p>
-            <h2 className="mt-3 text-2xl font-bold">{finding.title}</h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">{finding.description}</p>
+            <h2 className="mt-3 text-2xl font-bold">{explanation.finding.title}</h2>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">{explanation.finding.summary}</p>
           </section>
 
           <section className="rounded-2xl border bg-card p-6">
@@ -108,9 +161,18 @@ export default async function ResolvePage({ params }: PageProps) {
               <Scale className="mt-1 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Por qué importa</p>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  Esta situación forma parte del trabajo de cumplimiento de tu organización. Antes de incorporarla al estado oficial, debe existir una revisión humana y una decisión trazable.
-                </p>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{explanation.why}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border bg-card p-6">
+            <div className="flex items-start gap-3">
+              <ShieldQuestion className="mt-1 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Confianza de la conclusión</p>
+                <p className="mt-3 font-bold">{confidenceLabel(explanation.confidence.level)}</p>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{explanation.confidence.reason}</p>
               </div>
             </div>
           </section>
@@ -121,7 +183,7 @@ export default async function ResolvePage({ params }: PageProps) {
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Preparé</p>
                 <div className="mt-4 space-y-3">
-                  {prepared.map((item) => (
+                  {explanation.prepared.map((item) => (
                     <div key={item} className="flex items-start gap-3 text-sm leading-6">
                       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       <span>{item}</span>
@@ -133,24 +195,45 @@ export default async function ResolvePage({ params }: PageProps) {
           </section>
 
           <details className="rounded-2xl border bg-card p-6">
-            <summary className="cursor-pointer text-sm font-bold">Ver evidencia y trazabilidad</summary>
+            <summary className="cursor-pointer text-sm font-bold">Ver evidencia utilizada</summary>
+            <div className="mt-4 space-y-4 text-sm text-muted-foreground">
+              {explanation.evidence.length === 0 ? (
+                <p>No encontré evidencia vinculada suficiente. Esta limitación reduce la confianza de la conclusión.</p>
+              ) : explanation.evidence.map((item) => (
+                <article key={item.id} className="rounded-xl border bg-muted/20 p-4">
+                  <p className="font-semibold text-foreground">{item.label}</p>
+                  <p className="mt-1">Fuente: {item.source}</p>
+                  {item.date && <p>Fecha: {new Date(item.date).toLocaleDateString('es-CL')}</p>}
+                  {item.version && <p>Versión: {item.version}</p>}
+                </article>
+              ))}
+            </div>
+          </details>
+
+          <details className="rounded-2xl border bg-card p-6">
+            <summary className="cursor-pointer text-sm font-bold">Ver fundamento legal</summary>
             <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <p>{runs.length} capacidades registradas en esta misión.</p>
-              <p>{results.length} resultados conservados.</p>
-              {typedMission.due_at && <p>Fecha comprometida: {new Date(typedMission.due_at).toLocaleDateString('es-CL')}.</p>}
+              {explanation.legalBasis.length === 0 ? (
+                <p>No hay una referencia legal estructurada vinculada a esta misión. La decisión debe basarse en la evidencia y revisión disponible.</p>
+              ) : explanation.legalBasis.map((reference) => (
+                <div key={`${reference.label}-${reference.article || ''}`}>
+                  <p className="font-semibold text-foreground">{reference.label}</p>
+                  {reference.article && <p>Artículo: {reference.article}</p>}
+                  {reference.effectiveDate && <p>Vigencia: {new Date(reference.effectiveDate).toLocaleDateString('es-CL')}</p>}
+                </div>
+              ))}
             </div>
           </details>
 
           <section className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
-            <p className="text-sm font-semibold">La decisión sigue en tus manos.</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Revisa la propuesta completa y aprueba únicamente cuando el fundamento y la evidencia sean suficientes.
-            </p>
+            <p className="text-sm font-semibold">Mi recomendación</p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{explanation.recommendation}</p>
+            <p className="mt-4 text-sm font-semibold">La decisión sigue en tus manos.</p>
             <Link
-              href={primaryHref}
+              href={explanation.nextAction.href}
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 sm:w-auto"
             >
-              Revisar propuesta <ArrowRight className="h-4 w-4" />
+              {explanation.nextAction.label} <ArrowRight className="h-4 w-4" />
             </Link>
           </section>
         </div>
@@ -159,38 +242,8 @@ export default async function ResolvePage({ params }: PageProps) {
   )
 }
 
-function buildFinding(mission: Mission, reviewRuns: number, pendingResults: number) {
-  if (mission.status === 'blocked') {
-    return {
-      title: 'El trabajo no puede continuar todavía.',
-      description: 'La misión está bloqueada. Conviene revisar la causa y registrar la decisión necesaria para reanudarla.',
-    }
-  }
-
-  if (reviewRuns > 0) {
-    return {
-      title: 'El análisis terminó y requiere una decisión.',
-      description: `${reviewRuns} ${reviewRuns === 1 ? 'resultado intermedio necesita' : 'resultados intermedios necesitan'} revisión humana antes de continuar.`,
-    }
-  }
-
-  if (pendingResults > 0) {
-    return {
-      title: 'Existe una propuesta pendiente de aprobación.',
-      description: `${pendingResults} ${pendingResults === 1 ? 'resultado todavía no forma' : 'resultados todavía no forman'} parte del estado oficial de cumplimiento.`,
-    }
-  }
-
-  return {
-    title: 'La fecha o el avance requieren revisión.',
-    description: 'Conviene confirmar qué falta, quién debe intervenir y qué evidencia permitirá cerrar este trabajo.',
-  }
-}
-
-function buildPrepared(reviewRuns: number, results: MissionResult[]) {
-  const items = ['El contexto y el objetivo de cumplimiento', 'La trazabilidad del trabajo realizado']
-  if (reviewRuns > 0) items.push(`${reviewRuns} decisiones listas para revisión`)
-  if (results.length > 0) items.push(`${results.length} resultados disponibles como respaldo`)
-  items.push('El acceso directo a la propuesta completa')
-  return items
+function confidenceLabel(level: 'low' | 'medium' | 'high') {
+  if (level === 'high') return 'Alta'
+  if (level === 'medium') return 'Media'
+  return 'Baja'
 }
