@@ -5,11 +5,13 @@ on:
     paths:
       - 'app/**'
       - 'components/**'
+      - 'lib/auth/**'
       - 'lib/chile-compliance-content.ts'
       - 'lib/public-site.ts'
       - 'lib/services/**'
       - 'scripts/check-public-discovery.mjs'
       - 'scripts/check-client-boundaries.mjs'
+      - 'scripts/check-auth-password-policy.mjs'
       - 'supabase/migrations/**'
       - 'package.json'
       - '.github/workflows/public-discovery.yml'
@@ -46,6 +48,9 @@ jobs:
 
       - name: Validate client-server boundaries
         run: npm run check:boundaries
+
+      - name: Validate authentication password policy
+        run: npm run check:auth
 
       - name: Build Next.js
         run: npm run build
