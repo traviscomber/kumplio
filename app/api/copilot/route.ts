@@ -148,6 +148,11 @@ export async function POST(request: Request) {
     generation: { mode: 'deterministic' },
   }
 
-  const response = await orchestrateGroundedResponse({ userMessage: message, deterministic })
+  const response = await orchestrateGroundedResponse({
+    userMessage: message,
+    deterministic,
+    actorUserId: user.id,
+    surface: 'copilot',
+  })
   return NextResponse.json(response)
 }
