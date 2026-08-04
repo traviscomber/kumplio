@@ -63,6 +63,26 @@ jobs:
           }
           NODE
 
+      - name: Explain vulnerable dependency paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          for package in axios brace-expansion fast-uri form-data hono ip-address js-yaml next postcss sharp xlsx @hono/node-server @modelcontextprotocol/sdk dompurify body-parser; do
+            echo "===== npm explain $package ====="
+            npm explain "$package" || true
+          done
+
+      - name: Locate xlsx usage in application code
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '===== XLSX USAGE ====='
+          grep -RInE "(^|[^A-Za-z])(xlsx|XLSX|sheet_to_json|json_to_sheet|book_new|book_append_sheet)([^A-Za-z]|$)" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.git \
+            --exclude=package-lock.json \
+            . || true
+
       - name: List outdated direct dependencies
         shell: bash
         run: |
