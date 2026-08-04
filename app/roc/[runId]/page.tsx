@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import type { LucideIcon } from 'lucide-react'
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,6 +30,12 @@ type ImpactTarget = {
   node_snapshot: Record<string, unknown>
   edge_snapshot: Record<string, unknown>
   created_at: string
+}
+
+type MetricCard = {
+  label: string
+  value: number
+  Icon: LucideIcon
 }
 
 function text(value: unknown, fallback = 'Sin información') {
@@ -69,6 +76,12 @@ export default async function ImpactDetailPage({ params }: PageProps) {
   const impactTargets = (targets || []) as ImpactTarget[]
   const metrics = (run.metrics || {}) as Record<string, unknown>
   const mutations = Number(metrics.mutations_applied || 0)
+  const metricCards: MetricCard[] = [
+    { label: 'Objetivos', value: Number(metrics.targets || impactTargets.length), Icon: ListChecks },
+    { label: 'Críticos', value: Number(metrics.critical || 0), Icon: ShieldCheck },
+    { label: 'Organizaciones', value: Number(metrics.organizations || 0), Icon: Building2 },
+    { label: 'Revisión requerida', value: Number(metrics.review_required || 0), Icon: FileDiff },
+  ]
 
   return (
     <>
@@ -96,15 +109,10 @@ export default async function ImpactDetailPage({ params }: PageProps) {
         </header>
 
         <section className="grid gap-4 md:grid-cols-4">
-          {[
-            ['Objetivos', Number(metrics.targets || impactTargets.length), ListChecks],
-            ['Críticos', Number(metrics.critical || 0), ShieldCheck],
-            ['Organizaciones', Number(metrics.organizations || 0), Building2],
-            ['Revisión requerida', Number(metrics.review_required || 0), FileDiff],
-          ].map(([label, value, Icon]) => (
-            <article key={String(label)} className="rounded-2xl border bg-card p-5">
+          {metricCards.map(({ label, value, Icon }) => (
+            <article key={label} className="rounded-2xl border bg-card p-5">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-muted-foreground">{String(label)}</p>
+                <p className="text-sm font-semibold text-muted-foreground">{label}</p>
                 <Icon className="h-5 w-5 text-primary" />
               </div>
               <p className="mt-4 text-3xl font-extrabold">{String(value)}</p>
