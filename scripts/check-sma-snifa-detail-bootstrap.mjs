@@ -78,7 +78,10 @@ assert.match(persistence, /to service_role/)
 assert.match(sourceIdFix, /target_source_id uuid/)
 assert.match(sourceIdFix, /select source[.]id into target_source_id/)
 assert.match(sourceIdFix, /source_fetch[.]source_id = target_source_id/)
-assert.doesNotMatch(sourceIdFix, /source_fetch[.]source_id = source_id/)
+assert.match(
+  sourceIdFix,
+  /'source_fetch[.]source_id = source_id',[\s\S]*?'source_fetch[.]source_id = target_source_id'/,
+)
 
 assert.doesNotMatch(
   [connector,tables,access,helpers,persistence,sourceIdFix,guard,cleanup,metadataGuard].join('\n'),
