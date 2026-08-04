@@ -115,7 +115,8 @@ if (indexNowApi.includes('process.env.INDEXNOW_KEY')) {
 
 await expectIncludes('.github/workflows/indexnow.yml', [
   'Wait for production deployment and key verification',
-  `${indexNowKey}.txt`,
+  `INDEXNOW_KEY: ${indexNowKey}`,
+  '$INDEXNOW_KEY.txt',
   'sitemap.xml',
   'sales-kit',
   'demo/transporte',
