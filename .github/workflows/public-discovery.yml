@@ -62,6 +62,12 @@ jobs:
       - name: Validate Diario Oficial internal runner
         run: npm run check:diario-bootstrap
 
+      - name: Validate Dirección del Trabajo parser
+        run: npm run check:dt
+
+      - name: Validate Dirección del Trabajo internal runner
+        run: npm run check:dt-bootstrap
+
       - name: Validate LeyChile parser
         run: npm run check:leychile
 
