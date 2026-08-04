@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "check:discovery": "node scripts/check-public-discovery.mjs",
-    "check:boundaries": "node scripts/check-client-boundaries.mjs"
+    "check:boundaries": "node scripts/check-client-boundaries.mjs",
+    "check:auth": "node scripts/check-auth-password-policy.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
