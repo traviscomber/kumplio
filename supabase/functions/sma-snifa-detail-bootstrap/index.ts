@@ -113,6 +113,14 @@ Deno.serve(async (request) => {
   let runId: string | null = null;
 
   try {
+    const { data: source, error: sourceError } = await admin
+      .from("regulatory_sources")
+      .select("id")
+      .eq("canonical_url", SOURCE_URL)
+      .eq("is_active", true)
+      .single();
+    if (sourceError || !source) throw new Error("sma_detail_source_not_registered");
+
     const { data: proceedings, error: proceedingsError } = await admin
       .from("sma_sanctioning_proceedings")
       .select("sma_process_id, expediente, start_date, end_date, process_state, proceeding_url")
@@ -180,19 +188,12 @@ Deno.serve(async (request) => {
       const { data: previousFetch } = await admin
         .from("regulatory_source_fetches")
         .select("id, content_hash")
-        .eq("source_id", (await admin.from("regulatory_sources").select("id").eq("canonical_url", SOURCE_URL).single()).data?.id)
+        .eq("source_id", source.id)
         .eq("requested_url", capture.url)
         .in("status", ["succeeded", "unchanged"])
         .order("fetched_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-
-      const { data: source } = await admin
-        .from("regulatory_sources")
-        .select("id")
-        .eq("canonical_url", SOURCE_URL)
-        .single();
-      if (!source) throw new Error("sma_detail_source_not_registered");
 
       const fetchStatus = previousFetch?.content_hash === capture.contentHash ? "unchanged" : "succeeded";
       const { data: sourceFetch, error: fetchError } = await admin
