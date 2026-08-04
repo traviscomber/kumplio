@@ -35,23 +35,17 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Apply compatible dependency updates
+      - name: Apply verified security updates
         shell: bash
         run: |
           set -euo pipefail
 
           npm pkg set name='kumplio'
           npm pkg delete dependencies.xlsx
-          npm pkg set dependencies.@ai-sdk/react='^3.0.203'
-          npm pkg set dependencies.@supabase/ssr='^0.10.4'
-          npm pkg set dependencies.@supabase/supabase-js='^2.108.0'
           npm pkg set dependencies.ai='^6.0.203'
           npm pkg set dependencies.axios='^1.18.0'
           npm pkg set dependencies.next='16.3.0'
-          npm pkg set dependencies.openai='^6.43.0'
-          npm pkg set dependencies.swr='^2.4.2'
           npm pkg set devDependencies.postcss='^8.5.8'
-          npm pkg set devDependencies.tailwindcss='^4.2.2'
 
           npm install
           npm update
