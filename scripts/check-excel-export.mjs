@@ -1,4 +1,4 @@
-// Prueba de regresión: valida estructura XLSX y neutralización de fórmulas antes de publicar.
+// Prueba de regresión ejecutada en CI: valida estructura XLSX y neutralización de fórmulas antes de publicar.
 import assert from 'node:assert/strict'
 import ExcelJS from 'exceljs'
 import { generateExcelReport } from '../lib/services/export.ts'
