@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -20,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Estado de preparación',
-  description: 'Diagnóstico seguro para validar el primer recorrido productivo de KUMPLIO.',
+  description: 'Diagnóstico seguro para validar el primer recorrido productivo de Kumplio.',
   robots: { index: false, follow: false },
 }
 
@@ -43,7 +44,7 @@ const stateIcons = {
   pending: CircleDashed,
   blocked: XCircle,
   manual: Wrench,
-} satisfies Record<ReadinessState, typeof CheckCircle2>
+} satisfies Record<ReadinessState, LucideIcon>
 
 async function resolveOrigin() {
   const requestHeaders = await headers()
@@ -64,6 +65,19 @@ export default async function ReadinessPage() {
   const manualCount = snapshot.checks.filter((check) => check.state === 'manual').length
   const pendingCount = snapshot.checks.filter((check) => check.state === 'pending').length
   const total = snapshot.checks.length
+  const readinessPercent = total > 0 ? Math.round((readyCount / total) * 100) : 0
+
+  const summaryCards: Array<{
+    label: string
+    value: number
+    Icon: LucideIcon
+    iconClass: string
+  }> = [
+    { label: 'Listas', value: readyCount, Icon: CheckCircle2, iconClass: 'text-emerald-600' },
+    { label: 'Pendientes', value: pendingCount, Icon: CircleDashed, iconClass: 'text-amber-600' },
+    { label: 'Manuales', value: manualCount, Icon: Wrench, iconClass: 'text-sky-600' },
+    { label: 'Bloqueadas', value: blockedCount, Icon: AlertTriangle, iconClass: 'text-destructive' },
+  ]
 
   return (
     <>
@@ -72,7 +86,7 @@ export default async function ReadinessPage() {
         <section className="rounded-2xl border border-border bg-card p-6 md:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="text-sm font-medium text-primary">Sprint 1 · Production Validation</p>
+              <p className="text-sm font-medium text-primary">Sprint 1 · Validación productiva</p>
               <h1 className="mt-1 text-3xl font-bold md:text-4xl">Estado de preparación</h1>
               <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">
                 Diagnóstico seguro del recorrido productivo. Muestra estados y acciones pendientes sin exponer claves, tokens ni valores de configuración.
@@ -84,7 +98,7 @@ export default async function ReadinessPage() {
                 <strong>{readyCount} de {total}</strong>
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${Math.round((readyCount / total) * 100)}%` }} />
+                <div className="h-full rounded-full bg-primary" style={{ width: `${readinessPercent}%` }} />
               </div>
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
                 Generado {new Date(snapshot.generatedAt).toLocaleString('es-CL')} desde {snapshot.origin}.
@@ -94,16 +108,11 @@ export default async function ReadinessPage() {
         </section>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            ['Listas', readyCount, CheckCircle2, 'text-emerald-600'],
-            ['Pendientes', pendingCount, CircleDashed, 'text-amber-600'],
-            ['Manuales', manualCount, Wrench, 'text-sky-600'],
-            ['Bloqueadas', blockedCount, AlertTriangle, 'text-destructive'],
-          ].map(([label, value, Icon, iconClass]) => (
-            <article key={String(label)} className="rounded-xl border border-border bg-card p-5">
-              <Icon className={`h-5 w-5 ${String(iconClass)}`} />
-              <p className="mt-3 text-sm text-muted-foreground">{String(label)}</p>
-              <p className="mt-1 text-3xl font-bold">{Number(value)}</p>
+          {summaryCards.map(({ label, value, Icon, iconClass }) => (
+            <article key={label} className="rounded-xl border border-border bg-card p-5">
+              <Icon className={`h-5 w-5 ${iconClass}`} />
+              <p className="mt-3 text-sm text-muted-foreground">{label}</p>
+              <p className="mt-1 text-3xl font-bold">{value}</p>
             </article>
           ))}
         </section>
