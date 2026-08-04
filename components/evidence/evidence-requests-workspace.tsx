@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -156,6 +157,13 @@ export function EvidenceRequestsWorkspace({
     accepted: requests.filter((item) => item.status === 'accepted').length,
   }), [requests])
 
+  const summaryCards: Array<{ label: string; value: number; Icon: LucideIcon }> = [
+    { label: 'Abiertas', value: summary.open, Icon: CircleDashed },
+    { label: 'Vencidas', value: summary.overdue, Icon: AlertTriangle },
+    { label: 'En revisión', value: summary.review, Icon: Clock3 },
+    { label: 'Aceptadas', value: summary.accepted, Icon: CheckCircle2 },
+  ]
+
   function setProject(nextProjectId: string) {
     setProjectId(nextProjectId)
     setCaseId('')
@@ -284,16 +292,11 @@ export function EvidenceRequestsWorkspace({
   return (
     <div className="space-y-6">
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          ['Abiertas', summary.open, CircleDashed],
-          ['Vencidas', summary.overdue, AlertTriangle],
-          ['En revisión', summary.review, Clock3],
-          ['Aceptadas', summary.accepted, CheckCircle2],
-        ].map(([label, value, Icon]) => (
-          <article key={String(label)} className="rounded-xl border border-border bg-card p-5">
+        {summaryCards.map(({ label, value, Icon }) => (
+          <article key={label} className="rounded-xl border border-border bg-card p-5">
             <Icon className="h-5 w-5 text-primary" />
-            <p className="mt-3 text-sm text-muted-foreground">{String(label)}</p>
-            <p className="mt-1 text-3xl font-bold">{Number(value)}</p>
+            <p className="mt-3 text-sm text-muted-foreground">{label}</p>
+            <p className="mt-1 text-3xl font-bold">{value}</p>
           </article>
         ))}
       </section>

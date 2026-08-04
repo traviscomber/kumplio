@@ -1,17 +1,14 @@
-// Risk distribution pie chart component
+'use client'
 
-'use client';
-
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartContainer, ChartLegend, ChartTooltip } from '@/components/ui/chart';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
 interface RiskChartProps {
-  data: Array<{ name: string; value: number; fill: string }>;
+  data: Array<{ name: string; value: number; fill: string }>
 }
 
 export function RiskDistributionChart({ data }: RiskChartProps) {
   return (
-    <div className="w-full h-80">
+    <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -21,20 +18,17 @@ export function RiskDistributionChart({ data }: RiskChartProps) {
             labelLine={false}
             label={({ name, value }) => `${name}: ${value}`}
             outerRadius={120}
-            fill="#8884d8"
             dataKey="value"
           >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} />
-            ))}
+            {data.map((entry) => <Cell key={entry.name} fill={entry.fill} />)}
           </Pie>
-          <Tooltip 
-            formatter={(value: any) => `${value} items`}
+          <Tooltip
+            formatter={(value) => `${String(value)} elementos`}
             contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--border)' }}
           />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
-  );
+  )
 }

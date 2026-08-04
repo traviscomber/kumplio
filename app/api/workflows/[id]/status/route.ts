@@ -1,56 +1,65 @@
-export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-import { createClient } from '@/lib/supabase/client';
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  try {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+type WorkflowStepState = { state?: unknown }
 
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function GET(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    // Get execution status
-    const { data, error } = await supabase
-      .from('workflow_executions')
-      .select('*')
-      .eq('id', params.id)
-      .eq('user_id', user.id)
-      .single();
-
-    if (error || !data) {
-      return Response.json({ error: 'Execution not found' }, { status: 404 });
-    }
-
-    // Calculate progress
-    const totalSteps = data.steps.length;
-    const completedSteps = data.steps.filter((s: any) => s.state === 'completed').length;
-    const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
-
-    return Response.json(
-      {
-        execution: {
-          id: data.id,
-          state: data.state,
-          progress,
-          totalSteps,
-          completedSteps,
-          startTime: data.start_time,
-          endTime: data.end_time,
-          error: data.error,
-          steps: data.steps,
-        },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('[v0] Workflow status error:', error);
-    return Response.json(
-      { error: error instanceof Error ? error.message : 'Failed to get workflow status' },
-      { status: 400 }
-    );
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
   }
+
+  const { id } = await context.params
+  const { data, error } = await supabase
+    .from('workflow_executions')
+    .select('id, state, steps, start_time, end_time, error')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) {
+    console.error('[workflows/status] lookup failed', error.code)
+    return NextResponse.json(
+      { error: 'No fue posible consultar la ejecución.', code: 'workflow_status_failed' },
+      { status: 500 },
+    )
+  }
+
+  if (!data) {
+    return NextResponse.json(
+      { error: 'Ejecución no encontrada.', code: 'execution_not_found' },
+      { status: 404 },
+    )
+  }
+
+  const steps = Array.isArray(data.steps) ? data.steps as WorkflowStepState[] : []
+  const totalSteps = steps.length
+  const completedSteps = steps.filter((step) => step?.state === 'completed').length
+  const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0
+
+  return NextResponse.json({
+    execution: {
+      id: data.id,
+      state: data.state,
+      progress,
+      totalSteps,
+      completedSteps,
+      startTime: data.start_time,
+      endTime: data.end_time,
+      error: data.error,
+      steps,
+    },
+  }, {
+    headers: { 'Cache-Control': 'private, no-store' },
+  })
 }

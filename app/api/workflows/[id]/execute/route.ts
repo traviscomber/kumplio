@@ -1,43 +1,53 @@
-export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-import { createClient } from '@/lib/supabase/client';
-import { WorkflowStateManager, WorkflowExecutor } from '@/lib/services/workflow-engine';
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  try {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+export async function POST(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
-
-    // Load workflow definition
-    const { data: workflowData, error: workflowError } = await supabase
-      .from('workflow_definitions')
-      .select('definition')
-      .eq('id', params.id)
-      .eq('user_id', user.id)
-      .single();
-
-    if (workflowError || !workflowData) {
-      return Response.json({ error: 'Workflow not found' }, { status: 404 });
-    }
-
-    // Execute workflow
-    const executor = new WorkflowExecutor(workflowData.definition, user.id);
-    const result = await executor.execute();
-
-    return Response.json({ execution: result }, { status: 200 });
-  } catch (error) {
-    console.error('[v0] Workflow execution error:', error);
-    return Response.json(
-      { error: error instanceof Error ? error.message : 'Failed to execute workflow' },
-      { status: 400 }
-    );
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
   }
+
+  const { id } = await context.params
+  const { data: workflow, error: workflowError } = await supabase
+    .from('workflow_definitions')
+    .select('id')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (workflowError) {
+    console.error('[workflows/execute] lookup failed', workflowError.code)
+    return NextResponse.json(
+      { error: 'No fue posible consultar el workflow.', code: 'workflow_lookup_failed' },
+      { status: 500 },
+    )
+  }
+
+  if (!workflow) {
+    return NextResponse.json(
+      { error: 'Workflow no encontrado.', code: 'workflow_not_found' },
+      { status: 404 },
+    )
+  }
+
+  return NextResponse.json(
+    {
+      error: 'La ejecución automática está deshabilitada hasta conectar workers y agentes verificables.',
+      code: 'workflow_execution_not_configured',
+    },
+    {
+      status: 503,
+      headers: { 'Cache-Control': 'private, no-store' },
+    },
+  )
 }

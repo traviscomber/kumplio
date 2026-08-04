@@ -164,9 +164,13 @@ const schemas = {
   }),
 } satisfies Record<AgentId, z.ZodTypeAny>
 
-const jsonSchemas: Record<AgentId, Record<string, unknown>> = Object.fromEntries(
-  Object.entries(schemas).map(([agentId, schema]) => [agentId, z.toJSONSchema(schema)]),
-) as Record<AgentId, Record<string, unknown>>
+const jsonSchemas = (Object.keys(schemas) as AgentId[]).reduce(
+  (result, agentId) => {
+    result[agentId] = z.toJSONSchema(schemas[agentId]) as unknown as Record<string, unknown>
+    return result
+  },
+  {} as Record<AgentId, Record<string, unknown>>,
+)
 
 export type AgentOutput = z.infer<(typeof schemas)[AgentId]>
 

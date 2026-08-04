@@ -1,57 +1,71 @@
-export const dynamic = 'force-dynamic';
+import { z } from 'zod'
+import { createClient } from '@/lib/supabase/server'
 
-import { createClient } from '@/lib/supabase/client';
-import { WorkflowDefinitionBuilder, WorkflowExecutor } from '@/lib/services/workflow-engine';
-import { z } from 'zod';
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 const workflowRequestSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
+  name: z.string().trim().min(1).max(160),
+  description: z.string().trim().max(1000).optional(),
   steps: z.array(
     z.object({
-      id: z.string(),
-      agentName: z.string(),
-      inputs: z.record(z.any()),
-      condition: z.string().optional(),
-      retryCount: z.number().optional(),
-      timeout: z.number().optional(),
-    })
-  ),
-});
+      id: z.string().trim().min(1).max(120),
+      agentName: z.string().trim().min(1).max(120),
+      inputs: z.record(z.string(), z.unknown()),
+      condition: z.string().max(500).optional(),
+      retryCount: z.number().int().min(0).max(10).optional(),
+      timeout: z.number().int().min(1).max(900_000).optional(),
+    }),
+  ).min(1).max(100),
+})
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const validated = workflowRequestSchema.parse(body);
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Create workflow definition
-    const { data, error } = await supabase
-      .from('workflow_definitions')
-      .insert({
-        user_id: user.id,
-        name: validated.name,
-        description: validated.description,
-        definition: validated,
-      })
-      .select();
-
-    if (error) throw error;
-
-    return Response.json({ workflow: data[0] }, { status: 201 });
-  } catch (error) {
-    console.error('[v0] Workflow creation error:', error);
+  if (authError || !user) {
     return Response.json(
-      { error: error instanceof Error ? error.message : 'Failed to create workflow' },
-      { status: 400 }
-    );
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
+    )
   }
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return Response.json(
+      { error: 'Invalid JSON request', code: 'invalid_json' },
+      { status: 400 },
+    )
+  }
+
+  const parsed = workflowRequestSchema.safeParse(body)
+  if (!parsed.success) {
+    return Response.json(
+      { error: 'Invalid workflow definition', code: 'invalid_workflow', details: parsed.error.flatten() },
+      { status: 400 },
+    )
+  }
+
+  const { data, error } = await supabase
+    .from('workflow_definitions')
+    .insert({
+      user_id: user.id,
+      name: parsed.data.name,
+      description: parsed.data.description || null,
+      definition: parsed.data,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('[workflows/create]', error.code)
+    return Response.json(
+      { error: 'No fue posible crear el workflow.', code: 'workflow_creation_failed' },
+      { status: 500 },
+    )
+  }
+
+  return Response.json({ workflow: data }, { status: 201 })
 }
