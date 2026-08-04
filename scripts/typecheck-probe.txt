@@ -1,2 +1,2 @@
 Temporary CI probe for the TypeScript hardening branch.
-Measurement: 3
+Measurement: 4
