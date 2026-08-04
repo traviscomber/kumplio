@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { INDEXNOW_KEY, INDEXNOW_KEY_URL } from '@/lib/indexnow'
 import { SITE_URL } from '@/lib/public-site'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(10000),
@@ -12,11 +16,6 @@ export async function POST(request: NextRequest) {
 
   if (!secret || authorization !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-  }
-
-  const key = process.env.INDEXNOW_KEY
-  if (!key) {
-    return NextResponse.json({ error: 'INDEXNOW_KEY no está configurado' }, { status: 503 })
   }
 
   const parsed = requestSchema.safeParse(await request.json().catch(() => null))
@@ -43,16 +42,17 @@ export async function POST(request: NextRequest) {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
     body: JSON.stringify({
       host: new URL(SITE_URL).host,
-      key,
-      keyLocation: `${SITE_URL}/indexnow-key.txt`,
+      key: INDEXNOW_KEY,
+      keyLocation: INDEXNOW_KEY_URL,
       urlList,
     }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
   })
 
-  if (!response.ok && response.status !== 202) {
+  if (![200, 202].includes(response.status)) {
     const detail = await response.text().catch(() => '')
-    console.error('[INDEXNOW_FAILED]', { status: response.status, detail })
+    console.error('[INDEXNOW_FAILED]', { status: response.status, detail: detail.slice(0, 500) })
     return NextResponse.json({ error: 'IndexNow rechazó la solicitud' }, { status: 502 })
   }
 
