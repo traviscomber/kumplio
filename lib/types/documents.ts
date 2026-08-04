@@ -1,53 +1,36 @@
-// Document types for KUMPLIO
-
-export type DocumentFormat = 'pdf' | 'docx' | 'doc' | 'txt';
+export type DocumentFormat = 'pdf' | 'txt'
+export type DocumentStatus = 'pending' | 'analyzing' | 'analyzed' | 'error'
+export type ObligationPriority = 'critical' | 'high' | 'medium' | 'low'
 
 export interface Document {
-  id: string;
-  user_id: string;
-  filename: string;
-  file_type: string;
-  file_size: number;
-  s3_key: string;
-  upload_date: string;
-  status: 'uploading' | 'processing' | 'completed' | 'error';
-  industry?: string;
-  content_text?: string;
-  extraction_complete: boolean;
-  error_message?: string;
-  created_at: string;
-  updated_at: string;
+  id: string
+  project_id: string
+  user_id: string
+  name: string
+  file_url: string | null
+  document_type: string | null
+  upload_date: string | null
+  status: DocumentStatus
+  created_at: string | null
+  projects?: { name?: string | null } | null
 }
 
 export interface Obligation {
-  id: string;
-  document_id: string;
-  obligation_text: string;
-  type: 'deadline' | 'responsibility' | 'requirement' | 'risk';
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  owner?: string;
-  deadline?: string;
-  evidence_reference?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ComplianceMatrix {
-  id: string;
-  document_id: string;
-  obligation: string;
-  risk_level: 'critical' | 'high' | 'medium' | 'low';
-  responsible?: string;
-  due_date?: string;
-  evidence?: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  created_at: string;
-  updated_at: string;
+  id: string
+  project_id: string
+  document_id: string | null
+  obligation_text: string
+  responsible_party: string | null
+  due_date: string | null
+  priority: ObligationPriority | null
+  status: string | null
+  is1dora_confidence: number | null
+  created_at: string | null
 }
 
 export interface UploadProgress {
-  status: 'uploading' | 'processing' | 'completed' | 'error';
-  progress: number;
-  message: string;
-  error?: string;
+  status: 'uploading' | DocumentStatus
+  progress: number
+  message: string
+  error?: string
 }

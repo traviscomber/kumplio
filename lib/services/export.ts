@@ -1,5 +1,12 @@
 import jsPDF from 'jspdf'
 import * as XLSX from 'xlsx'
+import type { Obligation } from '@/lib/types/documents'
+
+type ExportStats = {
+  totalObligations: number
+  criticalItems: number
+  highPriorityItems: number
+}
 
 function neutralizeSpreadsheetFormula(value: unknown) {
   const text = value == null ? '' : String(value)
@@ -22,107 +29,79 @@ function csvRow(values: unknown[]) {
   return values.map(escapeCsvCell).join(',')
 }
 
+function priorityLabel(priority: Obligation['priority']) {
+  return priority || 'sin prioridad'
+}
+
 export function generateExcelReport(
   documentName: string,
-  obligations: any[],
-  matrix: any[],
-  stats: any,
+  obligations: Obligation[],
+  stats: ExportStats,
 ): ArrayBuffer {
   const workbook = XLSX.utils.book_new()
 
   const summaryData = [
-    ['KUMPLIO - Reporte de Cumplimiento', ''],
+    ['KUMPLIO - Reporte de obligaciones identificadas', ''],
     ['', ''],
     ['Documento', safeWorksheetCell(documentName)],
     ['Fecha de reporte', new Date().toLocaleDateString('es-CL')],
     ['', ''],
-    ['RESUMEN DE ESTADÍSTICAS', ''],
-    ['Total de Obligaciones', obligations.length],
-    ['Puntuación de Cumplimiento', `${stats.complianceScore}%`],
-    ['Riesgos Críticos', matrix.filter((item: any) => item.risk_level === 'critical').length],
-    ['Riesgos Altos', matrix.filter((item: any) => item.risk_level === 'high').length],
+    ['RESUMEN', ''],
+    ['Total de obligaciones', stats.totalObligations],
+    ['Prioridad crítica', stats.criticalItems],
+    ['Prioridad alta', stats.highPriorityItems],
+    ['', ''],
+    ['Advertencia', 'Resultados preliminares sujetos a revisión humana y a las fuentes originales.'],
   ]
 
   const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-  summarySheet['!cols'] = [{ wch: 30 }, { wch: 24 }]
+  summarySheet['!cols'] = [{ wch: 30 }, { wch: 80 }]
   XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen')
 
-  if (obligations.length > 0) {
-    const obligationsRows = [
-      ['Obligación', 'Tipo', 'Severidad', 'Responsable', 'Vencimiento', 'Notas'],
-      ...obligations.map((item: any) => [
-        safeWorksheetCell(item.obligation_text),
-        safeWorksheetCell(item.type),
-        safeWorksheetCell(item.severity),
-        safeWorksheetCell(item.owner),
-        safeWorksheetCell(item.deadline),
-        safeWorksheetCell(item.evidence_reference),
-      ]),
-    ]
+  const obligationsRows = [
+    ['Obligación', 'Prioridad', 'Responsable', 'Vencimiento', 'Estado', 'Confianza técnica'],
+    ...obligations.map((item) => [
+      safeWorksheetCell(item.obligation_text),
+      safeWorksheetCell(priorityLabel(item.priority)),
+      safeWorksheetCell(item.responsible_party),
+      safeWorksheetCell(item.due_date),
+      safeWorksheetCell(item.status),
+      typeof item.is1dora_confidence === 'number'
+        ? Math.round(item.is1dora_confidence * 100) / 100
+        : '',
+    ]),
+  ]
 
-    const obligationsSheet = XLSX.utils.aoa_to_sheet(obligationsRows)
-    obligationsSheet['!cols'] = [
-      { wch: 60 },
-      { wch: 18 },
-      { wch: 14 },
-      { wch: 24 },
-      { wch: 18 },
-      { wch: 45 },
-    ]
-    XLSX.utils.book_append_sheet(workbook, obligationsSheet, 'Obligaciones')
-  }
-
-  if (matrix.length > 0) {
-    const matrixRows = [
-      ['Obligación', 'Nivel de Riesgo', 'Responsable', 'Vencimiento', 'Estado', 'Evidencia'],
-      ...matrix.map((item: any) => [
-        safeWorksheetCell(item.obligation),
-        safeWorksheetCell(item.risk_level),
-        safeWorksheetCell(item.responsible),
-        safeWorksheetCell(item.due_date),
-        safeWorksheetCell(item.status),
-        safeWorksheetCell(item.evidence),
-      ]),
-    ]
-
-    const matrixSheet = XLSX.utils.aoa_to_sheet(matrixRows)
-    matrixSheet['!cols'] = [
-      { wch: 60 },
-      { wch: 18 },
-      { wch: 24 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 45 },
-    ]
-    XLSX.utils.book_append_sheet(workbook, matrixSheet, 'Matriz Cumplimiento')
-  }
+  const obligationsSheet = XLSX.utils.aoa_to_sheet(obligationsRows)
+  obligationsSheet['!cols'] = [
+    { wch: 80 },
+    { wch: 18 },
+    { wch: 28 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 20 },
+  ]
+  XLSX.utils.book_append_sheet(workbook, obligationsSheet, 'Obligaciones')
 
   return XLSX.write(workbook, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
 }
 
-export function generateCSVReport(obligations: any[], matrix: any[]) {
+export function generateCSVReport(obligations: Obligation[]) {
   const rows: unknown[][] = [
-    ['Obligaciones'],
-    ['Descripción', 'Tipo', 'Severidad', 'Responsable', 'Vencimiento', 'Notas'],
-    ...obligations.map((item: any) => [
+    ['Obligaciones identificadas'],
+    ['Descripción', 'Prioridad', 'Responsable', 'Vencimiento', 'Estado', 'Confianza técnica'],
+    ...obligations.map((item) => [
       item.obligation_text,
-      item.type,
-      item.severity,
-      item.owner,
-      item.deadline,
-      item.evidence_reference,
-    ]),
-    [],
-    ['Matriz de Cumplimiento'],
-    ['Obligación', 'Riesgo', 'Responsable', 'Vencimiento', 'Estado', 'Evidencia'],
-    ...matrix.map((item: any) => [
-      item.obligation,
-      item.risk_level,
-      item.responsible,
+      priorityLabel(item.priority),
+      item.responsible_party,
       item.due_date,
       item.status,
-      item.evidence,
+      typeof item.is1dora_confidence === 'number'
+        ? Math.round(item.is1dora_confidence * 100) / 100
+        : '',
     ]),
+    [],
+    ['Advertencia', 'Resultados preliminares sujetos a revisión humana y a las fuentes originales.'],
   ]
 
   return `\uFEFF${rows.map(csvRow).join('\r\n')}\r\n`
@@ -130,14 +109,13 @@ export function generateCSVReport(obligations: any[], matrix: any[]) {
 
 export async function generatePDFReport(
   documentName: string,
-  obligations: any[],
-  matrix: any[],
-  stats: any,
+  obligations: Obligation[],
+  stats: ExportStats,
 ): Promise<Blob> {
   const doc = new jsPDF()
 
   doc.setFontSize(20)
-  doc.text('KUMPLIO - Reporte de Cumplimiento', 20, 20)
+  doc.text('KUMPLIO - Reporte de obligaciones', 20, 20)
 
   doc.setFontSize(11)
   doc.setTextColor(100)
@@ -146,41 +124,51 @@ export async function generatePDFReport(
 
   doc.setFontSize(14)
   doc.setTextColor(0)
-  doc.text('Resumen Ejecutivo', 20, 55)
+  doc.text('Resumen', 20, 55)
 
   doc.setFontSize(11)
-  const statsY = 65
-  doc.text(`Puntuación de Cumplimiento: ${stats.complianceScore}%`, 20, statsY)
-  doc.text(`Total de Obligaciones: ${obligations.length}`, 20, statsY + 7)
-  doc.text(`Riesgos Críticos: ${matrix.filter((item: any) => item.risk_level === 'critical').length}`, 20, statsY + 14)
-  doc.text(`Riesgos Altos: ${matrix.filter((item: any) => item.risk_level === 'high').length}`, 20, statsY + 21)
+  doc.text(`Total de obligaciones: ${stats.totalObligations}`, 20, 65)
+  doc.text(`Prioridad crítica: ${stats.criticalItems}`, 20, 72)
+  doc.text(`Prioridad alta: ${stats.highPriorityItems}`, 20, 79)
+
+  doc.setFontSize(9)
+  doc.setTextColor(120)
+  const warning = doc.splitTextToSize(
+    'Resultados preliminares sujetos a revisión humana y a las fuentes originales. Este reporte no demuestra cumplimiento ni reemplaza asesoría profesional.',
+    170,
+  )
+  doc.text(warning, 20, 92)
 
   doc.addPage()
   doc.setFontSize(14)
-  doc.text('Obligaciones Identificadas', 20, 20)
+  doc.setTextColor(0)
+  doc.text('Obligaciones identificadas', 20, 20)
 
-  let y = 30
-  obligations.slice(0, 10).forEach((item: any) => {
-    if (y > 250) {
+  let y = 32
+  obligations.forEach((item, index) => {
+    const description = doc.splitTextToSize(`${index + 1}. ${item.obligation_text}`, 165)
+    const metadata = [
+      `Prioridad: ${priorityLabel(item.priority)}`,
+      item.responsible_party ? `Responsable: ${item.responsible_party}` : null,
+      item.due_date ? `Vencimiento: ${new Date(item.due_date).toLocaleDateString('es-CL')}` : null,
+    ].filter(Boolean).join(' · ')
+
+    const requiredHeight = description.length * 5 + 12
+    if (y + requiredHeight > 275) {
       doc.addPage()
       y = 20
     }
 
     doc.setFontSize(10)
     doc.setTextColor(0)
-    doc.text(`• ${String(item.obligation_text || '').slice(0, 80)}`, 25, y)
+    doc.text(description, 20, y)
+    y += description.length * 5 + 2
 
-    doc.setFontSize(9)
-    doc.setTextColor(150)
-    doc.text(`Tipo: ${String(item.type || '')} | Severidad: ${String(item.severity || '')}`, 30, y + 5)
-    y += 12
+    doc.setFontSize(8)
+    doc.setTextColor(120)
+    doc.text(doc.splitTextToSize(metadata || 'Sin metadatos adicionales', 165), 20, y)
+    y += 10
   })
-
-  if (obligations.length > 10) {
-    doc.setFontSize(9)
-    doc.setTextColor(150)
-    doc.text(`... y ${obligations.length - 10} obligaciones más`, 25, y)
-  }
 
   return doc.output('blob')
 }
