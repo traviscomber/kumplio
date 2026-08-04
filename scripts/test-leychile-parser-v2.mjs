@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { parsePayload } from '../supabase/functions/leychile-bootstrap/parser.mjs'
+import { parsePayload, sha256 } from '../supabase/functions/leychile-bootstrap/parser.mjs'
 
 const html = [
   '<p>Artículo primero</p>',
@@ -50,5 +50,9 @@ assert.ok(geolocation)
 assert.equal(parsed.sections.filter((section) => section.parentKey === geolocation.key).length, 2)
 assert.doesNotMatch(geolocation.bodyText, /En el artículo 17/)
 assert.ok(!parsed.sections.some((section) => /Artículo (?:14|16|30) [qson](?:,|$)/.test(section.referenceLabel)))
+
+for (const section of parsed.sections) {
+  assert.equal(section.hash, await sha256(`${section.key}\n${section.normalizedText}`))
+}
 
 console.log('LeyChile parser v2 fixtures passed')
