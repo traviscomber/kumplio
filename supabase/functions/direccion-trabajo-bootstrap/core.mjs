@@ -298,9 +298,9 @@ export async function parseDtDetailPage(html, discovery) {
   if (!dateCandidate) throw new Error('dt_detail_date_missing')
   if (dateCandidate !== discovery.publicationDate) throw new Error('dt_detail_date_mismatch')
 
-  const pdfMatch = String(html).match(/href=["']([^"']*articles-[0-9]+_recurso_[0-9]+[.]pdf)["']/i)
+  const pdfMatch = String(html).match(/href=["']([^"']*articles-[0-9]+_recurso_(?:[0-9]+|pdf)[.]pdf)["']/i)
   const pdfUrl = pdfMatch ? new URL(pdfMatch[1], BASE_URL).toString() : null
-  if (pdfUrl && !/^https:\/\/(?:www[.])?dt[.]gob[.]cl\/legislacion\/1624\/articles-[0-9]+_recurso_[0-9]+[.]pdf$/.test(pdfUrl)) {
+  if (pdfUrl && !/^https:\/\/(?:www[.])?dt[.]gob[.]cl\/legislacion\/1624\/articles-[0-9]+_recurso_(?:[0-9]+|pdf)[.]pdf$/.test(pdfUrl)) {
     throw new Error('dt_detail_pdf_host_invalid')
   }
 
