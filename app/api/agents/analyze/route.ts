@@ -1,30 +1,27 @@
-import { createCompliancePipeline, runQuickCompliacneScan } from '@/lib/agents/coordinator'
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
-export async function POST(req: Request) {
-  try {
-    const { documentContent, organizationType, scanType } = await req.json()
+export const runtime = 'nodejs'
 
-    if (!documentContent) {
-      return Response.json({ error: 'Document content required' }, { status: 400 })
-    }
+export async function POST() {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    const orgType = organizationType || 'empresa'
-
-    if (scanType === 'quick') {
-      const result = await runQuickCompliacneScan(documentContent, orgType)
-      return Response.json(result)
-    }
-
-    // Full analysis (default)
-    const result = await createCompliancePipeline(documentContent, orgType)
-    return Response.json(result)
-  } catch (error) {
-    console.error('[API] Compliance analysis error:', error)
-    return Response.json(
-      {
-        error: error instanceof Error ? error.message : 'Analysis failed',
-      },
-      { status: 500 }
+  if (authError || !user) {
+    return NextResponse.json(
+      { error: 'Authentication required', code: 'authentication_required' },
+      { status: 401 },
     )
   }
+
+  return NextResponse.json(
+    {
+      error: 'Este pipeline histórico está deshabilitado. Utiliza las misiones y agentes verificables del workspace.',
+      code: 'legacy_agent_pipeline_retired',
+    },
+    {
+      status: 503,
+      headers: { 'Cache-Control': 'private, no-store' },
+    },
+  )
 }
