@@ -9,6 +9,7 @@ import { AlertCircle, CheckCircle2, Eye, EyeOff, Lock, Mail } from 'lucide-react
 import { createClient } from '@/lib/supabase/client'
 import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
+import { authErrorMessage } from '@/lib/auth/password-policy'
 
 const successMessages: Record<string, string> = {
   'password-updated': 'Tu contraseña fue actualizada. Ya puedes iniciar sesión.',
@@ -40,7 +41,7 @@ export default function SignIn() {
       })
 
       if (signInError) {
-        setError(signInError.message)
+        setError(authErrorMessage(signInError))
         return
       }
 
