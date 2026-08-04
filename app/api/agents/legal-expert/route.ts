@@ -8,7 +8,7 @@ export const runtime = 'nodejs'
 
 const requestSchema = z.object({
   legalQuestion: z.string().trim().min(5).max(10_000),
-  context: z.unknown().optional(),
+  context: z.string().trim().max(20_000).optional(),
 })
 
 export async function POST(request: NextRequest) {
