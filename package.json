@@ -20,7 +20,8 @@
     "check:sma-detail": "node scripts/test-sma-snifa-detail-fixtures.mjs",
     "check:sma-detail-bootstrap": "node scripts/check-sma-snifa-detail-bootstrap.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
-    "check:claims": "node scripts/test-ley21719-claim-rules.mjs"
+    "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
+    "check:compliance-core": "node scripts/check-compliance-core-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
