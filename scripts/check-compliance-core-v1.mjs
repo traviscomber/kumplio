@@ -9,6 +9,10 @@ const evaluatorMigration = await readFile(
   'supabase/migrations/20260804143000_compliance_applicability_evaluator_v1.sql',
   'utf8',
 )
+const candidateRulesMigration = await readFile(
+  'supabase/migrations/20260804160000_ley21719_candidate_applicability_rules_v1.sql',
+  'utf8',
+)
 
 for (const table of [
   'organization_compliance_profiles',
@@ -59,5 +63,19 @@ assert.match(evaluatorMigration, /revoke all on function public[.]run_regulatory
 assert.match(evaluatorMigration, /grant execute on function public[.]run_regulatory_impact[\s\S]*to service_role/)
 assert.doesNotMatch(evaluatorMigration, /security definer/i)
 assert.doesNotMatch(evaluatorMigration, /grant execute[\s\S]*to (?:public|anon|authenticated)/i)
+
+assert.match(candidateRulesMigration, /generate_ley21719_candidate_rules_v1/)
+assert.match(candidateRulesMigration, /preview_organization_applicability_v1/)
+assert.match(candidateRulesMigration, /canonical_identifier = 'LEY-21719'/)
+assert.match(candidateRulesMigration, /validation_status = 'pending'/)
+assert.match(candidateRulesMigration, /requires_human_review = true/)
+assert.match(candidateRulesMigration, /rule_key like 'ley21719[.]%'/)
+assert.match(candidateRulesMigration, /on conflict \(rule_key, rule_version\) do nothing/)
+assert.match(candidateRulesMigration, /private[.]evaluate_compliance_conditions/)
+assert.match(candidateRulesMigration, /revoke all on function public[.]generate_ley21719_candidate_rules_v1/)
+assert.match(candidateRulesMigration, /revoke all on function public[.]preview_organization_applicability_v1/)
+assert.match(candidateRulesMigration, /grant execute on function public[.]preview_organization_applicability_v1[\s\S]*to service_role/)
+assert.doesNotMatch(candidateRulesMigration, /security definer/i)
+assert.doesNotMatch(candidateRulesMigration, /grant execute[\s\S]*to (?:public|anon|authenticated)/i)
 
 console.log('Compliance Core v1 validation passed')
