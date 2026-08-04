@@ -1,0 +1,63 @@
+import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+
+const entrypoint = await readFile('supabase/functions/sma-snifa-bootstrap/index.ts', 'utf8')
+const core = await readFile('supabase/functions/sma-snifa-bootstrap/core.mjs', 'utf8')
+const schema = await readFile('supabase/migrations/20260804062000_sma_snifa_sanctioning_source.sql', 'utf8')
+const corrections = await readFile('supabase/migrations/20260804062100_sma_snifa_schema_corrections.sql', 'utf8')
+const integrity = await readFile('supabase/migrations/20260804062200_sma_snifa_batch_integrity.sql', 'utf8')
+
+assert.match(entrypoint, /serviceRoleAuthorized\(request,\s*serviceKey\)/)
+assert.match(entrypoint, /authorization["']?\)\s*===\s*`Bearer \$\{serviceKey\}`/)
+assert.match(entrypoint, /drive[.]usercontent[.]google[.]com\/download/)
+assert.match(entrypoint, /1hPEwmUFZpmD7xFbJy-kjhhzjplnUB1mH/)
+assert.match(entrypoint, /redirect:\s*["']error["']/)
+assert.match(entrypoint, /MAX_BYTES\s*=\s*5\s*\*\s*1024\s*\*\s*1024/)
+assert.match(entrypoint, /BATCH_SIZE\s*=\s*400/)
+assert.match(entrypoint, /begin_sma_sanctioning_snapshot/)
+assert.match(entrypoint, /record_sma_sanctioning_batch/)
+assert.match(entrypoint, /complete_sma_sanctioning_snapshot/)
+assert.match(entrypoint, /target_status:\s*["']requires_review["']/)
+assert.doesNotMatch(entrypoint, /body\?\.url/)
+assert.doesNotMatch(entrypoint, /redirect:\s*["']follow["']/)
+assert.doesNotMatch(entrypoint, /verify_jwt\s*:\s*false/)
+
+assert.match(core, /EXPECTED_HEADERS/)
+assert.match(core, /windows-1252/)
+assert.match(core, /minimumRows\s*\?\?\s*3000/)
+assert.match(core, /sma_csv_headers_changed/)
+assert.match(core, /sma_duplicate_process_unit/)
+assert.match(core, /sma_inconsistent_process_fields/)
+assert.match(core, /snifa[.]sma[.]gob[.]cl/)
+assert.match(core, /Terminado - Sanción/)
+assert.match(core, /detailHydrationRequired|sourceUpdateDate/)
+assert.doesNotMatch(core, /eval\s*\(/)
+assert.doesNotMatch(core, /new\s+Function\s*\(/)
+
+const migrations = [schema, corrections, integrity].join('\n')
+assert.match(schema, /alter table public[.]sma_dataset_snapshots enable row level security/)
+assert.match(schema, /alter table public[.]sma_sanctioning_proceedings enable row level security/)
+assert.match(schema, /security invoker/g)
+assert.match(schema, /revoke all on function public[.]begin_sma_sanctioning_snapshot/)
+assert.match(schema, /revoke all on function public[.]record_sma_sanctioning_batch/)
+assert.match(schema, /revoke all on function public[.]complete_sma_sanctioning_snapshot/)
+assert.match(schema, /status = 'manual'/)
+assert.match(schema, /detailHydrationRequired/)
+assert.match(corrections, /drop not null/)
+assert.match(integrity, /sma_batch_duplicate_row_numbers/)
+assert.match(integrity, /persisted_count <> batch_size/)
+assert.doesNotMatch(migrations, /security definer/i)
+
+const executeGrants = migrations
+  .split(';')
+  .map((statement) => statement.trim())
+  .filter((statement) => /^grant\s+execute\s+on\s+function/i.test(statement))
+assert.ok(executeGrants.length >= 3)
+assert.ok(
+  executeGrants.every(
+    (statement) => /\bto\s+service_role\s*$/i.test(statement)
+      && !/\bto\s+(?:public|anon|authenticated)\b/i.test(statement),
+  ),
+)
+
+console.log('SMA SNIFA internal runner validation passed')
