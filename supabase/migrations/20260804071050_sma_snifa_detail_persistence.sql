@@ -29,6 +29,8 @@ declare
   created_version public.sma_sanctioning_detail_versions%rowtype;
   expected_url text;
   source_id uuid;
+  discovery_matches boolean;
+  fetch_matches boolean;
   unit_count integer;
   holder_count integer;
   document_count integer;
@@ -43,7 +45,7 @@ begin
 
   expected_url := format('https://snifa.sma.gob.cl/Sancionatorio/Ficha/%s',p_sma_process_id);
 
-  if not exists (
+  select exists(
     select 1 from public.sma_sanctioning_proceedings proceeding
     where proceeding.sma_process_id=p_sma_process_id
       and proceeding.is_current
@@ -51,7 +53,9 @@ begin
       and proceeding.start_date=p_start_date
       and proceeding.process_state=p_process_state
       and proceeding.proceeding_url=expected_url
-  ) then
+  ) into discovery_matches;
+
+  if not discovery_matches then
     raise exception 'sma_detail_discovery_mismatch:%',p_sma_process_id;
   end if;
 
@@ -64,7 +68,7 @@ begin
     raise exception 'sma_detail_source_not_registered';
   end if;
 
-  if not exists (
+  select exists(
     select 1 from public.regulatory_source_fetches fetch
     where fetch.id=p_source_fetch_id
       and fetch.source_id=source_id
@@ -72,7 +76,9 @@ begin
       and fetch.final_url=expected_url
       and fetch.content_hash=p_content_hash
       and fetch.status in ('succeeded','unchanged')
-  ) then
+  ) into fetch_matches;
+
+  if not fetch_matches then
     raise exception 'sma_detail_source_fetch_mismatch:%',p_sma_process_id;
   end if;
 
