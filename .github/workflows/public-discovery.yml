@@ -74,6 +74,12 @@ jobs:
       - name: Validate SMA SNIFA internal runner
         run: npm run check:sma-bootstrap
 
+      - name: Validate SMA SNIFA detail parser
+        run: npm run check:sma-detail
+
+      - name: Validate SMA SNIFA detail internal runner
+        run: npm run check:sma-detail-bootstrap
+
       - name: Validate LeyChile parser
         run: npm run check:leychile
 
