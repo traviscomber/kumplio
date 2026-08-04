@@ -18,6 +18,7 @@ const resourceLinks = [
   ['Guías Ley 21.719', '/resources/ley-21719'],
   ['Centro de recursos', '/resources/cumplimiento-normativo'],
   ['Preguntas frecuentes', '/faq'],
+  ['Cómo pensamos', '/como-pensamos'],
   ['Sobre Kumplio', '/about'],
 ]
 
