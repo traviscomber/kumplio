@@ -109,3 +109,5 @@ jobs:
             echo "===== $file ====="
             tail -250 "$file" 2>/dev/null || true
           done
+
+# Segunda publicación para activar el diagnóstico autenticado.
