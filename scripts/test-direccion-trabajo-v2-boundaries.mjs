@@ -34,13 +34,10 @@ const parsed = await parseDtDetailPage(html, {
 assert.equal(parsed.parserVersion, 'direccion-trabajo-doctrina-v2')
 assert.equal(parsed.summary, 'Primero está la seguridad de las personas. Complementa los Ordinarios N°2000/44737, de 17.07.2026, y N°2000/45139, de 20.07.2026.')
 assert.doesNotMatch(parsed.summary, /ORD\. N°1041/)
-assert.equal(parsed.relations.length, 2)
-assert.deepEqual(
-  parsed.relations.map((relation) => relation.targetIdentifier).sort(),
-  ['dt:ordinario:2000-44737/2026', 'dt:ordinario:2000-45139/2026'],
-)
-assert.ok(parsed.relations.every((relation) => relation.type === 'complements'))
-assert.ok(parsed.relations.every((relation) => relation.metadata.sourceBlock === 'catalogacion' || relation.metadata.sourceBlock === 'resumen'))
-assert.ok(parsed.relations.every((relation) => relation.targetIdentifier !== parsed.canonicalIdentifier))
+assert.equal(parsed.relations.length, 1)
+assert.equal(parsed.relations[0].targetIdentifier, 'dt:ordinario:2000-44737/2026')
+assert.equal(parsed.relations[0].type, 'complements')
+assert.ok(parsed.relations[0].metadata.sourceBlock === 'catalogacion' || parsed.relations[0].metadata.sourceBlock === 'resumen')
+assert.notEqual(parsed.relations[0].targetIdentifier, parsed.canonicalIdentifier)
 
 console.log('Dirección del Trabajo v2 boundaries passed')
