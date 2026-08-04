@@ -98,6 +98,17 @@ assert.ok(parsed.relations.some((relation) => relation.type === 'concordance' &&
 assert.ok(parsed.blocks.some((block) => block.type === 'cuerpo'))
 assert.match(parsed.hash, /^[0-9a-f]{64}$/)
 
+const recursoPdfDetail = detailHtml
+  .replaceAll('ORD.N°319/30', 'ORD.N°321')
+  .replaceAll('03-jul-2026', '08-jul-2026')
+  .replaceAll('03 JULIO 2026', '08 JULIO 2026')
+  .replace('articles-129427_recurso_1.pdf', 'articles-129458_recurso_pdf.pdf')
+  .replace('E115482/2026', 'E118000/2026')
+
+const recursoPdfParsed = await parseDtDetailPage(recursoPdfDetail, ordinarioEntries[0])
+assert.equal(recursoPdfParsed.pdfUrl, 'https://www.dt.gob.cl/legislacion/1624/articles-129458_recurso_pdf.pdf')
+assert.equal(recursoPdfParsed.normalizedNumber, '321')
+
 assert.throws(
   () => parseDtIndexPage(dictamenIndex, { year: 2025, month: 7, pronouncementType: 'dictamen' }),
   /dt_index_year_not_supported/,
