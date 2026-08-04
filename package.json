@@ -12,6 +12,7 @@
     "check:boundaries": "node scripts/check-client-boundaries.mjs",
     "check:auth": "node scripts/check-auth-password-policy.mjs",
     "check:diario": "node scripts/test-diario-oficial-fixtures.mjs",
+    "check:diario-bootstrap": "node scripts/check-diario-oficial-bootstrap.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs"
   },
