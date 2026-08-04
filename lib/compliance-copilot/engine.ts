@@ -18,6 +18,12 @@ export type CopilotResponse = {
   sources: Array<{ type: string; id: string; label: string }>
   actions: Array<{ label: string; href: string }>
   plan: CopilotPlanStep[]
+  generation?: {
+    mode: 'deterministic' | 'llm_grounded'
+    model?: string
+    fallbackReason?: string
+  }
+  caveats?: string[]
 }
 
 export function classifyCopilotIntent(input: string): CopilotIntent {
