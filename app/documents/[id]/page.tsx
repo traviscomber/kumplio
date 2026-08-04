@@ -99,7 +99,9 @@ export default function DocumentDetailPage() {
                 {uploadedAt && `Cargado el ${new Date(uploadedAt).toLocaleDateString('es-CL')}`}
               </p>
             </div>
-            <ExportMenu documentId={documentId} documentName={document.name} />
+            {document.status === 'analyzed' && (
+              <ExportMenu documentId={documentId} documentName={document.name} />
+            )}
           </div>
 
           <section className="rounded-lg border border-border bg-card p-4">
@@ -119,6 +121,12 @@ export default function DocumentDetailPage() {
             <Metric label="Prioridad crítica" value={criticalCount} valueClass="text-destructive" />
             <Metric label="Prioridad alta" value={highCount} valueClass="text-orange-500" />
           </section>
+
+          {document.status === 'pending' && (
+            <section className="rounded-lg border border-border bg-card py-12 text-center">
+              <p className="text-muted-foreground">El documento está pendiente de análisis.</p>
+            </section>
+          )}
 
           {document.status === 'analyzing' && (
             <section className="rounded-lg border border-border bg-card py-12 text-center">
