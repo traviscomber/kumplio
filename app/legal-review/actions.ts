@@ -51,11 +51,11 @@ export async function submitReviewDecision(formData: FormData) {
 
   const admin = createAdminClient()
   const { error } = await admin.rpc('record_regulatory_review_decision_v1', {
-    p_case_id: caseId,
+    p_review_case_id: caseId,
     p_decision: decision,
-    p_rationale: rationale || null,
     p_reviewer_id: user.id,
-    p_proposed_changes: proposal,
+    p_rationale: rationale || null,
+    p_decided_payload: proposal,
   })
 
   if (error) throw new Error(error.message)
