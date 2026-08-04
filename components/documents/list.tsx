@@ -20,13 +20,14 @@ export function DocumentsList() {
       return
     }
 
+    const userId = user.id
     let cancelled = false
 
     async function fetchDocuments() {
       setLoading(true)
       try {
         const supabase = createClient()
-        const rows = await getUserDocuments(supabase, user.id)
+        const rows = await getUserDocuments(supabase, userId)
         if (!cancelled) {
           setDocuments(rows as Document[])
           setError(null)

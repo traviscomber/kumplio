@@ -1,7 +1,5 @@
-export const dynamic = 'force-dynamic';
-
-import ComplianceMatrixPageClient from './client';
+import { redirect } from 'next/navigation'
 
 export default function ComplianceMatrixPage() {
-  return <ComplianceMatrixPageClient />;
+  redirect('/obligations')
 }
