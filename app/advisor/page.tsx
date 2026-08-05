@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, History, ShieldAlert } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Clock3, ShieldCheck } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
-import { CalmState, FocusPanel, PrimaryAction } from '@/components/product/focus-panel'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { getDailyAdvisorSummary } from '@/lib/compliance/advisor/daily-advisor'
-import { PRODUCT_LANGUAGE } from '@/lib/product/language'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,97 +20,127 @@ export default async function AdvisorPage() {
 
   const summary = await getDailyAdvisorSummary(admin, access.organizationId, user.id)
   const primary = summary.priorities[0]
+  const reviewedItems = summary.openSituations + summary.pendingDecisions + summary.recentMemories.length
 
   return (
     <>
       <WorkspaceNav />
-      <main className="container mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <FocusPanel
-          eyebrow="Hoy"
-          title={headline(summary.status)}
-          description={description(summary.status, summary.pendingDecisions, summary.openSituations)}
-        >
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <Metric label="Decisiones" value={summary.pendingDecisions} />
-            <Metric label="Situaciones" value={summary.openSituations} />
-            <Metric label="Tiempo estimado" value={`${summary.estimatedMinutes} min`} />
-          </div>
+      <main className="container mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+        <section className="overflow-hidden rounded-[28px] border bg-card shadow-sm">
+          <div className="border-b bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_42%)] px-6 py-10 sm:px-10 sm:py-14">
+            <p className="text-sm font-bold text-primary">Hoy</p>
+            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-6xl">Buenos días.</h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+              Revisé la información disponible de tu organización y preparé lo que requiere tu atención.
+            </p>
 
-          <div className="mt-8">
-            {primary ? <PrimaryAction href={primary.href}>{PRODUCT_LANGUAGE.actions.start}</PrimaryAction> : <CalmState>{PRODUCT_LANGUAGE.empty.noAction}</CalmState>}
-          </div>
-        </FocusPanel>
-
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-          <div className="rounded-2xl border bg-card p-5 sm:p-6">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-primary" />
-              <h2 className="font-bold">Lo que requiere atención</h2>
+            <div className="mt-10 space-y-4">
+              <BriefLine
+                icon={<CheckCircle2 className="h-5 w-5" />}
+                label="Información revisada"
+                value={`${reviewedItems} elementos considerados`}
+              />
+              <BriefLine
+                icon={<ShieldCheck className="h-5 w-5" />}
+                label="Situaciones abiertas"
+                value={`${summary.openSituations}`}
+              />
+              <BriefLine
+                icon={<CheckCircle2 className="h-5 w-5" />}
+                label="Decisiones preparadas"
+                value={`${summary.pendingDecisions}`}
+              />
+              <BriefLine
+                icon={<Clock3 className="h-5 w-5" />}
+                label="Tiempo estimado"
+                value={`${summary.estimatedMinutes} minutos`}
+              />
             </div>
-            <div className="mt-5 space-y-3">
-              {summary.priorities.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No encontré asuntos que requieran intervención.</p>
-              ) : summary.priorities.map((item) => (
-                <Link key={`${item.href}-${item.id}`} href={item.href} className="block rounded-xl border p-4 transition-colors hover:bg-muted/60">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
-                        <span>Riesgo {riskLabel(item.reasoning.risk)}</span>
-                        <span>Confianza {item.reasoning.confidence}%</span>
-                      </div>
-                      <p className="mt-2 font-bold">{item.title}</p>
-                      {item.summary && <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.summary}</p>}
-                      <p className="mt-3 text-sm font-semibold text-primary">{item.reasoning.nextAction}</p>
-                      <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.reasoning.explanation[1]}</p>
-                    </div>
-                    <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                  </div>
+
+            <div className="mt-10">
+              {primary ? (
+                <Link
+                  href={primary.href}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-primary px-6 py-3 font-bold text-primary-foreground transition hover:opacity-90"
+                >
+                  Comenzar <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
-              ))}
+              ) : (
+                <div className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-5 py-3 font-semibold text-foreground">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> No necesitas intervenir ahora.
+                </div>
+              )}
             </div>
           </div>
 
-          <aside className="rounded-2xl border bg-card p-5 sm:p-6">
-            <div className="flex items-center gap-2">
-              <History className="h-5 w-5 text-primary" />
-              <h2 className="font-bold">Precedentes recientes</h2>
-            </div>
-            <div className="mt-5 space-y-4">
-              {summary.recentMemories.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{PRODUCT_LANGUAGE.empty.noPrecedent}</p>
-              ) : summary.recentMemories.map((memory) => (
-                <article key={memory.id} className="border-l-2 border-primary/30 pl-4">
-                  <p className="font-semibold">{memory.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{memory.summary}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">{new Date(memory.occurredAt).toLocaleDateString('es-CL', { dateStyle: 'medium' })}</p>
-                </article>
-              ))}
-            </div>
-          </aside>
+          <div className="grid gap-8 px-6 py-8 sm:px-10 lg:grid-cols-[1fr_0.8fr]">
+            <section>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Lo que requiere atención</p>
+              <div className="mt-4 space-y-3">
+                {summary.priorities.length === 0 ? (
+                  <p className="rounded-2xl border bg-background/50 p-5 text-sm text-muted-foreground">
+                    No encontré asuntos que requieran una decisión inmediata.
+                  </p>
+                ) : summary.priorities.slice(0, 3).map((item, index) => (
+                  <Link
+                    key={`${item.href}-${item.id}`}
+                    href={item.href}
+                    className="block rounded-2xl border bg-background/50 p-5 transition hover:border-primary/30 hover:bg-muted/40"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-bold text-primary">Decisión {index + 1}</p>
+                        <h2 className="mt-2 font-bold">{item.title}</h2>
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.reasoning.nextAction}</p>
+                        <p className="mt-3 text-xs text-muted-foreground">
+                          Riesgo {riskLabel(item.reasoning.risk)} · confianza {item.reasoning.confidence}%
+                        </p>
+                      </div>
+                      <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            <aside className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
+              <ShieldCheck className="h-6 w-6 text-primary" />
+              <h2 className="mt-4 text-xl font-black">Todo lo demás está bajo control.</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Kumplio ya ordenó las situaciones y decisiones disponibles para que no tengas que revisar cada documento o alerta por separado.
+              </p>
+              <div className="mt-6 space-y-3 text-sm">
+                <StatusLine label="Situaciones priorizadas" value={summary.openSituations} />
+                <StatusLine label="Decisiones pendientes" value={summary.pendingDecisions} />
+                <StatusLine label="Precedentes considerados" value={summary.recentMemories.length} />
+              </div>
+            </aside>
+          </div>
         </section>
       </main>
     </>
   )
 }
 
-function Metric({ label, value }: { label: string; value: number | string }) {
+function BriefLine({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border bg-background/50 p-5">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-2 text-3xl font-black">{value}</p>
+    <div className="flex items-center justify-between gap-4 border-b pb-4 last:border-0 last:pb-0">
+      <div className="flex items-center gap-3 text-primary">
+        {icon}
+        <span className="text-sm font-semibold text-foreground">{label}</span>
+      </div>
+      <span className="text-sm font-bold text-foreground">{value}</span>
     </div>
   )
 }
 
-function headline(status: 'stable' | 'attention' | 'critical') {
-  if (status === 'critical') return 'Hay un asunto crítico que requiere tu atención.'
-  if (status === 'attention') return 'Preparé lo que necesitas revisar hoy.'
-  return 'La organización está estable.'
-}
-
-function description(status: 'stable' | 'attention' | 'critical', decisions: number, situations: number) {
-  if (status === 'stable') return 'Revisé las situaciones, decisiones y precedentes disponibles. No encontré una acción prioritaria para ti.'
-  return `Encontré ${situations} situaciones abiertas y ${decisions} decisiones pendientes. Las ordené para que comiences por lo más importante.`
+function StatusLine({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-bold">{value}</span>
+    </div>
+  )
 }
 
 function riskLabel(risk: 'low' | 'medium' | 'high' | 'critical') {
