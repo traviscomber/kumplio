@@ -11,20 +11,24 @@ type Props = {
   workflowStatus: string
 }
 
+type BusyAction = 'approve' | 'changes' | 'advance' | 'close' | null
+
 export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowStatus }: Props) {
   const router = useRouter()
-  const [busy, setBusy] = useState<'approve' | 'changes' | 'advance' | null>(null)
+  const [busy, setBusy] = useState<BusyAction>(null)
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
+  const [closed, setClosed] = useState(false)
 
   const canReview = Boolean(runId && stageStatus === 'pending_review')
   const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview
+  const canClose = workflowStatus === 'completed'
 
-  async function request(path: string, body: unknown) {
+  async function request(path: string, body?: unknown) {
     const response = await fetch(path, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     })
     const payload = await response.json().catch(() => ({}))
     if (!response.ok) throw new Error(payload.error || 'No fue posible completar la acción')
@@ -80,11 +84,27 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
     }
   }
 
-  if (!canReview && !canAdvance) return null
+  async function closeCase() {
+    if (busy || closed) return
+    setBusy('close')
+    setError('')
+    try {
+      await request(`/api/agents/workflows/${workflowId}/close-case`)
+      setClosed(true)
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible cerrar el caso')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  if (!canReview && !canAdvance && !canClose) return null
 
   return (
     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
-      <h2 className="font-black">Siguiente decisión</h2>
+      <h2 className="font-black">{canClose ? 'Cierre del caso' : 'Siguiente decisión'}</h2>
+
       {canReview ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -116,7 +136,7 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
             Solicitar cambios
           </button>
         </>
-      ) : (
+      ) : canAdvance ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             La siguiente etapa está preparada y todavía no se ha ejecutado.
@@ -131,7 +151,23 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
             Ejecutar siguiente etapa
           </button>
         </>
+      ) : (
+        <>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            El workflow terminó y su revisión final fue aprobada. Registra el cierre cuando el resultado ya esté listo para llevarse a la práctica.
+          </p>
+          <button
+            type="button"
+            onClick={closeCase}
+            disabled={Boolean(busy) || closed}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
+          >
+            {busy === 'close' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+            {closed ? 'Caso marcado como resuelto' : 'Marcar como resuelto'}
+          </button>
+        </>
       )}
+
       {error && <p className="mt-3 text-sm font-semibold text-destructive">{error}</p>}
     </section>
   )
