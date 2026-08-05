@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 const closeRoute = await readFile('app/api/cases/[caseId]/close/route.ts', 'utf8')
 const archiveRoute = await readFile('app/api/cases/[caseId]/archive/route.ts', 'utf8')
 const livePage = await readFile('app/cases/[caseId]/live/page.tsx', 'utf8')
+const newCasePage = await readFile('app/cases/new/page.tsx', 'utf8')
 const caseCenter = await readFile('components/cases-workspace.tsx', 'utf8')
 const workflowActions = await readFile('components/cases/live-workflow-actions.tsx', 'utf8')
 
@@ -27,6 +28,11 @@ assert.match(livePage, /from\('agent_reviews'\)/)
 assert.match(livePage, /from\('compliance_case_events'\)/)
 assert.match(livePage, /FinalCaseSummary/)
 assert.doesNotMatch(livePage, /Math[.]random|progress\s*=|setTimeout/)
+
+// Una cuenta sin workspace debe completar onboarding antes de crear casos.
+assert.match(newCasePage, /from\('organization_members'\)/)
+assert.match(newCasePage, /eq\('user_id', user[.]id\)/)
+assert.match(newCasePage, /if \(!membership[?][.]organization_id\) redirect\('\/onboarding'\)/)
 
 // El usuario puede continuar desde el centro de casos sin confundir expediente y ejecución.
 assert.match(caseCenter, /\/cases\/\$\{item[.]id\}\/live/)

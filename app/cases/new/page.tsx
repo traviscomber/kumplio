@@ -15,6 +15,15 @@ export default async function NewCasePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in?next=/cases/new')
 
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('organization_id')
+    .eq('user_id', user.id)
+    .limit(1)
+    .maybeSingle()
+
+  if (!membership?.organization_id) redirect('/onboarding')
+
   return (
     <>
       <WorkspaceNav />
