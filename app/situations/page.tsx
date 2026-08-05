@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, CheckCircle2, CircleDot, ShieldAlert } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CheckCircle2, CircleDot, ShieldAlert } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -51,9 +52,7 @@ export default async function SituationsPage() {
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
             {situations.length === 0 ? 'No hay situaciones abiertas.' : `${situations.length} situaciones están siendo gestionadas.`}
           </h1>
-          <p className="mt-4 max-w-3xl text-muted-foreground">
-            Cada situación reúne el evento que ocurrió, su contexto, impacto, evidencia y siguiente acción en una sola entidad trazable.
-          </p>
+          <p className="mt-4 max-w-3xl text-muted-foreground">Cada situación reúne el evento, contexto, impacto, evidencia y siguiente acción en un expediente trazable.</p>
           <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold">
             <span className="rounded-full border px-3 py-1.5">{critical} críticas</span>
             <span className="rounded-full border px-3 py-1.5">{high} altas</span>
@@ -69,7 +68,7 @@ export default async function SituationsPage() {
               <p className="mt-2 text-sm text-muted-foreground">Los nuevos eventos aparecerán aquí solo cuando requieran atención.</p>
             </div>
           ) : situations.map((situation) => (
-            <article key={situation.id} className="rounded-2xl border bg-card p-5 sm:p-6">
+            <Link key={situation.id} href={`/situations/${situation.id}`} className="block rounded-2xl border bg-card p-5 transition-colors hover:bg-muted/50 sm:p-6">
               <div className="flex items-start gap-4">
                 <div className={severityTone(situation.severity)}>{severityIcon(situation.severity)}</div>
                 <div className="min-w-0 flex-1">
@@ -81,12 +80,11 @@ export default async function SituationsPage() {
                   </div>
                   <h2 className="mt-2 text-xl font-bold">{situation.title}</h2>
                   {situation.summary && <p className="mt-2 text-sm leading-6 text-muted-foreground">{situation.summary}</p>}
-                  {situation.recommendation && (
-                    <p className="mt-4 text-sm leading-6"><span className="font-semibold">Siguiente paso:</span> {situation.recommendation}</p>
-                  )}
+                  {situation.recommendation && <p className="mt-4 text-sm leading-6"><span className="font-semibold">Siguiente paso:</span> {situation.recommendation}</p>}
                 </div>
+                <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-primary" />
               </div>
-            </article>
+            </Link>
           ))}
         </section>
       </main>
