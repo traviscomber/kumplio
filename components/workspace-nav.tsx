@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, ClipboardCheck, Gauge, Gavel, Library, ListTodo, Network, Radar, Settings, Users, Workflow } from 'lucide-react'
+import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, CircleDotDashed, ClipboardCheck, Gauge, Gavel, Library, ListTodo, Network, Radar, Settings, Users, Workflow } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
 const items = [
   { href: '/dashboard', label: 'Hoy', icon: Building2 },
   { href: '/my-work', label: 'Mi trabajo', icon: ListTodo },
+  { href: '/situations', label: 'Situaciones', icon: CircleDotDashed },
   { href: '/operations', label: 'Operaciones', icon: Workflow },
   { href: '/decisions', label: 'Decisiones', icon: Gavel },
   { href: '/team', label: 'Equipo', icon: Users },
