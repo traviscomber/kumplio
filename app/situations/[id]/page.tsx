@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import type { ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import { ArrowLeft, ArrowRight, Brain, BriefcaseBusiness, FileCheck2, Gavel, ShieldAlert } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
@@ -103,7 +105,7 @@ export default async function SituationDetailPage({ params }: PageProps) {
   )
 }
 
-function Panel({ icon: Icon, title, children }: { icon: typeof FileCheck2; title: string; children: React.ReactNode }) {
+function Panel({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children: ReactNode }) {
   return <article className="rounded-2xl border bg-card p-5"><Icon className="h-5 w-5 text-primary" /><h2 className="mt-4 font-bold">{title}</h2><div className="mt-2 text-sm leading-6 text-muted-foreground">{children}</div></article>
 }
 
