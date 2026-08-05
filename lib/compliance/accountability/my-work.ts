@@ -22,6 +22,11 @@ export type PersonalWorkSummary = {
   unassignedDates: number
 }
 
+type MissionActionContext = {
+  organizationId: string
+  userId: string
+}
+
 export async function getPersonalWork(
   admin: SupabaseClient,
   organizationId: string,
@@ -82,6 +87,134 @@ export async function getPersonalWork(
     dueSoon: items.filter((item) => item.urgency === 'soon').length,
     unassignedDates: missionItems.filter((item) => item.urgency === 'unscheduled').length,
   }
+}
+
+export async function startAssignedMission(
+  admin: SupabaseClient,
+  context: MissionActionContext,
+  missionId: string,
+): Promise<void> {
+  const mission = await getAssignedMission(admin, context, missionId)
+  if (mission.status === 'completed' || mission.status === 'cancelled') {
+    throw new Error('La misión ya no admite cambios.')
+  }
+  if (mission.status === 'in_progress') return
+
+  const startedAt = new Date().toISOString()
+  const { error } = await admin
+    .from('missions')
+    .update({ status: 'in_progress', started_at: mission.started_at || startedAt, updated_at: startedAt })
+    .eq('id', missionId)
+    .eq('organization_id', context.organizationId)
+    .eq('owner_id', context.userId)
+
+  if (error) throw new Error(`No fue posible iniciar la misión: ${error.message}`)
+  await recordMissionEvent(admin, context, missionId, 'mission_started', mission.status, 'in_progress', {})
+}
+
+export async function rescheduleAssignedMission(
+  admin: SupabaseClient,
+  context: MissionActionContext,
+  missionId: string,
+  dueDate: string,
+): Promise<void> {
+  const mission = await getAssignedMission(admin, context, missionId)
+  if (mission.status === 'completed' || mission.status === 'cancelled') {
+    throw new Error('La misión ya no admite cambios.')
+  }
+
+  const parsed = new Date(`${dueDate}T23:59:59`)
+  if (!dueDate || Number.isNaN(parsed.getTime())) throw new Error('Selecciona una fecha válida.')
+
+  const dueAt = parsed.toISOString()
+  const { error } = await admin
+    .from('missions')
+    .update({ due_at: dueAt, updated_at: new Date().toISOString() })
+    .eq('id', missionId)
+    .eq('organization_id', context.organizationId)
+    .eq('owner_id', context.userId)
+
+  if (error) throw new Error(`No fue posible reprogramar la misión: ${error.message}`)
+  await recordMissionEvent(admin, context, missionId, 'mission_rescheduled', mission.status, mission.status, {
+    previous_due_at: mission.due_at,
+    due_at: dueAt,
+  })
+}
+
+export async function completeAssignedMission(
+  admin: SupabaseClient,
+  context: MissionActionContext,
+  missionId: string,
+  completionNotes: string,
+): Promise<void> {
+  const notes = completionNotes.trim()
+  if (notes.length < 3) throw new Error('Registra una nota breve para mantener la trazabilidad.')
+
+  const mission = await getAssignedMission(admin, context, missionId)
+  if (mission.status === 'completed') return
+  if (mission.status === 'cancelled') throw new Error('Una misión cancelada no puede completarse.')
+
+  const completedAt = new Date().toISOString()
+  const metadata = mission.metadata && typeof mission.metadata === 'object'
+    ? mission.metadata as Record<string, unknown>
+    : {}
+
+  const { error } = await admin
+    .from('missions')
+    .update({
+      status: 'completed',
+      completed_at: completedAt,
+      updated_at: completedAt,
+      metadata: { ...metadata, completion_notes: notes, completed_by: context.userId },
+    })
+    .eq('id', missionId)
+    .eq('organization_id', context.organizationId)
+    .eq('owner_id', context.userId)
+
+  if (error) throw new Error(`No fue posible completar la misión: ${error.message}`)
+  await recordMissionEvent(admin, context, missionId, 'mission_completed', mission.status, 'completed', {
+    completion_notes: notes,
+  })
+}
+
+async function getAssignedMission(
+  admin: SupabaseClient,
+  context: MissionActionContext,
+  missionId: string,
+) {
+  const { data, error } = await admin
+    .from('missions')
+    .select('id,status,started_at,due_at,metadata')
+    .eq('id', missionId)
+    .eq('organization_id', context.organizationId)
+    .eq('owner_id', context.userId)
+    .maybeSingle()
+
+  if (error) throw new Error(`No fue posible validar la misión: ${error.message}`)
+  if (!data) throw new Error('La misión no existe o no está asignada a tu usuario.')
+  return data
+}
+
+async function recordMissionEvent(
+  admin: SupabaseClient,
+  context: MissionActionContext,
+  missionId: string,
+  eventType: string,
+  fromStatus: string,
+  toStatus: string,
+  payload: Record<string, unknown>,
+) {
+  const { error } = await admin.from('mission_events').insert({
+    organization_id: context.organizationId,
+    mission_id: missionId,
+    event_type: eventType,
+    actor_type: 'user',
+    actor_user_id: context.userId,
+    from_status: fromStatus,
+    to_status: toStatus,
+    payload,
+  })
+  if (error) throw new Error(`La misión cambió, pero no fue posible registrar su trazabilidad: ${error.message}`)
 }
 
 function calculateUrgency(value: string | null, now: Date): WorkUrgency {
