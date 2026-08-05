@@ -24,15 +24,26 @@ const AUDIENCES: Array<{ value: UserAudience; label: string }> = [
   { value: 'industry', label: 'Industria' },
 ]
 
+type CreationStep = 'idle' | 'case' | 'workflow' | 'execution' | 'opening'
+
+const CREATION_LABELS: Record<CreationStep, string> = {
+  idle: 'Crear e iniciar caso',
+  case: 'Creando expediente...',
+  workflow: 'Preparando equipo...',
+  execution: 'Iniciando primera etapa...',
+  opening: 'Abriendo expediente...',
+}
+
 export function CaseResolutionStudio() {
   const router = useRouter()
   const [goal, setGoal] = useState('')
   const [audience, setAudience] = useState<UserAudience>('company')
   const [started, setStarted] = useState(false)
-  const [creating, setCreating] = useState(false)
+  const [creationStep, setCreationStep] = useState<CreationStep>('idle')
   const [error, setError] = useState('')
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null)
 
+  const creating = creationStep !== 'idle'
   const plan = useMemo(() => {
     if (!started || goal.trim().length < 8) return null
     return buildOrchestrationPlan({ goal, audience })
@@ -45,10 +56,10 @@ export function CaseResolutionStudio() {
     setStarted(true)
   }
 
-  async function createPersistentCase() {
+  async function createAndStartCase() {
     if (!plan || creating) return
 
-    setCreating(true)
+    setCreationStep('case')
     setError('')
     setCreatedCaseId(null)
 
@@ -75,6 +86,7 @@ export function CaseResolutionStudio() {
       const caseId = casePayload.complianceCase?.id as string | undefined
       if (!caseId) throw new Error('El caso fue creado sin un identificador válido')
       setCreatedCaseId(caseId)
+      setCreationStep('workflow')
 
       const workflowResponse = await fetch('/api/agents/workflows', {
         method: 'POST',
@@ -91,12 +103,26 @@ export function CaseResolutionStudio() {
         throw new Error(workflowPayload.error || 'El caso se creó, pero no fue posible preparar el workflow')
       }
 
+      const workflowId = workflowPayload.workflow?.id as string | undefined
+      if (!workflowId) throw new Error('El workflow fue creado sin un identificador válido')
+      setCreationStep('execution')
+
+      const advanceResponse = await fetch(`/api/agents/workflows/${workflowId}/advance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const advancePayload = await advanceResponse.json()
+      if (!advanceResponse.ok) {
+        throw new Error(advancePayload.error || 'El expediente está listo, pero no fue posible iniciar la primera etapa')
+      }
+
+      setCreationStep('opening')
       router.push(`/cases/${caseId}`)
       router.refresh()
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'No fue posible preparar el caso')
-    } finally {
-      setCreating(false)
+      setError(caught instanceof Error ? caught.message : 'No fue posible iniciar el caso')
+      setCreationStep('idle')
     }
   }
 
@@ -109,7 +135,7 @@ export function CaseResolutionStudio() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Nuevo caso</p>
               <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">{plan.goal}</h1>
               <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
-                Kumplio interpretó el objetivo y preparó el equipo de trabajo. Los análisis comenzarán únicamente desde el expediente persistente.
+                Kumplio interpretó el objetivo y preparó el equipo. Al continuar se creará el expediente y comenzará una etapa real del workflow.
               </p>
             </div>
             <button
@@ -128,7 +154,7 @@ export function CaseResolutionStudio() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <SummaryItem icon={<Users className="h-5 w-5" />} label="Especialistas asignados" value={String(plan.tasks.length)} />
-            <SummaryItem icon={<Clock3 className="h-5 w-5" />} label="Estado" value="Listo para crear" />
+            <SummaryItem icon={<Clock3 className="h-5 w-5" />} label="Estado" value={creating ? CREATION_LABELS[creationStep] : 'Listo para iniciar'} />
             <SummaryItem icon={<ShieldCheck className="h-5 w-5" />} label="Revisión final" value="Julieta" />
           </div>
         </header>
@@ -140,7 +166,7 @@ export function CaseResolutionStudio() {
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Equipo preparado</p>
                 <h2 className="mt-2 text-2xl font-black">Trabajo propuesto para este caso</h2>
               </div>
-              <span className="rounded-full border bg-muted/40 px-3 py-1 text-xs font-semibold text-muted-foreground">Sin ejecución simulada</span>
+              <span className="rounded-full border bg-muted/40 px-3 py-1 text-xs font-semibold text-muted-foreground">Estados desde backend</span>
             </div>
 
             <div className="mt-7 space-y-4">
@@ -178,7 +204,7 @@ export function CaseResolutionStudio() {
               <FileSearch className="h-6 w-6 text-primary" />
               <h2 className="mt-4 text-xl font-black">Contexto por completar</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                El expediente puede crearse ahora. Antes o durante la ejecución, Kumplio solicitará únicamente lo que sea necesario.
+                El expediente puede iniciarse ahora. Los especialistas deberán marcar como pendiente cualquier conclusión que no tenga respaldo suficiente.
               </p>
               <ul className="mt-5 space-y-3">
                 {plan.missingContext.map((item) => (
@@ -202,7 +228,7 @@ export function CaseResolutionStudio() {
 
               {error && (
                 <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-                  <p className="font-semibold">No se pudo completar la preparación.</p>
+                  <p className="font-semibold">No se pudo completar el inicio.</p>
                   <p className="mt-1">{error}</p>
                   {createdCaseId && (
                     <button
@@ -210,7 +236,7 @@ export function CaseResolutionStudio() {
                       onClick={() => router.push(`/cases/${createdCaseId}`)}
                       className="mt-3 font-semibold underline underline-offset-4"
                     >
-                      Abrir el caso creado
+                      Abrir y continuar desde el expediente
                     </button>
                   )}
                 </div>
@@ -218,16 +244,16 @@ export function CaseResolutionStudio() {
 
               <button
                 type="button"
-                onClick={createPersistentCase}
+                onClick={createAndStartCase}
                 disabled={creating}
                 className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {creating ? 'Creando expediente...' : 'Crear y abrir caso'}
+                {CREATION_LABELS[creationStep]}
                 {!creating ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
               </button>
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                Se creará un expediente y un workflow auditable. Ningún especialista se mostrará como activo antes de iniciar una etapa real.
+                La primera etapa usa el motor persistente existente. Los estados, ejecuciones y artefactos quedarán registrados en el expediente.
               </p>
             </section>
           </aside>
