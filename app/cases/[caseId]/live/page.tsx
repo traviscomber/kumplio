@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
+import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
@@ -72,7 +73,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
     ? await Promise.all([
         supabase
           .from('agent_workflow_stages')
-          .select('id, stage_index, agent_id, label, status, attempt_count, output_artifact_id, started_at, completed_at, updated_at')
+          .select('id, stage_index, agent_id, label, status, attempt_count, run_id, output_artifact_id, started_at, completed_at, updated_at')
           .eq('workflow_id', workflow.id)
           .eq('organization_id', organizationId)
           .order('stage_index', { ascending: true }),
@@ -98,6 +99,9 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
   const events = eventsResult.data || []
   const active = Boolean(workflow && ['draft', 'queued', 'running', 'pending_review', 'paused'].includes(workflow.status))
   const completedStages = stages.filter((stage) => ['completed', 'approved'].includes(stage.status)).length
+  const currentStage = workflow
+    ? stages.find((stage) => stage.stage_index === workflow.current_stage) || null
+    : null
 
   return (
     <>
@@ -177,6 +181,13 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
               </section>
 
               <aside className="space-y-6">
+                <LiveWorkflowActions
+                  workflowId={workflow.id}
+                  runId={currentStage?.run_id || null}
+                  stageStatus={currentStage?.status || null}
+                  workflowStatus={workflow.status}
+                />
+
                 <section className="rounded-2xl border bg-background/50 p-5">
                   <div className="flex items-center gap-2">
                     <FileCheck2 className="h-5 w-5 text-primary" />
