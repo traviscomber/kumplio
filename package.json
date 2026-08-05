@@ -23,7 +23,8 @@
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
     "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
     "check:case-lifecycle": "node scripts/check-case-lifecycle-v1.mjs",
-    "check:operational-security": "node scripts/check-operational-security-v1.mjs"
+    "check:operational-security": "node scripts/check-operational-security-v1.mjs",
+    "check:agent-dashboard": "node scripts/check-agent-dashboard-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
