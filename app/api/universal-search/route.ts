@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rankDocuments } from '@/lib/compliance/documents/semantic-search'
 
 type SearchItem = {
   id: string
@@ -7,6 +8,8 @@ type SearchItem = {
   title: string
   subtitle: string
   href: string
+  score?: number
+  metadata?: Record<string, unknown>
 }
 
 export async function GET(request: NextRequest) {
@@ -38,21 +41,53 @@ export async function GET(request: NextRequest) {
     supabase.from('mission_playbooks').select('id,name,objective,vertical').eq('status', 'published').or(`name.ilike.${pattern},objective.ilike.${pattern}`).limit(8),
   ])
 
-  const [risks, documents] = projectIds.length
+  const [risks, documentRows] = projectIds.length
     ? await Promise.all([
         supabase.from('risks').select('id,risk_description,risk_score,impact,mitigation_status').in('project_id', projectIds).ilike('risk_description', pattern).limit(8),
-        supabase.from('documents').select('id,name,document_type,status').in('project_id', projectIds).ilike('name', pattern).limit(8),
+        supabase.from('documents').select('id,name,document_type,status,extracted_text').in('project_id', projectIds).limit(150),
       ])
     : [{ data: [] }, { data: [] }]
+
+  const rankedDocuments = rankDocuments(
+    query,
+    ((documentRows.data || []) as Array<{ id: string; name: string; document_type: string | null; status: string | null; extracted_text: string | null }>).map((row) => ({
+      id: row.id,
+      title: row.name,
+      text: row.extracted_text,
+      documentType: row.document_type,
+      status: row.status,
+      href: `/entities/document/${row.id}`,
+    })),
+    10,
+  )
 
   const results: SearchItem[] = [
     ...(missions.data || []).map((row) => ({ id: row.id, type: 'mission', title: row.title, subtitle: row.objective || row.status, href: `/missions/${row.id}` })),
     ...(controls.data || []).map((row) => ({ id: row.id, type: 'control', title: row.name, subtitle: row.description || row.status || 'Control', href: `/entities/control/${row.id}` })),
     ...(evidence.data || []).map((row) => ({ id: row.id, type: 'evidence', title: row.name, subtitle: row.description || row.validation_status || 'Evidencia', href: `/entities/evidence/${row.id}` })),
     ...((risks.data || []) as Array<{ id: string; risk_description: string; risk_score: number | null; impact: string | null; mitigation_status: string | null }>).map((row) => ({ id: row.id, type: 'risk', title: row.risk_description, subtitle: row.impact || row.mitigation_status || (row.risk_score == null ? 'Riesgo' : `Score ${row.risk_score}`), href: `/entities/risk/${row.id}` })),
-    ...((documents.data || []) as Array<{ id: string; name: string; document_type: string | null; status: string | null }>).map((row) => ({ id: row.id, type: 'document', title: row.name, subtitle: row.document_type || row.status || 'Documento', href: `/entities/document/${row.id}` })),
+    ...rankedDocuments.map((row) => ({
+      id: row.id,
+      type: 'document',
+      title: row.title,
+      subtitle: documentSubtitle(row),
+      href: row.href,
+      score: row.score,
+      metadata: {
+        kind: row.classification.kind,
+        confidence: row.classification.confidence,
+        domains: row.classification.domains,
+        matchedTerms: row.matchedTerms,
+      },
+    })),
     ...(playbooks.data || []).map((row) => ({ id: row.id, type: 'playbook', title: row.name, subtitle: row.objective || row.vertical || 'Playbook', href: `/entities/playbook/${row.id}` })),
   ]
 
   return NextResponse.json({ results })
+}
+
+function documentSubtitle(document: ReturnType<typeof rankDocuments>[number]) {
+  const kind = document.classification.kind === 'unknown' ? document.documentType || 'Documento' : document.classification.kind
+  const domains = document.classification.domains.length ? ` · ${document.classification.domains.join(', ')}` : ''
+  return `${kind}${domains} · coincidencia ${document.score}`
 }
