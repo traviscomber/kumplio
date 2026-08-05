@@ -1,11 +1,19 @@
 import Link from 'next/link'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { AlertTriangle, ArrowRight, CalendarClock, CheckCircle2, Clock3, UserCheck } from 'lucide-react'
+import { AlertTriangle, ArrowRight, CalendarClock, CheckCircle2, Clock3, Play, UserCheck } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
-import { getPersonalWork, type PersonalWorkItem, type WorkUrgency } from '@/lib/compliance/accountability/my-work'
+import {
+  completeAssignedMission,
+  getPersonalWork,
+  rescheduleAssignedMission,
+  startAssignedMission,
+  type PersonalWorkItem,
+  type WorkUrgency,
+} from '@/lib/compliance/accountability/my-work'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +25,37 @@ export default async function MyWorkPage() {
   const admin = createAdminClient()
   const access = await getWorkspaceAccess(admin, user.id)
   if (!access) redirect('/onboarding')
+
+  async function startMission(formData: FormData) {
+    'use server'
+    const context = await getActionContext()
+    await startAssignedMission(context.admin, context.access, String(formData.get('missionId') || ''))
+    revalidateWork()
+  }
+
+  async function rescheduleMission(formData: FormData) {
+    'use server'
+    const context = await getActionContext()
+    await rescheduleAssignedMission(
+      context.admin,
+      context.access,
+      String(formData.get('missionId') || ''),
+      String(formData.get('dueDate') || ''),
+    )
+    revalidateWork()
+  }
+
+  async function completeMission(formData: FormData) {
+    'use server'
+    const context = await getActionContext()
+    await completeAssignedMission(
+      context.admin,
+      context.access,
+      String(formData.get('missionId') || ''),
+      String(formData.get('completionNotes') || ''),
+    )
+    revalidateWork()
+  }
 
   const work = await getPersonalWork(admin, access.organizationId, user.id)
 
@@ -30,7 +69,7 @@ export default async function MyWorkPage() {
             {work.items.length === 0 ? 'No tienes asuntos asignados.' : `${work.items.length} asuntos requieren tu atención.`}
           </h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Kumplio reúne misiones y decisiones asignadas en una sola bandeja, ordenadas por vencimiento e impacto.
+            Inicia, reprograma y cierra tus misiones desde una sola bandeja. Cada cambio queda registrado para auditoría.
           </p>
         </section>
 
@@ -48,7 +87,15 @@ export default async function MyWorkPage() {
               <h2 className="mt-4 text-xl font-bold">Todo está al día.</h2>
               <p className="mt-2 text-sm text-muted-foreground">Cuando te asignen una misión o decisión aparecerá aquí.</p>
             </div>
-          ) : work.items.map((item) => <WorkCard key={`${item.kind}-${item.id}`} item={item} />)}
+          ) : work.items.map((item) => (
+            <WorkCard
+              key={`${item.kind}-${item.id}`}
+              item={item}
+              startAction={startMission}
+              rescheduleAction={rescheduleMission}
+              completeAction={completeMission}
+            />
+          ))}
         </section>
 
         {(work.overdue > 0 || work.dueToday > 0) && (
@@ -64,6 +111,23 @@ export default async function MyWorkPage() {
   )
 }
 
+async function getActionContext() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/sign-in?next=/my-work')
+
+  const admin = createAdminClient()
+  const access = await getWorkspaceAccess(admin, user.id)
+  if (!access) redirect('/onboarding')
+  return { admin, access }
+}
+
+function revalidateWork() {
+  revalidatePath('/my-work')
+  revalidatePath('/dashboard')
+  revalidatePath('/missions')
+}
+
 function SummaryCard({ label, value, icon: Icon }: { label: string; value: number; icon: typeof AlertTriangle }) {
   return (
     <div className="rounded-2xl border bg-card p-5">
@@ -74,7 +138,17 @@ function SummaryCard({ label, value, icon: Icon }: { label: string; value: numbe
   )
 }
 
-function WorkCard({ item }: { item: PersonalWorkItem }) {
+function WorkCard({
+  item,
+  startAction,
+  rescheduleAction,
+  completeAction,
+}: {
+  item: PersonalWorkItem
+  startAction: (formData: FormData) => Promise<void>
+  rescheduleAction: (formData: FormData) => Promise<void>
+  completeAction: (formData: FormData) => Promise<void>
+}) {
   return (
     <article className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
@@ -84,9 +158,48 @@ function WorkCard({ item }: { item: PersonalWorkItem }) {
             <span>{item.kind === 'decision' ? 'Decisión' : 'Misión'}</span>
             <span>Prioridad {priorityLabel(item.priority)}</span>
             <span>{urgencyLabel(item.urgency, item.dueAt)}</span>
+            {item.kind === 'mission' && <span>{statusLabel(item.status)}</span>}
           </div>
           <h2 className="mt-2 text-xl font-bold">{item.title}</h2>
           {item.summary && <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.summary}</p>}
+
+          {item.kind === 'mission' && (
+            <div className="mt-5 grid gap-3 lg:grid-cols-3">
+              {item.status !== 'in_progress' && (
+                <form action={startAction}>
+                  <input type="hidden" name="missionId" value={item.id} />
+                  <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold hover:bg-muted">
+                    <Play className="h-4 w-4" /> Iniciar
+                  </button>
+                </form>
+              )}
+
+              <form action={rescheduleAction} className="flex gap-2">
+                <input type="hidden" name="missionId" value={item.id} />
+                <input
+                  type="date"
+                  name="dueDate"
+                  required
+                  defaultValue={dateInputValue(item.dueAt)}
+                  className="min-w-0 flex-1 rounded-xl border bg-background px-3 py-2 text-sm"
+                  aria-label={`Nueva fecha para ${item.title}`}
+                />
+                <button className="rounded-xl border px-3 py-2 text-sm font-bold hover:bg-muted">Guardar</button>
+              </form>
+
+              <form action={completeAction} className="flex gap-2 lg:col-span-1">
+                <input type="hidden" name="missionId" value={item.id} />
+                <input
+                  name="completionNotes"
+                  required
+                  minLength={3}
+                  placeholder="Nota de cierre"
+                  className="min-w-0 flex-1 rounded-xl border bg-background px-3 py-2 text-sm"
+                />
+                <button className="rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground">Completar</button>
+              </form>
+            </div>
+          )}
         </div>
         <Link href={item.href} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground">
           Abrir <ArrowRight className="h-4 w-4" />
@@ -117,6 +230,12 @@ function urgencyLabel(urgency: WorkUrgency, dueAt: string | null) {
   return 'Sin fecha definida'
 }
 
+function statusLabel(status: string) {
+  if (status === 'in_progress') return 'En curso'
+  if (status === 'blocked') return 'Bloqueada'
+  return 'Pendiente'
+}
+
 function priorityLabel(priority: string) {
   if (priority === 'critical') return 'crítica'
   if (priority === 'high') return 'alta'
@@ -127,4 +246,9 @@ function priorityLabel(priority: string) {
 function formatDate(value: string | null) {
   if (!value) return ''
   return new Date(value).toLocaleDateString('es-CL', { dateStyle: 'medium' })
+}
+
+function dateInputValue(value: string | null) {
+  if (!value) return ''
+  return new Date(value).toISOString().slice(0, 10)
 }
