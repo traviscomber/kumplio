@@ -1,4 +1,5 @@
 import type { AgentId } from './catalog'
+import type { WorkflowType } from './orchestration'
 
 export type UserAudience = 'person' | 'company' | 'professional' | 'industry'
 
@@ -47,6 +48,12 @@ export function inferCaseIntent(goal: string): CaseIntent {
   }
 
   return best.intent
+}
+
+export function workflowTypeForIntent(intent: CaseIntent): WorkflowType {
+  if (intent === 'review-document') return 'contract_review'
+  if (intent === 'prepare-audit' || intent === 'improve-system') return 'control_assessment'
+  return 'compliance_assessment'
 }
 
 export function buildOrchestrationPlan(input: {
