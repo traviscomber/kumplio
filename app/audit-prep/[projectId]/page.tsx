@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CheckCircle2, FileArchive, RefreshCw } from 'lucide-react'
+import { CheckCircle2, Download, FileArchive, RefreshCw } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -76,11 +77,19 @@ export default async function AuditPrepPage({ params }: PageProps) {
           <p className="mt-4 max-w-2xl text-muted-foreground">
             El paquete conserva una fotografía reproducible de obligaciones, controles, evidencia y hallazgos.
           </p>
-          <form action={rebuild} className="mt-6">
-            <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground">
-              <RefreshCw className="h-4 w-4" /> Actualizar paquete
-            </button>
-          </form>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <form action={rebuild}>
+              <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground sm:w-auto">
+                <RefreshCw className="h-4 w-4" /> Actualizar paquete
+              </button>
+            </form>
+            <Link
+              href={`/api/audit-packages/${projectId}`}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border bg-background px-4 py-3 text-sm font-bold hover:bg-muted"
+            >
+              <Download className="h-4 w-4" /> Descargar paquete
+            </Link>
+          </div>
         </section>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
