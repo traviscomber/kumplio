@@ -6,7 +6,7 @@ import type { AgentId } from './catalog'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
-const MODEL = process.env.OPENAI_REASONING_MODEL || 'gpt-5.6'
+const MODEL = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-5'
 const MAX_OUTPUT_TOKENS = 16000
 const REQUEST_TIMEOUT_MS = 280000
 
@@ -82,9 +82,7 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
       instructions,
       input: userInput,
       reasoning: {
-        effort: 'max',
-        mode: 'pro',
-        context: 'auto',
+        effort: 'high',
       },
       text: {
         verbosity: 'high',
