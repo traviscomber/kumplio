@@ -12,6 +12,29 @@ export type VendorAssessment = {
   assessedAt: string
 }
 
+export type AuditEvidenceItem = {
+  id: string
+  name: string
+  type: string | null
+  status: string | null
+}
+
+export type AuditFindingItem = {
+  id: string
+  description: string
+  type: string | null
+  status: string | null
+}
+
+export type AuditPackage = {
+  id: string
+  status: string
+  summary: Record<string, number>
+  evidenceSnapshot: AuditEvidenceItem[]
+  findingsSnapshot: AuditFindingItem[]
+  generatedAt: string
+}
+
 export async function refreshVendorAssessments(admin: SupabaseClient, organizationId: string): Promise<VendorAssessment[]> {
   const { data, error } = await admin.rpc('refresh_vendor_assessments_v1', { p_organization_id: organizationId })
   if (error) throw new Error(`No fue posible evaluar proveedores: ${error.message}`)
@@ -27,27 +50,49 @@ export async function refreshVendorAssessments(admin: SupabaseClient, organizati
   return rows.map((row) => {
     const vendor = vendorMap.get(row.vendor_id)
     return {
-      id: row.id,
-      vendorId: row.vendor_id,
+      id: String(row.id),
+      vendorId: String(row.vendor_id),
       vendorName: vendor?.name || 'Proveedor',
       serviceCategory: vendor?.service_category || null,
       riskScore: Number(row.risk_score || 0),
-      riskLevel: row.risk_level,
-      findings: Array.isArray(row.findings) ? row.findings.filter(Boolean) : [],
-      recommendedAction: row.recommended_action,
-      assessedAt: row.assessed_at,
+      riskLevel: normalizeRiskLevel(row.risk_level),
+      findings: normalizeVendorFindings(row.findings),
+      recommendedAction: String(row.recommended_action || 'Revisar antecedentes del proveedor.'),
+      assessedAt: String(row.assessed_at || new Date().toISOString()),
     }
   })
 }
 
-export async function prepareAuditPackage(admin: SupabaseClient, organizationId: string, projectId: string, userId: string) {
+export async function getLatestAuditPackage(
+  admin: SupabaseClient,
+  organizationId: string,
+  projectId: string,
+): Promise<AuditPackage | null> {
+  const { data, error } = await admin
+    .from('audit_preparation_packages')
+    .select('id,status,summary,evidence_snapshot,findings_snapshot,generated_at')
+    .eq('organization_id', organizationId)
+    .eq('project_id', projectId)
+    .maybeSingle()
+
+  if (error) throw new Error(`No fue posible cargar el paquete de auditoría: ${error.message}`)
+  return data ? normalizeAuditPackage(data) : null
+}
+
+export async function prepareAuditPackage(
+  admin: SupabaseClient,
+  organizationId: string,
+  projectId: string,
+  userId: string,
+): Promise<AuditPackage> {
   const { data, error } = await admin.rpc('prepare_audit_package_v1', {
     p_organization_id: organizationId,
     p_project_id: projectId,
     p_generated_by: userId,
   })
   if (error) throw new Error(`No fue posible preparar la auditoría: ${error.message}`)
-  return data
+  if (!data || typeof data !== 'object') throw new Error('La preparación de auditoría no devolvió un paquete válido.')
+  return normalizeAuditPackage(data)
 }
 
 export async function getMarketplace(admin: SupabaseClient, organizationId: string) {
@@ -83,8 +128,67 @@ export async function getMarketplace(admin: SupabaseClient, organizationId: stri
       ...item,
       versionId: version?.id || null,
       manifest: version?.manifest || {},
-      requiredPermissions: version?.required_permissions || [],
+      requiredPermissions: Array.isArray(version?.required_permissions) ? version.required_permissions.filter((value): value is string => typeof value === 'string') : [],
       installed: version ? installedVersionIds.has(version.id) : false,
     }
   })
+}
+
+function normalizeAuditPackage(value: unknown): AuditPackage {
+  const row = value as Record<string, unknown>
+  return {
+    id: String(row.id || ''),
+    status: String(row.status || 'ready'),
+    summary: normalizeSummary(row.summary),
+    evidenceSnapshot: normalizeEvidence(row.evidence_snapshot),
+    findingsSnapshot: normalizeFindings(row.findings_snapshot),
+    generatedAt: String(row.generated_at || new Date().toISOString()),
+  }
+}
+
+function normalizeSummary(value: unknown): Record<string, number> {
+  if (!value || typeof value !== 'object') return {}
+  return Object.fromEntries(Object.entries(value).map(([key, amount]) => [key, Number(amount || 0)]))
+}
+
+function normalizeEvidence(value: unknown): AuditEvidenceItem[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    return [{
+      id: String(row.id || ''),
+      name: String(row.name || 'Evidencia'),
+      type: typeof row.type === 'string' ? row.type : null,
+      status: typeof row.status === 'string' ? row.status : null,
+    }]
+  })
+}
+
+function normalizeFindings(value: unknown): AuditFindingItem[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    return [{
+      id: String(row.id || ''),
+      description: String(row.description || 'Hallazgo'),
+      type: typeof row.type === 'string' ? row.type : null,
+      status: typeof row.status === 'string' ? row.status : null,
+    }]
+  })
+}
+
+function normalizeVendorFindings(value: unknown): Array<{ code: string; label: string }> {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((item) => {
+    if (!item || typeof item !== 'object') return []
+    const row = item as Record<string, unknown>
+    return [{ code: String(row.code || 'finding'), label: String(row.label || 'Revisión pendiente') }]
+  })
+}
+
+function normalizeRiskLevel(value: unknown): VendorAssessment['riskLevel'] {
+  if (value === 'critical' || value === 'high' || value === 'medium' || value === 'low') return value
+  return 'medium'
 }
