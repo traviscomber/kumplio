@@ -27,6 +27,50 @@ export function AgentDashboard() {
   ])
 
   const [analyzing, setAnalyzing] = useState(false)
+  const [task, setTask] = useState('Revisar el cumplimiento de la Ley 21.719 y preparar un diagnóstico inicial para mi organización.')
+  const [error, setError] = useState<string | null>(null)
+  const [lastRunId, setLastRunId] = useState<string | null>(null)
+
+  const runAnalysis = async () => {
+    if (task.trim().length < 10 || analyzing) return
+
+    setAnalyzing(true)
+    setError(null)
+    setLastRunId(null)
+    setAgents((current) => current.map((agent) => ({ ...agent, status: 'running' })))
+
+    try {
+      const response = await fetch('/api/agents/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: 'isidora', task: task.trim() }),
+      })
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload.error || 'No fue posible ejecutar el análisis')
+      }
+
+      setLastRunId(payload.runId || null)
+      setAgents((current) => current.map((agent) => ({
+        ...agent,
+        status: agent.agentId === 'isidora-analyzer' ? 'success' : 'idle',
+        lastRun: agent.agentId === 'isidora-analyzer' ? new Date() : agent.lastRun,
+        executionTimeMs: agent.agentId === 'isidora-analyzer' ? payload.elapsedMs : agent.executionTimeMs,
+        tokensUsed: agent.agentId === 'isidora-analyzer' && payload.result?.usage
+          ? { input: payload.result.usage.inputTokens, output: payload.result.usage.outputTokens }
+          : agent.tokensUsed,
+      })))
+    } catch (runError) {
+      setError(runError instanceof Error ? runError.message : 'No fue posible ejecutar el análisis')
+      setAgents((current) => current.map((agent) => ({
+        ...agent,
+        status: agent.agentId === 'isidora-analyzer' ? 'error' : 'idle',
+      })))
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -53,7 +97,7 @@ export function AgentDashboard() {
               </CardTitle>
               <CardDescription>6 agentes IA especializados para análisis de cumplimiento</CardDescription>
             </div>
-            <Button onClick={() => setAnalyzing(!analyzing)} disabled={analyzing}>
+            <Button onClick={runAnalysis} disabled={analyzing || task.trim().length < 10}>
               {analyzing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -65,7 +109,21 @@ export function AgentDashboard() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="agent-task" className="text-sm font-medium">Tarea del análisis</label>
+            <textarea
+              id="agent-task"
+              value={task}
+              onChange={(event) => setTask(event.target.value)}
+              placeholder="Describe qué debe revisar el agente..."
+              disabled={analyzing}
+              rows={3}
+              className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 shadow-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+            {lastRunId && <p className="text-sm text-muted-foreground">Análisis enviado a revisión. ID: {lastRunId}</p>}
+          </div>
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList>
               <TabsTrigger value="overview">Resumen</TabsTrigger>
