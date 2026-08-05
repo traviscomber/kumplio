@@ -18,7 +18,7 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
   const [error, setError] = useState('')
 
   const canReview = Boolean(runId && stageStatus === 'pending_review')
-  const canAdvance = ['draft', 'running', 'paused'].includes(workflowStatus) && !canReview
+  const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview
 
   async function request(path: string, body: unknown) {
     const response = await fetch(path, {
