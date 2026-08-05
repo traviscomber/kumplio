@@ -16,7 +16,7 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio es un software chileno de cumplimiento normativo e inteligencia regulatoria que convierte fuentes, obligaciones y contexto organizacional en controles, misiones, evidencia y decisiones revisables.'
+  'Kumplio revisa normativa, contratos, políticas y evidencias para mostrar qué cambió, cómo afecta a una empresa y qué decisión debe tomar su equipo.'
 
 export const POWERED_BY_DESCRIPTION =
   'Kumplio es un producto desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.'
@@ -29,13 +29,13 @@ export const PUBLIC_CONTACT = {
 }
 
 export const CORE_CAPABILITIES = [
-  'Conocimiento regulatorio con fuentes identificables',
-  'Contexto privado y aislado por organización',
-  'Obligaciones, controles, evidencia, riesgos y acciones',
-  'Misiones con responsables y criterios de éxito',
-  'Resultados versionados y revisables',
-  'Asistencia mediante IA con revisión humana',
-  'Preparación operativa para la Ley 21.719',
+  'Detectar cambios normativos desde fuentes identificables',
+  'Relacionar cambios con contratos, políticas, proveedores y procesos',
+  'Descartar automáticamente lo que no requiere acción',
+  'Preparar decisiones explicables con evidencia y precedentes',
+  'Convertir decisiones aprobadas en trabajo con responsables y fechas',
+  'Conservar trazabilidad para auditorías y revisiones',
+  'Mantener siempre el control y la decisión humana',
 ]
 
 export const PUBLIC_LIMITATIONS = [
