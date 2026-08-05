@@ -2,42 +2,55 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, BarChart3, Bot, Brain, BriefcaseBusiness, Building2, CircleDotDashed, ClipboardCheck, Gauge, Gavel, Library, ListTodo, Network, Radar, Settings, Sparkles, Users, Workflow } from 'lucide-react'
+import { Building2, Gauge, ListTodo, Settings, ShieldCheck, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
-const items = [
-  { href: '/dashboard', label: 'Hoy', icon: Building2 },
-  { href: '/advisor', label: 'Advisor', icon: Sparkles },
-  { href: '/my-work', label: 'Mi trabajo', icon: ListTodo },
-  { href: '/situations', label: 'Situaciones', icon: CircleDotDashed },
-  { href: '/context', label: 'Contexto', icon: Brain },
-  { href: '/operations', label: 'Operaciones', icon: Workflow },
-  { href: '/decisions', label: 'Decisiones', icon: Gavel },
-  { href: '/team', label: 'Equipo', icon: Users },
-  { href: '/review-center', label: 'Revisiones', icon: ClipboardCheck },
-  { href: '/executive', label: 'Ejecutivo', icon: Gauge },
-  { href: '/missions', label: 'Trabajo', icon: BriefcaseBusiness },
-  { href: '/roc', label: 'ROC', icon: Radar },
-  { href: '/digital-twin', label: 'Gemelo', icon: Network },
-  { href: '/libraries', label: 'Bibliotecas', icon: Library },
-  { href: '/copilot', label: 'Copilot', icon: Bot },
-  { href: '/ai-platform', label: 'IA', icon: Activity },
-  { href: '/analytics', label: 'Análisis', icon: BarChart3 },
+const areas = [
+  {
+    href: '/advisor',
+    label: 'Hoy',
+    icon: Sparkles,
+    routes: ['/advisor', '/dashboard'],
+  },
+  {
+    href: '/my-work',
+    label: 'Trabajo',
+    icon: ListTodo,
+    routes: ['/my-work', '/missions', '/decisions', '/review-center', '/operations'],
+  },
+  {
+    href: '/context',
+    label: 'Organización',
+    icon: Building2,
+    routes: ['/context', '/team', '/libraries', '/digital-twin', '/settings'],
+  },
+  {
+    href: '/situations',
+    label: 'Cumplimiento',
+    icon: ShieldCheck,
+    routes: ['/situations', '/roc', '/rules', '/event-recovery', '/copilot', '/ai-platform'],
+  },
+  {
+    href: '/executive',
+    label: 'Ejecutivo',
+    icon: Gauge,
+    routes: ['/executive', '/analytics'],
+  },
 ] as const
 
 export function WorkspaceNav() {
   const pathname = usePathname()
-  const activeHref = [...items]
-    .filter(({ href }) => pathname === href || pathname.startsWith(`${href}/`))
-    .sort((left, right) => right.href.length - left.href.length)[0]?.href
+  const activeArea = areas.find(({ routes }) =>
+    routes.some((route) => pathname === route || pathname.startsWith(`${route}/`)),
+  )?.href
 
   return (
-    <nav aria-label="Navegación principal de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+    <nav aria-label="Áreas principales de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
       <div className="container mx-auto flex items-center gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-          {items.map(({ href, label, icon: Icon }) => {
-            const active = href === activeHref
+          {areas.map(({ href, label, icon: Icon }) => {
+            const active = href === activeArea
             return (
               <Link
                 key={href}
