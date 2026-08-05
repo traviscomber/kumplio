@@ -1,9 +1,13 @@
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { Box, CheckCircle2, LockKeyhole, ShieldCheck } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getMarketplace } from '@/lib/compliance/operations/vendor-audit-marketplace'
+import {
+  getMarketplace,
+  installMarketplacePack,
+} from '@/lib/compliance/operations/vendor-audit-marketplace'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +24,34 @@ export default async function MarketplacePage() {
     .limit(1)
     .maybeSingle()
   if (!membership?.organization_id) redirect('/onboarding')
+
+  async function installPack(formData: FormData) {
+    'use server'
+
+    const versionId = String(formData.get('versionId') || '')
+    if (!versionId) throw new Error('No se recibió una versión válida del pack.')
+
+    const serverSupabase = await createClient()
+    const { data: { user: currentUser } } = await serverSupabase.auth.getUser()
+    if (!currentUser) redirect('/sign-in?next=/marketplace')
+
+    const serverAdmin = createAdminClient()
+    const { data: currentMembership } = await serverAdmin
+      .from('organization_members')
+      .select('organization_id')
+      .eq('user_id', currentUser.id)
+      .limit(1)
+      .maybeSingle()
+    if (!currentMembership?.organization_id) redirect('/onboarding')
+
+    await installMarketplacePack(
+      serverAdmin,
+      currentMembership.organization_id,
+      versionId,
+      currentUser.id,
+    )
+    revalidatePath('/marketplace')
+  }
 
   const items = await getMarketplace(admin, membership.organization_id)
 
@@ -73,12 +105,16 @@ export default async function MarketplacePage() {
                   </div>
                 </details>
               )}
-              <button
-                disabled={item.installed || !item.versionId}
-                className="mt-5 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {item.installed ? 'Ya instalado' : item.versionId ? 'Solicitar instalación' : 'Versión no disponible'}
-              </button>
+              <form action={installPack} className="mt-5">
+                <input type="hidden" name="versionId" value={item.versionId || ''} />
+                <button
+                  type="submit"
+                  disabled={item.installed || !item.versionId}
+                  className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {item.installed ? 'Ya instalado' : item.versionId ? 'Instalar pack' : 'Versión no disponible'}
+                </button>
+              </form>
             </article>
           ))}
         </section>
