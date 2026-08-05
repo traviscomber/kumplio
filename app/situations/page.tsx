@@ -5,6 +5,7 @@ import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
+import { humanSeverity, humanStatus } from '@/lib/product/language'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,9 +49,9 @@ export default async function SituationsPage() {
       <WorkspaceNav />
       <main className="container mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <section className="rounded-3xl border bg-card p-6 sm:p-8">
-          <p className="text-sm font-semibold text-primary">Situaciones</p>
+          <p className="text-sm font-semibold text-primary">Cumplimiento</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {situations.length === 0 ? 'No hay situaciones abiertas.' : `${situations.length} situaciones están siendo gestionadas.`}
+            {situations.length === 0 ? 'No hay situaciones abiertas.' : `${situations.length} situaciones requieren seguimiento.`}
           </h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">Cada situación reúne el evento, contexto, impacto, evidencia y siguiente acción en un expediente trazable.</p>
           <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold">
@@ -74,8 +75,8 @@ export default async function SituationsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
                     <span>{typeLabel(situation.situation_type)}</span>
-                    <span>Impacto {severityLabel(situation.severity)}</span>
-                    <span>{statusLabel(situation.status)}</span>
+                    <span>Impacto {humanSeverity(situation.severity).toLowerCase()}</span>
+                    <span>{humanStatus(situation.status)}</span>
                     <span>{new Date(situation.created_at).toLocaleString('es-CL')}</span>
                   </div>
                   <h2 className="mt-2 text-xl font-bold">{situation.title}</h2>
@@ -104,20 +105,6 @@ function severityIcon(severity: Situation['severity']) {
   if (severity === 'critical') return <ShieldAlert className="h-5 w-5" />
   if (severity === 'high') return <AlertTriangle className="h-5 w-5" />
   return <CircleDot className="h-5 w-5" />
-}
-
-function severityLabel(severity: Situation['severity']) {
-  if (severity === 'critical') return 'crítico'
-  if (severity === 'high') return 'alto'
-  if (severity === 'low') return 'bajo'
-  return 'medio'
-}
-
-function statusLabel(status: string) {
-  if (status === 'analyzing') return 'En análisis'
-  if (status === 'waiting_decision') return 'Espera decisión'
-  if (status === 'in_progress') return 'En ejecución'
-  return 'Abierta'
 }
 
 function typeLabel(type: string) {
