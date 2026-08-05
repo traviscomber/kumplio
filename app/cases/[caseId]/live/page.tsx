@@ -9,6 +9,7 @@ import {
   Loader2,
   ShieldCheck,
 } from 'lucide-react'
+import { ArtifactResultPreview } from '@/components/cases/artifact-result-preview'
 import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
 import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
 import { WorkspaceNav } from '@/components/workspace-nav'
@@ -79,7 +80,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
           .order('stage_index', { ascending: true }),
         supabase
           .from('agent_artifacts')
-          .select('id, run_id, artifact_type, title, status, version, created_at')
+          .select('id, run_id, artifact_type, title, content, status, version, created_at')
           .eq('case_id', caseId)
           .eq('organization_id', organizationId)
           .order('created_at', { ascending: false })
@@ -136,7 +137,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
           {!workflow ? (
             <div className="p-8 text-sm text-muted-foreground">No hay trabajo agentic preparado para este caso.</div>
           ) : (
-            <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[minmax(0,1fr)_380px]">
               <section>
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -193,14 +194,23 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                     <FileCheck2 className="h-5 w-5 text-primary" />
                     <h2 className="font-black">Resultados generados</h2>
                   </div>
-                  <div className="mt-4 space-y-3">
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    Se muestra solo contenido persistido. Los bloques aparecen cuando el artefacto contiene campos reconocibles.
+                  </p>
+                  <div className="mt-4 space-y-4">
                     {artifacts.length === 0 ? (
                       <p className="text-sm leading-6 text-muted-foreground">Todavía no existe un artefacto persistido.</p>
                     ) : artifacts.map((artifact) => (
-                      <div key={artifact.id} className="rounded-xl border p-4">
-                        <p className="font-semibold">{artifact.title}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">{artifact.artifact_type} · versión {artifact.version} · {statusLabels[artifact.status] || artifact.status}</p>
-                      </div>
+                      <article key={artifact.id} className="rounded-xl border p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <p className="font-semibold">{artifact.title}</p>
+                          <span className="rounded-full border px-2 py-1 text-[11px] font-semibold">
+                            {statusLabels[artifact.status] || artifact.status}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground">{artifact.artifact_type} · versión {artifact.version}</p>
+                        <ArtifactResultPreview content={artifact.content} />
+                      </article>
                     ))}
                   </div>
                 </section>
