@@ -2,12 +2,13 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { ArrowLeft, ArrowRight, Brain, BriefcaseBusiness, FileCheck2, Gavel, ShieldAlert } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Brain, BriefcaseBusiness, FileCheck2, Gavel, ShieldAlert, Sparkles } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { getOrganizationContext, findRelatedNodes } from '@/lib/compliance/context/context-graph'
+import { buildAdvisorReasoning } from '@/lib/compliance/advisor/reasoning'
 
 export const dynamic = 'force-dynamic'
 type PageProps = { params: Promise<{ id: string }> }
@@ -37,6 +38,17 @@ export default async function SituationDetailPage({ params }: PageProps) {
   const situationNode = graph.nodes.find((node) => node.nodeType === 'situation' && node.externalId === id)
   const related = situationNode ? findRelatedNodes(situationNode.id, graph.nodes, graph.edges) : []
   const memories = graph.memories.slice(0, 5)
+  const evidenceCount = Array.isArray(situation.evidence_ids) ? situation.evidence_ids.length : 0
+  const reasoning = buildAdvisorReasoning({
+    severity: String(situation.severity || 'medium'),
+    confidence: typeof situation.confidence === 'number' ? situation.confidence : null,
+    evidenceCount,
+    relatedCount: related.length,
+    precedentCount: memories.length,
+    hasMission: Boolean(situation.mission_id),
+    hasDecision: Boolean(situation.decision_id),
+    recommendation: typeof situation.recommendation === 'string' ? situation.recommendation : null,
+  })
 
   return (
     <>
@@ -48,33 +60,33 @@ export default async function SituationDetailPage({ params }: PageProps) {
 
         <header className="mt-6 rounded-3xl border bg-card p-6 sm:p-8">
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
-            <span>Impacto {String(situation.severity)}</span>
+            <span>Impacto {riskLabel(reasoning.risk)}</span>
             <span>{statusLabel(String(situation.status))}</span>
-            <span>Confianza {Math.round(Number(situation.confidence || 0) * 100)}%</span>
+            <span>Confianza {reasoning.confidence}%</span>
           </div>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">{String(situation.title)}</h1>
           {situation.summary && <p className="mt-4 max-w-4xl text-lg leading-8 text-muted-foreground">{String(situation.summary)}</p>}
-          {situation.recommendation && (
-            <div className="mt-6 rounded-2xl border border-primary/25 bg-primary/5 p-5">
-              <p className="text-sm font-semibold text-primary">Recomendación</p>
-              <p className="mt-2 leading-7">{String(situation.recommendation)}</p>
-            </div>
-          )}
+          <div className="mt-6 rounded-2xl border border-primary/25 bg-primary/5 p-5">
+            <p className="text-sm font-semibold text-primary">Siguiente acción</p>
+            <p className="mt-2 text-lg font-bold">{reasoning.nextAction}</p>
+          </div>
         </header>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-3">
-          <Panel icon={FileCheck2} title="Evidencia">
-            <p>{Array.isArray(situation.evidence_ids) ? situation.evidence_ids.length : 0} evidencias relacionadas.</p>
-          </Panel>
-          <Panel icon={BriefcaseBusiness} title="Ejecución">
-            {situation.mission_id ? <Link className="font-semibold text-primary" href={`/missions/${situation.mission_id}`}>Abrir misión <ArrowRight className="inline h-4 w-4" /></Link> : <p>No existe una misión vinculada.</p>}
-          </Panel>
-          <Panel icon={Gavel} title="Decisión">
-            {situation.decision_id ? <Link className="font-semibold text-primary" href="/decisions">Abrir decisión <ArrowRight className="inline h-4 w-4" /></Link> : <p>No existe una decisión vinculada.</p>}
-          </Panel>
+        <section className="mt-8 grid gap-6 lg:grid-cols-4">
+          <Panel icon={FileCheck2} title="Evidencia"><p>{evidenceCount} evidencias relacionadas.</p></Panel>
+          <Panel icon={BriefcaseBusiness} title="Ejecución">{situation.mission_id ? <Link className="font-semibold text-primary" href={`/missions/${situation.mission_id}`}>Abrir misión <ArrowRight className="inline h-4 w-4" /></Link> : <p>No existe una misión vinculada.</p>}</Panel>
+          <Panel icon={Gavel} title="Decisión">{situation.decision_id ? <Link className="font-semibold text-primary" href="/decisions">Abrir decisión <ArrowRight className="inline h-4 w-4" /></Link> : <p>No existe una decisión vinculada.</p>}</Panel>
+          <Panel icon={Brain} title="Contexto"><p>{related.length} elementos relacionados.</p></Panel>
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-2xl border bg-card p-5 sm:p-6">
+            <div className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /><h2 className="font-bold">Por qué llegamos a esta conclusión</h2></div>
+            <div className="mt-5 space-y-3">
+              {reasoning.explanation.map((line) => <p key={line} className="rounded-xl border bg-background/40 p-4 text-sm leading-6">{line}</p>)}
+            </div>
+          </div>
+
           <div className="rounded-2xl border bg-card p-5 sm:p-6">
             <div className="flex items-center gap-2"><Brain className="h-5 w-5 text-primary" /><h2 className="font-bold">Contexto relacionado</h2></div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -87,19 +99,19 @@ export default async function SituationDetailPage({ params }: PageProps) {
               ))}
             </div>
           </div>
-
-          <aside className="rounded-2xl border bg-card p-5 sm:p-6">
-            <div className="flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-primary" /><h2 className="font-bold">Precedentes</h2></div>
-            <div className="mt-5 space-y-4">
-              {memories.length === 0 ? <p className="text-sm text-muted-foreground">No hay precedentes registrados.</p> : memories.map((memory) => (
-                <article key={memory.id} className="border-l-2 border-primary/30 pl-4">
-                  <p className="font-semibold">{memory.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{memory.summary}</p>
-                </article>
-              ))}
-            </div>
-          </aside>
         </section>
+
+        <aside className="mt-8 rounded-2xl border bg-card p-5 sm:p-6">
+          <div className="flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-primary" /><h2 className="font-bold">Precedentes</h2></div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {memories.length === 0 ? <p className="text-sm text-muted-foreground">No hay precedentes registrados.</p> : memories.map((memory) => (
+              <article key={memory.id} className="border-l-2 border-primary/30 pl-4">
+                <p className="font-semibold">{memory.title}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{memory.summary}</p>
+              </article>
+            ))}
+          </div>
+        </aside>
       </main>
     </>
   )
@@ -114,4 +126,11 @@ function statusLabel(status: string) {
   if (status === 'in_progress') return 'En ejecución'
   if (status === 'analyzing') return 'En análisis'
   return 'Abierta'
+}
+
+function riskLabel(risk: 'low' | 'medium' | 'high' | 'critical') {
+  if (risk === 'critical') return 'crítico'
+  if (risk === 'high') return 'alto'
+  if (risk === 'low') return 'bajo'
+  return 'medio'
 }
