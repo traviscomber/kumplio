@@ -1,9 +1,14 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ArrowRight, CheckCircle2, Clock3, FileSearch, ShieldCheck, Users } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ArrowRight, CheckCircle2, Clock3, FileSearch, Loader2, ShieldCheck, Users } from 'lucide-react'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
-import { buildOrchestrationPlan, type UserAudience } from '@/lib/agents/orchestrator'
+import {
+  buildOrchestrationPlan,
+  workflowTypeForIntent,
+  type UserAudience,
+} from '@/lib/agents/orchestrator'
 
 const EXAMPLES = [
   'Preparar mi empresa para la Ley 21.719',
@@ -20,9 +25,13 @@ const AUDIENCES: Array<{ value: UserAudience; label: string }> = [
 ]
 
 export function CaseResolutionStudio() {
+  const router = useRouter()
   const [goal, setGoal] = useState('')
   const [audience, setAudience] = useState<UserAudience>('company')
   const [started, setStarted] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [error, setError] = useState('')
+  const [createdCaseId, setCreatedCaseId] = useState<string | null>(null)
 
   const plan = useMemo(() => {
     if (!started || goal.trim().length < 8) return null
@@ -31,7 +40,64 @@ export function CaseResolutionStudio() {
 
   function startCase() {
     if (goal.trim().length < 8) return
+    setError('')
+    setCreatedCaseId(null)
     setStarted(true)
+  }
+
+  async function createPersistentCase() {
+    if (!plan || creating) return
+
+    setCreating(true)
+    setError('')
+    setCreatedCaseId(null)
+
+    try {
+      const caseResponse = await fetch('/api/cases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: plan.goal.slice(0, 160),
+          description: [
+            `Objetivo declarado: ${plan.goal}`,
+            `Audiencia: ${plan.audience}`,
+            `Intención interpretada: ${plan.intent}`,
+          ].join('\n'),
+          priority: 'medium',
+        }),
+      })
+
+      const casePayload = await caseResponse.json()
+      if (!caseResponse.ok) {
+        throw new Error(casePayload.error || 'No fue posible crear el caso')
+      }
+
+      const caseId = casePayload.complianceCase?.id as string | undefined
+      if (!caseId) throw new Error('El caso fue creado sin un identificador válido')
+      setCreatedCaseId(caseId)
+
+      const workflowResponse = await fetch('/api/agents/workflows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          caseId,
+          workflowType: workflowTypeForIntent(plan.intent),
+          instructions: plan.goal,
+        }),
+      })
+
+      const workflowPayload = await workflowResponse.json()
+      if (!workflowResponse.ok) {
+        throw new Error(workflowPayload.error || 'El caso se creó, pero no fue posible preparar el workflow')
+      }
+
+      router.push(`/cases/${caseId}`)
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible preparar el caso')
+    } finally {
+      setCreating(false)
+    }
   }
 
   if (plan) {
@@ -43,13 +109,18 @@ export function CaseResolutionStudio() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Nuevo caso</p>
               <h1 className="mt-3 max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">{plan.goal}</h1>
               <p className="mt-4 max-w-2xl leading-7 text-muted-foreground">
-                Kumplio interpretó el objetivo y preparó el equipo de trabajo. Todavía no se han ejecutado análisis ni generado hallazgos.
+                Kumplio interpretó el objetivo y preparó el equipo de trabajo. Los análisis comenzarán únicamente desde el expediente persistente.
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setStarted(false)}
-              className="rounded-xl border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
+              onClick={() => {
+                setStarted(false)
+                setError('')
+                setCreatedCaseId(null)
+              }}
+              disabled={creating}
+              className="rounded-xl border px-4 py-2 text-sm font-semibold transition hover:bg-muted disabled:opacity-50"
             >
               Cambiar objetivo
             </button>
@@ -57,7 +128,7 @@ export function CaseResolutionStudio() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-3">
             <SummaryItem icon={<Users className="h-5 w-5" />} label="Especialistas asignados" value={String(plan.tasks.length)} />
-            <SummaryItem icon={<Clock3 className="h-5 w-5" />} label="Estado" value="Listo para ejecutar" />
+            <SummaryItem icon={<Clock3 className="h-5 w-5" />} label="Estado" value="Listo para crear" />
             <SummaryItem icon={<ShieldCheck className="h-5 w-5" />} label="Revisión final" value="Julieta" />
           </div>
         </header>
@@ -105,8 +176,10 @@ export function CaseResolutionStudio() {
           <aside className="space-y-6">
             <section className="rounded-[28px] border bg-card p-6 shadow-sm">
               <FileSearch className="h-6 w-6 text-primary" />
-              <h2 className="mt-4 text-xl font-black">Contexto que falta</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">Antes de ejecutar, Kumplio debe pedir únicamente la información necesaria.</p>
+              <h2 className="mt-4 text-xl font-black">Contexto por completar</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                El expediente puede crearse ahora. Antes o durante la ejecución, Kumplio solicitará únicamente lo que sea necesario.
+              </p>
               <ul className="mt-5 space-y-3">
                 {plan.missingContext.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm">
@@ -126,10 +199,36 @@ export function CaseResolutionStudio() {
                 <Outcome label="Fuentes y supuestos visibles" />
                 <Outcome label="Revisión humana requerida" />
               </div>
-              <button type="button" disabled className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-primary-foreground opacity-60">
-                Ejecutar caso <ArrowRight className="ml-2 h-4 w-4" />
+
+              {error && (
+                <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                  <p className="font-semibold">No se pudo completar la preparación.</p>
+                  <p className="mt-1">{error}</p>
+                  {createdCaseId && (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/cases/${createdCaseId}`)}
+                      className="mt-3 font-semibold underline underline-offset-4"
+                    >
+                      Abrir el caso creado
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={createPersistentCase}
+                disabled={creating}
+                className="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {creating ? 'Creando expediente...' : 'Crear y abrir caso'}
+                {!creating ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
               </button>
-              <p className="mt-3 text-xs leading-5 text-muted-foreground">La ejecución se habilitará cuando este flujo se conecte al motor persistente de casos y workflows.</p>
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                Se creará un expediente y un workflow auditable. Ningún especialista se mostrará como activo antes de iniciar una etapa real.
+              </p>
             </section>
           </aside>
         </div>
