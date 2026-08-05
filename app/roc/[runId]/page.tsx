@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import type { ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   ArrowLeft,
   ArrowRight,
@@ -35,7 +35,7 @@ type ImpactTarget = {
 type MetricCard = {
   label: string
   value: number
-  icon: ReactNode
+  icon: LucideIcon
 }
 
 function text(value: unknown, fallback = 'Sin información') {
@@ -77,10 +77,10 @@ export default async function ImpactDetailPage({ params }: PageProps) {
   const metrics = (run.metrics || {}) as Record<string, unknown>
   const mutations = Number(metrics.mutations_applied || 0)
   const metricCards: MetricCard[] = [
-    { label: 'Objetivos', value: Number(metrics.targets || impactTargets.length), icon: <ListChecks className="h-5 w-5 text-primary" /> },
-    { label: 'Críticos', value: Number(metrics.critical || 0), icon: <ShieldCheck className="h-5 w-5 text-primary" /> },
-    { label: 'Organizaciones', value: Number(metrics.organizations || 0), icon: <Building2 className="h-5 w-5 text-primary" /> },
-    { label: 'Revisión requerida', value: Number(metrics.review_required || 0), icon: <FileDiff className="h-5 w-5 text-primary" /> },
+    { label: 'Objetivos', value: Number(metrics.targets || impactTargets.length), icon: ListChecks },
+    { label: 'Críticos', value: Number(metrics.critical || 0), icon: ShieldCheck },
+    { label: 'Organizaciones', value: Number(metrics.organizations || 0), icon: Building2 },
+    { label: 'Revisión requerida', value: Number(metrics.review_required || 0), icon: FileDiff },
   ]
 
   return (
@@ -109,11 +109,11 @@ export default async function ImpactDetailPage({ params }: PageProps) {
         </header>
 
         <section className="grid gap-4 md:grid-cols-4">
-          {metricCards.map(({ label, value, icon }) => (
+          {metricCards.map(({ label, value, icon: Icon }) => (
             <article key={label} className="rounded-2xl border bg-card p-5">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-muted-foreground">{label}</p>
-                {icon}
+                <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
               </div>
               <p className="mt-4 text-3xl font-extrabold">{String(value)}</p>
             </article>
