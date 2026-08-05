@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, ClipboardCheck, Gauge, Gavel, Library, Network, Radar, Settings, Workflow } from 'lucide-react'
+import { Activity, BarChart3, Bot, BriefcaseBusiness, Building2, ClipboardCheck, Gauge, Gavel, Library, Network, Radar, Settings, UserRoundCheck, Workflow } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
@@ -10,6 +10,7 @@ const items = [
   { href: '/dashboard', label: 'Hoy', icon: Building2 },
   { href: '/operations', label: 'Operaciones', icon: Workflow },
   { href: '/decisions', label: 'Decisiones', icon: Gavel },
+  { href: '/accountability', label: 'Responsables', icon: UserRoundCheck },
   { href: '/review-center', label: 'Revisiones', icon: ClipboardCheck },
   { href: '/executive', label: 'Ejecutivo', icon: Gauge },
   { href: '/missions', label: 'Trabajo', icon: BriefcaseBusiness },
