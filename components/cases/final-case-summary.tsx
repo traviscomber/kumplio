@@ -38,35 +38,35 @@ export function FinalCaseSummary({
         <div>
           <div className="flex items-center gap-2">
             {isReady ? <CheckCircle2 className="h-6 w-6 text-primary" /> : <TriangleAlert className="h-6 w-6 text-amber-600" />}
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Resultado final</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Resultado del caso</p>
           </div>
-          <h2 className="mt-3 text-2xl font-black">{isReady ? 'Listo para actuar' : 'Revisión final pendiente de cierre'}</h2>
+          <h2 className="mt-3 text-3xl font-black">{isReady ? 'Ya puedes actuar.' : 'El resultado todavía necesita revisión.'}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             {isReady
-              ? `El workflow terminó y el resultado final fue aprobado por ${finalAgentName || 'la revisión final'}.`
-              : 'Existe una decisión de revisión, pero todavía no se cumplen todas las condiciones para presentar el caso como cerrado.'}
+              ? `${finalAgentName || 'La revisión final'} verificó que el resultado aprobado tiene respaldo suficiente para avanzar.`
+              : 'Existe una decisión registrada, pero aún faltan condiciones para presentar este caso como listo para actuar.'}
           </p>
         </div>
         <span className="inline-flex w-fit items-center rounded-full border bg-background px-3 py-1 text-xs font-semibold">
-          {reviewDecision === 'approved' ? 'Aprobado' : humanize(reviewDecision || 'pendiente')}
+          {reviewDecision === 'approved' ? 'Resultado aprobado' : humanize(reviewDecision || 'pendiente')}
         </span>
       </div>
 
       {summary && (
         <div className="mt-6 rounded-2xl border bg-background/75 p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Resumen ejecutivo</p>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Qué resolvió este caso</p>
           <p className="mt-3 text-sm leading-7">{summary}</p>
         </div>
       )}
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <SummaryBlock icon={<ShieldCheck className="h-5 w-5" />} title="Siguiente paso">
+        <SummaryBlock icon={<ShieldCheck className="h-5 w-5" />} title="Qué hacer ahora">
           <p className="text-sm leading-6 text-muted-foreground">
-            {nextStep || 'El artefacto final no contiene todavía un siguiente paso explícito.'}
+            {nextStep || 'El resultado final no contiene todavía un siguiente paso explícito.'}
           </p>
         </SummaryBlock>
 
-        <SummaryBlock icon={<FileCheck2 className="h-5 w-5" />} title="Respaldo de cierre">
+        <SummaryBlock icon={<FileCheck2 className="h-5 w-5" />} title="Cómo demostrarlo">
           {evidence.length > 0 ? (
             <ul className="space-y-2 text-sm text-muted-foreground">
               {evidence.slice(0, 5).map((item, index) => <li key={index}>• {toText(item)}</li>)}
@@ -79,7 +79,7 @@ export function FinalCaseSummary({
 
       {reservations.length > 0 && (
         <div className="mt-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-          <p className="text-sm font-black">Reservas que siguen vigentes</p>
+          <p className="text-sm font-black">Lo que todavía debes considerar</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             {reservations.slice(0, 5).map((item, index) => <li key={index}>• {toText(item)}</li>)}
           </ul>
@@ -89,7 +89,7 @@ export function FinalCaseSummary({
       <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
         {artifactTitle && <span>Resultado: {artifactTitle}</span>}
         {reviewedAt && <span>Revisado: {new Date(reviewedAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}</span>}
-        {reviewComment && <span>Comentario: {reviewComment}</span>}
+        {reviewComment && <span>Comentario de revisión: {reviewComment}</span>}
       </div>
     </section>
   )
