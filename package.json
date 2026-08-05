@@ -21,7 +21,8 @@
     "check:sma-detail-bootstrap": "node scripts/check-sma-snifa-detail-bootstrap.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
-    "check:compliance-core": "node scripts/check-compliance-core-v1.mjs"
+    "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
+    "check:case-lifecycle": "node scripts/check-case-lifecycle-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
