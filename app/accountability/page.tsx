@@ -32,7 +32,7 @@ export default async function AccountabilityPage() {
     const serverAdmin = createAdminClient()
     const currentAccess = await getWorkspaceAccess(serverAdmin, currentUser.id)
     if (!currentAccess) redirect('/onboarding')
-    if (!currentAccess.canManageWorkspace) throw new Error('Tu rol no permite reasignar trabajo.')
+    if (!currentAccess.canAssignWork) throw new Error('Tu rol no permite reasignar trabajo.')
 
     const missionId = String(formData.get('missionId') || '')
     const ownerId = String(formData.get('ownerId') || '')
@@ -102,7 +102,7 @@ export default async function AccountabilityPage() {
                     </p>
                   </div>
 
-                  {access.canManageWorkspace ? (
+                  {access.canAssignWork ? (
                     <form action={assign} className="grid w-full gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] lg:max-w-2xl">
                       <input type="hidden" name="missionId" value={mission.id} />
                       <select name="ownerId" required defaultValue={mission.ownerId || ''} className="rounded-xl border bg-background px-4 py-3 text-sm">
