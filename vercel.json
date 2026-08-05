@@ -6,6 +6,10 @@
       "schedule": "0 12 * * *"
     },
     {
+      "path": "/api/cron/autopilot",
+      "schedule": "5 12 * * *"
+    },
+    {
       "path": "/api/cron/regulatory/leychile",
       "schedule": "15 10 * * *"
     },
