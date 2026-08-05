@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, FileText, Link2 } from 'lucide-react'
+import { CaseActionPlan } from '@/components/cases/case-action-plan'
 
 type JsonRecord = Record<string, unknown>
 
@@ -8,17 +9,18 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
   const findings = firstList(record, ['findings', 'hallazgos', 'obligations', 'obligaciones', 'risks', 'riesgos', 'actions', 'acciones'])
   const sources = firstList(record, ['sources', 'fuentes', 'citations', 'citas', 'sourceRefs', 'source_refs'])
   const caveats = firstList(record, ['caveats', 'reservations', 'reservas', 'limitations', 'limitaciones', 'assumptions', 'supuestos', 'openQuestions', 'preguntas_abiertas'])
-
-  if (!summary && findings.length === 0 && sources.length === 0 && caveats.length === 0) {
-    return (
-      <p className="mt-3 text-sm leading-6 text-muted-foreground">
-        El artefacto existe, pero su contenido no tiene todavía un formato reconocido para esta vista. Puede revisarse desde el expediente técnico.
-      </p>
-    )
-  }
+  const hasRecognizedSummary = Boolean(summary || findings.length || sources.length || caveats.length)
 
   return (
     <div className="mt-4 space-y-4">
+      <CaseActionPlan content={content} />
+
+      {!hasRecognizedSummary && (
+        <p className="text-sm leading-6 text-muted-foreground">
+          El artefacto existe, pero su contenido no tiene todavía un formato reconocido para el resumen. Puede revisarse desde el expediente técnico.
+        </p>
+      )}
+
       {summary && (
         <div className="rounded-xl bg-primary/5 p-4">
           <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Resultado</p>
