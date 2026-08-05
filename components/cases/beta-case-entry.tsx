@@ -93,7 +93,7 @@ export function BetaCaseEntry() {
       if (!advanceResponse.ok) throw new Error(advancePayload.error || 'El caso está listo, pero no fue posible iniciar la primera etapa')
 
       setStep('opening')
-      router.push(`/cases/${caseId}/live`)
+      router.push(`/cases/${caseId}/beta`)
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible iniciar el caso')
@@ -160,7 +160,7 @@ export function BetaCaseEntry() {
             {createdCaseId && (
               <button
                 type="button"
-                onClick={() => router.push(`/cases/${createdCaseId}/live`)}
+                onClick={() => router.push(`/cases/${createdCaseId}/beta`)}
                 className="mt-3 font-semibold underline underline-offset-4"
               >
                 Abrir el caso creado
