@@ -4,7 +4,10 @@ import { CheckCircle2, FileArchive, RefreshCw } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { prepareAuditPackage } from '@/lib/compliance/operations/vendor-audit-marketplace'
+import {
+  getLatestAuditPackage,
+  prepareAuditPackage,
+} from '@/lib/compliance/operations/vendor-audit-marketplace'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,18 +36,12 @@ export default async function AuditPrepPage({ params }: PageProps) {
     .maybeSingle()
   if (!project) redirect('/dashboard')
 
-  let { data: auditPackage } = await admin
-    .from('audit_preparation_packages')
-    .select('id,status,summary,evidence_snapshot,findings_snapshot,generated_at')
-    .eq('organization_id', membership.organization_id)
-    .eq('project_id', projectId)
-    .maybeSingle()
-
   async function rebuild() {
     'use server'
     const serverSupabase = await createClient()
     const { data: { user: currentUser } } = await serverSupabase.auth.getUser()
     if (!currentUser) redirect(`/sign-in?next=/audit-prep/${projectId}`)
+
     const serverAdmin = createAdminClient()
     const { data: currentMembership } = await serverAdmin
       .from('organization_members')
@@ -53,17 +50,21 @@ export default async function AuditPrepPage({ params }: PageProps) {
       .limit(1)
       .maybeSingle()
     if (!currentMembership?.organization_id) redirect('/onboarding')
+
     await prepareAuditPackage(serverAdmin, currentMembership.organization_id, projectId, currentUser.id)
     revalidatePath(`/audit-prep/${projectId}`)
   }
 
-  if (!auditPackage) {
-    auditPackage = await prepareAuditPackage(admin, membership.organization_id, projectId, user.id)
-  }
+  const existingPackage = await getLatestAuditPackage(admin, membership.organization_id, projectId)
+  const auditPackage = existingPackage
+    ?? await prepareAuditPackage(admin, membership.organization_id, projectId, user.id)
 
-  const summary = (auditPackage?.summary || {}) as Record<string, number>
-  const evidence = Array.isArray(auditPackage?.evidence_snapshot) ? auditPackage.evidence_snapshot : []
-  const findings = Array.isArray(auditPackage?.findings_snapshot) ? auditPackage.findings_snapshot : []
+  const summaryCards: Array<[string, number]> = [
+    ['Obligaciones', auditPackage.summary.obligations || 0],
+    ['Controles', auditPackage.summary.controls || 0],
+    ['Evidencias', auditPackage.summary.evidence || 0],
+    ['Hallazgos abiertos', auditPackage.summary.open_findings || 0],
+  ]
 
   return (
     <>
@@ -83,13 +84,8 @@ export default async function AuditPrepPage({ params }: PageProps) {
         </section>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ['Obligaciones', summary.obligations || 0],
-            ['Controles', summary.controls || 0],
-            ['Evidencias', summary.evidence || 0],
-            ['Hallazgos abiertos', summary.open_findings || 0],
-          ].map(([label, value]) => (
-            <div key={String(label)} className="rounded-2xl border bg-card p-5">
+          {summaryCards.map(([label, value]) => (
+            <div key={label} className="rounded-2xl border bg-card p-5">
               <p className="text-sm text-muted-foreground">{label}</p>
               <p className="mt-2 text-3xl font-black">{value}</p>
             </div>
@@ -98,31 +94,47 @@ export default async function AuditPrepPage({ params }: PageProps) {
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border bg-card p-6">
-            <div className="flex items-center gap-3"><FileArchive className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold">Evidencia incluida</h2></div>
+            <div className="flex items-center gap-3">
+              <FileArchive className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold">Evidencia incluida</h2>
+            </div>
             <div className="mt-5 space-y-3">
-              {evidence.length === 0 ? <p className="text-sm text-muted-foreground">No hay evidencia registrada todavía.</p> : evidence.slice(0, 10).map((item: any) => (
+              {auditPackage.evidenceSnapshot.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No hay evidencia registrada todavía.</p>
+              ) : auditPackage.evidenceSnapshot.slice(0, 10).map((item) => (
                 <div key={item.id} className="rounded-xl border p-4">
                   <p className="font-semibold">{item.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.type || 'Evidencia'} · {item.status || 'sin validar'}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {item.type || 'Evidencia'} · {item.status || 'sin validar'}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-2xl border bg-card p-6">
-            <div className="flex items-center gap-3"><CheckCircle2 className="h-5 w-5 text-primary" /><h2 className="text-xl font-bold">Hallazgos</h2></div>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold">Hallazgos</h2>
+            </div>
             <div className="mt-5 space-y-3">
-              {findings.length === 0 ? <p className="text-sm text-muted-foreground">No hay hallazgos registrados.</p> : findings.slice(0, 10).map((item: any) => (
+              {auditPackage.findingsSnapshot.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No hay hallazgos registrados.</p>
+              ) : auditPackage.findingsSnapshot.slice(0, 10).map((item) => (
                 <div key={item.id} className="rounded-xl border p-4">
                   <p className="font-semibold">{item.description}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.type || 'Hallazgo'} · {item.status}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {item.type || 'Hallazgo'} · {item.status || 'sin estado'}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <p className="mt-6 text-sm text-muted-foreground">Generado: {new Date(auditPackage.generated_at).toLocaleString('es-CL')}</p>
+        <p className="mt-6 text-sm text-muted-foreground">
+          Generado: {new Date(auditPackage.generatedAt).toLocaleString('es-CL')}
+        </p>
       </main>
     </>
   )
