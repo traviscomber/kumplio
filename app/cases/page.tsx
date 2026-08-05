@@ -25,7 +25,7 @@ export default async function CasesPage() {
     .maybeSingle()
 
   const organizationId = membership?.organization_id
-  const [{ data: organization }, { data: projects }, { data: cases, error: casesError }] = organizationId
+  const [{ data: organization }, { data: projects }, { data: cases, error: casesError }, { data: workflows }] = organizationId
     ? await Promise.all([
         supabase.from('organizations').select('id, name').eq('id', organizationId).maybeSingle(),
         supabase
@@ -41,10 +41,27 @@ export default async function CasesPage() {
           .neq('status', 'archived')
           .order('updated_at', { ascending: false })
           .limit(100),
+        supabase
+          .from('agent_workflows')
+          .select('id, case_id, status, current_stage, total_stages, updated_at')
+          .eq('organization_id', organizationId)
+          .order('created_at', { ascending: false })
+          .limit(300),
       ])
-    : [{ data: null }, { data: [] }, { data: [], error: null }]
+    : [{ data: null }, { data: [] }, { data: [], error: null }, { data: [] }]
 
   const migrationPending = casesError?.code === '42P01' || casesError?.message?.includes('compliance_cases')
+  const latestWorkflowByCase = new Map<string, { id: string; status: string; current_stage: number; total_stages: number; updated_at: string }>()
+  for (const workflow of workflows || []) {
+    if (workflow.case_id && !latestWorkflowByCase.has(workflow.case_id)) {
+      latestWorkflowByCase.set(workflow.case_id, workflow)
+    }
+  }
+
+  const casesWithWorkflow = (cases || []).map((item) => ({
+    ...item,
+    workflow: latestWorkflowByCase.get(item.id) || null,
+  }))
 
   return (
     <>
@@ -69,7 +86,7 @@ export default async function CasesPage() {
             <p className="mt-2 text-sm text-muted-foreground">Aplica las migraciones del Agent Control Plane en Supabase.</p>
           </div>
         ) : (
-          <CasesWorkspace cases={(cases || []) as any} projects={(projects || []) as any} />
+          <CasesWorkspace cases={casesWithWorkflow as any} projects={(projects || []) as any} />
         )}
       </main>
     </>
