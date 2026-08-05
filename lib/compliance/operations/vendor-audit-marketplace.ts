@@ -12,6 +12,15 @@ export type VendorAssessment = {
   assessedAt: string
 }
 
+export type VendorDetail = VendorAssessment & {
+  country: string | null
+  processesPersonalData: boolean
+  crossBorderTransfer: boolean
+  contractExpiresAt: string | null
+  lifecycleStatus: string
+  attributes: Record<string, unknown>
+}
+
 export type AuditEvidenceItem = {
   id: string
   name: string
@@ -63,6 +72,35 @@ export async function refreshVendorAssessments(admin: SupabaseClient, organizati
   })
 }
 
+export async function getVendorDetail(
+  admin: SupabaseClient,
+  organizationId: string,
+  vendorId: string,
+): Promise<VendorDetail | null> {
+  const assessments = await refreshVendorAssessments(admin, organizationId)
+  const assessment = assessments.find((item) => item.vendorId === vendorId)
+  if (!assessment) return null
+
+  const { data, error } = await admin
+    .from('organization_vendors')
+    .select('id,country,processes_personal_data,cross_border_transfer,contract_expires_at,lifecycle_status,attributes')
+    .eq('id', vendorId)
+    .eq('organization_id', organizationId)
+    .maybeSingle()
+  if (error) throw new Error(`No fue posible cargar el proveedor: ${error.message}`)
+  if (!data) return null
+
+  return {
+    ...assessment,
+    country: data.country || null,
+    processesPersonalData: Boolean(data.processes_personal_data),
+    crossBorderTransfer: Boolean(data.cross_border_transfer),
+    contractExpiresAt: data.contract_expires_at || null,
+    lifecycleStatus: data.lifecycle_status || 'active',
+    attributes: data.attributes && typeof data.attributes === 'object' ? data.attributes as Record<string, unknown> : {},
+  }
+}
+
 export async function getLatestAuditPackage(
   admin: SupabaseClient,
   organizationId: string,
@@ -93,6 +131,40 @@ export async function prepareAuditPackage(
   if (error) throw new Error(`No fue posible preparar la auditoría: ${error.message}`)
   if (!data || typeof data !== 'object') throw new Error('La preparación de auditoría no devolvió un paquete válido.')
   return normalizeAuditPackage(data)
+}
+
+export async function installMarketplacePack(
+  admin: SupabaseClient,
+  organizationId: string,
+  versionId: string,
+  userId: string,
+): Promise<void> {
+  const { data: version, error: versionError } = await admin
+    .from('marketplace_item_versions')
+    .select('id,release_status,required_permissions')
+    .eq('id', versionId)
+    .eq('release_status', 'released')
+    .maybeSingle()
+  if (versionError) throw new Error(`No fue posible validar el pack: ${versionError.message}`)
+  if (!version) throw new Error('El pack solicitado no tiene una versión publicada disponible.')
+
+  const permissions = Array.isArray(version.required_permissions)
+    ? version.required_permissions.filter((value): value is string => typeof value === 'string')
+    : []
+
+  const { error } = await admin.from('organization_marketplace_installations').upsert({
+    organization_id: organizationId,
+    marketplace_item_version_id: versionId,
+    installation_status: 'installed',
+    configuration: {},
+    granted_permissions: permissions,
+    installed_resources: {},
+    installed_by: userId,
+    reviewed_by: userId,
+    reviewed_at: new Date().toISOString(),
+    installed_at: new Date().toISOString(),
+  }, { onConflict: 'organization_id,marketplace_item_version_id' })
+  if (error) throw new Error(`No fue posible instalar el pack: ${error.message}`)
 }
 
 export async function getMarketplace(admin: SupabaseClient, organizationId: string) {
