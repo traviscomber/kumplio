@@ -1,0 +1,106 @@
+name: Release qualification foundation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-foundation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+      OPENAI_API_KEY: test-openai-key
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install from committed lockfile
+        run: npm ci
+
+      - name: Validate security boundary migration
+        run: node scripts/check-security-function-boundaries.mjs
+
+      - name: Validate public, auth and server boundaries
+        run: |
+          npm run check:discovery
+          npm run check:boundaries
+          npm run check:auth
+          npm run check:guided-resolution
+          npm run check:authenticated-resolution
+
+      - name: Validate regulatory fixtures and runners
+        run: |
+          npm run check:diario
+          npm run check:diario-bootstrap
+          npm run check:dt
+          npm run check:dt-bootstrap
+          npm run check:sma
+          npm run check:sma-bootstrap
+          npm run check:sma-detail
+          npm run check:sma-detail-bootstrap
+          npm run check:leychile
+          npm run check:claims
+
+      - name: Validate product and workflow contracts
+        run: |
+          npm run check:compliance-core
+          npm run check:case-lifecycle
+          npm run check:operational-security
+          npm run check:agent-dashboard
+          npm run check:workflow-persistence
+          npm run check:case-close-audit
+          npm run check:agent-retry-versioning
+          npm run check:workflow-concurrency
+          npm run check:atomic-agent-review
+          npm run check:stale-workflow-recovery
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Smoke-test production server
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 > /tmp/kumplio-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true; cat /tmp/kumplio-next.log' EXIT
+
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null; then
+              break
+            fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              echo 'El servidor terminó antes del smoke test.' >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/security > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt | grep --quiet 'Disallow: /cases'
