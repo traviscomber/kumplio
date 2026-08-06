@@ -55,11 +55,10 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
   if (!workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
   if (['completed', 'cancelled'].includes(workflow.status)) return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
 
-  // When pending_review: allow advance only if the current stage is already approved (review just happened)
-  // This handles the race condition where /review sets workflow to 'running' but /advance fires first
+  // When pending_review: allow advance only if current stage is already approved
+  // (handles race condition where /review updates status to 'running' but /advance fires first)
   let effectiveStageIndex = workflow.current_stage
   if (workflow.status === 'pending_review') {
-    // Check if current stage is approved — if so, we need to run the NEXT stage
     const { data: currentStageCheck } = await supabase
       .from('agent_workflow_stages')
       .select('status')
@@ -71,14 +70,12 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     if (currentStageCheck?.status !== 'approved') {
       return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
     }
-    // Stage is approved — advance to next stage
+    // Stage approved — target the next stage
     effectiveStageIndex = workflow.current_stage + 1
     if (effectiveStageIndex >= workflow.total_stages) {
-      // All stages done — mark completed
       await supabase.from('agent_workflows').update({ status: 'completed', completed_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', workflow.id)
       return NextResponse.json({ workflowId: workflow.id, status: 'completed' })
     }
-    // Transition workflow to running so the advance proceeds
     await supabase.from('agent_workflows').update({ status: 'running', current_stage: effectiveStageIndex, updated_at: new Date().toISOString() }).eq('id', workflow.id)
   }
 

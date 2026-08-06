@@ -6,10 +6,12 @@ import type { AgentId } from './catalog'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
-const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-4.1'
-const MODEL_FALLBACK = 'gpt-4o'
-const MAX_OUTPUT_TOKENS = 8000
-const REQUEST_TIMEOUT_MS = 90000
+// o3 is the best reasoning model — structured JSON in ~20-40s.
+// gpt-4.1 is the fast non-reasoning fallback (~8-15s).
+const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || 'o3'
+const MODEL_FALLBACK = process.env.OPENAI_FALLBACK_MODEL || 'gpt-4.1'
+const MAX_OUTPUT_TOKENS = 16000
+const REQUEST_TIMEOUT_MS = 120000
 const MAX_PROVIDER_RETRIES = 2
 const PROVIDER_RETRY_DELAY_MS = 2000
 
@@ -120,7 +122,8 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
         lastError = error
         if (error instanceof AgentRuntimeError) throw error
         if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
-          throw new AgentRuntimeError('timeout', 'The agent exceeded the execution time limit')
+          // Timeout on this model — break inner loop and try the fallback model
+          break
         }
         attempt++
         if (attempt < MAX_PROVIDER_RETRIES) {
@@ -132,6 +135,12 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
   }
 
   if (!response) {
+    if (
+      lastError instanceof Error &&
+      (lastError.name === 'TimeoutError' || lastError.name === 'AbortError')
+    ) {
+      throw new AgentRuntimeError('timeout', 'The agent exceeded the execution time limit')
+    }
     throw new AgentRuntimeError('provider_error', 'The reasoning provider could not complete the request')
   }
 
