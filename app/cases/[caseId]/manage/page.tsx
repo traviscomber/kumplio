@@ -35,7 +35,7 @@ export default async function ManageCasePage({ params }: { params: Promise<{ cas
     <>
       <WorkspaceNav />
       <main className="container mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <Link href={`/cases/${caseId}/live`} className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <Link href={`/cases/${caseId}`} className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" /> Volver al resultado
         </Link>
         <section className="mt-6 rounded-[28px] border bg-card p-6 shadow-sm sm:p-8">
