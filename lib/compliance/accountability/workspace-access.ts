@@ -29,24 +29,51 @@ export async function getWorkspaceAccess(
   admin: SupabaseClient,
   userId: string,
 ): Promise<WorkspaceAccess | null> {
-  const { data, error } = await admin
-    .from('organization_members')
-    .select('organization_id,user_id,role')
-    .eq('user_id', userId)
-    .limit(1)
+  const { data: profile, error: profileError } = await admin
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', userId)
     .maybeSingle()
 
-  if (error) throw new Error(`No fue posible validar el acceso: ${error.message}`)
-  if (!data) return null
+  if (profileError) throw new Error(`No fue posible cargar el workspace activo: ${profileError.message}`)
 
-  const role = normalizeRole(data.role)
-  return {
-    organizationId: String(data.organization_id),
-    userId: String(data.user_id),
-    role,
-    canResolveDecisions: ['owner', 'admin', 'compliance', 'reviewer'].includes(role),
-    canAssignWork: ['owner', 'admin', 'compliance'].includes(role),
+  const activeOrganizationId = profile?.organization_id ? String(profile.organization_id) : null
+
+  if (activeOrganizationId) {
+    const { data, error } = await admin
+      .from('organization_members')
+      .select('organization_id,user_id,role')
+      .eq('user_id', userId)
+      .eq('organization_id', activeOrganizationId)
+      .maybeSingle()
+
+    if (error) throw new Error(`No fue posible validar el acceso: ${error.message}`)
+    if (!data) throw new Error('El workspace activo ya no pertenece a tus organizaciones. Selecciona una organización válida.')
+    return buildWorkspaceAccess(data)
   }
+
+  const { data: memberships, error } = await admin
+    .from('organization_members')
+    .select('organization_id,user_id,role,joined_at')
+    .eq('user_id', userId)
+    .order('joined_at', { ascending: true })
+    .limit(2)
+
+  if (error) throw new Error(`No fue posible validar el acceso: ${error.message}`)
+  if (!memberships?.length) return null
+
+  if (memberships.length > 1) {
+    throw new Error('Tienes más de una organización. Selecciona explícitamente el workspace activo.')
+  }
+
+  const membership = memberships[0]
+  const { error: repairError } = await admin
+    .from('profiles')
+    .update({ organization_id: membership.organization_id, updated_at: new Date().toISOString() })
+    .eq('id', userId)
+
+  if (repairError) throw new Error(`No fue posible guardar el workspace activo: ${repairError.message}`)
+  return buildWorkspaceAccess(membership)
 }
 
 export async function listOrganizationDecisions(
@@ -109,6 +136,17 @@ export async function resolveDecision(
 
   if (error) throw new Error(`No fue posible registrar la decisión: ${error.message}`)
   if (!data) throw new Error('La decisión no existe, ya fue resuelta o no pertenece a tu organización.')
+}
+
+function buildWorkspaceAccess(data: { organization_id: unknown; user_id: unknown; role: unknown }): WorkspaceAccess {
+  const role = normalizeRole(data.role)
+  return {
+    organizationId: String(data.organization_id),
+    userId: String(data.user_id),
+    role,
+    canResolveDecisions: ['owner', 'admin', 'compliance', 'reviewer'].includes(role),
+    canAssignWork: ['owner', 'admin', 'compliance'].includes(role),
+  }
 }
 
 function normalizeRole(value: unknown): WorkspaceRole {
