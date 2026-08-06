@@ -21,7 +21,7 @@ const montserrat = Montserrat({
   weight: ['300', '400', '500', '600', '700', '800'],
 })
 
-const title = 'Kumplio | Resolución guiada de obligaciones y cumplimiento en Chile'
+const title = 'Kumplio | Protección de datos y guía experta para resolver en Chile'
 const description = `${PUBLIC_DESCRIPTION} Producto desarrollado por n3uralia.`
 
 export const metadata: Metadata = {
@@ -29,15 +29,17 @@ export const metadata: Metadata = {
   title: { default: title, template: `%s | ${SITE_NAME}` },
   description,
   keywords: [
-    'resolver problema de cumplimiento Chile',
-    'resolución guiada de obligaciones',
-    'asistente cumplimiento normativo Chile',
-    'preparar auditoría Chile',
-    'implementar Ley 21.719',
-    'revisar contrato con inteligencia artificial',
-    'evidencia auditable',
-    'plan de cumplimiento con respaldo',
-    'software compliance Chile',
+    'protección de datos personales Chile',
+    'Ley 21.719 Chile',
+    'software protección de datos Chile',
+    'gestión privacidad Chile',
+    'centralizar información de cumplimiento',
+    'guía experta protección de datos',
+    'mapa de tratamientos de datos',
+    'evidencia protección de datos',
+    'gestión de riesgos de privacidad',
+    'resolver obligaciones de privacidad',
+    'cumplimiento normativo Chile',
     'Kumplio',
     'n3uralia',
   ],
@@ -46,7 +48,7 @@ export const metadata: Metadata = {
   creator: N3URALIA_NAME,
   publisher: N3URALIA_NAME,
   category: 'business software',
-  classification: 'Plataforma de resolución guiada de obligaciones regulatorias, contractuales y de cumplimiento',
+  classification: 'Plataforma de protección de datos, privacidad y resolución guiada de obligaciones en Chile',
   referrer: 'origin-when-cross-origin',
   robots: {
     index: true,
@@ -85,7 +87,7 @@ export const metadata: Metadata = {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'Kumplio, resolución guiada de obligaciones con evidencia y revisión humana',
+        alt: 'Kumplio, protección de datos y guía experta con evidencia y revisión humana',
       },
     ],
   },
@@ -103,7 +105,7 @@ export const metadata: Metadata = {
     'powered-by': N3URALIA_NAME,
     company: N3URALIA_NAME,
     product: SITE_NAME,
-    category: 'Resolución guiada de obligaciones',
+    category: 'Protección de datos y resolución guiada',
     country: 'Chile',
     language: SITE_LOCALE,
     'content-authority': 'Kumplio editorial team, powered by n3uralia',
@@ -145,6 +147,8 @@ const graph = {
         'Sistemas multiagente',
         'Automatización empresarial',
         'Software fullstack',
+        'Protección de datos personales',
+        'Privacidad y Ley 21.719',
         'Resolución guiada de obligaciones',
         'Cumplimiento normativo',
       ],
@@ -155,7 +159,7 @@ const graph = {
       name: SITE_NAME,
       alternateName: 'Kumplio by n3uralia',
       url: SITE_URL,
-      slogan: 'Describe el problema. Avanza hasta el cierre.',
+      slogan: 'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.',
       logo: `${SITE_URL}/logo-kumplio.svg`,
     },
     {
@@ -177,14 +181,13 @@ const graph = {
       url: SITE_URL,
       description: PUBLIC_DESCRIPTION,
       applicationCategory: 'BusinessApplication',
-      applicationSubCategory: 'Guided obligation resolution and compliance case management',
+      applicationSubCategory: 'Data protection, privacy and guided compliance resolution',
       operatingSystem: 'Web',
       inLanguage: SITE_LOCALE,
       areaServed: { '@type': 'Country', name: 'Chile' },
       audience: [
-        { '@type': 'Audience', audienceType: 'Personas' },
-        { '@type': 'BusinessAudience', audienceType: 'Empresas' },
-        { '@type': 'ProfessionalAudience', audienceType: 'Profesionales' },
+        { '@type': 'BusinessAudience', audienceType: 'Empresas y organizaciones' },
+        { '@type': 'ProfessionalAudience', audienceType: 'Profesionales de privacidad, compliance y legal' },
       ],
       brand: { '@id': `${SITE_URL}/#brand` },
       creator: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
