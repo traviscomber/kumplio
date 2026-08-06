@@ -6,9 +6,8 @@ import type { AgentId } from './catalog'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
-// o3 is the best reasoning model — structured JSON in ~20-40s.
-// gpt-4.1 is the fast non-reasoning fallback (~8-15s).
-const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || 'o3'
+// Keep gpt-5.6 as the quality-first model, with a fast fallback for timeouts.
+const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-5.6'
 const MODEL_FALLBACK = process.env.OPENAI_FALLBACK_MODEL || 'gpt-4.1'
 const MAX_OUTPUT_TOKENS = 16000
 const REQUEST_TIMEOUT_MS = 120000
@@ -80,19 +79,13 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     'Entrega solo información sustentada. No expongas razonamiento interno privado.',
   ].filter(Boolean).join('\n\n')
 
-  const modelsToTry = [MODEL_PRIMARY, MODEL_FALLBACK].filter(
-    (m, i, arr) => arr.indexOf(m) === i,
-  )
-
+  const modelsToTry = [MODEL_PRIMARY, MODEL_FALLBACK].filter((model, index, models) => models.indexOf(model) === index)
   let response: Awaited<ReturnType<typeof openai.responses.create>> | null = null
   let lastError: unknown = null
 
   for (const model of modelsToTry) {
-    let attempt = 0
-    while (attempt < MAX_PROVIDER_RETRIES) {
+    for (let attempt = 0; attempt < MAX_PROVIDER_RETRIES; attempt += 1) {
       try {
-        // Only reasoning models (o-series) support the `reasoning` parameter
-        const isReasoningModel = model.startsWith('o') || model.startsWith('gpt-5')
         const createParams: Record<string, unknown> = {
           model,
           instructions,
@@ -109,9 +102,12 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
           safety_identifier: safetyIdentifier,
           store: false,
         }
-        if (isReasoningModel) {
-          createParams.reasoning = { effort: 'medium' }
+
+        // gpt-5.6 is the quality-first model. Only reasoning-capable models receive this option.
+        if (model.startsWith('o') || model.startsWith('gpt-5')) {
+          createParams.reasoning = { effort: 'max' }
         }
+
         response = await openai.responses.create(
           createParams as any,
           { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
@@ -122,12 +118,11 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
         lastError = error
         if (error instanceof AgentRuntimeError) throw error
         if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
-          // Timeout on this model — break inner loop and try the fallback model
+          // A timeout on 5.6 should immediately move to the fallback model.
           break
         }
-        attempt++
-        if (attempt < MAX_PROVIDER_RETRIES) {
-          await new Promise((resolve) => setTimeout(resolve, PROVIDER_RETRY_DELAY_MS * attempt))
+        if (attempt + 1 < MAX_PROVIDER_RETRIES) {
+          await new Promise((resolve) => setTimeout(resolve, PROVIDER_RETRY_DELAY_MS * (attempt + 1)))
         }
       }
     }
@@ -135,10 +130,7 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
   }
 
   if (!response) {
-    if (
-      lastError instanceof Error &&
-      (lastError.name === 'TimeoutError' || lastError.name === 'AbortError')
-    ) {
+    if (lastError instanceof Error && (lastError.name === 'TimeoutError' || lastError.name === 'AbortError')) {
       throw new AgentRuntimeError('timeout', 'The agent exceeded the execution time limit')
     }
     throw new AgentRuntimeError('provider_error', 'The reasoning provider could not complete the request')
