@@ -6,12 +6,12 @@ import type { AgentId } from './catalog'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
-const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-5'
-const MODEL_FALLBACK = 'o4-mini'
-const MAX_OUTPUT_TOKENS = 16000
-const REQUEST_TIMEOUT_MS = 240000
+const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-4.1'
+const MODEL_FALLBACK = 'gpt-4o'
+const MAX_OUTPUT_TOKENS = 8000
+const REQUEST_TIMEOUT_MS = 90000
 const MAX_PROVIDER_RETRIES = 2
-const PROVIDER_RETRY_DELAY_MS = 3000
+const PROVIDER_RETRY_DELAY_MS = 2000
 
 let client: OpenAI | null = null
 
@@ -89,13 +89,12 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     let attempt = 0
     while (attempt < MAX_PROVIDER_RETRIES) {
       try {
-        response = await openai.responses.create({
+        // Only reasoning models (o-series) support the `reasoning` parameter
+        const isReasoningModel = model.startsWith('o') || model.startsWith('gpt-5')
+        const createParams: Record<string, unknown> = {
           model,
           instructions,
           input: userInput,
-          reasoning: {
-            effort: model === MODEL_PRIMARY ? 'high' : 'medium',
-          },
           text: {
             format: {
               type: 'json_schema',
@@ -107,7 +106,14 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
           max_output_tokens: MAX_OUTPUT_TOKENS,
           safety_identifier: safetyIdentifier,
           store: false,
-        } as any, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
+        }
+        if (isReasoningModel) {
+          createParams.reasoning = { effort: 'medium' }
+        }
+        response = await openai.responses.create(
+          createParams as any,
+          { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
+        )
         lastError = null
         break
       } catch (error) {
