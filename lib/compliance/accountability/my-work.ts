@@ -191,7 +191,7 @@ function compareWorkItems(left: PersonalWorkItem, right: PersonalWorkItem) {
     unscheduled: 3,
     scheduled: 4,
   }
-  const urgencyDifference = rank[left.urgency] - rank[right.urgency)
+  const urgencyDifference = rank[left.urgency] - rank[right.urgency]
   if (urgencyDifference !== 0) return urgencyDifference
   if (left.dueAt && right.dueAt) return new Date(left.dueAt).getTime() - new Date(right.dueAt).getTime()
   return left.title.localeCompare(right.title, 'es')
