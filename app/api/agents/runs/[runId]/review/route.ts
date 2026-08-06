@@ -103,6 +103,13 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     .select('id, decision, comment, created_at')
     .single()
 
+  if (reviewError?.code === '23505') {
+    return NextResponse.json(
+      { error: 'This run already has a final review decision', code: 'already_reviewed' },
+      { status: 409 },
+    )
+  }
+
   if (reviewError || !review) {
     console.error('[agents/review] unable to create review', reviewError?.code)
     return NextResponse.json({ error: 'Unable to save review', code: 'review_create_failed' }, { status: 500 })
