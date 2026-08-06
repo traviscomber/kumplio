@@ -166,11 +166,15 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
         ? isFinalStage ? 'completed' : 'running'
         : parsed.data.decision === 'commented' ? 'pending_review' : 'paused'
 
+      const nextStage = parsed.data.decision === 'approved' && !isFinalStage
+        ? workflowStage.stage_index + 1
+        : workflow.current_stage
+
       await supabase
         .from('agent_workflows')
         .update({
           status: workflowStatus,
-          current_stage: workflowStatus === 'paused' ? workflowStage.stage_index : workflow.current_stage,
+          current_stage: workflowStatus === 'paused' ? workflowStage.stage_index : nextStage,
           completed_at: workflowStatus === 'completed' ? new Date().toISOString() : null,
           updated_at: new Date().toISOString(),
         })
