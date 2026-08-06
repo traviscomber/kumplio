@@ -28,7 +28,8 @@
     "check:workflow-persistence": "node scripts/check-workflow-artifact-persistence-v1.mjs",
     "check:case-close-audit": "node scripts/check-case-close-audit-v1.mjs",
     "check:agent-retry-versioning": "node scripts/check-agent-retry-versioning-v1.mjs",
-    "check:workflow-concurrency": "node scripts/check-workflow-concurrency-v1.mjs"
+    "check:workflow-concurrency": "node scripts/check-workflow-concurrency-v1.mjs",
+    "check:atomic-agent-review": "node scripts/check-atomic-agent-review-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
@@ -54,7 +55,7 @@
     "shadcn": "^4.8.0",
     "swr": "^2.4.1",
     "tailwind-merge": "^3.3.1",
-    "tw-animate-css": "^1.4.0",
+    "tw-animate-css": "^4.0.0",
     "xlsx": "^0.18.5",
     "zod": "^4.4.3"
   },
