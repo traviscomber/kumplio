@@ -37,6 +37,7 @@ const statusLabels: Record<string, string> = {
   approved: 'Aprobado',
   rejected: 'Rechazado',
   failed: 'Fallido',
+  superseded: 'Reemplazado',
 }
 
 export default async function LiveCasePage({ params }: { params: Promise<{ caseId: string }> }) {
@@ -77,7 +78,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
     ? await Promise.all([
         supabase
           .from('agent_workflow_stages')
-          .select('id, stage_index, agent_id, status, attempt_count, run_id, output_artifact_id, started_at, completed_at, updated_at')
+          .select('id, stage_index, agent_id, status, attempt_count, max_attempts, run_id, output_artifact_id, started_at, completed_at, updated_at')
           .eq('workflow_id', workflow.id)
           .eq('organization_id', organizationId)
           .order('stage_index', { ascending: true }),
@@ -207,7 +208,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                               </div>
                               <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
                                 <span>Etapa {stage.stage_index + 1}</span>
-                                <span>Intentos: {stage.attempt_count}</span>
+                                <span>Intentos: {stage.attempt_count} de {stage.max_attempts}</span>
                                 {stage.started_at && <span>Inicio: {new Date(stage.started_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</span>}
                                 {stage.completed_at && <span>Fin: {new Date(stage.completed_at).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}</span>}
                               </div>
@@ -225,6 +226,8 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                     runId={actionableStage?.run_id || null}
                     stageStatus={actionableStage?.status || null}
                     workflowStatus={workflow.status}
+                    attemptCount={actionableStage?.attempt_count ?? null}
+                    maxAttempts={actionableStage?.max_attempts ?? null}
                   />
 
                   <section className="rounded-2xl border bg-background/50 p-5">

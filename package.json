@@ -26,7 +26,8 @@
     "check:operational-security": "node scripts/check-operational-security-v1.mjs",
     "check:agent-dashboard": "node scripts/check-agent-dashboard-v1.mjs",
     "check:workflow-persistence": "node scripts/check-workflow-artifact-persistence-v1.mjs",
-    "check:case-close-audit": "node scripts/check-case-close-audit-v1.mjs"
+    "check:case-close-audit": "node scripts/check-case-close-audit-v1.mjs",
+    "check:agent-retry-versioning": "node scripts/check-agent-retry-versioning-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
