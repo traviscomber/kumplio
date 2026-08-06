@@ -20,6 +20,8 @@ import { getWorkflowStage } from '@/lib/agents/orchestration'
 
 export const dynamic = 'force-dynamic'
 
+const STALE_EXECUTION_MS = 7 * 60 * 1000
+
 const workflowLabels: Record<string, string> = {
   compliance_assessment: 'Evaluación integral',
   contract_review: 'Revisión contractual',
@@ -117,6 +119,12 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
       || stages.find((stage) => stage.stage_index === workflow.current_stage)
       || null
     : null
+  const canRecoverStale = Boolean(
+    workflow?.status === 'running'
+      && actionableStage?.status === 'running'
+      && actionableStage.started_at
+      && Date.now() - new Date(actionableStage.started_at).getTime() >= STALE_EXECUTION_MS,
+  )
   const finalStage = stages.length > 0 ? stages[stages.length - 1] : null
   const finalArtifact = finalStage
     ? artifacts.find((artifact) => artifact.id === finalStage.output_artifact_id)
@@ -228,6 +236,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                     workflowStatus={workflow.status}
                     attemptCount={actionableStage?.attempt_count ?? null}
                     maxAttempts={actionableStage?.max_attempts ?? null}
+                    canRecoverStale={canRecoverStale}
                   />
 
                   <section className="rounded-2xl border bg-background/50 p-5">
