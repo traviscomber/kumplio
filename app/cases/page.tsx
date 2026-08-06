@@ -7,8 +7,8 @@ import { createClient } from '@/lib/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Casos de cumplimiento',
-  description: 'Expedientes trazables de cumplimiento en KUMPLIO.',
+  title: 'Tus casos',
+  description: 'Situaciones en resolución, decisiones, acciones y evidencia en Kumplio.',
   robots: { index: false, follow: false },
 }
 
@@ -53,7 +53,7 @@ export default async function CasesPage() {
   const migrationPending = casesError?.code === '42P01' || casesError?.message?.includes('compliance_cases')
   const latestWorkflowByCase = new Map<string, { id: string; status: string; current_stage: number; total_stages: number; updated_at: string }>()
   for (const workflow of workflows || []) {
-    if (workflow.case_id && !latestWorkflowByCase.has(workflow.case_id)) {
+    if (workflow.case_id && workflow.status !== 'cancelled' && !latestWorkflowByCase.has(workflow.case_id)) {
       latestWorkflowByCase.set(workflow.case_id, workflow)
     }
   }
@@ -66,24 +66,24 @@ export default async function CasesPage() {
   return (
     <>
       <WorkspaceNav />
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 py-8 sm:px-6">
         <div className="mb-8">
-          <p className="text-sm font-medium text-primary">{organization?.name || 'Workspace de cumplimiento'}</p>
-          <h1 className="mt-1 text-3xl font-bold">Centro de casos</h1>
-          <p className="mt-2 max-w-3xl text-muted-foreground">
-            Organiza cada objetivo regulatorio como un expediente con contexto, fuentes, análisis, aprobaciones y decisiones trazables.
+          <p className="text-sm font-bold text-primary">{organization?.name || 'Tu espacio de trabajo'}</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Tus casos</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">
+            Cada caso reúne lo que necesitas resolver, el trabajo de Kumplio, las decisiones humanas, el plan y la evidencia necesaria para cerrar.
           </p>
         </div>
 
         {!organizationId ? (
           <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-8 text-center">
-            <p className="font-semibold">Tu cuenta todavía no está vinculada a una organización.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Completa el onboarding para crear tu primer workspace.</p>
+            <p className="font-semibold">Tu cuenta todavía no está vinculada a un espacio de trabajo.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Completa el onboarding para iniciar tu primer caso.</p>
           </div>
         ) : migrationPending ? (
           <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-8 text-center">
-            <p className="font-semibold">El Centro de Casos está listo para activarse.</p>
-            <p className="mt-2 text-sm text-muted-foreground">Aplica las migraciones del Agent Control Plane en Supabase.</p>
+            <p className="font-semibold">Tus casos están listos para activarse.</p>
+            <p className="mt-2 text-sm text-muted-foreground">La plataforma todavía necesita completar su configuración de datos.</p>
           </div>
         ) : (
           <CasesWorkspace cases={casesWithWorkflow as any} projects={(projects || []) as any} />
