@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { buildOrchestrationPlan, workflowTypeForIntent, type UserAudience } from '@/lib/agents/orchestrator'
@@ -22,11 +22,15 @@ const AUDIENCES: Array<{ value: UserAudience; label: string }> = [
 type Step = 'idle' | 'case' | 'workflow' | 'execution' | 'opening'
 
 const STEP_COPY: Record<Step, string> = {
-  idle: 'Empezar',
-  case: 'Creando el caso...',
+  idle: 'Empezar a resolver',
+  case: 'Creando el expediente...',
   workflow: 'Preparando el equipo...',
   execution: 'Iniciando el trabajo...',
   opening: 'Abriendo tu caso...',
+}
+
+function isAudience(value: unknown): value is UserAudience {
+  return ['person', 'company', 'professional', 'industry'].includes(String(value))
 }
 
 export function BetaCaseEntry() {
@@ -37,6 +41,18 @@ export function BetaCaseEntry() {
   const [error, setError] = useState('')
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null)
   const busy = step !== 'idle'
+
+  useEffect(() => {
+    try {
+      const stored = window.sessionStorage.getItem('kumplio:case-draft')
+      if (!stored) return
+      const draft = JSON.parse(stored) as { goal?: unknown; audience?: unknown }
+      if (typeof draft.goal === 'string' && draft.goal.trim().length >= 8) setGoal(draft.goal.trim())
+      if (isAudience(draft.audience)) setAudience(draft.audience)
+    } catch {
+      window.sessionStorage.removeItem('kumplio:case-draft')
+    }
+  }, [])
 
   async function start() {
     if (busy || goal.trim().length < 8) return
@@ -92,6 +108,7 @@ export function BetaCaseEntry() {
       const advancePayload = await advanceResponse.json().catch(() => ({}))
       if (!advanceResponse.ok) throw new Error(advancePayload.error || 'El caso está listo, pero no fue posible iniciar la primera etapa')
 
+      window.sessionStorage.removeItem('kumplio:case-draft')
       setStep('opening')
       router.push(`/cases/${caseId}/beta`)
       router.refresh()
@@ -104,12 +121,12 @@ export function BetaCaseEntry() {
   return (
     <section className="mx-auto max-w-5xl py-8 sm:py-16">
       <div className="text-center">
-        <p className="text-sm font-bold text-primary">Kumplio</p>
+        <p className="text-sm font-bold text-primary">Resolución guiada</p>
         <h1 className="mx-auto mt-4 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">
-          Convierte una obligación compleja en un plan claro.
+          Cuéntanos qué necesitas resolver.
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-          Describe lo que necesitas. Kumplio prepara el caso, organiza el trabajo y conserva el respaldo de cada decisión.
+          Kumplio prepara el expediente, organiza el trabajo y conserva el respaldo necesario para avanzar hasta el cierre.
         </p>
       </div>
 
@@ -135,7 +152,7 @@ export function BetaCaseEntry() {
           onChange={(event) => setGoal(event.target.value)}
           disabled={busy}
           rows={5}
-          placeholder="Ej.: Necesito preparar mi empresa para la Ley 21.719"
+          placeholder="Ej.: Un cliente me exige demostrar cómo protegemos sus datos"
           className="mt-3 w-full resize-none rounded-2xl border bg-background px-4 py-4 text-lg leading-8 outline-none transition focus:border-primary disabled:opacity-60"
         />
 

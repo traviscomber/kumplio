@@ -6,11 +6,10 @@ import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
 import { N3URALIA_REFERRAL_URL, PUBLIC_CONTACT } from '@/lib/public-site'
 
 const productLinks = [
-  ['Software de cumplimiento Chile', '/software-cumplimiento-chile'],
+  ['Resolución guiada', '/#diferencia'],
   ['Cómo funciona', '/#como-funciona'],
-  ['Ley 21.719', '/features/ley-21719'],
-  ['Casos de uso', '/use-cases'],
-  ['Demo pública', '/demo'],
+  ['Para quién', '/#para-quien'],
+  ['Demostración', '/demo'],
   ['Planes', '/pricing'],
 ]
 
@@ -26,7 +25,7 @@ const companyLinks = [
   ['Enterprise Studio', '/enterprise'],
   ['Kumplio y n3uralia', '/powered-by-n3uralia'],
   ['Ingresar', '/sign-in'],
-  ['Crear organización', '/sign-up'],
+  ['Resolver un caso', '/#resolver'],
   ['Contacto', '/contact'],
 ]
 
@@ -47,7 +46,7 @@ export function Footer() {
           <div>
             <Image src="/logo-kumplio.svg" alt="Kumplio" width={120} height={48} className="h-12 w-auto" />
             <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">
-              Software chileno de cumplimiento normativo e inteligencia regulatoria para convertir fuentes, obligaciones y contexto en controles, misiones, evidencia y decisiones revisables.
+              Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento. Desde el objetivo inicial hasta la decisión, la evidencia y el cierre.
             </p>
             <a
               href={N3URALIA_REFERRAL_URL}
