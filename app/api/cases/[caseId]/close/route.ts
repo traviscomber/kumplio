@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
+
+function closeError(error: { message?: string } | null) {
+  const message = error?.message || ''
+  if (message.includes('Compliance case not found')) return { status: 404, code: 'case_not_found', error: 'Compliance case not found' }
+  if (message.includes('Workflow is not completed')) return { status: 409, code: 'workflow_not_completed', error: 'The workflow is not completed' }
+  if (message.includes('Final stage is not approved')) return { status: 409, code: 'final_stage_not_approved', error: 'The final stage has not been approved' }
+  if (message.includes('Final review is not approved')) return { status: 409, code: 'final_review_not_approved', error: 'The final review has not been approved' }
+  return { status: 500, code: 'case_close_failed', error: 'Unable to close the case' }
+}
 
 export async function POST(
   _req: Request,
@@ -33,7 +43,7 @@ export async function POST(
   const organizationId = membership.organization_id
   const { data: complianceCase } = await supabase
     .from('compliance_cases')
-    .select('id, status')
+    .select('id')
     .eq('id', caseId)
     .eq('organization_id', organizationId)
     .maybeSingle()
@@ -42,77 +52,32 @@ export async function POST(
     return NextResponse.json({ error: 'Compliance case not found', code: 'case_not_found' }, { status: 404 })
   }
 
-  if (complianceCase.status === 'approved') {
-    return NextResponse.json({ caseId, status: 'approved', alreadyClosed: true })
-  }
-
   const { data: workflow } = await supabase
     .from('agent_workflows')
-    .select('id, status, total_stages')
+    .select('id')
     .eq('case_id', caseId)
     .eq('organization_id', organizationId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
-  if (!workflow || workflow.status !== 'completed') {
+  if (!workflow) {
     return NextResponse.json({ error: 'The workflow is not completed', code: 'workflow_not_completed' }, { status: 409 })
   }
 
-  const { data: finalStage } = await supabase
-    .from('agent_workflow_stages')
-    .select('id, run_id, status, stage_index')
-    .eq('workflow_id', workflow.id)
-    .eq('organization_id', organizationId)
-    .order('stage_index', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (!finalStage || finalStage.status !== 'approved' || !finalStage.run_id) {
-    return NextResponse.json({ error: 'The final stage has not been approved', code: 'final_stage_not_approved' }, { status: 409 })
-  }
-
-  const { data: finalReview } = await supabase
-    .from('agent_reviews')
-    .select('id, decision')
-    .eq('case_id', caseId)
-    .eq('run_id', finalStage.run_id)
-    .eq('organization_id', organizationId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (!finalReview || finalReview.decision !== 'approved') {
-    return NextResponse.json({ error: 'The final review has not been approved', code: 'final_review_not_approved' }, { status: 409 })
-  }
-
-  const closedAt = new Date().toISOString()
-  const { data: updatedCase, error: updateError } = await supabase
-    .from('compliance_cases')
-    .update({ status: 'approved', updated_at: closedAt })
-    .eq('id', caseId)
-    .eq('organization_id', organizationId)
-    .select('id, status, updated_at')
-    .single()
-
-  if (updateError || !updatedCase) {
-    return NextResponse.json({ error: 'Unable to close the case', code: 'case_close_failed' }, { status: 500 })
-  }
-
-  await supabase.from('compliance_case_events').insert({
-    organization_id: organizationId,
-    case_id: caseId,
-    actor_id: user.id,
-    event_type: 'case_closed',
-    summary: 'Caso marcado como resuelto',
-    changes: {
-      workflow_id: workflow.id,
-      final_stage_id: finalStage.id,
-      final_review_id: finalReview.id,
-      status: 'approved',
-      closed_at: closedAt,
-    },
+  const admin = createAdminClient()
+  const { data, error } = await admin.rpc('close_compliance_case_record', {
+    p_actor_id: user.id,
+    p_organization_id: organizationId,
+    p_case_id: caseId,
+    p_workflow_id: workflow.id,
   })
 
-  return NextResponse.json({ case: updatedCase })
+  if (error || !data) {
+    const mapped = closeError(error)
+    console.error('[cases/close]', error?.code || mapped.code)
+    return NextResponse.json({ error: mapped.error, code: mapped.code }, { status: mapped.status })
+  }
+
+  return NextResponse.json(data)
 }

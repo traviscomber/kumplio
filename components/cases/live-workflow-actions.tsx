@@ -9,11 +9,22 @@ type Props = {
   runId: string | null
   stageStatus: string | null
   workflowStatus: string
+  attemptCount: number | null
+  maxAttempts: number | null
+  canRecoverStale: boolean
 }
 
-type BusyAction = 'approve' | 'changes' | 'advance' | 'close' | null
+type BusyAction = 'approve' | 'changes' | 'advance' | 'retry' | 'recover' | 'close' | null
 
-export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowStatus }: Props) {
+export function LiveWorkflowActions({
+  workflowId,
+  runId,
+  stageStatus,
+  workflowStatus,
+  attemptCount,
+  maxAttempts,
+  canRecoverStale,
+}: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<BusyAction>(null)
   const [comment, setComment] = useState('')
@@ -21,7 +32,16 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
   const [closed, setClosed] = useState(false)
 
   const canReview = Boolean(runId && stageStatus === 'pending_review')
-  const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview
+  const canRetryFailed = stageStatus === 'failed' && workflowStatus === 'failed'
+  const canRetryChanges = stageStatus === 'changes_requested' && workflowStatus === 'paused'
+  const hasRetryState = canRetryFailed || canRetryChanges
+  const retriesExhausted = Boolean(
+    hasRetryState
+      && attemptCount !== null
+      && maxAttempts !== null
+      && attemptCount >= maxAttempts,
+  )
+  const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview && !canRecoverStale
   const canClose = workflowStatus === 'completed'
 
   async function request(path: string, body?: unknown) {
@@ -31,7 +51,11 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     })
     const payload = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(payload.error || 'No fue posible completar la acción')
+    if (!response.ok) {
+      const error = new Error(payload.error || 'No fue posible completar la acción') as Error & { code?: string }
+      error.code = payload.code
+      throw error
+    }
     return payload
   }
 
@@ -61,7 +85,6 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
         decision: 'changes_requested',
         comment: comment.trim(),
       })
-      setComment('')
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible solicitar cambios')
@@ -84,6 +107,37 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
     }
   }
 
+  async function retry() {
+    if (busy || retriesExhausted || (canRetryChanges && comment.trim().length < 3)) return
+    setBusy('retry')
+    setError('')
+    try {
+      await request(`/api/agents/workflows/${workflowId}/advance`, canRetryChanges
+        ? { instructions: comment.trim() }
+        : {})
+      setComment('')
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible reintentar la etapa')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function recoverStale() {
+    if (busy || !canRecoverStale) return
+    setBusy('recover')
+    setError('')
+    try {
+      await request(`/api/agents/workflows/${workflowId}/recover-stale`)
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible recuperar la ejecución detenida')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   async function closeCase() {
     if (busy || closed) return
     setBusy('close')
@@ -99,13 +153,28 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
     }
   }
 
-  if (!canReview && !canAdvance && !canClose) return null
+  if (!canReview && !hasRetryState && !canAdvance && !canRecoverStale && !canClose) return null
 
   return (
     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
       <h2 className="font-black">{canClose ? 'Cierre del caso' : 'Siguiente decisión'}</h2>
 
-      {canReview ? (
+      {canRecoverStale ? (
+        <>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            La ejecución superó el tiempo máximo del servidor y no entregó un resultado. Recupérala para liberar la etapa y habilitar un reintento trazable.
+          </p>
+          <button
+            type="button"
+            onClick={recoverStale}
+            disabled={Boolean(busy)}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
+          >
+            {busy === 'recover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+            Recuperar ejecución detenida
+          </button>
+        </>
+      ) : canReview ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Revisa el resultado persistido. Al aprobarlo, Kumplio iniciará la siguiente etapa real.
@@ -136,6 +205,48 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
             Solicitar cambios
           </button>
         </>
+      ) : hasRetryState ? (
+        retriesExhausted ? (
+          <>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Esta etapa alcanzó el máximo de intentos permitidos. El historial y los errores permanecen disponibles para revisión técnica.
+            </p>
+            <p className="mt-3 text-sm font-semibold text-destructive">
+              Límite alcanzado: {attemptCount ?? 0} de {maxAttempts ?? 0} intentos.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {canRetryChanges
+                ? 'La etapa necesita una nueva ejecución. Escribe instrucciones concretas para el siguiente intento.'
+                : 'La etapa falló antes de producir un resultado revisable. Puedes usar el siguiente intento disponible.'}
+            </p>
+            {attemptCount !== null && maxAttempts !== null && (
+              <p className="mt-2 text-xs font-semibold text-muted-foreground">
+                Intentos usados: {attemptCount} de {maxAttempts}.
+              </p>
+            )}
+            {canRetryChanges && (
+              <textarea
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                rows={3}
+                placeholder="Instrucciones para el reintento..."
+                className="mt-4 w-full resize-none rounded-xl border bg-background p-3 text-sm outline-none focus:border-primary"
+              />
+            )}
+            <button
+              type="button"
+              onClick={retry}
+              disabled={Boolean(busy) || (canRetryChanges && comment.trim().length < 3)}
+              className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
+            >
+              {busy === 'retry' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+              Reintentar etapa
+            </button>
+          </>
+        )
       ) : canAdvance ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">

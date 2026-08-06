@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, CircleDashed, FileCheck2, Loader2, ShieldChec
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
+import { getWorkflowStage } from '@/lib/agents/orchestration'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -44,7 +45,7 @@ export default async function AgentsDashboardPage() {
   const [{ data: workflow }, { data: latestCase }] = await Promise.all([
     supabase
       .from('agent_workflows')
-      .select('id, case_id, status, current_stage, total_stages, created_at')
+      .select('id, case_id, workflow_type, status, current_stage, total_stages, created_at')
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -63,7 +64,7 @@ export default async function AgentsDashboardPage() {
     ? await Promise.all([
         supabase
           .from('agent_workflow_stages')
-          .select('id, stage_index, agent_id, label, status, run_id, output_artifact_id')
+          .select('id, stage_index, agent_id, status, run_id, output_artifact_id')
           .eq('workflow_id', workflow.id)
           .eq('organization_id', organizationId)
           .order('stage_index', { ascending: true }),
@@ -157,6 +158,7 @@ export default async function AgentsDashboardPage() {
               <div className="mt-6 space-y-4">
                 {stages.map((stage) => {
                   const agent = AGENT_CATALOG.find((item) => item.id === stage.agent_id)
+                  const stageLabel = getWorkflowStage(workflow.workflow_type, stage.stage_index)?.label || `Etapa ${stage.stage_index + 1}`
                   return (
                     <article key={stage.id} className="rounded-2xl border bg-background/60 p-5">
                       <div className="flex items-start gap-4">
@@ -165,7 +167,7 @@ export default async function AgentsDashboardPage() {
                           <div className="flex flex-wrap items-start justify-between gap-3">
                             <div>
                               <p className="font-black">{agent?.name || stage.agent_id}</p>
-                              <p className="mt-1 text-sm leading-6 text-muted-foreground">{valueMessage(stage.status, stage.label)}</p>
+                              <p className="mt-1 text-sm leading-6 text-muted-foreground">{valueMessage(stage.status, stageLabel)}</p>
                             </div>
                             <span className="rounded-full border px-3 py-1 text-xs font-semibold">
                               {statusLabels[stage.status] || stage.status}
