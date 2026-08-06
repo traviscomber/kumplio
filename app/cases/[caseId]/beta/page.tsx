@@ -23,6 +23,7 @@ const statusLabels: Record<string, string> = {
   approved: 'Aprobado',
   rejected: 'Rechazado',
   failed: 'No completado',
+  superseded: 'Reemplazado',
 }
 
 export default async function BetaCasePage({ params }: { params: Promise<{ caseId: string }> }) {
@@ -61,7 +62,7 @@ export default async function BetaCasePage({ params }: { params: Promise<{ caseI
     ? await Promise.all([
         supabase
           .from('agent_workflow_stages')
-          .select('id, stage_index, agent_id, status, attempt_count, run_id, output_artifact_id, started_at, completed_at')
+          .select('id, stage_index, agent_id, status, attempt_count, max_attempts, run_id, output_artifact_id, started_at, completed_at')
           .eq('workflow_id', workflow.id)
           .eq('organization_id', organizationId)
           .order('stage_index', { ascending: true }),
@@ -165,6 +166,7 @@ export default async function BetaCasePage({ params }: { params: Promise<{ caseI
                               </div>
                               <span className="rounded-full border px-3 py-1 text-xs font-semibold">{statusLabels[stage.status] || stage.status}</span>
                             </div>
+                            <p className="mt-3 text-xs text-muted-foreground">Intentos: {stage.attempt_count} de {stage.max_attempts}</p>
                           </div>
                         </div>
                       </article>
@@ -179,6 +181,8 @@ export default async function BetaCasePage({ params }: { params: Promise<{ caseI
                   runId={actionableStage?.run_id || null}
                   stageStatus={actionableStage?.status || null}
                   workflowStatus={workflow.status}
+                  attemptCount={actionableStage?.attempt_count ?? null}
+                  maxAttempts={actionableStage?.max_attempts ?? null}
                 />
 
                 <section className="rounded-[28px] border bg-card p-5 shadow-sm">
