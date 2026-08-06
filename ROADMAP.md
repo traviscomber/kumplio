@@ -1,541 +1,524 @@
-# KUMPLIO — Roadmap Maestro de Producto y Arquitectura
+# KUMPLIO — Roadmap Maestro de Producto y Ejecución
 
-> **Documento canónico de producto, arquitectura y ejecución**  
+> **Documento canónico de producto, arquitectura y prioridades**  
 > Estado: activo  
-> Revisión: 2 de agosto de 2026  
+> Revisión: 6 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Horizonte: KUMPLIO v2.0  
-> Responsable técnico interno: Travis — Arquitecto IA full-stack  
+> Baseline técnico validado: `eac65ae8ca60018ce8637ab0dd5b69514bfce747`  
 > Repositorio: `traviscomber/kumplio`
 
 ---
 
-## 1. Propósito
+## 1. Regla de este roadmap
 
-Kumplio construye el sistema de conocimiento regulatorio y cumplimiento verificable más confiable para las organizaciones chilenas.
+Este archivo representa el **estado real del producto**, no el estado histórico de issues o PRs.
 
-La plataforma debe:
+Prioridad de evidencia para marcar algo como hecho:
 
-1. capturar fuentes oficiales con integridad demostrable;
-2. transformar documentos en conocimiento estructurado;
-3. relacionar obligaciones públicas con la realidad privada de cada organización;
-4. operar expedientes, controles, evidencias, riesgos y acciones;
-5. ejecutar agentes especializados con citas y revisión humana;
-6. mantener memoria organizacional privada y aislada;
-7. entregar resultados auditables para gerencia, operaciones y asesoría jurídica;
-8. extenderse a transporte, agro, minería y otras industrias chilenas.
+1. código presente en `main`;
+2. migración presente y aplicada en producción cuando corresponda;
+3. prueba técnica o transaccional verificable;
+4. despliegue verde;
+5. uso real por un usuario o piloto.
 
-> **Propuesta de valor:** Cumplimiento continuo respaldado por conocimiento y evidencia verificables.
+Los issues y PRs antiguos son evidencia histórica. Si contradicen `main` o producción, prevalece este roadmap.
 
----
-
-## 2. Documentos maestros
-
-Son vinculantes para producto, arquitectura, interfaz y agentes:
-
-- `ROADMAP.md`
-- `MODELO_CANONICO.md`
-- `LENGUAJE_CANONICO.md`
-- `PRINCIPIOS.md`
-- `ARQUITECTURA_PLATAFORMA_CONOCIMIENTO.md`
-- `AGENTS.md`
-- `.agents/skills/travis-kumplio-architect/SKILL.md`
-
-**Regla:** ningún módulo nuevo puede crear una estructura paralela de conocimiento.
-
----
-
-## 3. Estados oficiales
+### Estados oficiales
 
 | Estado | Significado |
 |---|---|
 | `PLANNED` | Definido, sin implementación activa. |
-| `DISCOVERY` | Investigación de requisitos, fuentes o arquitectura. |
-| `ACTIVE` | Desarrollo en issue, rama y PR. |
-| `DEPLOYED` | Código y migraciones en producción; falta validación real. |
-| `VALIDATED` | Flujo probado con datos y usuario real. |
-| `DONE` | Gate cerrado con métricas y evidencia. |
-| `BLOCKED` | Dependencia externa o decisión pendiente. |
+| `ACTIVE` | Desarrollo o cierre en curso. |
+| `DEPLOYED` | Código y/o migración ya están en producción. |
+| `VALIDATED` | Flujo probado de extremo a extremo con datos reales. |
+| `DONE` | Validado, medido y sin gate pendiente. |
+| `BLOCKED` | Requiere acción externa o decisión explícita. |
+| `DEFERRED` | Existe valor, pero no debe competir con la ruta crítica actual. |
 
-`DEPLOYED` no equivale a `DONE`.
+`DEPLOYED` no equivale a `VALIDATED` ni a `DONE`.
 
 ---
 
-## 4. Principios estratégicos
+## 2. Tesis de producto vigente
+
+Kumplio no debe presentarse como un dashboard genérico de compliance ni como un conjunto de agentes.
+
+La experiencia central es:
+
+```text
+Persona u organización describe una situación
+→ Kumplio crea un expediente vivo
+→ reúne contexto, fuentes y evidencia
+→ ejecuta especialistas cuando corresponde
+→ una persona revisa decisiones sensibles
+→ quedan acciones, responsables, plazos y respaldo
+→ el caso se cierra de forma auditable
+```
+
+### Propuesta de valor
+
+**Resolver situaciones regulatorias y de cumplimiento con contexto, evidencia, especialistas y revisión humana, dejando cada decisión trazable.**
+
+### Principios no negociables
 
 1. Chile primero.
-2. Todo contenido visible en español.
-3. Sin fuente no hay afirmación regulatoria.
-4. Sin evidencia no hay conclusión de cumplimiento.
-5. La IA propone; las personas validan.
-6. Conocimiento público y memoria privada están físicamente separados.
-7. La memoria de una organización nunca se comparte con otra.
-8. Versionado antes que sobrescritura.
-9. Citas exactas antes que similitud semántica.
-10. Confianza explicable, no porcentajes opacos.
-11. Scrapers auditables y operables.
-12. Núcleo común y verticales modulares.
+2. Sin fuente no hay afirmación regulatoria.
+3. Sin evidencia no hay conclusión de cumplimiento.
+4. IA genera o propone; una persona valida decisiones sensibles.
+5. Generado no significa aprobado.
+6. Toda mutación crítica debe dejar auditoría en la misma transacción.
+7. Cada organización debe permanecer aislada.
+8. Versionar antes que sobrescribir.
+9. La UI debe hablar de resultados y decisiones, no de infraestructura.
+10. No se agregan módulos nuevos mientras el golden path principal no esté validado.
 
 ---
 
-## 5. Arquitectura objetivo
+## 3. Estado ejecutivo al 6 de agosto de 2026
 
-```text
-Experiencia
-├── Panel de control
-├── Expedientes
-├── Controles y evidencias
-├── Inteligencia regulatoria
-└── Explorador del conocimiento
+### Baseline verde
 
-Flujos de trabajo
-├── Agentes especializados
-├── Revisión humana
-├── Acciones y seguimiento
-└── Artefactos versionados
+`main` está restaurado al último commit verificado en verde:
 
-Plataforma de Conocimiento
-├── Grafo Nacional de Conocimiento
-├── Memoria Organizacional
-├── Capa de Mapeo
-├── Procedencia y eventos
-├── Motor de confianza
-└── Consulta para agentes
+`eac65ae8ca60018ce8637ab0dd5b69514bfce747`
 
-Plataforma de Evidencia
-├── Documentos y versiones
-├── Capturas regulatorias
-├── Evidencias organizacionales
-└── Hashes e integridad
+Los dos despliegues Vercel asociados estaban aprobados en este baseline.
 
-Infraestructura
-├── Supabase/Postgres
-├── Plataforma de conectores
-├── Next.js/Vercel
-├── Modelos de IA
-└── Workers y tareas programadas
-```
+### Preparación actual
 
----
+| Nivel | Estado |
+|---|---|
+| Desarrollo técnico | sólido |
+| Demo comercial acompañada | apta con control |
+| Piloto supervisado | apto |
+| Beta privada | cerca, con gates pendientes |
+| Registro público autoservicio | no habilitar todavía |
+| Escalamiento multiempresa | no todavía |
 
-## 6. Estado real
+### Realidad de producción
 
-### Desplegado
+La arquitectura es mucho más avanzada que su uso real.
 
-- Next.js, Vercel y Supabase;
-- organizaciones, perfiles, membresías y onboarding transaccional;
-- expedientes y línea de tiempo;
-- documentos, obligaciones, riesgos, acciones y vínculos;
-- controles, evidencias, evaluaciones y solicitudes;
-- agentes, herramientas y flujos con aprobación humana;
-- versionado de artefactos;
-- Motor de Evidencia Regulatoria;
-- conector LeyChile mediante JSON oficial;
-- plataforma común de conectores con cola, lease, reintentos, circuit breaker y ejecuciones agotadas;
-- modelo canónico del Grafo Nacional y Memoria Organizacional;
-- servicios internos, RLS, procedencia y eventos.
+| Activo operacional | Volumen actual |
+|---|---:|
+| Casos | 2 |
+| Workflows | 4 |
+| Ejecuciones de agentes | 9 |
+| Artefactos | 3 |
+| Revisiones humanas | 2 |
+| Misiones | 0 |
+| Evidencias operacionales | 0 |
+| Controles operacionales | 0 |
+| Claims regulatorios | 186 |
+| Secciones regulatorias | 2.104 |
 
-### En desarrollo
-
-- proyección de la Ley N.º 21.719 al Grafo Nacional — issue #67, PR #68;
-- conector Diario Oficial — issue #63, PR #64 pendiente de actualización;
-- corpus verificado de obligaciones y citas de la Ley N.º 21.719.
-
-### Pendiente de validación real
-
-- primer workspace productivo creado por un usuario real;
-- prueba multiempresa completa;
-- expediente real con control, evidencia y flujo agentic;
-- configuración final de Auth;
-- primeros pilotos.
+**Conclusión:** el cuello de botella ya no es construir infraestructura; es demostrar repetidamente que un caso real puede entrar, resolverse, revisarse, ejecutarse y cerrarse sin intervención manual en la base.
 
 ---
 
-# 7. Programas maestros
+## 4. Qué ya tenemos
 
-## M0 — Fundación técnica y plataforma agentic
+### A. Experiencia y expediente — `DEPLOYED`
 
-**Estado:** `DEPLOYED`
+- narrativa pública orientada a resolución guiada;
+- centro de casos;
+- expediente canónico `/cases/[caseId]`;
+- recursos, documentos, obligaciones, riesgos y acciones vinculables;
+- timeline y eventos;
+- cierre y archivo atómicos;
+- navegación privada y noindex reforzado;
+- seguimiento de responsable y vencimiento;
+- bandeja de accountability y SLA.
 
-Infraestructura, agentes, herramientas, flujos, revisión humana, RLS, cuotas y trazabilidad.
+### B. Controles y evidencia — `DEPLOYED / NO VALIDATED`
 
-**Gate pendiente:** baseline completo de migraciones y prueba real de extremo a extremo.
-
----
-
-## M1 — Plataforma Operacional
-
-**Estado:** `DEPLOYED / ACTIVE`  
-**Issue maestro:** #38
-
-Objetivos:
-
-- expediente como unidad central;
-- onboarding real;
-- controles y evidencias;
-- aseguramiento de controles;
+- catálogo de controles;
+- biblioteca de evidencia;
+- vínculo control-obligación;
+- vínculo control-evidencia;
+- evaluación de diseño y operación;
+- historial de evaluaciones;
 - solicitudes de evidencia;
-- flujos agentic desde el expediente.
+- UI de Control Assurance;
+- workspace `/evidence`.
 
-**Gate M1:** un usuario real completa onboarding, expediente, control, evidencia, solicitud, flujo agentic y aprobación humana sin entrar a Supabase.
+La funcionalidad existe, pero falta cerrar un caso real usando estas piezas de extremo a extremo.
 
----
+### C. Plataforma agentic — `DEPLOYED / PARTIAL VALIDATION`
 
-## M2 — Plataforma Regulatoria
+- catálogo de agentes;
+- Structured Outputs y Zod;
+- límites, timeout, retries y sanitización;
+- `store: false`;
+- versionado de prompt y schema;
+- herramientas autorizadas y tool-call logging;
+- workflows por etapas;
+- revisión humana;
+- reintentos sin sobrescribir resultados anteriores;
+- stale workflow recovery;
+- decisiones y eventos auditables;
+- aprobación con justificación y checklist;
+- distinción entre resultado terminado y resultado aprobado.
 
-**Estado:** `ACTIVE / DEPLOYED PARCIAL`
+Pendiente: validar repetidamente el flujo completo y desacoplar ejecución larga del request HTTP.
 
-Objetivos:
+### D. Responsabilidad y auditoría — `DEPLOYED`
 
-- registro de autoridades y fuentes;
-- capturas inmutables y hashes;
-- comparación determinística;
-- afirmaciones, citas y revisión;
-- aplicabilidad por organización y expediente;
-- operación de conectores y scrapers.
+- asignación de responsables;
+- fechas objetivo;
+- estados SLA;
+- acciones de misión alineadas con estados reales de PostgreSQL;
+- mutaciones críticas de misión + evento de auditoría en una transacción;
+- roles de revisión alineados entre aplicación y base.
 
-Conectores prioritarios:
+### E. Motor regulatorio — `DEPLOYED`
 
-1. LeyChile/BCN — operativo.
-2. Diario Oficial — en desarrollo.
-3. Consejo para la Transparencia y futura autoridad de datos.
-4. CMF.
-5. Dirección del Trabajo.
-6. MTT y Aduanas.
-7. SAG.
-8. Sernageomin, SEA y SMA.
+- Regulatory Evidence Engine;
+- fuentes y versiones;
+- capturas y hashes;
+- claims y citas;
+- 186 claims regulatorios;
+- 2.104 secciones regulatorias;
+- LeyChile / BCN;
+- Diario Oficial;
+- Dirección del Trabajo;
+- SMA / SNIFA;
+- procedencia, cambios y registros de captura;
+- plataforma común de scrapers/conectores.
 
-**Gate M2:** Kumplio captura una fuente oficial, demuestra integridad, detecta cambios, conserva citas y vincula resultados revisados con una organización o expediente.
+### F. Plataforma de conocimiento — `DEPLOYED PARCIAL`
 
----
+- Grafo Nacional;
+- Memoria Organizacional como modelo físico;
+- nodos, relaciones y versiones;
+- procedencia y eventos;
+- `knowledge_mappings`;
+- proyección regulatoria y relaciones operacionales.
 
-## M3 — Plataforma de Conocimiento
+Pendiente: convertir esa infraestructura en una función visible que realmente mejore el expediente y la respuesta de los agentes.
 
-**Estado:** `ACTIVE`  
-**Prioridad:** P0
+### G. Seguridad aplicada recientemente — `DEPLOYED`
 
-### OBJ-KP-001 — Documentos maestros
-
-**Estado:** `DONE`
-
-### OBJ-KP-002 — Modelo físico del Grafo Nacional
-
-**Estado:** `DEPLOYED`
-
-Tablas:
-
-- `public_knowledge_nodes`
-- `public_knowledge_node_versions`
-- `public_knowledge_edges`
-- `public_knowledge_edge_versions`
-
-### OBJ-KP-003 — Modelo físico de Memoria Organizacional
-
-**Estado:** `DEPLOYED`
-
-Tablas:
-
-- `organization_memory_nodes`
-- `organization_memory_node_versions`
-- `organization_memory_edges`
-- `organization_memory_edge_versions`
-
-### OBJ-KP-004 — Capa de Mapeo
-
-**Estado:** `DEPLOYED / SIN USO REAL`
-
-Tabla: `knowledge_mappings`.
-
-### OBJ-KP-005 — Procedencia y eventos
-
-**Estado:** `DEPLOYED`
-
-Tablas:
-
-- `knowledge_provenance`
-- `knowledge_events`
-
-### OBJ-KP-006 — Integración regulatoria
-
-**Estado:** `ACTIVE / VALIDACIÓN TÉCNICA COMPLETA`
-
-Ley N.º 21.719 proyectada desde el Motor de Evidencia Regulatoria:
-
-- 1 nodo de norma;
-- 741 nodos de artículos e incisos;
-- 741 relaciones `CONTIENE`;
-- 742 procedencias verificables;
-- 742 versiones de nodo;
-- 741 versiones de relación;
-- segunda ejecución sin cambios ni versiones duplicadas;
-- historial independiente de ejecuciones;
-- escritura exclusiva por `service_role`.
-
-Pendiente para `DONE`:
-
-- fusionar PR #68;
-- integrar Diario Oficial sobre el mismo contrato;
-- incorporar revisión humana de conocimiento derivado.
-
-### OBJ-KP-007 — Integración de Memoria Organizacional
-
-**Estado:** `PLANNED`
-
-Documentos, controles, evidencias, riesgos, proveedores y expedientes deben generar nodos privados sin reemplazar sus tablas operacionales.
-
-### OBJ-KP-008 — Consulta para agentes
-
-**Estado:** `PLANNED`
-
-Los agentes deben consultar grafo, memoria, evidencia, citas y confianza antes de responder.
-
-### OBJ-KP-009 — Explorador del conocimiento
-
-**Estado:** `PLANNED`
-
-Interfaz en español para navegar nodos, relaciones, versiones, fuentes y aplicabilidad.
-
-**Gate M3:**
-
-- documentos maestros fusionados;
-- esquema reproducible y seguro;
-- Ley N.º 21.719 proyectada;
-- una organización real con memoria privada;
-- primer mapeo revisado entre obligación y control/evidencia;
-- agentes consultando el modelo;
-- explorador mínimo operativo.
+- funciones privilegiadas sensibles movidas a `private`;
+- wrappers públicos `SECURITY INVOKER`;
+- aprobación humana endurecida;
+- mutaciones críticas atómicas;
+- rutas privadas con `noindex` y `no-store`.
 
 ---
 
-## M4 — Plataforma Agentic de Conocimiento
+## 5. Qué falta y por qué importa
 
-**Estado:** `PLANNED / BASE DESPLEGADA`
+### P0 — Gates antes de autoservicio público
 
-- API unificada de consulta;
-- recuperación de subgrafo relevante;
-- uso de memoria privada por organización;
-- respuestas con afirmaciones y citas;
-- aprobación y versionado;
-- observabilidad y evaluaciones.
+1. **Supabase Auth: leaked password protection** — `BLOCKED`
+   - activar protección contra contraseñas filtradas;
+   - alinear política real del servidor con la UI;
+   - cerrar issue #115.
+
+2. **Golden path Ley N.º 21.719** — `ACTIVE`
+   - registro/login;
+   - workspace;
+   - situación real;
+   - caso;
+   - contexto y fuentes;
+   - ejecución;
+   - revisión humana;
+   - control/evidencia/acción cuando corresponda;
+   - cierre auditable.
+
+3. **Validación multiempresa real** — `ACTIVE`
+   - dos organizaciones;
+   - dos usuarios;
+   - pruebas negativas de acceso cruzado;
+   - ningún query puede depender de elegir `.limit(1)` como workspace activo.
+
+4. **Semántica comercial coherente** — `ACTIVE`
+   - mostrar solo segmentos cuyo onboarding esté realmente implementado;
+   - no prometer siete agentes actuando si el workflow usa menos;
+   - revisar claims antiguos que puedan seguir indexados o cacheados.
+
+### P1 — Operación profesional
+
+5. **Workspace activo explícito** — `PLANNED`
+   - eliminar la dependencia de “primera organización encontrada”;
+   - selector de organización;
+   - contexto de sesión explícito;
+   - pruebas cross-tenant.
+
+6. **Equipo humano usable** — `PLANNED`
+   - nombres y correos, no UUIDs;
+   - invitaciones;
+   - revocación;
+   - último acceso;
+   - historial de roles.
+
+7. **Workers durables** — `PLANNED`
+   - sacar ejecuciones largas del request HTTP;
+   - cola persistente;
+   - lease;
+   - heartbeat;
+   - idempotencia;
+   - retry exponencial;
+   - dead-letter;
+   - alertas de jobs estancados.
+
+8. **Aceptaciones legales auditables** — `PLANNED`
+   - registro append-only de términos y privacidad;
+   - versión, fecha, usuario, organización y documento aceptado.
+
+9. **Data minimization para IA** — `ACTIVE`
+   - reemplazar selecciones amplias por allowlists de columnas;
+   - contexto por propósito;
+   - revisión de PII enviada a modelos.
+
+### P2 — Deuda técnica que debe aislarse
+
+10. **Dependencias y `xlsx`** — `DEFERRED / SECURITY DEBT`
+    - no volver a mezclar ExcelJS + Next + Axios + lockfile + CI en un solo cambio;
+    - resolver en una rama exclusiva;
+    - mantener `main` verde como requisito absoluto.
+
+11. **Release qualification real** — `ACTIVE`
+    - `npm ci` reproducible;
+    - lint;
+    - typecheck;
+    - checks de dominio;
+    - build;
+    - dependency audit;
+    - smoke test;
+    - preview verde antes de merge.
+
+12. **Schema/types drift** — `ACTIVE`
+    - regenerar tipos desde producción;
+    - eliminar `as any` de nuevas tablas;
+    - tests de contrato para queries críticas.
+
+13. **Inventario de tablas y módulos** — `PLANNED`
+    - clasificar: producto activo / interno / catálogo / futuro / deprecated;
+    - mover capacidades puramente internas fuera del esquema expuesto cuando sea conveniente;
+    - no crear nuevas tablas sin owner funcional.
+
+### P3 — Producto de privacidad Ley N.º 21.719
+
+14. **Mapa de tratamientos** — `PLANNED`
+15. **Bases de licitud, finalidades y categorías de datos** — `PLANNED`
+16. **Encargados/subencargados y transferencias** — `PLANNED`
+17. **Derechos de titulares** — `PLANNED`
+18. **EIPD / alto riesgo** — `PLANNED`
+19. **Incidentes** — `PLANNED`
+20. **Privacidad desde el diseño** — `PLANNED`
+
+No se debe construir todo a la vez. Primero debe validarse qué parte del flujo Ley N.º 21.719 vende y genera valor real.
 
 ---
 
-## M5 — Datos Personales y Ley N.º 21.719
+## 6. Plan de ejecución — bloques de 3
 
-**Estado:** `DISCOVERY / PLANNED`  
-**Fecha crítica:** 1 de diciembre de 2026.
+### OLA 1 — Cerrar el producto que ya existe
 
-- registro de actividades de tratamiento;
-- bases de licitud y finalidades;
-- titulares y categorías de datos;
-- encargados y subencargados;
-- portal de derechos;
-- EIPD;
-- incidentes;
-- transferencias internacionales;
-- protección de datos desde el diseño y por defecto;
-- decisiones automatizadas;
-- modelo de prevención.
+#### Bloque 1 — Auth + workspace + tenant
 
----
+1. cerrar configuración de Supabase Auth y issue #115;
+2. implementar workspace activo explícito;
+3. ejecutar prueba multiempresa negativa y positiva.
 
-## M6 — Artefactos e informes auditables
+**Salida:** dos organizaciones operan sin depender de “primera membresía” y sin fuga cross-tenant.
 
-**Estado:** `DEPLOYED PARCIAL / ACTIVE`
+#### Bloque 2 — Golden path Ley N.º 21.719
 
-- versiones y comparación;
-- bloqueo de aprobados;
-- firma lógica;
-- PDF ejecutivo y técnico;
-- matrices Excel;
-- paquete auditable;
-- enlace privado con vencimiento.
+1. crear un caso real desde la UI;
+2. ejecutarlo hasta revisión humana y acciones;
+3. cerrarlo con expediente auditable.
+
+**Salida:** mismo caso ejecutado 10 veces desde tenants limpios sin duplicados, huérfanos ni intervención SQL.
+
+#### Bloque 3 — UX operacional
+
+1. equipo con nombres, invitaciones y roles;
+2. consolidar seguimiento, decisiones, accountability y revisión;
+3. pulir móvil del workspace y resultado de agentes.
+
+**Salida:** una persona externa entiende qué debe hacer sin conocer la arquitectura de Kumplio.
 
 ---
 
-## M7 — Pilotos y KUMPLIO v1.0 Chile
+### OLA 2 — Hacerlo confiable para pilotos
 
-**Estado:** `PLANNED`
+#### Bloque 4 — Ejecución durable
+
+1. cola persistente de jobs agentic;
+2. lease/heartbeat/retry/dead-letter;
+3. monitoreo y recuperación automática.
+
+**Salida:** ningún workflow depende de mantener vivo un request HTTP.
+
+#### Bloque 5 — Evidencia y controles reales
+
+1. completar un control de diseño y operación;
+2. completar una solicitud de evidencia de extremo a extremo;
+3. cerrar una brecha con evidencia aceptada y responsable.
+
+**Salida:** al menos un caso real demuestra obligación → control → evidencia → revisión → acción → cierre.
+
+#### Bloque 6 — Release gate
+
+1. lockfile reproducible y dependency audit;
+2. suite única de release qualification;
+3. smoke test automático de preview y producción.
+
+**Salida:** ningún merge crítico depende solo de “Vercel compiló”.
+
+---
+
+### OLA 3 — Convertir conocimiento en ventaja de producto
+
+#### Bloque 7 — Mapeo
+
+1. obligación pública → control privado;
+2. control → evidencia;
+3. revisión humana del mapeo y su historial.
+
+**Salida:** primer mapeo real aprobado sin cálculo automático de “cumplimiento”.
+
+#### Bloque 8 — Memoria organizacional
+
+1. proyectar documentos y controles útiles;
+2. relaciones privadas por organización;
+3. usar memoria en una respuesta o workflow real.
+
+**Salida:** los agentes mejoran una decisión usando conocimiento privado sin mezclar tenants.
+
+#### Bloque 9 — Consulta agentic de conocimiento
+
+1. recuperación de subgrafo relevante;
+2. citas y procedencia obligatorias;
+3. evaluación de calidad y cobertura.
+
+**Salida:** un agente responde usando fuente pública + memoria privada + evidencia de forma trazable.
+
+---
+
+### OLA 4 — Ley N.º 21.719 vendible
+
+#### Bloque 10 — Inventario mínimo de tratamientos
+
+1. actividad de tratamiento;
+2. finalidad/base/datos/titulares;
+3. responsable, sistema y conservación.
+
+#### Bloque 11 — Riesgo y evidencia de privacidad
+
+1. EIPD inicial;
+2. terceros y transferencias;
+3. controles y evidencia vinculados.
+
+#### Bloque 12 — Operación continua
+
+1. derechos de titulares;
+2. incidentes;
+3. cambios regulatorios y seguimiento.
+
+**Salida Ola 4:** un cliente piloto puede usar Kumplio para operar una parte concreta de su preparación a la Ley N.º 21.719, no solo para leer un diagnóstico.
+
+---
+
+## 7. Pilotos y comercialización
+
+### KUMPLIO v1.0 Chile — `PLANNED`
+
+Objetivos mínimos:
 
 - 3 a 5 organizaciones piloto;
-- corpus de 50 a 100 afirmaciones verificadas;
+- 10 casos reales completos;
+- al menos 1 caso Ley N.º 21.719 repetible;
 - métricas de precisión, tiempo, costo y aprobación;
-- seguridad, backups, monitoreo, soporte y pricing;
-- primeros clientes.
+- cero fugas cross-tenant;
+- backups y restore probado;
+- soporte y runbooks;
+- pricing validado con conversaciones reales.
+
+### Métricas mínimas de producto
+
+- tiempo desde registro a primer caso útil;
+- porcentaje de casos que llegan a cierre;
+- tiempo de revisión humana;
+- porcentaje de outputs aprobados / cambios solicitados / rechazados;
+- costo por caso y por etapa;
+- tasa de retries;
+- trabajos estancados;
+- evidencia solicitada vs recibida;
+- tiempo hasta cerrar una brecha;
+- retención y repetición de uso por organización.
 
 ---
 
-## M8 — Plataforma vertical y aplicación de terreno
+## 8. Qué queda fuera de la ruta crítica
 
-**Estado:** `PLANNED`
+Hasta validar v1.0 no deben competir con los bloques anteriores:
 
-- arquitectura modular;
-- permisos por sitio, faena, predio o flota;
-- PWA instalable;
-- cámara, firma y QR;
-- geolocalización opcional;
-- operación sin conexión.
+- marketplace amplio;
+- studio genérico;
+- benchmark avanzado;
+- múltiples verticales simultáneas;
+- PWA de terreno;
+- operación offline;
+- geolocalización;
+- integraciones enterprise no requeridas por piloto;
+- automatización total sin revisión humana.
 
----
+### Verticales futuras
 
-## M9 — KUMPLIO Transporte
+- KUMPLIO Transporte;
+- KUMPLIO Agro;
+- KUMPLIO Minería.
 
-**Estado:** `PLANNED`
-
-Flotas, vehículos, conductores, cargas, rutas, viajes, documentos, previaje, incidentes, contratistas, telemetría y evidencia de terreno.
-
----
-
-## M10 — KUMPLIO Agro
-
-**Estado:** `PLANNED`
-
-Predios, cuarteles, cultivos, temporadas, lotes, insumos, aplicaciones, trazabilidad, inspecciones, inocuidad y exportación.
+Primero validar el núcleo común; después una vertical a la vez.
 
 ---
 
-## M11 — KUMPLIO Minería
+## 9. Deuda de gestión del repositorio
 
-**Estado:** `PLANNED`, condicionado a una empresa asociada de diseño.
+Existen issues y PRs históricos abiertos cuyo contenido ya fue parcial o totalmente absorbido por `main`.
 
-Faenas, instalaciones, contratistas, permisos, RCA, controles críticos, fiscalizaciones, incidentes y compromisos.
+Ejemplos: #29, #38, #46, #47, #51, #52, #53, #57, #60, #63, #79 y PRs antiguos como #30, #31, #35 y #55.
 
----
+**Plan:** no usarlos como fuente de verdad. En una ola administrativa separada se debe:
 
-## M12 — KUMPLIO v2.0
-
-**Estado:** objetivo final.
-
-Requiere plataforma SaaS estable, Grafo Nacional maduro, Memoria Organizacional operativa, Ley N.º 21.719 completa, agentes consultando conocimiento, al menos una vertical validada y controles de seguridad enterprise.
+1. comparar cada issue/PR con `main` y producción;
+2. cerrar como `completed` o `superseded` lo ya absorbido;
+3. crear issues nuevos y pequeños solo para gaps reales del roadmap vigente.
 
 ---
 
-# 8. Activos estratégicos
+## 10. Definition of Done para registro público
 
-No se usan porcentajes subjetivos. Cada índice se calcula con entregables verificables.
+Kumplio puede abrir autoservicio público únicamente cuando:
 
-| Activo | Entregables del índice | Estado actual |
-|---|---|---|
-| Modelo Canónico | documentos, esquema, verificadores, lenguaje | `4/4 — COMPLETO` |
-| Grafo Nacional | modelo, primera fuente, jerarquía, versionado, procedencia, revisión | `5/6` |
-| Memoria Organizacional | modelo, aislamiento, proyección operativa, relaciones, consulta, piloto | `2/6` |
-| Capa de Mapeo | modelo, validación, propuesta, revisión, primer mapeo real | `2/5` |
-| Motor de Evidencia | documentos, versiones, hashes, citas, controles, solicitudes | `6/6 — DESPLEGADO` |
-| Plataforma de Conectores | registro, cola, lease, reintentos, circuit breaker, panel, conectores reales | `6/7` |
-| Corpus Ley N.º 21.719 | captura, secciones, grafo, afirmaciones, citas revisadas, aplicabilidad | `3/6` |
-| Plataforma Agentic | agentes, herramientas, flujos, aprobación, versiones, conocimiento, evaluaciones | `5/7` |
-| Diario Oficial | parser, modelo, conector, operación, captura real, grafo | `3/6` |
-
----
-
-# 9. Próximas dos olas de tres sprints
-
-## Ola siguiente
-
-### Sprint A — Cerrar Ley N.º 21.719 en el Grafo Nacional
-
-- fusionar PR #68;
-- confirmar producción;
-- registrar revisión técnica;
-- crear vista de salud del grafo.
-
-### Sprint B — Primera Memoria Organizacional
-
-- proyectar documentos, controles y evidencias;
-- mantener aislamiento por organización;
-- crear relaciones privadas;
-- validar con un workspace real.
-
-### Sprint C — Primer Motor de Mapeo
-
-- obligación pública → control privado;
-- control privado → evidencia;
-- propuesta automática;
-- aprobación humana;
-- historial de decisiones.
-
-## Ola posterior
-
-### Sprint D — Corpus verificado Ley N.º 21.719
-
-### Sprint E — API de conocimiento para agentes
-
-### Sprint F — Explorador mínimo del conocimiento
+- leaked password protection esté activado y verificado;
+- audiencia pública y onboarding coincidan;
+- exista workspace activo explícito;
+- pruebas cross-tenant estén automatizadas;
+- un caso Ley N.º 21.719 complete el golden path repetidamente;
+- “validado” signifique aprobación humana real;
+- mutaciones críticas y auditoría sean atómicas;
+- jobs agentic sean idempotentes, recuperables y observables;
+- release qualification sea reproducible;
+- dependencias críticas no tengan vulnerabilidades conocidas aceptadas sin plan;
+- rutas privadas permanezcan noindex/no-store;
+- cierre de caso produzca expediente completo y auditable;
+- exista backup/restore probado;
+- soporte y runbooks estén documentados.
 
 ---
 
-# 10. Riesgos activos
+## 11. Próximo bloque recomendado
 
-| ID | Riesgo | Impacto | Mitigación | Estado |
-|---|---|---|---|---|
-| R-001 | Fuente oficial cambia formato o servicio | Alto | fixtures, health checks, circuit breaker y revisión | Activo |
-| R-002 | Conocimiento sin revisión se presenta como obligación | Crítico | estados, citas, aprobación humana | Mitigado técnicamente |
-| R-003 | Cruce de memoria entre organizaciones | Crítico | separación física, RLS y validadores Postgres | Mitigado técnicamente |
-| R-004 | Grafo duplica el texto regulatorio | Medio | identidad y procedencia; texto permanece en Evidence Engine | Mitigado |
-| R-005 | Roadmap avanza sin usuario real | Alto | gate de validación productiva | Activo |
-| R-006 | Scraper Diario Oficial queda desactualizado frente a `main` | Medio | rebase y cierre antes del siguiente conector | Activo |
-| R-007 | Dependencia excesiva de un modelo de IA | Alto | reglas determinísticas, evaluaciones y revisión | Activo |
+La próxima ejecución debe ser **OLA 1 — Bloque 1**:
 
----
+1. cerrar Auth;
+2. workspace activo explícito;
+3. prueba multiempresa completa.
 
-# 11. Deuda técnica
-
-| ID | Deuda | Prioridad | Estado |
-|---|---|---|---|
-| DT-001 | Consolidar baseline histórico de migraciones | Alta | Pendiente |
-| DT-002 | Corregir índice faltante preexistente de aplicabilidad regulatoria | Media | Pendiente |
-| DT-003 | Optimizar políticas duplicadas de `organization_members` | Media | Pendiente |
-| DT-004 | Activar protección de contraseñas filtradas en Supabase Auth | Alta | Manual pendiente |
-| DT-005 | Actualizar o reemplazar PR #64 de Diario Oficial | Alta | Pendiente |
-| DT-006 | Añadir worker programado para proyecciones regulatorias | Media | Pendiente |
-
----
-
-# 12. Investigación
-
-| ID | Investigación | Resultado esperado | Estado |
-|---|---|---|---|
-| I-001 | Modelo canónico de conocimiento | documentos y esquema | Completado |
-| I-002 | LeyChile oficial | método estructurado y estable | Completado |
-| I-003 | Diario Oficial | ediciones, CVE y PDFs | En curso |
-| I-004 | Agencia de Protección de Datos Personales | fuentes e instrucciones oficiales | Continuo |
-| I-005 | Graph + memoria para agentes | contrato de consulta y evaluación | Próximo |
-| I-006 | Vertical Transporte | design partner y fuentes | Planificado |
-
----
-
-# 13. Trazabilidad obligatoria
-
-```text
-VISIÓN
-→ OBJETIVO
-→ PROGRAMA
-→ ISSUE
-→ RAMA
-→ PR
-→ CÓDIGO / MIGRACIÓN
-→ PREVIEW
-→ PRUEBA
-→ MERGE
-→ PRODUCCIÓN
-→ MÉTRICA
-→ EVIDENCIA DE CIERRE
-```
-
-Todo objetivo debe enlazar issue, PR, commit, migración, prueba y métrica.
-
----
-
-# 14. Definición de terminado
-
-KUMPLIO v2.0 estará terminado cuando:
-
-1. opere de forma estable como SaaS multiempresa;
-2. el Grafo Nacional contenga fuentes regulatorias relevantes para Chile;
-3. la Memoria Organizacional funcione con aislamiento demostrado;
-4. los agentes consulten conocimiento y devuelvan citas;
-5. la Ley N.º 21.719 pueda gestionarse de extremo a extremo;
-6. al menos una vertical esté validada comercialmente;
-7. existan pilotos, métricas, seguridad, soporte y continuidad operacional;
-8. ninguna conclusión crítica dependa exclusivamente de IA sin revisión humana.
+No se inicia una funcionalidad nueva hasta cerrar esos tres puntos.
