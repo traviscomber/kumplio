@@ -104,29 +104,50 @@ export function UniversalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex min-w-[210px] items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-2 text-sm text-muted-foreground shadow-sm transition hover:border-primary/40 hover:text-foreground"
+        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-sm text-muted-foreground shadow-sm transition hover:border-primary/40 hover:text-foreground sm:h-auto sm:w-auto sm:min-w-[180px] sm:justify-between sm:gap-3 sm:px-3 sm:py-2 lg:min-w-[210px]"
         aria-label="Buscar en Kumplio"
+        aria-haspopup="dialog"
+        title="Buscar en Kumplio"
       >
-        <span className="inline-flex items-center gap-2"><Search className="h-4 w-4" />Buscar o preguntar</span>
-        <kbd className="rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-semibold">⌘ K</kbd>
+        <span className="inline-flex items-center gap-2">
+          <Search className="h-4 w-4" />
+          <span className="hidden sm:inline">Buscar</span>
+        </span>
+        <kbd className="hidden rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-semibold lg:inline-block">⌘ K</kbd>
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/45 px-4 pt-[10vh] backdrop-blur-sm" onMouseDown={() => setOpen(false)}>
-          <section className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-background shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[100] flex items-start justify-center bg-black/45 px-3 pt-[7vh] backdrop-blur-sm sm:px-4 sm:pt-[10vh]"
+          onMouseDown={() => setOpen(false)}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label="Buscar en Kumplio"
+            className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-              <Search className="h-5 w-5 text-primary" />
+              <Search className="h-5 w-5 shrink-0 text-primary" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Describe lo que necesitas encontrar…"
+                placeholder="Busca por significado dentro de tu organización…"
                 className="min-w-0 flex-1 bg-transparent py-2 text-base outline-none placeholder:text-muted-foreground"
               />
-              <button onClick={() => setOpen(false)} className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground" aria-label="Cerrar búsqueda"><X className="h-4 w-4" /></button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Cerrar búsqueda"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            <div className="max-h-[65vh] overflow-y-auto p-3">
+            <div className="max-h-[72vh] overflow-y-auto p-3 sm:max-h-[65vh]">
               {query.trim().length < 2 && (
                 <div className="p-6 text-center">
                   <p className="font-semibold">Encuentra información por significado</p>
@@ -142,7 +163,12 @@ export function UniversalSearch() {
                     {items.map((item) => {
                       const Icon = icons[item.type as keyof typeof icons] || Search
                       return (
-                        <button key={`${item.type}-${item.id}`} onClick={() => navigate(item.href)} className="flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-muted">
+                        <button
+                          type="button"
+                          key={`${item.type}-${item.id}`}
+                          onClick={() => navigate(item.href)}
+                          className="flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-muted"
+                        >
                           <span className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary"><Icon className="h-4 w-4" /></span>
                           <span className="min-w-0 flex-1">
                             <span className="block truncate font-semibold">{item.title}</span>
