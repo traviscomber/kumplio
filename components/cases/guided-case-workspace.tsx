@@ -132,7 +132,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
   const finalAgent = finalStage
     ? AGENT_CATALOG.find((item) => item.id === finalStage.agent_id) || null
     : null
-  const validatedStages = stages.filter((stage) => ['completed', 'approved'].includes(stage.status)).length
+  const approvedStages = stages.filter((stage) => stage.status === 'approved').length
 
   return (
     <>
@@ -166,7 +166,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
             {workflow ? (
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <Metric label="Estado actual" value={statusLabels[workflow.status] || workflow.status} />
-                <Metric label="Pasos validados" value={`${validatedStages} de ${workflow.total_stages}`} />
+                <Metric label="Pasos validados" value={`${approvedStages} de ${workflow.total_stages}`} />
                 <Metric label="Resultados disponibles" value={String(artifacts.filter((artifact) => artifact.status !== 'superseded').length)} />
               </div>
             ) : (
@@ -197,7 +197,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
               <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Control humano</p>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  Kumplio no presenta una etapa como válida hasta que exista un resultado persistido y una decisión registrada.
+                  Kumplio no presenta una etapa como validada hasta que exista un resultado persistido y una aprobación humana registrada.
                 </p>
               </section>
             </div>
@@ -230,8 +230,8 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                     const agent = AGENT_CATALOG.find((item) => item.id === stage.agent_id)
                     const stageLabel = getWorkflowStage(workflow.workflow_type, stage.stage_index)?.label || `Paso ${stage.stage_index + 1}`
                     const isRunning = stage.status === 'running'
-                    const isDone = ['completed', 'approved'].includes(stage.status)
-                    const needsReview = ['pending_review', 'changes_requested'].includes(stage.status)
+                    const isDone = stage.status === 'approved'
+                    const needsReview = ['completed', 'pending_review', 'changes_requested'].includes(stage.status)
                     const failed = stage.status === 'failed'
 
                     return (
@@ -254,7 +254,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                                 <p className="font-black">{agent?.name || stage.agent_id}</p>
                                 <p className="mt-1 text-sm leading-6 text-muted-foreground">{valueMessage(stage.status, stageLabel)}</p>
                               </div>
-                              <span className="rounded-full border px-3 py-1 text-xs font-semibold">{statusLabels[stage.status] || stage.status}</span>
+                              <span className="rounded-full border px-3 py-1 text-xs font-semibold">{stageStatusLabel(stage.status)}</span>
                             </div>
                             <p className="mt-3 text-xs text-muted-foreground">Intentos utilizados: {stage.attempt_count} de {stage.max_attempts}</p>
                           </div>
@@ -351,11 +351,17 @@ function currentDetail(workflowStatus: string, stageStatus: string | null) {
   return 'El siguiente paso se habilitará cuando sus dependencias estén disponibles.'
 }
 
+function stageStatusLabel(status: string) {
+  if (status === 'completed') return 'Resultado generado'
+  return statusLabels[status] || status
+}
+
 function valueMessage(status: string, label: string) {
   if (status === 'running') return `${label}. Está preparando un resultado verificable para este caso.`
+  if (status === 'completed') return `${label}. La ejecución terminó, pero todavía necesita aprobación humana.`
   if (status === 'pending_review') return `${label}. El resultado está disponible y necesita una decisión antes de continuar.`
   if (status === 'changes_requested') return `${label}. Debe incorporar los cambios solicitados antes de avanzar.`
-  if (['completed', 'approved'].includes(status)) return `${label}. Su resultado quedó validado y guardado en el expediente.`
+  if (status === 'approved') return `${label}. Su resultado fue aprobado y quedó guardado en el expediente.`
   if (status === 'failed') return `${label}. No terminó; puedes reintentarlo sin perder el trabajo ya aprobado.`
   return `${label}. Comenzará cuando estén disponibles los insumos necesarios.`
 }
