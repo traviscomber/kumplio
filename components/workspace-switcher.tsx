@@ -83,9 +83,9 @@ export function WorkspaceSwitcher() {
 
   if (loading) {
     return (
-      <div className="hidden h-10 min-w-[150px] items-center gap-2 rounded-lg border border-border/70 px-3 text-xs text-muted-foreground md:flex">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 text-muted-foreground md:w-auto md:min-w-[150px] md:justify-start md:gap-2 md:px-3">
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-        Organización
+        <span className="hidden text-xs md:inline">Organización</span>
       </div>
     )
   }
@@ -93,29 +93,31 @@ export function WorkspaceSwitcher() {
   if (!active) return null
 
   return (
-    <div className="relative hidden md:block">
+    <div className="relative shrink-0">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex h-10 max-w-[260px] items-center gap-2 rounded-lg border border-border/70 bg-card/60 px-3 text-left transition-colors hover:bg-muted"
+        aria-label={`Organización activa: ${active.organization_name}`}
+        title={`Organización activa: ${active.organization_name}`}
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/70 bg-card/60 transition-colors hover:bg-muted md:w-auto md:max-w-[260px] md:justify-start md:gap-2 md:px-3 md:text-left"
       >
         <Building2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-        <span className="min-w-0 flex-1">
+        <span className="hidden min-w-0 flex-1 md:block">
           <span className="block truncate text-xs font-bold text-foreground">{active.organization_name}</span>
           <span className="block truncate text-[10px] text-muted-foreground">
             {roleLabels[active.role] || 'Miembro'}
           </span>
         </span>
-        {workspaces.length > 1 && <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />}
+        {workspaces.length > 1 && <ChevronsUpDown className="hidden h-4 w-4 shrink-0 text-muted-foreground md:block" aria-hidden="true" />}
       </button>
 
       {open && workspaces.length > 1 && (
         <div
           role="listbox"
           aria-label="Cambiar organización activa"
-          className="absolute right-0 top-12 z-50 w-[300px] overflow-hidden rounded-xl border border-border bg-popover p-2 shadow-xl"
+          className="absolute right-0 top-12 z-50 w-[min(300px,calc(100vw-24px))] overflow-hidden rounded-xl border border-border bg-popover p-2 shadow-xl"
         >
           <p className="px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Organización activa
