@@ -95,6 +95,12 @@ export async function assignDecision(
 }
 
 function normalizeRole(value: unknown): WorkspaceRole {
-  if (value === 'owner' || value === 'admin' || value === 'compliance' || value === 'reviewer') return value
+  if (
+    value === 'owner'
+    || value === 'admin'
+    || value === 'compliance'
+    || value === 'reviewer'
+    || value === 'viewer'
+  ) return value
   return 'member'
 }

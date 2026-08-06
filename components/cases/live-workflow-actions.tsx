@@ -16,6 +16,18 @@ type Props = {
 
 type BusyAction = 'approve' | 'changes' | 'advance' | 'retry' | 'recover' | 'close' | null
 
+type ApprovalChecklist = {
+  evidence_reviewed: boolean
+  limitations_understood: boolean
+  outcome_supported: boolean
+}
+
+const initialChecklist: ApprovalChecklist = {
+  evidence_reviewed: false,
+  limitations_understood: false,
+  outcome_supported: false,
+}
+
 export function LiveWorkflowActions({
   workflowId,
   runId,
@@ -28,6 +40,7 @@ export function LiveWorkflowActions({
   const router = useRouter()
   const [busy, setBusy] = useState<BusyAction>(null)
   const [comment, setComment] = useState('')
+  const [checklist, setChecklist] = useState<ApprovalChecklist>(initialChecklist)
   const [error, setError] = useState('')
   const [closed, setClosed] = useState(false)
 
@@ -43,6 +56,10 @@ export function LiveWorkflowActions({
   )
   const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview && !canRecoverStale
   const canClose = workflowStatus === 'completed'
+  const approvalReady = comment.trim().length >= 3
+    && checklist.evidence_reviewed
+    && checklist.limitations_understood
+    && checklist.outcome_supported
 
   async function request(path: string, body?: unknown) {
     const response = await fetch(path, {
@@ -59,15 +76,29 @@ export function LiveWorkflowActions({
     return payload
   }
 
+  function resetReviewFields() {
+    setComment('')
+    setChecklist(initialChecklist)
+  }
+
+  function toggleChecklist(key: keyof ApprovalChecklist) {
+    setChecklist((current) => ({ ...current, [key]: !current[key] }))
+  }
+
   async function approveAndContinue() {
-    if (!runId || busy) return
+    if (!runId || busy || !approvalReady) return
     setBusy('approve')
     setError('')
     try {
-      const review = await request(`/api/agents/runs/${runId}/review`, { decision: 'approved' })
+      const review = await request(`/api/agents/runs/${runId}/review`, {
+        decision: 'approved',
+        comment: comment.trim(),
+        checklist,
+      })
       if (review.workflowStatus !== 'completed') {
         await request(`/api/agents/workflows/${workflowId}/advance`, {})
       }
+      resetReviewFields()
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible aprobar la etapa')
@@ -85,6 +116,7 @@ export function LiveWorkflowActions({
         decision: 'changes_requested',
         comment: comment.trim(),
       })
+      resetReviewFields()
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible solicitar cambios')
@@ -177,24 +209,45 @@ export function LiveWorkflowActions({
       ) : canReview ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Revisa el resultado persistido. Al aprobarlo, Kumplio iniciará la siguiente etapa real.
+            Revisa el resultado persistido. Aprobar significa que verificaste su respaldo y sus límites; no solo que el agente terminó.
           </p>
-          <button
-            type="button"
-            onClick={approveAndContinue}
-            disabled={Boolean(busy)}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
-          >
-            {busy === 'approve' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-            Aprobar y continuar
-          </button>
+
           <textarea
             value={comment}
             onChange={(event) => setComment(event.target.value)}
             rows={3}
-            placeholder="Explica qué debe corregirse..."
+            placeholder="Justifica la aprobación o explica qué debe corregirse..."
             className="mt-4 w-full resize-none rounded-xl border bg-background p-3 text-sm outline-none focus:border-primary"
           />
+
+          <fieldset className="mt-4 space-y-3 rounded-xl border bg-background/60 p-4">
+            <legend className="px-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Confirmaciones para aprobar</legend>
+            <ChecklistItem
+              checked={checklist.evidence_reviewed}
+              onChange={() => toggleChecklist('evidence_reviewed')}
+              label="Revisé las fuentes y evidencias relacionadas."
+            />
+            <ChecklistItem
+              checked={checklist.limitations_understood}
+              onChange={() => toggleChecklist('limitations_understood')}
+              label="Entiendo los supuestos, reservas y datos que todavía faltan."
+            />
+            <ChecklistItem
+              checked={checklist.outcome_supported}
+              onChange={() => toggleChecklist('outcome_supported')}
+              label="La conclusión está suficientemente respaldada para avanzar."
+            />
+          </fieldset>
+
+          <button
+            type="button"
+            onClick={approveAndContinue}
+            disabled={Boolean(busy) || !approvalReady}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {busy === 'approve' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+            Aprobar y continuar
+          </button>
           <button
             type="button"
             onClick={requestChanges}
@@ -281,5 +334,19 @@ export function LiveWorkflowActions({
 
       {error && <p className="mt-3 text-sm font-semibold text-destructive">{error}</p>}
     </section>
+  )
+}
+
+function ChecklistItem({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 text-sm leading-6">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="mt-1 h-4 w-4 shrink-0 accent-primary"
+      />
+      <span>{label}</span>
+    </label>
   )
 }

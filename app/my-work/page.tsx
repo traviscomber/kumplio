@@ -69,7 +69,7 @@ export default async function MyWorkPage() {
             {work.items.length === 0 ? 'No tienes asuntos asignados.' : `${work.items.length} asuntos requieren tu atención.`}
           </h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Inicia, reprograma y cierra tus misiones desde una sola bandeja. Cada cambio queda registrado para auditoría.
+            Inicia, reprograma y cierra tus misiones desde una sola bandeja. El cambio y su evento de auditoría se guardan en una misma transacción.
           </p>
         </section>
 
@@ -124,6 +124,7 @@ async function getActionContext() {
 
 function revalidateWork() {
   revalidatePath('/my-work')
+  revalidatePath('/accountability')
   revalidatePath('/dashboard')
   revalidatePath('/missions')
 }
@@ -149,6 +150,8 @@ function WorkCard({
   rescheduleAction: (formData: FormData) => Promise<void>
   completeAction: (formData: FormData) => Promise<void>
 }) {
+  const canStart = item.status === 'draft' || item.status === 'ready'
+
   return (
     <article className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
@@ -165,10 +168,10 @@ function WorkCard({
 
           {item.kind === 'mission' && (
             <div className="mt-5 grid gap-3 lg:grid-cols-3">
-              {item.status !== 'in_progress' && (
+              {canStart && (
                 <form action={startAction}>
                   <input type="hidden" name="missionId" value={item.id} />
-                  <button className="inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold hover:bg-muted">
+                  <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold hover:bg-muted">
                     <Play className="h-4 w-4" /> Iniciar
                   </button>
                 </form>
@@ -184,7 +187,7 @@ function WorkCard({
                   className="min-w-0 flex-1 rounded-xl border bg-background px-3 py-2 text-sm"
                   aria-label={`Nueva fecha para ${item.title}`}
                 />
-                <button className="rounded-xl border px-3 py-2 text-sm font-bold hover:bg-muted">Guardar</button>
+                <button type="submit" className="rounded-xl border px-3 py-2 text-sm font-bold hover:bg-muted">Guardar</button>
               </form>
 
               <form action={completeAction} className="flex gap-2 lg:col-span-1">
@@ -196,7 +199,7 @@ function WorkCard({
                   placeholder="Nota de cierre"
                   className="min-w-0 flex-1 rounded-xl border bg-background px-3 py-2 text-sm"
                 />
-                <button className="rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground">Completar</button>
+                <button type="submit" className="rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground">Completar</button>
               </form>
             </div>
           )}
@@ -231,9 +234,12 @@ function urgencyLabel(urgency: WorkUrgency, dueAt: string | null) {
 }
 
 function statusLabel(status: string) {
-  if (status === 'in_progress') return 'En curso'
+  if (status === 'active') return 'En curso'
   if (status === 'blocked') return 'Bloqueada'
-  return 'Pendiente'
+  if (status === 'in_review') return 'En revisión'
+  if (status === 'ready') return 'Lista para iniciar'
+  if (status === 'draft') return 'Borrador'
+  return status
 }
 
 function priorityLabel(priority: string) {

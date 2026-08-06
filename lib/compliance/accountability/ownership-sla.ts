@@ -62,7 +62,7 @@ export async function listAccountableMissions(admin: SupabaseClient, organizatio
   return (missions || []).map((mission) => ({
     id: String(mission.id),
     title: String(mission.title || 'Misión de cumplimiento'),
-    status: String(mission.status || 'queued'),
+    status: String(mission.status || 'draft'),
     priority: String(mission.priority || 'medium'),
     ownerId: mission.owner_id ? String(mission.owner_id) : null,
     dueAt: mission.due_at ? String(mission.due_at) : null,
@@ -76,51 +76,34 @@ export async function assignMissionOwner(
   admin: SupabaseClient,
   organizationId: string,
   missionId: string,
-  ownerId: string,
+  ownerId: string | null,
   dueAt: string | null,
   actorUserId: string,
 ): Promise<void> {
-  const { data: member, error: memberError } = await admin
-    .from('organization_members')
-    .select('user_id')
-    .eq('organization_id', organizationId)
-    .eq('user_id', ownerId)
-    .maybeSingle()
-  if (memberError) throw new Error(`No fue posible validar al responsable: ${memberError.message}`)
-  if (!member) throw new Error('El responsable no pertenece a esta organización.')
-
-  const { data: mission, error: missionError } = await admin
-    .from('missions')
-    .select('id,owner_id,due_at,status')
-    .eq('id', missionId)
-    .eq('organization_id', organizationId)
-    .maybeSingle()
-  if (missionError) throw new Error(`No fue posible validar la misión: ${missionError.message}`)
-  if (!mission) throw new Error('La misión no pertenece a esta organización.')
-
-  const { error: updateError } = await admin
-    .from('missions')
-    .update({ owner_id: ownerId, due_at: dueAt, updated_at: new Date().toISOString() })
-    .eq('id', missionId)
-    .eq('organization_id', organizationId)
-  if (updateError) throw new Error(`No fue posible asignar la misión: ${updateError.message}`)
-
-  const { error: eventError } = await admin.from('mission_events').insert({
-    organization_id: organizationId,
-    mission_id: missionId,
-    event_type: 'ownership_updated',
-    actor_type: 'user',
-    actor_user_id: actorUserId,
-    from_status: mission.status,
-    to_status: mission.status,
-    payload: {
-      previous_owner_id: mission.owner_id,
-      owner_id: ownerId,
-      previous_due_at: mission.due_at,
-      due_at: dueAt,
-    },
+  const { error } = await admin.rpc('update_mission_accountability', {
+    p_actor_id: actorUserId,
+    p_organization_id: organizationId,
+    p_mission_id: missionId,
+    p_owner_id: ownerId,
+    p_due_at: dueAt,
   })
-  if (eventError) throw new Error(`La asignación se guardó, pero falló la bitácora: ${eventError.message}`)
+
+  if (!error) return
+
+  const message = error.message || ''
+  if (message.includes('mission_assignment_forbidden')) {
+    throw new Error('Tu rol no permite asignar responsables ni vencimientos.')
+  }
+  if (message.includes('mission_owner_not_member')) {
+    throw new Error('El responsable seleccionado no pertenece a esta organización.')
+  }
+  if (message.includes('mission_terminal')) {
+    throw new Error('La misión ya está cerrada y no admite cambios.')
+  }
+  if (message.includes('mission_not_found')) {
+    throw new Error('La misión no existe o no pertenece a esta organización.')
+  }
+  throw new Error(`No fue posible actualizar la responsabilidad: ${error.message}`)
 }
 
 export async function listAuditEvents(admin: SupabaseClient, organizationId: string): Promise<AuditEvent[]> {
@@ -163,7 +146,8 @@ function calculateSla(dueAt: string | null): AccountableMission['sla'] {
 function roleLabel(role: string) {
   if (role === 'owner') return 'Propietario'
   if (role === 'admin') return 'Administrador'
-  if (role === 'compliance') return 'Compliance'
+  if (role === 'compliance') return 'Cumplimiento'
   if (role === 'reviewer') return 'Revisor'
+  if (role === 'viewer') return 'Observador'
   return 'Miembro'
 }

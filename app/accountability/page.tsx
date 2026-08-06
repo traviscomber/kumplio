@@ -35,13 +35,13 @@ export default async function AccountabilityPage() {
     if (!currentAccess.canAssignWork) throw new Error('Tu rol no permite reasignar trabajo.')
 
     const missionId = String(formData.get('missionId') || '')
-    const ownerId = String(formData.get('ownerId') || '')
+    const ownerValue = String(formData.get('ownerId') || '')
     const dueAtValue = String(formData.get('dueAt') || '')
     await assignMissionOwner(
       serverAdmin,
       currentAccess.organizationId,
       missionId,
-      ownerId,
+      ownerValue || null,
       dueAtValue ? new Date(`${dueAtValue}T23:59:59`).toISOString() : null,
       currentUser.id,
     )
@@ -67,9 +67,9 @@ export default async function AccountabilityPage() {
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="rounded-3xl border bg-card p-6 sm:p-8">
           <p className="text-sm font-semibold text-primary">Responsabilidad operativa</p>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Cada tarea con dueño, plazo y rastro.</h1>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Cada tarea con responsable, plazo y rastro.</h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Kumplio usa los responsables, vencimientos y eventos existentes. No crea un sistema paralelo de tareas.
+            La asignación y su evento de auditoría se guardan juntos. Una misión no puede cambiar sin dejar trazabilidad.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <Metric icon={AlertTriangle} label="Vencidas" value={overdue} />
@@ -106,8 +106,8 @@ export default async function AccountabilityPage() {
                   {access.canAssignWork ? (
                     <form action={assign} className="grid w-full gap-3 sm:grid-cols-[minmax(0,1fr)_180px_auto] lg:max-w-2xl">
                       <input type="hidden" name="missionId" value={mission.id} />
-                      <select name="ownerId" required defaultValue={mission.ownerId || ''} className="rounded-xl border bg-background px-4 py-3 text-sm">
-                        <option value="" disabled>Seleccionar responsable</option>
+                      <select name="ownerId" defaultValue={mission.ownerId || ''} className="rounded-xl border bg-background px-4 py-3 text-sm">
+                        <option value="">Sin responsable</option>
                         {members.map((member) => <option key={member.userId} value={member.userId}>{member.label}</option>)}
                       </select>
                       <input name="dueAt" type="date" defaultValue={mission.dueAt?.slice(0, 10) || ''} className="rounded-xl border bg-background px-4 py-3 text-sm" />
@@ -137,7 +137,7 @@ export default async function AccountabilityPage() {
               <div key={event.id} className="py-4 sm:flex sm:items-start sm:justify-between sm:gap-5">
                 <div>
                   <p className="font-semibold">{event.missionTitle}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{eventLabel(event.eventType)} · actor {event.actorType}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{eventLabel(event.eventType)} · {actorLabel(event.actorType)}</p>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground sm:mt-0">{new Date(event.createdAt).toLocaleString('es-CL')}</p>
               </div>
@@ -175,15 +175,26 @@ function priorityLabel(value: string) {
 }
 
 function statusLabel(value: string) {
-  if (value === 'in_progress') return 'En curso'
+  if (value === 'active') return 'En curso'
   if (value === 'blocked') return 'Bloqueada'
-  if (value === 'review') return 'En revisión'
-  return 'Pendiente'
+  if (value === 'in_review') return 'En revisión'
+  if (value === 'ready') return 'Lista para iniciar'
+  if (value === 'draft') return 'Borrador'
+  return value
 }
 
 function eventLabel(value: string) {
   if (value === 'ownership_updated') return 'Responsable o vencimiento actualizado'
+  if (value === 'mission_started') return 'Misión iniciada'
+  if (value === 'mission_rescheduled') return 'Misión reprogramada'
+  if (value === 'mission_completed') return 'Misión completada'
   if (value === 'status_changed') return 'Estado actualizado'
   if (value === 'created') return 'Misión creada'
   return value.replaceAll('_', ' ')
+}
+
+function actorLabel(value: string) {
+  if (value === 'user') return 'cambio realizado por una persona'
+  if (value === 'agent') return 'cambio realizado por un agente'
+  return 'cambio del sistema'
 }

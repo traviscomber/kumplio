@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export type WorkspaceRole = 'owner' | 'admin' | 'compliance' | 'reviewer' | 'member'
+export type WorkspaceRole = 'owner' | 'admin' | 'compliance' | 'reviewer' | 'member' | 'viewer'
 
 export type WorkspaceAccess = {
   organizationId: string
@@ -112,6 +112,12 @@ export async function resolveDecision(
 }
 
 function normalizeRole(value: unknown): WorkspaceRole {
-  if (value === 'owner' || value === 'admin' || value === 'compliance' || value === 'reviewer') return value
+  if (
+    value === 'owner'
+    || value === 'admin'
+    || value === 'compliance'
+    || value === 'reviewer'
+    || value === 'viewer'
+  ) return value
   return 'member'
 }
