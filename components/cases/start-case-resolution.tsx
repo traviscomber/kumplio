@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { buildOrchestrationPlan, workflowTypeForIntent } from '@/lib/agents/orchestrator'
 
 type Props = {
   caseId: string
@@ -20,13 +21,14 @@ export function StartCaseResolution({ caseId, instructions }: Props) {
     setError('')
 
     try {
+      const plan = buildOrchestrationPlan({ goal: instructions, audience: 'company' })
       const workflowResponse = await fetch('/api/agents/workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           caseId,
-          workflowType: 'compliance_assessment',
-          instructions,
+          workflowType: workflowTypeForIntent(plan.intent),
+          instructions: plan.goal,
         }),
       })
       const workflowPayload = await workflowResponse.json().catch(() => ({}))
