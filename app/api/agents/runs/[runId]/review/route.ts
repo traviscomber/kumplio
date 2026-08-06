@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -18,26 +17,6 @@ const reviewSchema = z.object({
     })
   }
 })
-
-function reviewError(error: { code?: string; message?: string } | null) {
-  const message = error?.message || ''
-  if (error?.code === '23505') {
-    return { status: 409, code: 'already_reviewed', error: 'This run already has a final review decision' }
-  }
-  if (message.includes('Agent run not found')) {
-    return { status: 404, code: 'run_not_found', error: 'Agent run not found' }
-  }
-  if (message.includes('Organization membership required')) {
-    return { status: 403, code: 'organization_required', error: 'An organization membership is required' }
-  }
-  if (message.includes('Run is not reviewable')) {
-    return { status: 409, code: 'run_not_reviewable', error: 'This run cannot be reviewed yet' }
-  }
-  if (message.includes('Review comment required') || message.includes('Invalid review decision')) {
-    return { status: 400, code: 'invalid_review', error: 'Invalid review' }
-  }
-  return { status: 500, code: 'review_transition_failed', error: 'Unable to save review' }
-}
 
 export async function POST(req: NextRequest, context: { params: Promise<{ runId: string }> }) {
   const { runId } = await context.params
@@ -74,21 +53,168 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     return NextResponse.json({ error: 'An organization membership is required', code: 'organization_required' }, { status: 403 })
   }
 
-  const admin = createAdminClient()
-  const { data, error } = await admin.rpc('review_agent_run_record', {
-    p_actor_id: user.id,
-    p_organization_id: membership.organization_id,
-    p_run_id: runId,
-    p_decision: parsed.data.decision,
-    p_comment: parsed.data.comment || null,
-    p_checklist: parsed.data.checklist,
-  })
+  const organizationId = membership.organization_id
+  const { data: run } = await supabase
+    .from('agent_runs')
+    .select('id, case_id, status')
+    .eq('id', runId)
+    .eq('organization_id', organizationId)
+    .maybeSingle()
 
-  if (error || !data) {
-    const mapped = reviewError(error)
-    console.error('[agents/review]', error?.code || mapped.code)
-    return NextResponse.json({ error: mapped.error, code: mapped.code }, { status: mapped.status })
+  if (!run) {
+    return NextResponse.json({ error: 'Agent run not found', code: 'run_not_found' }, { status: 404 })
   }
 
-  return NextResponse.json(data)
+  if (!['completed', 'pending_review', 'approved', 'rejected'].includes(run.status)) {
+    return NextResponse.json({ error: 'This run cannot be reviewed yet', code: 'run_not_reviewable' }, { status: 409 })
+  }
+
+  const [{ data: artifact }, { data: workflowStage }] = await Promise.all([
+    supabase
+      .from('agent_artifacts')
+      .select('id')
+      .eq('run_id', runId)
+      .eq('organization_id', organizationId)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('agent_workflow_stages')
+      .select('id, workflow_id, stage_index')
+      .eq('run_id', runId)
+      .eq('organization_id', organizationId)
+      .maybeSingle(),
+  ])
+
+  const { data: review, error: reviewError } = await supabase
+    .from('agent_reviews')
+    .insert({
+      organization_id: organizationId,
+      case_id: run.case_id,
+      run_id: runId,
+      artifact_id: artifact?.id || null,
+      reviewer_id: user.id,
+      decision: parsed.data.decision,
+      comment: parsed.data.comment || null,
+      checklist: parsed.data.checklist,
+    })
+    .select('id, decision, comment, created_at')
+    .single()
+
+  if (reviewError || !review) {
+    console.error('[agents/review] unable to create review', reviewError?.code)
+    return NextResponse.json({ error: 'Unable to save review', code: 'review_create_failed' }, { status: 500 })
+  }
+
+  const runStatus = parsed.data.decision === 'approved'
+    ? 'approved'
+    : parsed.data.decision === 'rejected'
+      ? 'rejected'
+      : 'pending_review'
+  const artifactStatus = parsed.data.decision === 'approved'
+    ? 'approved'
+    : parsed.data.decision === 'rejected'
+      ? 'rejected'
+      : 'pending_review'
+
+  const { error: runUpdateError } = await supabase
+    .from('agent_runs')
+    .update({ status: runStatus, updated_at: new Date().toISOString() })
+    .eq('id', runId)
+    .eq('organization_id', organizationId)
+
+  if (runUpdateError) {
+    return NextResponse.json({ error: 'Review saved but run status could not be updated', code: 'run_review_sync_failed' }, { status: 500 })
+  }
+
+  if (artifact?.id) {
+    await supabase
+      .from('agent_artifacts')
+      .update({ status: artifactStatus })
+      .eq('id', artifact.id)
+      .eq('organization_id', organizationId)
+  }
+
+  let workflowStatus: string | null = null
+  if (workflowStage) {
+    const stageStatus = parsed.data.decision === 'approved'
+      ? 'approved'
+      : parsed.data.decision === 'commented'
+        ? 'pending_review'
+        : 'changes_requested'
+
+    const { error: stageUpdateError } = await supabase
+      .from('agent_workflow_stages')
+      .update({ status: stageStatus, updated_at: new Date().toISOString() })
+      .eq('id', workflowStage.id)
+      .eq('organization_id', organizationId)
+
+    if (stageUpdateError) {
+      return NextResponse.json({ error: 'Review saved but workflow stage could not be updated', code: 'workflow_review_sync_failed' }, { status: 500 })
+    }
+
+    const { data: workflow } = await supabase
+      .from('agent_workflows')
+      .select('id, workflow_type, current_stage, total_stages')
+      .eq('id', workflowStage.workflow_id)
+      .eq('organization_id', organizationId)
+      .maybeSingle()
+
+    if (workflow) {
+      const isFinalStage = workflowStage.stage_index >= workflow.total_stages - 1
+      workflowStatus = parsed.data.decision === 'approved'
+        ? isFinalStage ? 'completed' : 'running'
+        : parsed.data.decision === 'commented' ? 'pending_review' : 'paused'
+
+      const nextStage = parsed.data.decision === 'approved' && !isFinalStage
+        ? workflowStage.stage_index + 1
+        : workflow.current_stage
+
+      await supabase
+        .from('agent_workflows')
+        .update({
+          status: workflowStatus,
+          current_stage: workflowStatus === 'paused' ? workflowStage.stage_index : nextStage,
+          completed_at: workflowStatus === 'completed' ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', workflow.id)
+        .eq('organization_id', organizationId)
+
+      if (run.case_id) {
+        await supabase.from('compliance_case_events').insert({
+          organization_id: organizationId,
+          case_id: run.case_id,
+          actor_id: user.id,
+          event_type: 'workflow_stage_reviewed',
+          summary: parsed.data.decision === 'approved'
+            ? 'Etapa agentic aprobada'
+            : parsed.data.decision === 'commented'
+              ? 'Etapa agentic comentada'
+              : parsed.data.decision === 'rejected'
+                ? 'Etapa agentic rechazada'
+                : 'Se solicitaron cambios a una etapa agentic',
+          changes: {
+            workflow_id: workflow.id,
+            workflow_type: workflow.workflow_type,
+            stage_id: workflowStage.id,
+            stage_index: workflowStage.stage_index,
+            run_id: runId,
+            artifact_id: artifact?.id || null,
+            review_id: review.id,
+            decision: parsed.data.decision,
+            workflow_status: workflowStatus,
+          },
+        })
+      }
+    }
+  }
+
+  return NextResponse.json({
+    review,
+    runId,
+    status: runStatus,
+    workflowStageId: workflowStage?.id || null,
+    workflowStatus,
+  })
 }

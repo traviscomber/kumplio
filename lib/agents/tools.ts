@@ -19,7 +19,6 @@ type ToolDefinition = {
   name: string
   table: string
   limit: number
-  requiresProject?: boolean
 }
 
 type ToolRecord = Record<string, unknown>
@@ -35,41 +34,43 @@ const MAX_SERIALIZED_CHARS = 60000
 
 const TOOL_REGISTRY: Record<AgentId, ToolDefinition[]> = {
   isidora: [
-    { name: 'read_documents', table: 'documents', limit: 12, requiresProject: true },
-    { name: 'read_obligations', table: 'obligations', limit: 40, requiresProject: true },
+    { name: 'read_case', table: 'compliance_cases', limit: 1 },
+    { name: 'read_documents', table: 'documents', limit: 12 },
+    { name: 'read_obligations', table: 'obligations', limit: 40 },
   ],
   rodrigo: [
-    { name: 'read_obligations', table: 'obligations', limit: 40, requiresProject: true },
-    { name: 'read_risks', table: 'risks', limit: 40, requiresProject: true },
-    { name: 'read_controls', table: 'controls', limit: 40, requiresProject: true },
+    { name: 'read_case', table: 'compliance_cases', limit: 1 },
+    { name: 'read_obligations', table: 'obligations', limit: 40 },
+    { name: 'read_risks', table: 'risks', limit: 40 },
+    { name: 'read_controls', table: 'controls', limit: 40 },
   ],
   javier: [
-    { name: 'read_risks', table: 'risks', limit: 40, requiresProject: true },
-    { name: 'read_findings', table: 'findings', limit: 40, requiresProject: true },
-    { name: 'read_actions', table: 'actions', limit: 60, requiresProject: true },
+    { name: 'read_risks', table: 'risks', limit: 40 },
+    { name: 'read_findings', table: 'findings', limit: 40 },
+    { name: 'read_actions', table: 'actions', limit: 60 },
   ],
   beatriz: [
-    { name: 'read_documents', table: 'documents', limit: 12, requiresProject: true },
-    { name: 'read_obligations', table: 'obligations', limit: 40, requiresProject: true },
+    { name: 'read_documents', table: 'documents', limit: 12 },
+    { name: 'read_obligations', table: 'obligations', limit: 40 },
   ],
   veronica: [
-    { name: 'read_controls', table: 'controls', limit: 50, requiresProject: true },
-    { name: 'read_evidence', table: 'evidence', limit: 50, requiresProject: true },
-    { name: 'read_findings', table: 'findings', limit: 40, requiresProject: true },
+    { name: 'read_controls', table: 'controls', limit: 50 },
+    { name: 'read_evidence', table: 'evidence', limit: 50 },
+    { name: 'read_findings', table: 'findings', limit: 40 },
   ],
   andres: [
-    { name: 'read_controls', table: 'controls', limit: 50, requiresProject: true },
-    { name: 'read_evidence', table: 'evidence', limit: 50, requiresProject: true },
-    { name: 'read_findings', table: 'findings', limit: 40, requiresProject: true },
-    { name: 'read_actions', table: 'actions', limit: 60, requiresProject: true },
+    { name: 'read_controls', table: 'controls', limit: 50 },
+    { name: 'read_evidence', table: 'evidence', limit: 50 },
+    { name: 'read_findings', table: 'findings', limit: 40 },
+    { name: 'read_actions', table: 'actions', limit: 60 },
   ],
   catalina: [
-    { name: 'read_obligations', table: 'obligations', limit: 40, requiresProject: true },
-    { name: 'read_controls', table: 'controls', limit: 40, requiresProject: true },
-    { name: 'read_evidence', table: 'evidence', limit: 40, requiresProject: true },
-    { name: 'read_risks', table: 'risks', limit: 40, requiresProject: true },
-    { name: 'read_findings', table: 'findings', limit: 40, requiresProject: true },
-    { name: 'read_actions', table: 'actions', limit: 40, requiresProject: true },
+    { name: 'read_obligations', table: 'obligations', limit: 40 },
+    { name: 'read_controls', table: 'controls', limit: 40 },
+    { name: 'read_evidence', table: 'evidence', limit: 40 },
+    { name: 'read_risks', table: 'risks', limit: 40 },
+    { name: 'read_findings', table: 'findings', limit: 40 },
+    { name: 'read_actions', table: 'actions', limit: 40 },
   ],
 }
 
@@ -126,14 +127,21 @@ async function queryTool(
   scope: ToolScope,
   tool: ToolDefinition,
 ): Promise<{ records: ToolRecord[]; callId?: string; warning?: string }> {
-  if (tool.requiresProject && !scope.projectId) {
-    return { records: [], warning: `${tool.name}: skipped because the case has no project scope` }
-  }
-
   const callId = await createAuditCall(supabase, scope, tool)
   let query = supabase.from(tool.table).select('*').limit(tool.limit)
-  if (scope.projectId) query = query.eq('project_id', scope.projectId)
-  else query = query.eq('organization_id', scope.organizationId)
+
+  if (tool.table === 'compliance_cases') {
+    // read_case: query by case id directly
+    if (scope.caseId) {
+      query = query.eq('id', scope.caseId)
+    } else {
+      query = query.eq('organization_id', scope.organizationId)
+    }
+  } else if (scope.projectId) {
+    query = query.eq('project_id', scope.projectId)
+  } else {
+    query = query.eq('organization_id', scope.organizationId)
+  }
 
   const { data, error } = await query
   if (error) {

@@ -81,18 +81,39 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
 
   if (!workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
   if (['completed', 'cancelled'].includes(workflow.status)) return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
+
+  // When pending_review: allow advance only if current stage is already approved
+  // (handles race condition where /review updates status to 'running' but /advance fires first)
+  let effectiveStageIndex = workflow.current_stage
   if (workflow.status === 'pending_review') {
-    return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
+    const { data: currentStageCheck } = await supabase
+      .from('agent_workflow_stages')
+      .select('status')
+      .eq('workflow_id', workflow.id)
+      .eq('stage_index', workflow.current_stage)
+      .eq('organization_id', organizationId)
+      .maybeSingle()
+
+    if (currentStageCheck?.status !== 'approved') {
+      return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
+    }
+    // Stage approved — target the next stage
+    effectiveStageIndex = workflow.current_stage + 1
+    if (effectiveStageIndex >= workflow.total_stages) {
+      await supabase.from('agent_workflows').update({ status: 'completed', completed_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', workflow.id)
+      return NextResponse.json({ workflowId: workflow.id, status: 'completed' })
+    }
+    await supabase.from('agent_workflows').update({ status: 'running', current_stage: effectiveStageIndex, updated_at: new Date().toISOString() }).eq('id', workflow.id)
   }
 
-  const stageDefinition = getWorkflowStage(workflow.workflow_type, workflow.current_stage)
+  const stageDefinition = getWorkflowStage(workflow.workflow_type, effectiveStageIndex)
   if (!stageDefinition) return NextResponse.json({ error: 'Workflow stage definition not found' }, { status: 409 })
 
   const { data: stage } = await supabase
     .from('agent_workflow_stages')
     .select('*')
     .eq('workflow_id', workflow.id)
-    .eq('stage_index', workflow.current_stage)
+    .eq('stage_index', effectiveStageIndex)
     .eq('organization_id', organizationId)
     .maybeSingle()
 

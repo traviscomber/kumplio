@@ -300,10 +300,22 @@ export function CaseWorkflowPanel({ caseId }: { caseId: string }) {
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'No fue posible registrar la revisión.')
 
+      if (reviewDecision === 'approved') {
+        const advanceResponse = await fetch(`/api/agents/workflows/${selectedId}/advance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ instructions: null }),
+        })
+        const advancePayload = await advanceResponse.json()
+        if (!advanceResponse.ok) {
+          throw new Error(advancePayload.error || 'La aprobación se guardó, pero no fue posible iniciar la siguiente etapa.')
+        }
+      }
+
       setReviewComment('')
       setReviewDecision('approved')
       setSuccess(reviewDecision === 'approved'
-        ? 'Etapa aprobada. El workflow puede continuar.'
+        ? 'Etapa aprobada. La siguiente etapa se inició automáticamente.'
         : 'Decisión registrada. El intento anterior se conserva.')
       await refresh(selectedId)
     } catch (reason) {
@@ -427,7 +439,7 @@ export function CaseWorkflowPanel({ caseId }: { caseId: string }) {
                     </label>
                     <Button onClick={reviewStage} disabled={loadingKey !== null} className="gap-2">
                       {loadingKey === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : reviewDecision === 'approved' ? <CheckCircle2 className="h-4 w-4" /> : reviewDecision === 'rejected' ? <XCircle className="h-4 w-4" /> : <PauseCircle className="h-4 w-4" />}
-                      Registrar decisión
+                      {reviewDecision === 'approved' ? 'Aprobar y continuar' : 'Registrar decisión'}
                     </Button>
                   </div>
                 </div>
