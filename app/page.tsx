@@ -3,8 +3,10 @@ import Link from 'next/link'
 import {
   ArrowRight,
   CheckCircle2,
+  Database,
   FileCheck2,
   FolderKanban,
+  LockKeyhole,
   SearchCheck,
   ShieldCheck,
   Sparkles,
@@ -13,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 import { ResolutionEntry } from '@/components/marketing/resolution-entry'
+import { AGENT_CATALOG } from '@/lib/agents/catalog'
 
 const resultLayers = [
   {
@@ -35,7 +38,7 @@ const resultLayers = [
 
 const steps = [
   ['Entiende', 'Interpreta el resultado que necesitas, no solo una palabra clave o una normativa.', SearchCheck],
-  ['Organiza', 'Crea un expediente y reúne los antecedentes que realmente afectan tu situación.', FolderKanban],
+  ['Organiza', 'Centraliza en un expediente los antecedentes que realmente afectan tu situación.', FolderKanban],
   ['Trabaja', 'Asigna especialistas digitales según el objetivo y registra cada ejecución real.', Users],
   ['Prepara', 'Convierte hallazgos en prioridades, acciones y criterios concretos de cierre.', Sparkles],
   ['Verifica', 'Relaciona conclusiones con fuentes, evidencia y revisión humana antes de avanzar.', FileCheck2],
@@ -60,6 +63,24 @@ const audiences = [
   },
 ]
 
+const centralizationBenefits = [
+  {
+    title: 'Un solo expediente',
+    description: 'Documentos, obligaciones, controles, evidencias, responsables y decisiones dejan de vivir separados.',
+    icon: Database,
+  },
+  {
+    title: 'Contexto que no se pierde',
+    description: 'Cada antecedente queda relacionado con el caso y puede reutilizarse sin reconstruir la historia desde cero.',
+    icon: FolderKanban,
+  },
+  {
+    title: 'Información privada controlada',
+    description: 'Kumplio está diseñado para mantener el contexto de cada organización aislado, con acceso controlado y trazabilidad.',
+    icon: LockKeyhole,
+  },
+] as const
+
 export default function HomePage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -68,10 +89,11 @@ export default function HomePage() {
           <Link href="/" aria-label="Kumplio">
             <Image src="/logo-kumplio.svg" alt="Kumplio" width={150} height={64} priority className="h-12 w-auto" />
           </Link>
-          <div className="hidden items-center gap-7 lg:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             <a href="#diferencia" className="text-sm font-medium text-white/65 hover:text-white">La diferencia</a>
             <a href="#como-funciona" className="text-sm font-medium text-white/65 hover:text-white">Cómo funciona</a>
-            <a href="#para-quien" className="text-sm font-medium text-white/65 hover:text-white">Para quién</a>
+            <a href="#equipo" className="text-sm font-medium text-white/65 hover:text-white">Equipo digital</a>
+            <a href="#seguridad" className="text-sm font-medium text-white/65 hover:text-white">Seguridad</a>
             <Link href="/pricing" className="text-sm font-medium text-white/65 hover:text-white">Planes</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -93,10 +115,10 @@ export default function HomePage() {
                 Describe el problema. Kumplio te acompaña hasta cerrarlo.
               </h1>
               <p className="mt-7 max-w-[700px] text-pretty text-[17px] leading-8 text-white/62 sm:text-lg">
-                No recibes otro dashboard ni una matriz para completar. Kumplio entiende la situación, organiza el trabajo, prepara una decisión y conserva el respaldo necesario para avanzar.
+                Primero reúne la información que hoy está repartida. Kumplio la organiza en un expediente, coordina el trabajo de especialistas digitales y conserva fuentes, evidencia y decisiones para que puedas gestionar con contexto y seguridad.
               </p>
-              <div className="mt-9 grid max-w-[760px] gap-3 text-sm text-white/58 sm:grid-cols-3">
-                {['Empieza con tu objetivo', 'Avanza con revisión humana', 'Cierra con evidencia'].map((item) => (
+              <div className="mt-9 grid max-w-[820px] gap-3 text-sm text-white/58 sm:grid-cols-3">
+                {['Centraliza tus antecedentes', 'Trabaja con especialistas digitales', 'Cierra con evidencia'].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
                     <span>{item}</span>
@@ -121,7 +143,7 @@ export default function HomePage() {
                   No solo te muestra qué falta. Te ayuda a resolverlo.
                 </h2>
                 <p className="mt-6 max-w-2xl text-base leading-8 text-white/55">
-                  La mayoría de las soluciones parte desde módulos, normas o matrices. Kumplio parte desde la situación que necesitas resolver y mantiene un expediente vivo hasta llegar a una decisión respaldada.
+                  La mayoría de las soluciones parte desde módulos, normas o matrices. Kumplio parte desde la situación que necesitas resolver, centraliza sus antecedentes y mantiene un expediente vivo hasta llegar a una decisión respaldada.
                 </p>
               </div>
 
@@ -138,12 +160,12 @@ export default function HomePage() {
                 </div>
                 <div className="grid sm:grid-cols-2">
                   <div className="p-6 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-white/35">Diagnóstico tradicional</p>
-                    <p className="mt-4 text-xl font-bold text-white/75">Entrega hallazgos y termina cuando comienza el trabajo.</p>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-white/35">Información dispersa</p>
+                    <p className="mt-4 text-xl font-bold text-white/75">Correos, carpetas, planillas y decisiones pierden contexto entre sí.</p>
                   </div>
                   <div className="border-t border-white/10 bg-primary/[0.055] p-6 sm:border-l sm:border-t-0 sm:p-8">
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Kumplio</p>
-                    <p className="mt-4 text-xl font-bold">Convierte el resultado en acciones, evidencia, revisión y cierre.</p>
+                    <p className="mt-4 text-xl font-bold">Reúne antecedentes, trabajo, evidencia y decisiones dentro del mismo expediente.</p>
                   </div>
                 </div>
               </div>
@@ -152,6 +174,31 @@ export default function HomePage() {
         </section>
 
         <section className="border-b border-white/10 px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="max-w-4xl">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Antes de gestionar, centraliza</p>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
+                La gestión comienza cuando la información deja de estar repartida.
+              </h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">
+                Cumplimiento no es solo conocer una norma. Es saber qué documento existe, qué obligación afecta, quién es responsable, qué evidencia falta, qué se decidió y qué cambió después. Si esa información vive en lugares distintos, cada revisión parte casi desde cero.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              {centralizationBenefits.map(({ title, description, icon: Icon }) => (
+                <article key={title} className="rounded-[24px] border border-white/10 bg-card p-7">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-6 text-xl font-black">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/50">{description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
             <div className="max-w-3xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Lo que recibes</p>
@@ -171,7 +218,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="como-funciona" className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+        <section id="como-funciona" className="border-b border-white/10 px-5 py-24 sm:px-8 md:py-32 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
             <div className="max-w-3xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Cómo funciona</p>
@@ -179,7 +226,7 @@ export default function HomePage() {
                 Un equipo digital trabaja. Tú mantienes la decisión.
               </h2>
               <p className="mt-6 text-base leading-8 text-white/55">
-                Cada etapa existe porque hay una ejecución, un resultado persistido y una revisión. Kumplio no muestra actividad simulada ni declara certezas sin respaldo.
+                Cada etapa existe porque hay información centralizada, una ejecución real, un resultado persistido y una revisión. Kumplio no muestra actividad simulada ni declara certezas sin respaldo.
               </p>
             </div>
             <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -196,6 +243,52 @@ export default function HomePage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="equipo" className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="max-w-4xl">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">Quién hace el trabajo</p>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
+                Siete especialistas digitales. Cada uno tiene una responsabilidad distinta.
+              </h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">
+                Kumplio no trata la IA como una caja negra. Cada agente tiene una función definida, recibe un tipo de contexto y entrega resultados concretos que pueden revisarse antes de tomar una decisión.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {AGENT_CATALOG.map((agent, index) => (
+                <article key={agent.id} className="rounded-[24px] border border-white/10 bg-card p-7">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Especialista 0{index + 1}</p>
+                      <h3 className="mt-3 text-2xl font-black">{agent.name}</h3>
+                      <p className="mt-2 text-sm font-semibold text-white/70">{agent.role}</p>
+                    </div>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Users className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <p className="mt-5 text-sm leading-7 text-white/50">{agent.mission}</p>
+                  <div className="mt-6 border-t border-white/10 pt-5">
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-white/35">Entrega</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {agent.delivers.slice(0, 3).map((deliverable) => (
+                        <span key={deliverable} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/55">
+                          {deliverable}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <p className="mt-8 max-w-3xl text-sm leading-7 text-white/42">
+              No todos intervienen en todos los casos. Kumplio activa las capacidades que corresponden al objetivo y conserva qué agente trabajó, qué produjo y qué revisión recibió.
+            </p>
           </div>
         </section>
 
@@ -226,20 +319,24 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+        <section id="seguridad" className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
           <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
             <div>
               <ShieldCheck className="h-10 w-10 text-primary" />
-              <h2 className="mt-6 text-balance text-4xl font-extrabold tracking-[-0.03em] md:text-5xl">Confianza que puedes abrir y revisar.</h2>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.2em] text-primary">Seguridad de la información</p>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] md:text-5xl">Centralizar sí. Exponer no.</h2>
               <p className="mt-6 max-w-2xl text-base leading-8 text-white/55">
-                Kumplio no reemplaza una decisión profesional. Organiza el trabajo para que cada conclusión relevante pueda revisarse con su contexto, fuente, evidencia y reservas.
+                Reunir información en un solo lugar solo genera valor si permanece controlada. Kumplio está diseñado para separar el contexto privado de cada organización, limitar el acceso y conservar trazabilidad sobre el trabajo y las decisiones.
+              </p>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/42">
+                La centralización permite gestionar mejor; la seguridad evita que esa ventaja se transforme en un nuevo riesgo.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {[
-                ['Fuentes identificables', 'Cada conclusión relevante puede relacionarse con los antecedentes que la sustentan.'],
-                ['Revisión humana', 'Las etapas críticas requieren aprobación antes de continuar.'],
-                ['Expediente vivo', 'El historial conserva qué se hizo, qué cambió y quién decidió.'],
+                ['Aislamiento por organización', 'El contexto privado de una organización se mantiene separado del de las demás.'],
+                ['Trazabilidad', 'Ejecuciones, resultados, revisiones y decisiones conservan un historial que puede revisarse.'],
+                ['Control humano', 'Los agentes preparan el trabajo; las decisiones sensibles mantienen revisión y aprobación humana.'],
               ].map(([title, description]) => (
                 <article key={title} className="rounded-[22px] border border-white/10 bg-card p-6">
                   <h3 className="font-black">{title}</h3>
@@ -257,7 +354,7 @@ export default function HomePage() {
               Cuéntanos qué necesitas resolver.
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/55">
-              Kumplio preparará el caso, organizará el trabajo y te mostrará qué decisión corresponde tomar después.
+              Kumplio centralizará los antecedentes del caso, organizará el trabajo de los especialistas y te mostrará qué decisión corresponde tomar después.
             </p>
             <Button size="lg" asChild className="mt-8 h-13 rounded-[10px] px-8 font-black">
               <a href="#resolver">Empezar un caso <ArrowRight className="ml-2 h-4 w-4" /></a>

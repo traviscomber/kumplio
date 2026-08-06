@@ -16,7 +16,7 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio convierte situaciones regulatorias, contractuales y de cumplimiento en casos guiados con prioridades, acciones, fuentes, revisión humana y evidencia de cierre.'
+  'Kumplio centraliza información regulatoria, contractual y de cumplimiento en expedientes trazables, coordina especialistas digitales y convierte cada situación en prioridades, acciones, fuentes, revisión humana y evidencia de cierre.'
 
 export const POWERED_BY_DESCRIPTION =
   'Kumplio es un producto desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.'
@@ -29,12 +29,14 @@ export const PUBLIC_CONTACT = {
 }
 
 export const CORE_CAPABILITIES = [
+  'Centralizar documentos, obligaciones, controles, evidencias, responsables y decisiones dentro de un expediente trazable',
   'Interpretar el resultado que una persona, profesional u organización necesita lograr',
   'Crear un expediente vivo para cada situación regulatoria, contractual o de cumplimiento',
-  'Asignar especialistas digitales según el objetivo y el contexto disponible',
+  'Coordinar especialistas digitales con funciones y entregables definidos según el objetivo',
   'Priorizar qué requiere atención ahora y qué puede esperar',
   'Convertir hallazgos en acciones, responsables sugeridos y criterios de cierre',
   'Relacionar conclusiones con fuentes, documentos, evidencia y revisiones humanas',
+  'Conservar contexto, trazabilidad y separación por organización durante la gestión del caso',
   'Acompañar el caso desde la comprensión inicial hasta la decisión y el cierre verificable',
 ]
 
