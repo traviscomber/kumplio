@@ -27,13 +27,13 @@ const plans = {
     id: 'esencial',
     name: 'Esencial',
     price: '$79.990 al mes + IVA',
-    description: 'Hasta 5 usuarios, misiones guiadas, evidencias, decisiones y trazabilidad.',
+    description: 'Hasta 5 usuarios, casos guiados, evidencia, decisiones y trazabilidad.',
   },
   profesional: {
     id: 'profesional',
     name: 'Profesional',
     price: '$249.990 al mes + IVA',
-    description: 'Hasta 20 usuarios, monitoreo regulatorio, automatizaciones y soporte prioritario.',
+    description: 'Hasta 20 usuarios, seguimiento continuo, automatizaciones y soporte prioritario.',
   },
 } as const
 
@@ -83,8 +83,9 @@ export default function SignUp() {
           emailRedirectTo: callbackUrl,
           data: {
             company_name: organizationName.trim(),
+            workspace_name: organizationName.trim(),
             selected_plan: selectedPlan?.id || null,
-            signup_source: selectedPlan ? 'pricing' : 'direct',
+            signup_source: selectedPlan ? 'pricing' : 'guided_resolution',
             terms_version: '2026-08-03',
             privacy_version: '2026-08-03',
             legal_accepted_at: acceptedAt,
@@ -120,7 +121,7 @@ export default function SignUp() {
           </div>
           <h1 className="mt-5 text-2xl font-bold">Revisa tu correo</h1>
           <p className="mt-3 leading-7 text-muted-foreground">
-            Enviamos un enlace de confirmación a <strong className="text-foreground">{email}</strong>. Después de confirmar, continuarás con la configuración segura de tu workspace.
+            Enviamos un enlace de confirmación a <strong className="text-foreground">{email}</strong>. Después de confirmar, continuarás con el caso que quieres resolver y la configuración segura de tu espacio.
           </p>
           {selectedPlan && (
             <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
@@ -144,7 +145,7 @@ export default function SignUp() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">K</div>
             <div>
               <h1 className="text-2xl font-bold">Crea tu cuenta Kumplio</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Verifica tu correo y configura después el primer objetivo de tu organización.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Verifica tu correo y continúa con la situación que necesitas resolver.</p>
             </div>
           </div>
 
@@ -171,18 +172,19 @@ export default function SignUp() {
             )}
 
             <label className="block space-y-2" htmlFor="organization">
-              <span className="text-sm font-medium">Nombre de la organización</span>
+              <span className="text-sm font-medium">Nombre de tu espacio de trabajo</span>
               <span className="relative block">
                 <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="organization" type="text" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} minLength={2} maxLength={160} placeholder="Mi Empresa SpA" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+                <input id="organization" type="text" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} minLength={2} maxLength={160} placeholder="Tu nombre, estudio o empresa" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
               </span>
+              <span className="block text-xs leading-5 text-muted-foreground">Puede ser tu nombre, el de tu estudio profesional o el de tu organización.</span>
             </label>
 
             <label className="block space-y-2" htmlFor="email">
               <span className="text-sm font-medium">Correo electrónico</span>
               <span className="relative block">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" placeholder="tu@empresa.cl" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
+                <input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" placeholder="tu@correo.cl" className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary" required />
               </span>
             </label>
 
@@ -211,7 +213,7 @@ export default function SignUp() {
             </div>
 
             <Button type="submit" disabled={loading || !passwordReady || !acceptedLegal} className="w-full">
-              {loading ? 'Creando cuenta…' : 'Crear cuenta y verificar correo'}
+              {loading ? 'Creando cuenta…' : 'Crear cuenta y continuar'}
             </Button>
           </form>
 
