@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [home, demo, layout, publicSite, entry, caseEntry, footer] = await Promise.all([
+const [home, demo, layout, publicSite, entry, caseEntry, footer, signUp] = await Promise.all([
   readFile('app/page.tsx', 'utf8'),
   readFile('app/demo/page.tsx', 'utf8'),
   readFile('app/layout.tsx', 'utf8'),
@@ -9,6 +9,7 @@ const [home, demo, layout, publicSite, entry, caseEntry, footer] = await Promise
   readFile('components/marketing/resolution-entry.tsx', 'utf8'),
   readFile('components/cases/beta-case-entry.tsx', 'utf8'),
   readFile('components/footer.tsx', 'utf8'),
+  readFile('app/(auth)/sign-up/page.tsx', 'utf8'),
 ])
 
 assert.match(home, /Resolución guiada de obligaciones/)
@@ -24,6 +25,9 @@ assert.match(entry, /¿Qué necesitas resolver\?/)
 assert.match(entry, /Empezar a resolver/)
 assert.match(caseEntry, /sessionStorage\.getItem\('kumplio:case-draft'\)/)
 assert.match(caseEntry, /sessionStorage\.removeItem\('kumplio:case-draft'\)/)
+assert.match(signUp, /Nombre de tu espacio de trabajo/)
+assert.match(signUp, /Tu nombre, estudio o empresa/)
+assert.match(signUp, /guided_resolution/)
 
 assert.match(layout, /Resolución guiada de obligaciones y cumplimiento en Chile/)
 assert.match(layout, /Guided obligation resolution and compliance case management/)
