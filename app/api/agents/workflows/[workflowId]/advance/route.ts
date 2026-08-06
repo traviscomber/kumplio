@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { runAgent } from '@/lib/agents/openai-runtime'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { AgentRuntimeError, runAgent } from '@/lib/agents/openai-runtime'
 import { getWorkflowStage, serializeWorkflowContext } from '@/lib/agents/orchestration'
 import { retrieveAgentContext } from '@/lib/agents/tools'
 
@@ -11,6 +12,31 @@ export const maxDuration = 300
 const advanceSchema = z.object({
   instructions: z.string().trim().max(2000).nullable().optional(),
 })
+
+class WorkflowStageError extends Error {
+  constructor(
+    readonly code: string,
+    readonly publicMessage: string,
+    readonly internalCode?: string,
+  ) {
+    super(publicMessage)
+    this.name = 'WorkflowStageError'
+  }
+}
+
+function classifyStageFailure(error: unknown) {
+  if (error instanceof WorkflowStageError) {
+    return { code: error.code, message: error.publicMessage, internalCode: error.internalCode }
+  }
+  if (error instanceof AgentRuntimeError) {
+    return { code: error.code, message: error.message, internalCode: error.code }
+  }
+  return {
+    code: 'workflow_stage_failed',
+    message: 'No fue posible completar la etapa del workflow',
+    internalCode: error instanceof Error ? error.name : 'unknown',
+  }
+}
 
 export async function POST(req: NextRequest, context: { params: Promise<{ workflowId: string }> }) {
   const { workflowId } = await context.params
@@ -45,6 +71,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
   if (!membership?.organization_id) return NextResponse.json({ error: 'Organization required' }, { status: 403 })
 
   const organizationId = membership.organization_id
+  const admin = createAdminClient()
   const { data: workflow } = await supabase
     .from('agent_workflows')
     .select('id, case_id, workflow_type, status, current_stage, total_stages, input_payload, compliance_cases(title, description, project_id)')
@@ -121,7 +148,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     ? `${stage.task_template}\n\nINSTRUCCIONES ADICIONALES PARA ESTE REINTENTO:\n${retryInstructions}`
     : stage.task_template
 
-  await supabase.from('agent_workflow_stages').update({
+  const { error: stageStartError } = await supabase.from('agent_workflow_stages').update({
     status: 'running',
     attempt_count: attempt,
     source_artifact_ids: artifactIds,
@@ -135,13 +162,24 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     updated_at: new Date().toISOString(),
   }).eq('id', stage.id).eq('organization_id', organizationId)
 
-  await supabase.from('agent_workflows').update({
+  if (stageStartError) {
+    return NextResponse.json({ error: 'Unable to start workflow stage', code: 'stage_start_failed' }, { status: 500 })
+  }
+
+  const { error: workflowStartError } = await supabase.from('agent_workflows').update({
     status: 'running',
     started_at: workflow.status === 'draft' ? new Date().toISOString() : undefined,
+    error_code: null,
+    error_message: null,
     updated_at: new Date().toISOString(),
   }).eq('id', workflow.id).eq('organization_id', organizationId)
 
-  await supabase.from('compliance_case_events').insert({
+  if (workflowStartError) {
+    await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
+    return NextResponse.json({ error: 'Unable to start workflow', code: 'workflow_start_failed' }, { status: 500 })
+  }
+
+  const { error: startedEventError } = await admin.from('compliance_case_events').insert({
     organization_id: organizationId,
     case_id: workflow.case_id,
     actor_id: user.id,
@@ -156,6 +194,10 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
       attempt,
     },
   })
+
+  if (startedEventError) {
+    console.error('[agents/workflows/advance] start event', startedEventError.code)
+  }
 
   const retrieval = await retrieveAgentContext(supabase, {
     organizationId,
@@ -194,7 +236,8 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
 
   if (runError || !run) {
     await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
-    return NextResponse.json({ error: 'Unable to create stage run' }, { status: 500 })
+    await supabase.from('agent_workflows').update({ status: 'failed', error_code: 'run_create_failed', error_message: 'Unable to create stage run', updated_at: new Date().toISOString() }).eq('id', workflow.id)
+    return NextResponse.json({ error: 'Unable to create stage run', code: 'run_create_failed' }, { status: 500 })
   }
 
   if (retrieval.toolCallIds.length) {
@@ -221,7 +264,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     })
     const elapsedMs = Date.now() - startedAt
 
-    await supabase.from('agent_runs').update({
+    const { error: resultPersistError } = await supabase.from('agent_runs').update({
       status: 'pending_review',
       output_payload: result.output,
       output_text: result.outputText,
@@ -234,8 +277,14 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
       total_tokens: result.usage.totalTokens,
       elapsed_ms: elapsedMs,
       completed_at: new Date().toISOString(),
+      error_code: null,
+      error_message: null,
       updated_at: new Date().toISOString(),
     }).eq('id', run.id).eq('organization_id', organizationId)
+
+    if (resultPersistError) {
+      throw new WorkflowStageError('run_persistence_failed', 'No fue posible guardar la respuesta del agente', resultPersistError.code)
+    }
 
     const { data: artifact, error: artifactError } = await supabase.from('agent_artifacts').insert({
       organization_id: organizationId,
@@ -249,25 +298,43 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
       created_by: user.id,
     }).select('id').single()
 
-    if (artifactError || !artifact) throw new Error('artifact_creation_failed')
+    if (artifactError || !artifact) {
+      console.error('[agents/workflows/advance] artifact', artifactError?.code || 'missing_artifact')
+      throw new WorkflowStageError(
+        'artifact_creation_failed',
+        'El agente terminó, pero no fue posible guardar su resultado',
+        artifactError?.code,
+      )
+    }
 
     const nextStage = stage.stage_index + 1
     const isFinal = nextStage >= workflow.total_stages
-    await supabase.from('agent_workflow_stages').update({
+    const { error: stagePersistError } = await supabase.from('agent_workflow_stages').update({
       status: 'pending_review',
       output_artifact_id: artifact.id,
       completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }).eq('id', stage.id).eq('organization_id', organizationId)
-    await supabase.from('agent_workflows').update({
+
+    if (stagePersistError) {
+      throw new WorkflowStageError('stage_persistence_failed', 'No fue posible actualizar el estado de la etapa', stagePersistError.code)
+    }
+
+    const { error: workflowPersistError } = await supabase.from('agent_workflows').update({
       status: 'pending_review',
       current_stage: isFinal ? stage.stage_index : nextStage,
       final_payload: isFinal ? result.output : null,
       completed_at: null,
+      error_code: null,
+      error_message: null,
       updated_at: new Date().toISOString(),
     }).eq('id', workflow.id).eq('organization_id', organizationId)
 
-    await supabase.from('compliance_case_events').insert({
+    if (workflowPersistError) {
+      throw new WorkflowStageError('workflow_persistence_failed', 'No fue posible actualizar el estado del workflow', workflowPersistError.code)
+    }
+
+    const { error: completedEventError } = await admin.from('compliance_case_events').insert({
       organization_id: organizationId,
       case_id: workflow.case_id,
       actor_id: user.id,
@@ -286,6 +353,10 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
       },
     })
 
+    if (completedEventError) {
+      console.error('[agents/workflows/advance] completed event', completedEventError.code)
+    }
+
     return NextResponse.json({
       workflowId: workflow.id,
       workflowType: workflow.workflow_type,
@@ -300,17 +371,20 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     })
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
+    const failure = classifyStageFailure(error)
+
     await supabase.from('agent_runs').update({
       status: 'failed',
-      error_code: 'workflow_stage_failed',
-      error_message: 'The workflow stage could not be completed',
+      error_code: failure.code,
+      error_message: failure.message,
       elapsed_ms: elapsedMs,
       completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }).eq('id', run.id).eq('organization_id', organizationId)
     await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id).eq('organization_id', organizationId)
-    await supabase.from('agent_workflows').update({ status: 'failed', error_code: 'workflow_stage_failed', error_message: 'A workflow stage failed', updated_at: new Date().toISOString() }).eq('id', workflow.id).eq('organization_id', organizationId)
-    await supabase.from('compliance_case_events').insert({
+    await supabase.from('agent_workflows').update({ status: 'failed', error_code: failure.code, error_message: failure.message, updated_at: new Date().toISOString() }).eq('id', workflow.id).eq('organization_id', organizationId)
+
+    const { error: failedEventError } = await admin.from('compliance_case_events').insert({
       organization_id: organizationId,
       case_id: workflow.case_id,
       actor_id: user.id,
@@ -323,9 +397,14 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
         stage_index: stage.stage_index,
         run_id: run.id,
         attempt,
+        failure_code: failure.code,
       },
     })
-    console.error('[agents/workflows/advance]', error instanceof Error ? error.name : 'unknown')
-    return NextResponse.json({ error: 'The workflow stage could not be completed', runId: run.id }, { status: 502 })
+
+    if (failedEventError) {
+      console.error('[agents/workflows/advance] failed event', failedEventError.code)
+    }
+    console.error('[agents/workflows/advance]', failure.code, failure.internalCode || 'unknown')
+    return NextResponse.json({ error: failure.message, code: failure.code, runId: run.id }, { status: 502 })
   }
 }
