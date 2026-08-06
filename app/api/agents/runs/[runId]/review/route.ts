@@ -67,7 +67,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     return NextResponse.json({ error: 'Agent run not found', code: 'run_not_found' }, { status: 404 })
   }
 
-  if (!['completed', 'pending_review', 'approved', 'rejected'].includes(run.status)) {
+  if (!['completed', 'pending_review'].includes(run.status)) {
     return NextResponse.json({ error: 'This run cannot be reviewed yet', code: 'run_not_reviewable' }, { status: 409 })
   }
 
@@ -117,7 +117,9 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
     ? 'approved'
     : parsed.data.decision === 'rejected'
       ? 'rejected'
-      : 'pending_review'
+      : parsed.data.decision === 'changes_requested'
+        ? 'changes_requested'
+        : 'pending_review'
 
   const { error: runUpdateError } = await supabase
     .from('agent_runs')
