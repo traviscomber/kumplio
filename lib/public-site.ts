@@ -16,7 +16,7 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio centraliza información regulatoria, contractual y de cumplimiento en expedientes trazables, coordina especialistas digitales y convierte cada situación en prioridades, acciones, fuentes, revisión humana y evidencia de cierre.'
+  'Kumplio ayuda a organizaciones en Chile a proteger datos y resolver obligaciones de privacidad: centraliza información sensible en expedientes trazables, coordina especialistas digitales y convierte brechas y riesgos en acciones, evidencia y decisiones revisables.'
 
 export const POWERED_BY_DESCRIPTION =
   'Kumplio es un producto desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.'
@@ -29,15 +29,14 @@ export const PUBLIC_CONTACT = {
 }
 
 export const CORE_CAPABILITIES = [
-  'Centralizar documentos, obligaciones, controles, evidencias, responsables y decisiones dentro de un expediente trazable',
-  'Interpretar el resultado que una persona, profesional u organización necesita lograr',
-  'Crear un expediente vivo para cada situación regulatoria, contractual o de cumplimiento',
-  'Coordinar especialistas digitales con funciones y entregables definidos según el objetivo',
-  'Priorizar qué requiere atención ahora y qué puede esperar',
-  'Convertir hallazgos en acciones, responsables sugeridos y criterios de cierre',
-  'Relacionar conclusiones con fuentes, documentos, evidencia y revisiones humanas',
-  'Conservar contexto, trazabilidad y separación por organización durante la gestión del caso',
-  'Acompañar el caso desde la comprensión inicial hasta la decisión y el cierre verificable',
+  'Centralizar información sensible, documentos, tratamientos, proveedores, controles, evidencias y decisiones dentro de expedientes trazables',
+  'Ayudar a entender qué datos existen, cómo se usan, quién interviene y qué obligaciones o riesgos requieren atención',
+  'Preparar a organizaciones para la Ley 21.719 mediante trabajo guiado, prioridades y evidencia verificable',
+  'Coordinar especialistas digitales con funciones y entregables definidos según el objetivo y el contexto autorizado',
+  'Convertir brechas de privacidad y cumplimiento en acciones, responsables sugeridos, dependencias y criterios de cierre',
+  'Relacionar conclusiones con fuentes, documentos, evidencia y revisiones humanas antes de avanzar',
+  'Conservar aislamiento por organización, acceso controlado, historial y trazabilidad durante la gestión del caso',
+  'Acompañar cada situación desde la comprensión inicial hasta una decisión y cierre verificables',
 ]
 
 export const PUBLIC_LIMITATIONS = [
