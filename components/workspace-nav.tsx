@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Building2, FolderKanban, ListTodo, Settings, Sparkles } from 'lucide-react'
+import { Building2, FolderKanban, ListTodo, Settings, Sparkles, UserRoundCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
@@ -49,6 +49,7 @@ export function WorkspaceNav() {
   const activeArea = areas.find(({ routes }) =>
     routes.some((route) => pathname === route || pathname.startsWith(`${route}/`)),
   )?.href
+  const accountabilityActive = pathname === '/accountability' || pathname.startsWith('/accountability/')
 
   return (
     <nav aria-label="Áreas principales de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
@@ -73,6 +74,19 @@ export function WorkspaceNav() {
           })}
         </div>
         <UniversalSearch />
+        <Link
+          href="/accountability"
+          aria-label="Responsables y vencimientos"
+          aria-current={accountabilityActive ? 'page' : undefined}
+          className={cn(
+            'rounded-lg p-2 transition-colors',
+            accountabilityActive
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+          )}
+        >
+          <UserRoundCheck className="h-4 w-4" />
+        </Link>
         <Link href="/settings" aria-label="Configuración" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground">
           <Settings className="h-4 w-4" />
         </Link>
