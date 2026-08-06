@@ -53,6 +53,7 @@ returns table (
 )
 language sql
 stable
+security invoker
 set search_path = ''
 as $$
   select * from private.list_my_workspaces();
@@ -100,6 +101,7 @@ $$;
 create or replace function public.set_active_workspace(target_organization uuid)
 returns boolean
 language sql
+security invoker
 set search_path = ''
 as $$
   select private.set_active_workspace(target_organization);
@@ -124,6 +126,7 @@ grant execute on function public.set_active_workspace(uuid) to authenticated, se
 -- explicitly selected workspace. When no active workspace exists yet, all of
 -- the user's authorized memberships remain visible so onboarding can bootstrap.
 drop policy if exists organization_members_select_member on public.organization_members;
+drop policy if exists organization_members_select_active_workspace on public.organization_members;
 
 create policy organization_members_select_active_workspace
 on public.organization_members
