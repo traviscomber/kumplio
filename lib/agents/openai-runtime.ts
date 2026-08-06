@@ -6,9 +6,13 @@ import type { AgentId } from './catalog'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
-const MODEL = process.env.OPENAI_REASONING_MODEL || 'gpt-5.6'
+// Keep gpt-5.6 as the quality-first model, with a fast fallback for timeouts.
+const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-5.6'
+const MODEL_FALLBACK = process.env.OPENAI_FALLBACK_MODEL || 'gpt-4.1'
 const MAX_OUTPUT_TOKENS = 16000
-const REQUEST_TIMEOUT_MS = 280000
+const REQUEST_TIMEOUT_MS = 120000
+const MAX_PROVIDER_RETRIES = 2
+const PROVIDER_RETRY_DELAY_MS = 2000
 
 let client: OpenAI | null = null
 
@@ -75,33 +79,58 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     'Entrega solo información sustentada. No expongas razonamiento interno privado.',
   ].filter(Boolean).join('\n\n')
 
-  let response: Awaited<ReturnType<typeof openai.responses.create>>
-  try {
-    response = await openai.responses.create({
-      model: MODEL,
-      instructions,
-      input: userInput,
-      reasoning: {
-        effort: 'max',
-        mode: 'pro',
-        context: 'auto',
-      },
-      text: {
-        verbosity: 'high',
-        format: {
-          type: 'json_schema',
-          name: outputSchema.name,
-          strict: true,
-          schema: outputSchema.schema,
-        },
-      },
-      max_output_tokens: MAX_OUTPUT_TOKENS,
-      safety_identifier: safetyIdentifier,
-      store: false,
-    } as any, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) })
-  } catch (error) {
-    if (error instanceof AgentRuntimeError) throw error
-    if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+  const modelsToTry = [MODEL_PRIMARY, MODEL_FALLBACK].filter((model, index, models) => models.indexOf(model) === index)
+  let response: Awaited<ReturnType<typeof openai.responses.create>> | null = null
+  let lastError: unknown = null
+
+  for (const model of modelsToTry) {
+    for (let attempt = 0; attempt < MAX_PROVIDER_RETRIES; attempt += 1) {
+      try {
+        const createParams: Record<string, unknown> = {
+          model,
+          instructions,
+          input: userInput,
+          text: {
+            format: {
+              type: 'json_schema',
+              name: outputSchema.name,
+              strict: true,
+              schema: outputSchema.schema,
+            },
+          },
+          max_output_tokens: MAX_OUTPUT_TOKENS,
+          safety_identifier: safetyIdentifier,
+          store: false,
+        }
+
+        // gpt-5.6 is the quality-first model. Only reasoning-capable models receive this option.
+        if (model.startsWith('o') || model.startsWith('gpt-5')) {
+          createParams.reasoning = { effort: 'max' }
+        }
+
+        response = await openai.responses.create(
+          createParams as any,
+          { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
+        )
+        lastError = null
+        break
+      } catch (error) {
+        lastError = error
+        if (error instanceof AgentRuntimeError) throw error
+        if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+          // A timeout on 5.6 should immediately move to the fallback model.
+          break
+        }
+        if (attempt + 1 < MAX_PROVIDER_RETRIES) {
+          await new Promise((resolve) => setTimeout(resolve, PROVIDER_RETRY_DELAY_MS * (attempt + 1)))
+        }
+      }
+    }
+    if (response) break
+  }
+
+  if (!response) {
+    if (lastError instanceof Error && (lastError.name === 'TimeoutError' || lastError.name === 'AbortError')) {
       throw new AgentRuntimeError('timeout', 'The agent exceeded the execution time limit')
     }
     throw new AgentRuntimeError('provider_error', 'The reasoning provider could not complete the request')
@@ -127,7 +156,7 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
 
   return {
     responseId: response.id,
-    model: response.model || MODEL,
+    model: response.model || MODEL_PRIMARY,
     output,
     outputText: JSON.stringify(output, null, 2),
     usage: normalizeUsage(response.usage),
