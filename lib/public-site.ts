@@ -16,7 +16,7 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio revisa normativa, contratos, políticas y evidencias para mostrar qué cambió, cómo afecta a una empresa y qué decisión debe tomar su equipo.'
+  'Kumplio convierte situaciones regulatorias, contractuales y de cumplimiento en casos guiados con prioridades, acciones, fuentes, revisión humana y evidencia de cierre.'
 
 export const POWERED_BY_DESCRIPTION =
   'Kumplio es un producto desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.'
@@ -29,17 +29,17 @@ export const PUBLIC_CONTACT = {
 }
 
 export const CORE_CAPABILITIES = [
-  'Detectar cambios normativos desde fuentes identificables',
-  'Relacionar cambios con contratos, políticas, proveedores y procesos',
-  'Descartar automáticamente lo que no requiere acción',
-  'Preparar decisiones explicables con evidencia y precedentes',
-  'Convertir decisiones aprobadas en trabajo con responsables y fechas',
-  'Conservar trazabilidad para auditorías y revisiones',
-  'Mantener siempre el control y la decisión humana',
+  'Interpretar el resultado que una persona, profesional u organización necesita lograr',
+  'Crear un expediente vivo para cada situación regulatoria, contractual o de cumplimiento',
+  'Asignar especialistas digitales según el objetivo y el contexto disponible',
+  'Priorizar qué requiere atención ahora y qué puede esperar',
+  'Convertir hallazgos en acciones, responsables sugeridos y criterios de cierre',
+  'Relacionar conclusiones con fuentes, documentos, evidencia y revisiones humanas',
+  'Acompañar el caso desde la comprensión inicial hasta la decisión y el cierre verificable',
 ]
 
 export const PUBLIC_LIMITATIONS = [
-  'Kumplio no declara automáticamente que una organización cumple una norma.',
+  'Kumplio no declara automáticamente que una persona u organización cumple una norma.',
   'Kumplio no reemplaza asesoría jurídica, auditoría independiente ni decisiones profesionales.',
   'Las conclusiones relevantes requieren fuentes identificables, contexto suficiente y revisión humana.',
 ]
