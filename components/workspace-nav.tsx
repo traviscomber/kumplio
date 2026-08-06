@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Building2, FolderKanban, ListTodo, Settings, Sparkles, UserRoundCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
+import { WorkspaceSwitcher } from '@/components/workspace-switcher'
 
 const areas = [
   {
@@ -73,6 +74,7 @@ export function WorkspaceNav() {
             )
           })}
         </div>
+        <WorkspaceSwitcher />
         <UniversalSearch />
         <Link
           href="/accountability"
