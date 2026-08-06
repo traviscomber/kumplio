@@ -9,7 +9,7 @@ import { listTeamMembers, updateMemberRole } from '@/lib/compliance/accountabili
 
 export const dynamic = 'force-dynamic'
 
-const roles: WorkspaceRole[] = ['owner', 'admin', 'compliance', 'reviewer', 'member']
+const roles: WorkspaceRole[] = ['owner', 'admin', 'compliance', 'reviewer', 'member', 'viewer']
 
 export default async function TeamPage() {
   const supabase = await createClient()
@@ -83,7 +83,7 @@ export default async function TeamPage() {
                         <option key={role} value={role}>{roleLabel(role)}</option>
                       ))}
                     </select>
-                    <button className="rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground">Guardar rol</button>
+                    <button type="submit" className="rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground">Guardar rol</button>
                   </form>
                 ) : (
                   <p className="text-sm text-muted-foreground">
@@ -104,6 +104,7 @@ function roleLabel(role: WorkspaceRole) {
   if (role === 'admin') return 'Administrador'
   if (role === 'compliance') return 'Cumplimiento'
   if (role === 'reviewer') return 'Revisor'
+  if (role === 'viewer') return 'Observador'
   return 'Miembro'
 }
 
