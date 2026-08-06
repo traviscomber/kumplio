@@ -46,22 +46,22 @@ const areas = [
 
 export function WorkspaceNav() {
   const pathname = usePathname()
+  const accountabilityActive = pathname === '/accountability' || pathname.startsWith('/accountability/')
   const activeArea = areas.find(({ routes }) =>
     routes.some((route) => pathname === route || pathname.startsWith(`${route}/`)),
   )?.href
-  const accountabilityActive = pathname === '/accountability' || pathname.startsWith('/accountability/')
 
   return (
     <nav aria-label="Áreas principales de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
-      <div className="container mx-auto flex items-center gap-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+      <div className="container mx-auto flex max-w-full items-center gap-1 px-3 py-3 sm:gap-3 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto overscroll-x-contain">
           {areas.map(({ href, label, icon: Icon }) => {
             const active = href === activeArea
             return (
               <Link
                 key={href}
                 href={href}
-                aria-current={active ? 'page' : undefined}
+                aria-current={active && !accountabilityActive ? 'page' : undefined}
                 className={cn(
                   'inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
                   active ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -78,17 +78,23 @@ export function WorkspaceNav() {
           href="/accountability"
           aria-label="Responsables y vencimientos"
           aria-current={accountabilityActive ? 'page' : undefined}
+          title="Responsables y vencimientos"
           className={cn(
-            'rounded-lg p-2 transition-colors',
+            'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors',
             accountabilityActive
               ? 'bg-primary text-primary-foreground shadow-sm'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground',
           )}
         >
-          <UserRoundCheck className="h-4 w-4" />
+          <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
         </Link>
-        <Link href="/settings" aria-label="Configuración" className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground">
-          <Settings className="h-4 w-4" />
+        <Link
+          href="/settings"
+          aria-label="Configuración"
+          title="Configuración"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <Settings className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
     </nav>
