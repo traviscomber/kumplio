@@ -11,9 +11,10 @@ type Props = {
   workflowStatus: string
   attemptCount: number | null
   maxAttempts: number | null
+  canRecoverStale: boolean
 }
 
-type BusyAction = 'approve' | 'changes' | 'advance' | 'retry' | 'close' | null
+type BusyAction = 'approve' | 'changes' | 'advance' | 'retry' | 'recover' | 'close' | null
 
 export function LiveWorkflowActions({
   workflowId,
@@ -22,6 +23,7 @@ export function LiveWorkflowActions({
   workflowStatus,
   attemptCount,
   maxAttempts,
+  canRecoverStale,
 }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<BusyAction>(null)
@@ -39,7 +41,7 @@ export function LiveWorkflowActions({
       && maxAttempts !== null
       && attemptCount >= maxAttempts,
   )
-  const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview
+  const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview && !canRecoverStale
   const canClose = workflowStatus === 'completed'
 
   async function request(path: string, body?: unknown) {
@@ -122,6 +124,20 @@ export function LiveWorkflowActions({
     }
   }
 
+  async function recoverStale() {
+    if (busy || !canRecoverStale) return
+    setBusy('recover')
+    setError('')
+    try {
+      await request(`/api/agents/workflows/${workflowId}/recover-stale`)
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible recuperar la ejecución detenida')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   async function closeCase() {
     if (busy || closed) return
     setBusy('close')
@@ -137,13 +153,28 @@ export function LiveWorkflowActions({
     }
   }
 
-  if (!canReview && !hasRetryState && !canAdvance && !canClose) return null
+  if (!canReview && !hasRetryState && !canAdvance && !canRecoverStale && !canClose) return null
 
   return (
     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
       <h2 className="font-black">{canClose ? 'Cierre del caso' : 'Siguiente decisión'}</h2>
 
-      {canReview ? (
+      {canRecoverStale ? (
+        <>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            La ejecución superó el tiempo máximo del servidor y no entregó un resultado. Recupérala para liberar la etapa y habilitar un reintento trazable.
+          </p>
+          <button
+            type="button"
+            onClick={recoverStale}
+            disabled={Boolean(busy)}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
+          >
+            {busy === 'recover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+            Recuperar ejecución detenida
+          </button>
+        </>
+      ) : canReview ? (
         <>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Revisa el resultado persistido. Al aprobarlo, Kumplio iniciará la siguiente etapa real.
