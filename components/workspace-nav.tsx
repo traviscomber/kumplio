@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Building2, Gauge, ListTodo, Settings, ShieldCheck, Sparkles } from 'lucide-react'
+import { Building2, FolderKanban, ListTodo, Settings, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UniversalSearch } from '@/components/universal-search'
 
@@ -14,28 +14,33 @@ const areas = [
     routes: ['/advisor', '/dashboard'],
   },
   {
+    href: '/cases',
+    label: 'Casos',
+    icon: FolderKanban,
+    routes: ['/cases', '/dashboard/agents', '/agents'],
+  },
+  {
     href: '/my-work',
-    label: 'Trabajo',
+    label: 'Seguimiento',
     icon: ListTodo,
-    routes: ['/my-work', '/missions', '/decisions', '/review-center', '/operations'],
+    routes: ['/my-work', '/missions', '/decisions', '/review-center', '/operations', '/accountability'],
   },
   {
     href: '/context',
     label: 'Organización',
     icon: Building2,
-    routes: ['/context', '/team', '/libraries', '/digital-twin', '/settings'],
-  },
-  {
-    href: '/situations',
-    label: 'Cumplimiento',
-    icon: ShieldCheck,
-    routes: ['/situations', '/roc', '/rules', '/event-recovery', '/copilot', '/ai-platform'],
-  },
-  {
-    href: '/executive',
-    label: 'Ejecutivo',
-    icon: Gauge,
-    routes: ['/executive', '/analytics'],
+    routes: [
+      '/context',
+      '/team',
+      '/libraries',
+      '/digital-twin',
+      '/documents',
+      '/obligations',
+      '/risks',
+      '/controls',
+      '/evidence',
+      '/settings',
+    ],
   },
 ] as const
 
