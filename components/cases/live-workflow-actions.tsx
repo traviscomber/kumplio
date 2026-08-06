@@ -11,7 +11,7 @@ type Props = {
   workflowStatus: string
 }
 
-type BusyAction = 'approve' | 'changes' | 'advance' | 'close' | null
+type BusyAction = 'approve' | 'changes' | 'advance' | 'retry' | 'close' | null
 
 export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowStatus }: Props) {
   const router = useRouter()
@@ -21,6 +21,8 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
   const [closed, setClosed] = useState(false)
 
   const canReview = Boolean(runId && stageStatus === 'pending_review')
+  const canRetryFailed = stageStatus === 'failed' && workflowStatus === 'failed'
+  const canRetryChanges = stageStatus === 'changes_requested' && workflowStatus === 'paused'
   const canAdvance = ['draft', 'running'].includes(workflowStatus) && !canReview
   const canClose = workflowStatus === 'completed'
 
@@ -31,7 +33,11 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     })
     const payload = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(payload.error || 'No fue posible completar la acción')
+    if (!response.ok) {
+      const error = new Error(payload.error || 'No fue posible completar la acción') as Error & { code?: string }
+      error.code = payload.code
+      throw error
+    }
     return payload
   }
 
@@ -61,7 +67,6 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
         decision: 'changes_requested',
         comment: comment.trim(),
       })
-      setComment('')
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible solicitar cambios')
@@ -84,6 +89,23 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
     }
   }
 
+  async function retry() {
+    if (busy || (canRetryChanges && comment.trim().length < 3)) return
+    setBusy('retry')
+    setError('')
+    try {
+      await request(`/api/agents/workflows/${workflowId}/advance`, canRetryChanges
+        ? { instructions: comment.trim() }
+        : {})
+      setComment('')
+      router.refresh()
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'No fue posible reintentar la etapa')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   async function closeCase() {
     if (busy || closed) return
     setBusy('close')
@@ -99,7 +121,7 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
     }
   }
 
-  if (!canReview && !canAdvance && !canClose) return null
+  if (!canReview && !canRetryFailed && !canRetryChanges && !canAdvance && !canClose) return null
 
   return (
     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
@@ -134,6 +156,32 @@ export function LiveWorkflowActions({ workflowId, runId, stageStatus, workflowSt
           >
             {busy === 'changes' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
             Solicitar cambios
+          </button>
+        </>
+      ) : canRetryFailed || canRetryChanges ? (
+        <>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {canRetryChanges
+              ? 'La etapa necesita una nueva ejecución. Escribe instrucciones concretas para el siguiente intento.'
+              : 'La etapa falló antes de producir un resultado revisable. Puedes usar el siguiente intento disponible.'}
+          </p>
+          {canRetryChanges && (
+            <textarea
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              rows={3}
+              placeholder="Instrucciones para el reintento..."
+              className="mt-4 w-full resize-none rounded-xl border bg-background p-3 text-sm outline-none focus:border-primary"
+            />
+          )}
+          <button
+            type="button"
+            onClick={retry}
+            disabled={Boolean(busy) || (canRetryChanges && comment.trim().length < 3)}
+            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 font-bold text-primary-foreground disabled:opacity-60"
+          >
+            {busy === 'retry' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+            Reintentar etapa
           </button>
         </>
       ) : canAdvance ? (

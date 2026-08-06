@@ -16,6 +16,7 @@ import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
+import { getWorkflowStage } from '@/lib/agents/orchestration'
 
 export const dynamic = 'force-dynamic'
 
@@ -76,7 +77,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
     ? await Promise.all([
         supabase
           .from('agent_workflow_stages')
-          .select('id, stage_index, agent_id, label, status, attempt_count, run_id, output_artifact_id, started_at, completed_at, updated_at')
+          .select('id, stage_index, agent_id, status, attempt_count, run_id, output_artifact_id, started_at, completed_at, updated_at')
           .eq('workflow_id', workflow.id)
           .eq('organization_id', organizationId)
           .order('stage_index', { ascending: true }),
@@ -110,8 +111,10 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
   const reviews = reviewsResult.data || []
   const active = Boolean(workflow && ['draft', 'queued', 'running', 'pending_review', 'paused'].includes(workflow.status))
   const completedStages = stages.filter((stage) => ['completed', 'approved'].includes(stage.status)).length
-  const currentStage = workflow
-    ? stages.find((stage) => stage.stage_index === workflow.current_stage) || null
+  const actionableStage = workflow
+    ? stages.find((stage) => ['pending_review', 'changes_requested'].includes(stage.status))
+      || stages.find((stage) => stage.stage_index === workflow.current_stage)
+      || null
     : null
   const finalStage = stages.length > 0 ? stages[stages.length - 1] : null
   const finalArtifact = finalStage
@@ -184,6 +187,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                   <div className="mt-6 space-y-4">
                     {stages.map((stage) => {
                       const agent = AGENT_CATALOG.find((item) => item.id === stage.agent_id)
+                      const stageLabel = getWorkflowStage(workflow.workflow_type, stage.stage_index)?.label || `Etapa ${stage.stage_index + 1}`
                       const isRunning = stage.status === 'running'
                       const isDone = ['completed', 'approved'].includes(stage.status)
                       const needsReview = ['pending_review', 'changes_requested'].includes(stage.status)
@@ -197,7 +201,7 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                               <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
                                   <p className="font-black">{agent?.name || stage.agent_id}</p>
-                                  <p className="mt-1 text-sm text-muted-foreground">{stage.label}</p>
+                                  <p className="mt-1 text-sm text-muted-foreground">{stageLabel}</p>
                                 </div>
                                 <span className="rounded-full border px-3 py-1 text-xs font-semibold">{statusLabels[stage.status] || stage.status}</span>
                               </div>
@@ -218,8 +222,8 @@ export default async function LiveCasePage({ params }: { params: Promise<{ caseI
                 <aside className="space-y-6">
                   <LiveWorkflowActions
                     workflowId={workflow.id}
-                    runId={currentStage?.run_id || null}
-                    stageStatus={currentStage?.status || null}
+                    runId={actionableStage?.run_id || null}
+                    stageStatus={actionableStage?.status || null}
                     workflowStatus={workflow.status}
                   />
 

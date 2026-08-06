@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   }
 
   const organizationId = membership.organization_id
+  const admin = createAdminClient()
   const { data: run } = await supabase
     .from('agent_runs')
     .select('id, case_id, status')
@@ -128,11 +130,15 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
   }
 
   if (artifact?.id) {
-    await supabase
+    const { error: artifactUpdateError } = await supabase
       .from('agent_artifacts')
       .update({ status: artifactStatus })
       .eq('id', artifact.id)
       .eq('organization_id', organizationId)
+
+    if (artifactUpdateError) {
+      return NextResponse.json({ error: 'Review saved but artifact status could not be updated', code: 'artifact_review_sync_failed' }, { status: 500 })
+    }
   }
 
   let workflowStatus: string | null = null
@@ -166,19 +172,25 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
         ? isFinalStage ? 'completed' : 'running'
         : parsed.data.decision === 'commented' ? 'pending_review' : 'paused'
 
-      await supabase
+      const { error: workflowUpdateError } = await supabase
         .from('agent_workflows')
         .update({
           status: workflowStatus,
           current_stage: workflowStatus === 'paused' ? workflowStage.stage_index : workflow.current_stage,
           completed_at: workflowStatus === 'completed' ? new Date().toISOString() : null,
+          error_code: null,
+          error_message: null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', workflow.id)
         .eq('organization_id', organizationId)
 
+      if (workflowUpdateError) {
+        return NextResponse.json({ error: 'Review saved but workflow status could not be updated', code: 'workflow_status_sync_failed' }, { status: 500 })
+      }
+
       if (run.case_id) {
-        await supabase.from('compliance_case_events').insert({
+        const { error: eventError } = await admin.from('compliance_case_events').insert({
           organization_id: organizationId,
           case_id: run.case_id,
           actor_id: user.id,
@@ -202,6 +214,8 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
             workflow_status: workflowStatus,
           },
         })
+
+        if (eventError) console.error('[agents/review] case event', eventError.code)
       }
     }
   }
