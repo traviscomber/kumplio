@@ -31,7 +31,8 @@ export function StartCaseResolution({ caseId, instructions }: Props) {
       })
       const workflowPayload = await workflowResponse.json().catch(() => ({}))
 
-      const workflowId = workflowPayload.workflow?.id || workflowPayload.workflowId
+      const workflow = workflowPayload.workflow as { id?: string; status?: string } | undefined
+      const workflowId = workflow?.id || workflowPayload.workflowId
       if (!workflowResponse.ok && workflowResponse.status !== 409) {
         throw new Error(workflowPayload.error || 'No fue posible preparar el trabajo guiado')
       }
@@ -39,7 +40,8 @@ export function StartCaseResolution({ caseId, instructions }: Props) {
         throw new Error('No fue posible identificar el trabajo preparado para este caso')
       }
 
-      if (workflowResponse.ok) {
+      const shouldAdvance = workflowResponse.status === 201 || ['draft', 'failed'].includes(workflow?.status || '')
+      if (shouldAdvance) {
         const advanceResponse = await fetch(`/api/agents/workflows/${workflowId}/advance`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -47,7 +49,7 @@ export function StartCaseResolution({ caseId, instructions }: Props) {
         })
         const advancePayload = await advanceResponse.json().catch(() => ({}))
         if (!advanceResponse.ok) {
-          throw new Error(advancePayload.error || 'El caso quedó preparado, pero la primera etapa no pudo comenzar')
+          throw new Error(advancePayload.error || 'El caso quedó preparado, pero la siguiente etapa no pudo comenzar')
         }
       }
 
