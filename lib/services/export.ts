@@ -1,5 +1,5 @@
+import ExcelJS from 'exceljs'
 import jsPDF from 'jspdf'
-import * as XLSX from 'xlsx'
 import type { Obligation } from '@/lib/types/documents'
 
 type ExportStats = {
@@ -33,12 +33,41 @@ function priorityLabel(priority: Obligation['priority']) {
   return priority || 'sin prioridad'
 }
 
-export function generateExcelReport(
+function addWorksheet(
+  workbook: ExcelJS.Workbook,
+  name: string,
+  rows: Array<Array<string | number | boolean>>,
+  widths: number[],
+) {
+  const worksheet = workbook.addWorksheet(name, {
+    properties: { defaultRowHeight: 18 },
+    views: [{ state: 'frozen', ySplit: 1 }],
+  })
+
+  worksheet.addRows(rows)
+  worksheet.columns = widths.map((width) => ({ width }))
+
+  const header = worksheet.getRow(1)
+  header.font = { bold: true }
+  header.alignment = { vertical: 'middle', wrapText: true }
+
+  worksheet.eachRow((row) => {
+    row.alignment = { vertical: 'top', wrapText: true }
+  })
+
+  return worksheet
+}
+
+export async function generateExcelReport(
   documentName: string,
   obligations: Obligation[],
   stats: ExportStats,
-): ArrayBuffer {
-  const workbook = XLSX.utils.book_new()
+): Promise<Uint8Array> {
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Kumplio'
+  workbook.company = 'n3uralia'
+  workbook.created = new Date()
+  workbook.modified = new Date()
 
   const summaryData = [
     ['KUMPLIO - Reporte de obligaciones identificadas', ''],
@@ -54,9 +83,7 @@ export function generateExcelReport(
     ['Advertencia', 'Resultados preliminares sujetos a revisión humana y a las fuentes originales.'],
   ]
 
-  const summarySheet = XLSX.utils.aoa_to_sheet(summaryData)
-  summarySheet['!cols'] = [{ wch: 30 }, { wch: 80 }]
-  XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen')
+  addWorksheet(workbook, 'Resumen', summaryData, [30, 80])
 
   const obligationsRows = [
     ['Obligación', 'Prioridad', 'Responsable', 'Vencimiento', 'Estado', 'Confianza técnica'],
@@ -72,18 +99,10 @@ export function generateExcelReport(
     ]),
   ]
 
-  const obligationsSheet = XLSX.utils.aoa_to_sheet(obligationsRows)
-  obligationsSheet['!cols'] = [
-    { wch: 80 },
-    { wch: 18 },
-    { wch: 28 },
-    { wch: 18 },
-    { wch: 18 },
-    { wch: 20 },
-  ]
-  XLSX.utils.book_append_sheet(workbook, obligationsSheet, 'Obligaciones')
+  addWorksheet(workbook, 'Obligaciones', obligationsRows, [80, 18, 28, 18, 18, 20])
 
-  return XLSX.write(workbook, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer
+  const output = await workbook.xlsx.writeBuffer()
+  return new Uint8Array(output)
 }
 
 export function generateCSVReport(obligations: Obligation[]) {

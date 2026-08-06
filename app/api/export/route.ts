@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
   try {
     if (parsedFormat.data === 'excel') {
-      const body = generateExcelReport(document.name || 'Documento', obligations, stats)
+      const body = await generateExcelReport(document.name || 'Documento', obligations, stats)
       const filename = `${baseName}.xlsx`
       return new NextResponse(body, {
         headers: downloadHeaders(

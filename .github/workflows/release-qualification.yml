@@ -1,4 +1,4 @@
-name: Release qualification foundation
+name: Release qualification
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: release-foundation-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: release-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,7 +16,7 @@ permissions:
 jobs:
   qualify:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-publishable-key
@@ -36,8 +36,13 @@ jobs:
       - name: Install from committed lockfile
         run: npm ci
 
-      - name: Validate security boundary migration
-        run: node scripts/check-security-function-boundaries.mjs
+      - name: Audit dependency graph
+        run: npm audit --audit-level=high
+
+      - name: Validate security and export boundaries
+        run: |
+          node scripts/check-security-function-boundaries.mjs
+          npm run check:export
 
       - name: Validate public, auth and server boundaries
         run: |
