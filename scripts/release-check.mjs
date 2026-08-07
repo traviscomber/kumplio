@@ -22,6 +22,7 @@ const checks = [
   ['check:durable-agent-queue'],
   ['check:control-evidence-lifecycle'],
   ['check:knowledge-graph'],
+  ['check:insights'],
   ['build'],
 ]
 
