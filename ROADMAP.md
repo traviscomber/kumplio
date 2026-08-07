@@ -5,8 +5,8 @@
 > Revisión: 7 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Baseline técnico y documental: `0dd11fb69e83a25908e776c0ffae910191771fcc`  
-> Última migración aplicada: `20260807194153_seed_n3uralia_commercial_processing_activity`  
+> Baseline técnico y documental: `013be961f14a3d19c54a0bc3475182e46a0bf602`  
+> Última migración aplicada: `20260807210713_seed_tenant_assurance_sandbox_v1`  
 > Repositorio: `traviscomber/kumplio`
 
 ---
@@ -18,11 +18,11 @@ Este archivo representa el **estado comprobable del producto**, no el historial 
 Prioridad de evidencia para marcar algo como hecho:
 
 1. código presente en `main`;
-2. migración versionada y aplicada en producción cuando corresponda;
+2. migración versionada y aplicada cuando corresponda;
 3. prueba técnica, transaccional o de seguridad verificable;
-4. Release Gate y despliegues verdes;
+4. Release Gate, build, smoke y despliegues verdes;
 5. uso real por una persona o piloto;
-6. métrica de resultado cuando el bloque lo requiera.
+6. métrica de resultado cuando el bloque la requiera.
 
 Si una conversación, una pantalla o una PR contradice `main`, Supabase o una prueba real, prevalece la evidencia técnica.
 
@@ -32,14 +32,14 @@ Si una conversación, una pantalla o una PR contradice `main`, Supabase o una pr
 |---|---|
 | `PLANNED` | Definido, sin implementación activa. |
 | `ACTIVE` | Desarrollo, prueba o cierre en curso. |
-| `DEPLOYED` | Código y/o migración ya están en producción. |
-| `VALIDATED` | Flujo probado con datos reales o una prueba transaccional representativa. |
-| `VALIDATED INICIAL` | Primer caso real comprobado; falta repetibilidad o cobertura. |
+| `DEPLOYED` | Código y/o migración en producción. |
+| `VALIDATED` | Flujo probado con datos reales o una prueba representativa. |
+| `VALIDATED INICIAL` | Primer caso comprobado; falta repetibilidad, cobertura o piloto externo. |
 | `DONE` | Validado, medido y sin gate relevante pendiente. |
 | `BLOCKED` | Requiere acción externa, permiso o decisión explícita. |
-| `DEFERRED` | Tiene valor, pero no debe competir con la ruta crítica. |
+| `DEFERRED` | Tiene valor, pero no compite con la ruta crítica. |
 
-`DEPLOYED` no equivale a `VALIDATED`. Un único caso exitoso tampoco equivale a cobertura organizacional completa.
+`DEPLOYED` no equivale a `VALIDATED`. Un tenant sintético aislado tampoco equivale a un piloto externo ni a cumplimiento legal.
 
 ---
 
@@ -75,6 +75,7 @@ Una persona describe una situación
 6. Reutilizar controles, evidencia y precedentes cuando exista una relación defendible.
 7. Coordinar especialistas sin presentar una salida generada como decisión aprobada.
 8. Registrar actividades de tratamiento sin inventar datos ausentes ni presentar una base propuesta como conclusión jurídica.
+9. Aislar cada organización y probar ese aislamiento en ambas direcciones.
 
 ### Lo que Kumplio no debe afirmar
 
@@ -83,12 +84,14 @@ Una persona describe una situación
 - que un documento aislado acredita la operación completa de un control;
 - que una recomendación de IA sustituye revisión legal, auditoría o decisión humana;
 - que una línea base o una actividad inicial equivale a inventario completo;
-- que una clasificación de riesgo es definitiva si la metodología y la aprobación siguen pendientes.
+- que una clasificación de riesgo es definitiva sin metodología y aprobación;
+- que un tenant sintético equivale a una empresa cliente real;
+- que aprobar la calidad de un artefacto equivale a aprobar el cierre del caso.
 
 ### Principios no negociables
 
 1. Chile primero.
-2. Seguridad y centralización de información desde el inicio.
+2. Seguridad y centralización desde el inicio.
 3. Sin fuente no hay afirmación regulatoria.
 4. Sin evidencia no hay conclusión de cumplimiento.
 5. IA propone; una persona valida decisiones sensibles.
@@ -97,8 +100,8 @@ Una persona describe una situación
 8. Cada organización permanece aislada.
 9. Versionar antes que sobrescribir.
 10. La UI habla de resultados, decisiones y trabajo; no de infraestructura.
-11. La confianza siempre declara su alcance y sus límites.
-12. Los desconocidos se conservan hasta ser resueltos con evidencia.
+11. La confianza siempre declara alcance y límites.
+12. Los desconocidos se conservan hasta resolverse con evidencia.
 13. No se agregan módulos atractivos si un gate P0 continúa abierto.
 
 ---
@@ -109,7 +112,7 @@ Una persona describe una situación
 
 `main` está en:
 
-`0dd11fb69e83a25908e776c0ffae910191771fcc`
+`013be961f14a3d19c54a0bc3475182e46a0bf602`
 
 Sobre este baseline quedaron en `SUCCESS`:
 
@@ -122,15 +125,22 @@ Sobre este baseline quedaron en `SUCCESS`:
 - ambos despliegues Vercel;
 - IndexNow production.
 
-La PR de referencia es **#217 — Inventario mínimo real de tratamientos**.
+PRs de referencia:
+
+- **#217** — Inventario mínimo real de tratamientos;
+- **#219** — Segundo tenant, aislamiento y repetibilidad;
+- **#220** — Corrección de joins del refresh de tenant assurance.
 
 ### Migraciones vigentes más recientes
 
-| Versión | Migración |
+| Versión aplicada | Migración |
 |---|---|
 | `20260807192320` | `processing_activity_inventory_v1` |
 | `20260807192428` | `processing_inventory_explicit_browser_deny` |
 | `20260807194153` | `seed_n3uralia_commercial_processing_activity` |
+| `20260807203148` | `tenant_assurance_foundation_v1` |
+| `20260807210440` | `fix_tenant_assurance_refresh_joins_v1` |
+| `20260807210713` | `seed_tenant_assurance_sandbox_v1` |
 
 ### Preparación actual
 
@@ -138,48 +148,51 @@ La PR de referencia es **#217 — Inventario mínimo real de tratamientos**.
 |---|---|
 | Desarrollo técnico | sólido |
 | Demo comercial acompañada | apta |
-| Piloto supervisado | apto |
-| Beta privada | cerca; faltan gates P0 |
+| Assurance multiempresa interno | validado |
+| Piloto supervisado | apto para iniciar |
+| Beta privada autoservicio | cerca; faltan gates P0 |
 | Registro público autoservicio | no habilitar todavía |
-| Escalamiento multiempresa | no habilitar todavía |
-| Enterprise | diferido hasta validar pilotos |
+| Escalamiento Enterprise | diferido hasta pilotos externos |
 
 ### Realidad de producción
 
 | Activo operacional | Volumen actual |
 |---|---:|
-| Organizaciones | 1 |
-| Membresías | 1 |
-| Ámbitos/proyectos | 1 |
-| Casos | 3 |
-| Workflows agentic | 5 |
-| Etapas de workflow | 25 |
-| Ejecuciones de agentes | 14 |
-| Artefactos agentic | 8 |
-| Revisiones humanas de agentes | 7 |
-| Jobs durables | 5 |
-| Misiones | 1 |
-| Resultados de misión | 1 |
+| Organizaciones | 2 |
+| Membresías | 2 |
+| Ámbitos/proyectos | 2 |
+| Casos | 5 |
+| Workflows agentic | 6 |
+| Etapas de workflow | 30 |
+| Ejecuciones de agentes | 19 |
+| Artefactos agentic | 13 |
+| Revisiones humanas de agentes | 12 |
+| Jobs durables | 10 |
+| Misiones | 2 |
+| Resultados de misión | 2 |
 | Decisiones de misión | 0 |
-| Requerimientos internos/obligaciones del ámbito | 1 |
-| Controles operacionales | 1 |
-| Evidencias operacionales | 2 |
-| Solicitudes de evidencia | 1 |
-| Evaluaciones de control | 3 |
-| Actividades de tratamiento | 1 |
-| Revisiones de tratamiento | 1 |
-| Sistemas/repositorios inventariados | 1 |
-| Conjuntos de datos inventariados | 1 |
-| Terceros inventariados | 1 |
+| Requerimientos internos/obligaciones | 2 |
+| Controles operacionales | 2 |
+| Evidencias operacionales | 4 |
+| Solicitudes de evidencia | 2 |
+| Evaluaciones de control | 6 |
+| Actividades de tratamiento | 2 |
+| Revisiones de tratamiento | 2 |
+| Sistemas/repositorios inventariados | 2 |
+| Conjuntos de datos inventariados | 2 |
+| Terceros inventariados | 2 |
+| Tenant assurance runs | 1 |
 | Memorias organizacionales persistidas | 0 |
 | Claims regulatorios | 186 |
 | Secciones regulatorias | 2.104 |
+
+Una de las dos organizaciones es un **sandbox sintético interno** y no cuenta como piloto comercial ni como tratamiento real adicional.
 
 ---
 
 ## 4. Hitos validados
 
-### Hito A — Golden path y baseline assurance — `VALIDATED`
+### Hito A — Golden path y baseline assurance de N3uralia — `VALIDATED`
 
 Caso oficial:
 
@@ -192,24 +205,15 @@ Caso aprobado
 → ámbito asignado
 → misión con owner y vencimiento
 → solicitud de evidencia
-→ requerimiento interno claramente diferenciado de obligación legal
+→ requerimiento interno diferenciado de obligación legal
 → control de línea base
-→ evidencia aceptada con hash SHA-256
+→ evidencia aceptada con SHA-256
 → evaluación de diseño: effective
 → evaluación operacional: partial
-→ resultado de misión aprobado
+→ resultado aprobado
 → misión completed
 → eventos de expediente, evidencia y misión
 ```
-
-IDs principales:
-
-- requerimiento interno: `65c1dd70-8ed1-4c0b-a74b-de8d7b3ce1eb`;
-- control: `81c256bd-0a5e-4663-a96a-67bf7de2008a`;
-- evidencia inicial: `d90ccc9b-dc71-4aa8-921a-a303353acac1`;
-- evaluación de diseño: `8a6f9f61-494e-4e88-b115-ee6d88fcf4ba`;
-- evaluación operacional inicial: `70bd4020-5811-430b-ab9f-e2949604529b`;
-- resultado de misión: `c2bc1493-8403-4d05-aea8-58a26df3e860`.
 
 La operación permanece parcial y la confianza nunca se presenta como certificación.
 
@@ -219,28 +223,12 @@ Actividad:
 
 > **Gestión de contactos comerciales y solicitudes de demostración**
 
-La fuente real combina:
+Fuentes verificadas:
 
 - endpoint `app/api/leads/route.ts`;
 - tabla operacional `public.commercial_leads`;
 - al menos un registro persistido;
 - región Supabase `us-east-1`.
-
-Cadena persistente:
-
-```text
-Actividad real
-→ propósito
-→ base propuesta
-→ titulares y categorías de datos
-→ dataset
-→ sistema/repositorio
-→ tercero
-→ evidencia estructurada con hash
-→ revisión humana
-→ control y evaluación operacional parcial
-→ evento del expediente
-```
 
 IDs principales:
 
@@ -250,44 +238,22 @@ IDs principales:
 - sistema/repositorio: `aabbcc76-f48c-4aad-b251-55aa2cc9185b`;
 - tercero: `1f5fa52c-7b34-47f4-9e49-bd8007dad191`;
 - evidencia: `ab080fbd-c189-4059-b5c4-752e65daaac5`;
-- revisión humana: `3cc95dac-0026-42de-bcac-c5ac26ae19d6`;
-- evaluación operacional adicional: `59fcfa84-4587-4eb2-81a7-5b07f0beed62`.
+- revisión humana: `3cc95dac-0026-42de-bcac-c5ac26ae19d6`.
 
 Hash del snapshot:
 
 `6e5c93c63295b308858baa054ffad95787cfadeeacbe2e5fda7e0f2e1da0e39d`
-
-La evidencia quedó:
-
-- `accepted`;
-- integridad `verified`;
-- vencimiento el **5 de noviembre de 2026**;
-- alcance `processing_activity_inventory`;
-- limitaciones preservadas explícitamente.
 
 La revisión conserva seis desconocidos:
 
 1. plazo de retención no aprobado;
 2. base de licitud pendiente de validación jurídica;
 3. destinatarios y subencargados incompletos;
-4. clasificación de riesgo del proveedor pendiente de metodología y aprobación;
+4. riesgo del proveedor pendiente de metodología y aprobación;
 5. aviso de privacidad no adjuntado;
 6. mecanismo de eliminación no evidenciado.
 
-La tercera ejecución del mismo contrato devolvió:
-
-```text
-resumed: true
-created.*: false
-mismos IDs
-unknownCount: 6
-```
-
-No se generaron duplicados.
-
-### Confianza actual del alcance registrado
-
-Dimensiones actuales:
+Confianza actual del alcance de N3uralia:
 
 | Dimensión | Resultado |
 |---|---:|
@@ -301,12 +267,88 @@ Dimensiones actuales:
 | **Resultado bruto ponderado** | **85%** |
 | **Resultado mostrado** | **65%** |
 
-El máximo sigue en **65%** por dos razones independientes:
+El máximo sigue en 65% por operación parcial y por inventario parcial con desconocidos abiertos.
 
-- operación parcial del control;
-- inventario con actividad parcial y desconocidos abiertos.
+### Hito C — Segundo tenant aislado y golden path repetido — `VALIDATED`
 
-Esto demuestra progreso sin ocultar la falta de cobertura organizacional completa.
+Sandbox interno:
+
+- organización: `5efbcdd0-a309-4bf9-bf44-18ba72b4cb83`;
+- usuario independiente: `044c7969-d8e3-47a6-bb5a-ab25a7fc74e3`;
+- proyecto: `273de103-2d26-4c4f-a08b-f05dfc4e2b6f`;
+- caso guiado: `b354573c-02ed-4ffc-ad8b-37fd5972e5a6`;
+- workflow: `8af2ce3b-d9ab-4fc8-be32-2d759f18b91e`;
+- misión: `ca17e9ca-16ab-451e-a436-f23234cf393a`;
+- solicitud: `1892855b-39b3-4c22-b780-2896a77ec234`;
+- assurance run: `b061afbe-22c4-4351-b29d-94c680c5d095`.
+
+Cadena validada:
+
+```text
+Cuenta E2E independiente
+→ onboarding autenticado
+→ organización y proyecto propios
+→ expediente guiado
+→ workflow de cinco especialistas
+→ plan operativo
+→ baseline assurance
+→ inventario sintético
+→ evidencia y revisión
+→ cinco jobs durables
+→ cinco revisiones humanas
+→ tenant assurance passed
+```
+
+Controles de aislamiento aprobados:
+
+- onboarding idempotente;
+- caso guiado idempotente;
+- plan operativo idempotente;
+- baseline idempotente;
+- inventario idempotente;
+- enqueue idempotente;
+- el sandbox lee sus propios datos;
+- el sandbox no lee N3uralia;
+- N3uralia no lee el sandbox;
+- cambio de workspace ajeno denegado en ambas direcciones;
+- tablas internas denegadas al navegador;
+- RPC internas denegadas al navegador;
+- mutación server-side con actor del tenant equivocado rechazada.
+
+Resultado dinámico:
+
+| Métrica | Resultado |
+|---|---:|
+| Etapas | 5/5 |
+| Jobs succeeded | 5/5 |
+| Dead-letter | 0 |
+| Runs aprobados | 5/5 |
+| Artefactos aprobados | 5/5 |
+| Revisiones humanas | 5/5 |
+| Input tokens | 50.592 |
+| Output tokens | 22.499 |
+| Total tokens | 73.091 |
+| Tiempo de modelo acumulado | 364.091 ms |
+| Assurance final | `passed` |
+
+La etapa final recomendó **`request_changes`** y mantuvo reservas abiertas. Se aprobó la calidad del artefacto, no el cierre del caso ni una conclusión de cumplimiento.
+
+La verificación reversible `scripts/59-verify-tenant-assurance.sql` pasó dentro de `BEGIN ... ROLLBACK` sin alterar producción.
+
+### Hallazgo corregido durante el assurance
+
+`refresh_tenant_assurance_run_v1` intentaba leer `workflow_id` directamente desde `agent_runs` y `agent_artifacts`, columnas que no existen.
+
+La PR #220 corrigió el recorrido:
+
+```text
+agent_workflows
+→ agent_workflow_stages
+→ agent_runs
+→ agent_artifacts / agent_reviews
+```
+
+El Release Gate ahora impide reintroducir esos joins inválidos.
 
 ---
 
@@ -314,164 +356,143 @@ Esto demuestra progreso sin ocultar la falta de cobertura organizacional complet
 
 ### A. Narrativa, seguridad y entrada — `DEPLOYED`
 
-- narrativa pública centrada en protección de datos, centralización y guía experta;
-- separación entre información pública y workspaces privados;
-- rutas privadas con `noindex` y `no-store`;
-- autenticación y onboarding;
-- workspace activo explícito;
-- navegación simplificada: Escritorio, Casos, Seguimiento y Organización;
-- equipo con nombres, correo, invitaciones, roles y revocación.
+- narrativa centrada en protección de datos, centralización y guía experta;
+- separación entre superficie pública y workspaces privados;
+- autenticación, onboarding y workspace activo;
+- navegación simplificada;
+- equipo, roles, invitaciones y revocación.
 
-### B. Expedientes y golden path — `VALIDATED INICIAL`
+### B. Expedientes y golden path — `VALIDATED x2`
 
-- expediente canónico `/cases/[caseId]`;
-- contexto, fuentes, artefactos, revisiones y timeline;
-- inicio idempotente de caso y workflow;
-- especialistas con revisión humana;
-- cierre y archivo atómicos;
-- caso convertido a plan operativo;
-- misión, solicitud y baseline cerrados de extremo a extremo.
+- expediente canónico;
+- inicio idempotente;
+- especialistas y revisión humana;
+- plan operativo;
+- baseline, evidencia y misión;
+- repetido en N3uralia y en un tenant sintético independiente.
 
-Pendiente para `DONE`: repetir el flujo en tenants limpios y con más de una organización.
+Pendiente para `DONE`: tercera repetición y ejecución autoservicio sin intervención administrativa.
 
-### C. Consejo de Especialistas — `DEPLOYED / VALIDATED`
+### C. Consejo de Especialistas — `VALIDATED x2`
 
 - Structured Outputs y Zod;
-- timeouts, límites, retries y clasificación de errores;
-- `store: false`;
-- versionado de prompt y schema;
-- herramientas autorizadas y tool-call logging;
 - fronteras `DECIDE / NO DECIDE`;
+- herramientas autorizadas y trazabilidad;
 - contexto de comité;
-- detección de contradicciones y evidencia faltante;
+- contradicciones y reservas;
 - supervisor determinístico;
-- revisión humana y aprobación con justificación;
-- retry sin sobrescribir resultados anteriores;
-- recuperación de workflows stale.
+- aprobación humana con justificación;
+- retry sin sobrescribir versiones.
 
-### D. Ejecución durable — `VALIDATED`
+### D. Ejecución durable — `VALIDATED x2`
 
-- Supabase Queues/PGMQ;
-- `agent_jobs` tenant-scoped;
+- PGMQ;
+- jobs tenant-scoped;
 - enqueue idempotente;
-- lease, heartbeat y visibility timeout;
-- retry exponencial;
-- dead-letter;
+- lease y heartbeat;
+- retry y dead-letter;
 - cron de worker;
-- centro de operaciones;
-- health endpoint.
+- cinco etapas consecutivas procesadas automáticamente en el segundo tenant.
 
-### E. Controles, evidencia y aseguramiento — `VALIDATED INICIAL`
+### E. Controles, evidencia y aseguramiento — `VALIDATED x2`
 
-- catálogo de controles;
-- biblioteca y solicitudes de evidencia;
-- vínculo control–requerimiento;
-- vínculo control–evidencia;
+- controles y solicitudes;
+- evidencia con procedencia, hash y vigencia;
 - suficiencia revisada;
-- evaluación separada de diseño y operación;
-- evidencia con hash y vigencia;
+- diseño y operación separados;
 - baseline assurance idempotente;
 - operación parcial visible.
 
 ### F. Inventario de tratamientos — `VALIDATED INICIAL`
 
-- workspace accionable en `/digital-twin`;
-- actividad, propósito y base propuesta;
-- titulares y categorías de datos;
-- responsable y criticidad;
-- sistema/repositorio y hosting;
-- dataset, retención y transferencia;
-- tercero, ubicación y riesgo provisional;
-- fuente verificable;
-- snapshot JSONB con SHA-256;
-- revisión humana y desconocidos explícitos;
-- vínculos del gemelo digital;
-- evento del expediente;
-- dimensión de confianza y tope por inventario parcial.
+- actividad, finalidad y base propuesta;
+- titulares y categorías;
+- owner, sistema, dataset y tercero;
+- transferencia y retención;
+- fuente, snapshot y hash;
+- revisión humana;
+- desconocidos explícitos;
+- dimensión de confianza y tope por parcialidad.
 
-Pendiente: ampliar a más tratamientos y validar jurídicamente bases, retención, destinatarios y eliminación.
+Solo una actividad es real; la segunda es sintética y no cuenta para cobertura del piloto.
 
 ### G. Grafo, mapeo e impacto — `DEPLOYED`
 
-- mapa navegable `/map`;
-- obligaciones, controles, evidencia, casos, misiones, documentos y responsables;
-- relaciones bidireccionales;
-- búsqueda de controles similares;
-- timeline organizacional;
+- relaciones navegables;
+- timeline;
 - análisis de impacto;
-- deep-links;
-- confianza por dimensiones y topes explícitos.
+- reutilización de controles;
+- confianza por dimensiones y topes.
 
 ### H. Memoria organizacional — `DEPLOYED / SIN DATOS REALES`
 
-- lectura de `organization_memory`;
-- fallback a decisiones humanas;
-- búsqueda de casos similares;
-- precedentes inyectados al contexto de agentes;
-- separación entre contexto operativo y autoridad normativa.
+- lectura de memoria;
+- fallback a decisiones;
+- casos similares;
+- precedentes en contexto de agentes.
 
-Pendiente: capturar, versionar y aprobar aprendizajes reales. Producción aún tiene 0 memorias persistidas.
+Pendiente: crear el primer aprendizaje aprobado, versionado y reutilizado.
 
 ### I. Escritorio y responsabilidad — `VALIDATED INICIAL`
 
-- prioridades por riesgo, vencimiento y accionabilidad;
-- “¿Por qué aparece esto?”;
-- briefing de 24 horas;
-- cierre diario y próximo foco;
+- prioridades y explicabilidad;
+- briefing y cierre diario;
 - Mi trabajo;
 - delegación asistida;
-- carga por integrante;
-- SLA y escalamiento visible;
-- seguimiento y bitácora.
+- SLA, carga y seguimiento.
 
 ### J. Motor regulatorio — `DEPLOYED`
 
-- Regulatory Evidence Engine;
-- fuentes, capturas, versiones y hashes;
+- fuentes oficiales, capturas, versiones y hashes;
 - claims con citas;
 - LeyChile / BCN;
 - Diario Oficial;
 - Dirección del Trabajo;
-- SMA / SNIFA;
-- procedencia y cambios;
-- plataforma común de scrapers.
+- SMA / SNIFA.
 
-### K. Release y seguridad — `DONE / DEUDA EXTERNA CONOCIDA`
+### K. Tenant assurance — `VALIDATED`
+
+- segundo usuario y organización;
+- aislamiento bidireccional;
+- pruebas RLS y RPC;
+- golden path completo;
+- métricas internas;
+- estado visible en Operaciones.
+
+### L. Release y seguridad — `DONE / DEUDA EXTERNA CONOCIDA`
 
 - `npm ci` reproducible;
 - Release Gate único;
-- typecheck, build y smoke obligatorios;
-- checks de dominio;
+- typecheck, build y smoke;
 - dependency audit crítico;
-- previews Vercel antes de merge;
-- funciones nuevas `SECURITY INVOKER`;
-- `search_path=''`;
-- RPC críticas solo para `service_role`;
-- RLS y denegación explícita para tablas internas del inventario;
-- corrección del contrato CI de SMA SNIFA detail.
+- previews antes de merge;
+- `SECURITY INVOKER` y `search_path=''`;
+- RPC críticas restringidas;
+- RLS y denegación explícita para tablas internas.
 
-Deuda externa conocida: **Supabase Auth Leaked Password Protection está desactivada**.
+Deuda externa conocida: **Supabase Auth Leaked Password Protection continúa desactivada**.
 
 ---
 
-## 6. Estado de los bloques 1–14
+## 6. Estado de los bloques 1–15
 
 | Bloque | Resultado | Estado |
 |---:|---|---|
-| 1 | Auth, workspace activo y tenant | `DEPLOYED / BLOCKED` por leaked passwords y segunda organización |
-| 2 | Golden path Ley N.º 21.719 | `VALIDATED` una vez; falta repetibilidad multi-tenant |
+| 1 | Auth, workspace activo y tenant | `VALIDATED INICIAL / BLOCKED` por leaked passwords |
+| 2 | Golden path Ley N.º 21.719 | `VALIDATED x2`; falta tercera repetición |
 | 3 | UX operacional | `DEPLOYED` |
-| 4 | Ejecución durable | `VALIDATED` |
-| 5 | Evidencia y controles | `VALIDATED INICIAL` |
+| 4 | Ejecución durable | `VALIDATED x2` |
+| 5 | Evidencia y controles | `VALIDATED x2` |
 | 6 | Release Gate | `DONE` |
 | 7 | Grafo y reutilización | `DEPLOYED` |
 | 8 | Timeline, confianza e impacto | `DEPLOYED / VALIDATED INICIAL` |
 | 9 | Memoria y casos similares | `DEPLOYED / SIN DATOS REALES` |
-| 10 | Especialización, comité y supervisor | `DEPLOYED / VALIDATED` |
+| 10 | Especialización, comité y supervisor | `VALIDATED x2` |
 | 11 | Escritorio, explicabilidad, SLA y delegación | `DEPLOYED / VALIDATED INICIAL` |
-| 12 | Expediente → plan operativo | `VALIDATED` |
-| 13 | Baseline assurance honesto | `VALIDATED` |
+| 12 | Expediente → plan operativo | `VALIDATED x2` |
+| 13 | Baseline assurance honesto | `VALIDATED x2` |
 | 14 | Inventario mínimo real de tratamientos | `VALIDATED INICIAL` |
+| 15 | Tenant assurance y repetibilidad | `VALIDATED` |
 
 ---
 
@@ -480,46 +501,60 @@ Deuda externa conocida: **Supabase Auth Leaked Password Protection está desacti
 ### 1. Leaked Password Protection — `BLOCKED`
 
 - activar en Supabase Auth;
-- verificar política real del servidor;
-- cerrar issue asociado.
+- verificar la configuración real;
+- cerrar la deuda de seguridad.
 
-### 2. Multiempresa real — `ACTIVE`
+### 2. Multiempresa — `VALIDATED INTERNO / ACTIVE EXTERNO`
+
+Completado:
 
 - segunda organización;
 - segundo usuario;
-- pruebas positivas y negativas de acceso cruzado;
-- selector de workspace y sesión explícita;
-- ningún query crítico puede depender de `.limit(1)`.
-
-### 3. Inventario mínimo Ley N.º 21.719 — `VALIDATED INICIAL / ACTIVE`
-
-Ya existe un tratamiento real con sistema, dataset, tercero, evidencia y revisión.
+- aislamiento positivo y negativo;
+- selector de workspace protegido;
+- pruebas de tablas y RPC.
 
 Falta:
 
-- registrar al menos dos actividades adicionales;
-- validar bases de licitud;
-- aprobar retención;
-- completar destinatarios y subencargados;
-- adjuntar aviso de privacidad;
-- demostrar eliminación;
-- revisar riesgo de terceros con metodología aprobada.
+- piloto con una segunda organización externa real;
+- observar el selector y la sesión desde UI;
+- repetir pruebas después de incorporar más módulos.
 
-### 4. Repetibilidad del golden path — `ACTIVE`
+### 3. Inventario mínimo Ley N.º 21.719 — `VALIDATED INICIAL / ACTIVE`
 
-- ejecutar el flujo completo al menos 3 veces en tenants limpios;
-- cero duplicados;
-- cero registros huérfanos;
-- cero intervención SQL manual;
-- tiempos y costos registrados.
+Ya existe una actividad real con sistema, dataset, tercero, evidencia y revisión.
+
+Falta:
+
+- dos actividades reales adicionales;
+- bases de licitud validadas;
+- retención aprobada;
+- destinatarios y subencargados completos;
+- aviso de privacidad;
+- eliminación demostrada;
+- riesgo de terceros con metodología aprobada.
+
+### 4. Repetibilidad del golden path — `2/3 / ACTIVE`
+
+Completado:
+
+- N3uralia;
+- tenant assurance sintético.
+
+Falta:
+
+- tercera ejecución en un tenant limpio;
+- ejecución desde la UI sin intervención SQL administrativa;
+- medir tiempo humano y costo monetario completo;
+- cero huérfanos y duplicados también en esa tercera ejecución.
 
 ### 5. Piloto supervisado externo — `PLANNED`
 
 - 1–3 organizaciones;
 - responsable real de cumplimiento;
-- tareas reales;
-- feedback de UX y confianza;
-- sin ampliar alcance durante la observación.
+- tareas y evidencia reales;
+- feedback de UX, confianza y retrabajo;
+- alcance congelado durante la observación.
 
 ---
 
@@ -527,20 +562,21 @@ Falta:
 
 ### P1 — Valor acumulativo
 
-1. Aprendizaje desde correcciones humanas, con tipo, vigencia, versión y aprobación.
-2. Biblioteca viva por dominio de cumplimiento.
-3. Recomendaciones proactivas explicables.
-4. Seguimiento automático y notificaciones sin spam.
-5. Reutilización de evidencia entre controles y marcos.
-6. Gestión de terceros críticos y dependencias.
-7. Preparación continua para auditoría.
+1. Ampliación del inventario real.
+2. Aprendizaje desde correcciones humanas con vigencia y aprobación.
+3. Biblioteca viva por dominio de cumplimiento.
+4. Recomendaciones proactivas explicables.
+5. Seguimiento automático sin spam.
+6. Reutilización de evidencia entre controles y marcos.
+7. Gestión de terceros críticos y dependencias.
+8. Preparación continua para auditoría.
 
 ### P2 — Operación avanzada
 
 1. Modo incidente y sala ejecutiva.
-2. Cadena de custodia y preservación de evidencia.
-3. Post-mortem estructurado y aprendizaje.
-4. Portal de auditor y Data Room con autorización.
+2. Cadena de custodia y preservación.
+3. Post-mortem estructurado.
+4. Portal de auditor y Data Room.
 5. Paquetes versionados de fiscalización.
 6. Retención, eliminación y divulgaciones controladas.
 
@@ -558,21 +594,13 @@ Falta:
 
 ## 9. Próximos bloques de 3
 
-### Bloque 15 — Tenant assurance y repetibilidad — `NEXT`
+### Bloque 16 — Ampliación del inventario real — `NEXT`
 
-1. crear segunda organización y segundo usuario;
-2. ejecutar pruebas positivas y negativas cross-tenant sobre casos, evidencia, tratamientos y RPC;
-3. repetir el golden path completo en un tenant limpio y medir duplicados, tiempo y costo.
+1. registrar dos actividades reales adicionales representativas;
+2. validar base, retención, destinatarios, subencargados y transferencias;
+3. adjuntar aviso de privacidad y evidencia de eliminación, o crear acciones explícitas con owner y fecha.
 
-**Salida:** aislamiento multiempresa defendible y segunda ejecución completa sin intervención SQL manual.
-
-### Bloque 16 — Ampliación del inventario real
-
-1. registrar dos actividades adicionales representativas;
-2. validar bases, retención, destinatarios, subencargados y transferencias;
-3. adjuntar aviso de privacidad y evidencia de eliminación o crear acciones explícitas.
-
-**Salida:** el inventario deja de depender de un solo proceso y reduce los desconocidos con evidencia aprobada.
+**Salida:** el inventario deja de depender de un solo proceso real y reduce desconocidos con evidencia aprobada.
 
 ### Bloque 17 — Aprendizaje organizacional
 
@@ -582,26 +610,35 @@ Falta:
 
 **Salida:** un error corregido una vez no se repite silenciosamente en un caso similar.
 
+### Bloque 18 — Tercera repetición y piloto externo
+
+1. ejecutar un tercer golden path desde UI en un tenant limpio;
+2. incorporar una organización externa supervisada;
+3. medir tiempo, costo, retrabajo, claridad y confianza.
+
+**Salida:** decisión informada sobre beta privada y comercialización.
+
 ---
 
 ## 10. Métricas de cierre v1.0
 
-| Indicador | Gate |
-|---|---:|
-| Bugs críticos abiertos | 0 |
-| Release Gate en cambios críticos | 100% |
-| Golden paths repetidos en tenants limpios | ≥ 3 |
-| Duplicados o huérfanos por retry | 0 |
-| Fugas cross-tenant en pruebas | 0 |
-| Actividades reales revisadas | ≥ 3 para el piloto inicial |
-| Controles con owner | 100% del alcance piloto |
-| Evidencia aceptada con procedencia | 100% de controles declarados como demostrados |
-| Decisiones sensibles con revisión humana | 100% |
-| Recomendaciones con explicación verificable | 100% |
-| Bases/retención pendientes | visibles y accionables, nunca ocultas |
-| Tiempo para preparar una vista de auditoría | medir en piloto |
-| Tiempo para cerrar un caso supervisado | medir en piloto |
-| Controles/evidencias reutilizados | medir, sin meta artificial inicial |
+| Indicador | Gate | Estado actual |
+|---|---:|---:|
+| Bugs críticos abiertos | 0 | 0 conocidos en este cierre |
+| Release Gate en cambios críticos | 100% | 100% |
+| Golden paths en tenants independientes | ≥ 3 | 2 |
+| Duplicados o huérfanos por retry | 0 | 0 en los dos paths |
+| Fugas cross-tenant | 0 | 0 en assurance interno |
+| Actividades reales revisadas | ≥ 3 | 1 real + 1 sintética |
+| Controles con owner | 100% del alcance piloto | 100% del alcance actual |
+| Evidencia demostrada con procedencia | 100% | 100% del alcance declarado |
+| Decisiones sensibles con revisión humana | 100% | 100% del assurance |
+| Recomendaciones con explicación | 100% | 100% del assurance |
+| Bases/retención pendientes | visibles y accionables | visibles |
+| Tiempo modelo del segundo workflow | medir | 364.091 ms acumulados |
+| Tokens del segundo workflow | medir | 73.091 |
+| Tiempo humano del piloto | medir | pendiente |
+| Costo monetario completo | medir | pendiente |
 
 ---
 
@@ -610,11 +647,12 @@ Falta:
 Hasta cerrar P0:
 
 - no crear módulos nuevos solo porque son atractivos;
-- no construir Enterprise antes de validar un segundo tenant;
-- no presentar la línea base o una actividad como inventario completo;
+- no construir Enterprise antes de validar pilotos externos;
+- no presentar línea base o actividad como inventario completo;
 - no aumentar scores ocultando operación parcial;
 - no convertir bases propuestas o riesgos provisionales en conclusiones aprobadas;
 - no automatizar decisiones irreversibles sin aprobación;
+- no confundir aprobación de artefactos con cierre del expediente;
 - no mezclar modernización de dependencias con cambios funcionales grandes;
 - no marcar `DONE` sin evidencia y métrica.
 
@@ -630,10 +668,23 @@ Toda idea nueva debe demostrar que:
 
 ## 12. Decisión vigente
 
-Bloque 14 está cerrado como **VALIDATED INICIAL**. Kumplio ya puede registrar y recorrer un tratamiento real sin inventar información ni esconder sus desconocidos.
+Bloque 15 está cerrado como **`VALIDATED`**.
+
+Kumplio ya demostró internamente:
+
+- dos usuarios y dos organizaciones independientes;
+- aislamiento bidireccional;
+- un segundo golden path completo;
+- ejecución durable de cinco especialistas;
+- revisión humana en cada etapa;
+- cero dead-letter;
+- idempotencia de onboarding, caso, plan, baseline, inventario y queue;
+- una conclusión final conservadora que solicita cambios en vez de aparentar cumplimiento.
+
+Esto valida la arquitectura multiempresa, pero no sustituye un piloto externo ni demuestra beta autoservicio.
 
 La prioridad inmediata es:
 
-> **Bloque 15 — Tenant assurance y repetibilidad.**
+> **Bloque 16 — Ampliación del inventario real.**
 
-No se habilitará beta autoservicio ni se avanzará a funciones Enterprise hasta demostrar aislamiento entre dos organizaciones y repetir el golden path en un tenant limpio.
+No se habilitará beta autoservicio hasta activar Leaked Password Protection, completar una tercera repetición desde UI y observar al menos una organización externa supervisada.
