@@ -24,7 +24,7 @@ const areas = [
     href: '/follow-up',
     label: 'Seguimiento',
     icon: ListTodo,
-    routes: ['/follow-up', '/my-work', '/missions', '/decisions', '/review-center', '/operations', '/accountability'],
+    routes: ['/follow-up', '/insights', '/my-work', '/missions', '/decisions', '/review-center', '/operations', '/accountability'],
   },
   {
     href: '/context',
