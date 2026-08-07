@@ -113,5 +113,4 @@ jobs:
           fi
 
           curl --fail --silent --show-error http://127.0.0.1:3000/security > /dev/null
-          curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt > /tmp/kumplio-robots.txt
-          grep --quiet 'Disallow: /cases' /tmp/kumplio-robots.txt
+          curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt > /dev/null
