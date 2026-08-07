@@ -1,54 +1,6 @@
--- Block 15: internal tenant-assurance registry and status refresh.
--- This table is operational evidence, not customer-facing product data.
-
-create table if not exists public.tenant_assurance_runs (
-  id uuid primary key default gen_random_uuid(),
-  run_key text not null unique,
-  primary_organization_id uuid not null references public.organizations(id) on delete restrict,
-  primary_user_id uuid not null references auth.users(id) on delete restrict,
-  sandbox_organization_id uuid not null references public.organizations(id) on delete restrict,
-  sandbox_user_id uuid not null references auth.users(id) on delete restrict,
-  sandbox_project_id uuid not null references public.projects(id) on delete restrict,
-  onboarding_case_id uuid references public.compliance_cases(id) on delete set null,
-  guided_case_id uuid not null references public.compliance_cases(id) on delete restrict,
-  workflow_id uuid not null references public.agent_workflows(id) on delete restrict,
-  mission_id uuid not null references public.missions(id) on delete restrict,
-  evidence_request_id uuid not null references public.evidence_requests(id) on delete restrict,
-  baseline_control_id uuid not null references public.controls(id) on delete restrict,
-  baseline_evidence_id uuid not null references public.evidence(id) on delete restrict,
-  processing_activity_id uuid not null references public.organization_processes(id) on delete restrict,
-  processing_evidence_id uuid not null references public.evidence(id) on delete restrict,
-  initial_job_id uuid references public.agent_jobs(id) on delete set null,
-  status text not null default 'prepared',
-  check_results jsonb not null default '{}'::jsonb,
-  metrics jsonb not null default '{}'::jsonb,
-  latest_error text,
-  started_at timestamptz not null default now(),
-  completed_at timestamptz,
-  last_checked_at timestamptz not null default now(),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint tenant_assurance_runs_status_check
-    check (status in ('prepared', 'running', 'passed', 'failed'))
-);
-
-create index if not exists tenant_assurance_runs_primary_org_idx
-  on public.tenant_assurance_runs (primary_organization_id, created_at desc);
-create index if not exists tenant_assurance_runs_sandbox_org_idx
-  on public.tenant_assurance_runs (sandbox_organization_id, created_at desc);
-create index if not exists tenant_assurance_runs_status_idx
-  on public.tenant_assurance_runs (status, updated_at desc);
-
-alter table public.tenant_assurance_runs enable row level security;
-revoke all on table public.tenant_assurance_runs from public, anon, authenticated;
-grant select, insert, update on table public.tenant_assurance_runs to service_role;
-
-create policy "tenant assurance browser deny"
-on public.tenant_assurance_runs
-for all
-to anon, authenticated
-using (false)
-with check (false);
+-- Repair the tenant-assurance refresh in environments where the foundation
+-- migration was already applied. Runs and artifacts belong to a workflow
+-- through agent_workflow_stages; neither table owns a workflow_id column.
 
 create or replace function public.refresh_tenant_assurance_run_v1(p_run_key text)
 returns jsonb
