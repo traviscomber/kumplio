@@ -20,7 +20,7 @@ export default async function FollowUpPage() {
   const [missionsResult, decisionsResult, reviewsResult, overdueResult] = await Promise.all([
     admin.from('missions').select('id', { count: 'exact', head: true })
       .eq('organization_id', access.organizationId)
-      .eq('assigned_to', user.id)
+      .eq('owner_id', user.id)
       .not('status', 'in', '(completed,cancelled)'),
     admin.from('mission_decisions').select('id', { count: 'exact', head: true })
       .eq('organization_id', access.organizationId)
