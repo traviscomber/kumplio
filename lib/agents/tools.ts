@@ -1,6 +1,7 @@
 import 'server-only'
 
 import type { AgentId } from './catalog'
+import { getOrganizationalMemoryContext } from '@/lib/compliance/context/organizational-memory'
 
 type SupabaseClientLike = any
 
@@ -131,7 +132,6 @@ async function queryTool(
   let query = supabase.from(tool.table).select('*').limit(tool.limit)
 
   if (tool.table === 'compliance_cases') {
-    // read_case: query by case id directly
     if (scope.caseId) {
       query = query.eq('id', scope.caseId)
     } else {
@@ -192,6 +192,33 @@ export async function retrieveAgentContext(
     }))
     sourceRefs.push(...refs)
     sections.push(`HERRAMIENTA ${tool.name} (${result.records.length} registros):\n${JSON.stringify(result.records, null, 2)}`)
+  }
+
+  try {
+    const memory = await getOrganizationalMemoryContext(supabase, {
+      organizationId: scope.organizationId,
+      caseId: scope.caseId || null,
+    })
+
+    if (memory.precedents.length) {
+      sections.push(`MEMORIA ORGANIZACIONAL — PRECEDENTES Y DECISIONES HUMANAS:\n${JSON.stringify(memory.precedents, null, 2)}`)
+      sourceRefs.push(...memory.precedents.map((item) => ({
+        tool: 'read_organizational_memory',
+        table: item.source === 'organization_memory' ? 'organization_memory' : 'mission_decisions',
+        id: item.id,
+      })))
+    }
+
+    if (memory.similarCases.length) {
+      sections.push(`CASOS SIMILARES DE ESTA ORGANIZACIÓN (usar como precedente, no como autoridad normativa):\n${JSON.stringify(memory.similarCases, null, 2)}`)
+      sourceRefs.push(...memory.similarCases.map((item) => ({
+        tool: 'read_similar_cases',
+        table: 'compliance_cases',
+        id: item.id,
+      })))
+    }
+  } catch {
+    warnings.push('organizational_memory: unavailable')
   }
 
   const serialized = sections.join('\n\n')
