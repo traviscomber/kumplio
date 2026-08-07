@@ -2,18 +2,24 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 const reviewRoute = await readFile('app/api/agents/runs/[runId]/review/route.ts', 'utf8')
+const reviewMigration = await readFile('scripts/47-review-approval-contract.sql', 'utf8')
 const workflowActions = await readFile('components/cases/live-workflow-actions.tsx', 'utf8')
 const betaPage = await readFile('app/cases/[caseId]/beta/page.tsx', 'utf8')
 const livePage = await readFile('app/cases/[caseId]/live/page.tsx', 'utf8')
 const migration = await readFile('supabase/migrations/20260806014500_supersede_retried_agent_artifacts.sql', 'utf8')
 
-// Una ejecución aprobada o rechazada no vuelve a abrirse para una nueva revisión.
-assert.match(reviewRoute, /!\['completed', 'pending_review'\][.]includes\(run[.]status\)/)
-assert.doesNotMatch(reviewRoute, /'approved', 'rejected'\][.]includes\(run[.]status\)/)
+// La ruta delega revisión y cambios a una transacción única.
+assert.match(reviewRoute, /review_agent_workflow_run/)
+assert.doesNotMatch(reviewRoute, /from\('agent_runs'\)[.]update/)
+assert.match(reviewMigration, /v_run[.]status not in \('completed', 'pending_review'\)/)
+assert.match(reviewMigration, /when p_decision = 'approved' then 'approved'/)
+assert.match(reviewMigration, /when p_decision = 'rejected' then 'rejected'/)
+assert.match(reviewMigration, /else 'pending_review'/)
 
-// Solicitar cambios queda visible tanto en la etapa como en el artefacto.
-assert.match(reviewRoute, /parsed[.]data[.]decision === 'changes_requested'/)
-assert.match(reviewRoute, /artifactStatus[\s\S]*'changes_requested'/)
+// Solicitar cambios pausa el workflow y deja la etapa explícitamente reintentable.
+assert.match(reviewMigration, /when p_decision = 'commented' then 'pending_review'/)
+assert.match(reviewMigration, /else 'changes_requested'/)
+assert.match(reviewMigration, /else 'paused'/)
 
 // Una nueva versión reemplaza explícitamente la anterior, conservando trazabilidad.
 assert.match(migration, /supersede_parent_agent_artifact/)
@@ -28,11 +34,12 @@ assert.match(workflowActions, /attemptCount >= maxAttempts/)
 assert.match(workflowActions, /Límite alcanzado/)
 assert.match(workflowActions, /retriesExhausted/)
 
-for (const page of [betaPage, livePage]) {
-  assert.match(page, /max_attempts/)
-  assert.match(page, /attemptCount=\{actionableStage[?][.]attempt_count \?\? null\}/)
-  assert.match(page, /maxAttempts=\{actionableStage[?][.]max_attempts \?\? null\}/)
-  assert.match(page, /superseded: 'Reemplazado'/)
-}
+// La ruta beta ya no es una superficie activa.
+assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+
+assert.match(livePage, /max_attempts/)
+assert.match(livePage, /attemptCount=\{actionableStage[?][.]attempt_count \?\? null\}/)
+assert.match(livePage, /maxAttempts=\{actionableStage[?][.]max_attempts \?\? null\}/)
+assert.match(livePage, /superseded: 'Reemplazado'/)
 
 console.log('Bounded and versioned agent retry validation passed')
