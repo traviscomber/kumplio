@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createPublicKey, verify as verifySignature } from 'node:crypto'
+import { createPublicKey, verify as verifySignature, type JsonWebKey } from 'node:crypto'
 
 const ISSUER = 'https://token.actions.githubusercontent.com'
 const JWKS_URL = `${ISSUER}/.well-known/jwks`
