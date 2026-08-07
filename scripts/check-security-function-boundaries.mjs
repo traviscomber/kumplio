@@ -13,40 +13,41 @@ const guidedMigration = await readFile(
   new URL('./50-guided-case-idempotent-start.sql', import.meta.url),
   'utf8',
 )
+const guidedFixMigration = await readFile(
+  new URL('./52-fix-guided-case-idempotent-start.sql', import.meta.url),
+  'utf8',
+)
+
+function functionDefinition(sql, schema, functionName) {
+  const startPattern = new RegExp(`create or replace function ${schema}\\.${functionName}\\(`, 'i')
+  const start = sql.search(startPattern)
+  assert.notEqual(start, -1, `${schema}.${functionName} debe existir`)
+
+  const end = sql.indexOf('$$;', start)
+  assert.notEqual(end, -1, `${schema}.${functionName} debe tener un cuerpo SQL cerrado`)
+  return sql.slice(start, end + 3)
+}
 
 for (const functionName of ['is_organization_member', 'create_document_record']) {
-  assert.match(
-    privilegedMigration,
-    new RegExp(`create or replace function private\\.${functionName}\\(`, 'i'),
-    `${functionName} debe conservar su implementación privilegiada en private`,
-  )
-  assert.match(
-    privilegedMigration,
-    new RegExp(`create or replace function public\\.${functionName}\\([\\s\\S]*?security invoker`, 'i'),
-    `${functionName} debe exponer solo un wrapper SECURITY INVOKER`,
-  )
+  const privateDefinition = functionDefinition(privilegedMigration, 'private', functionName)
+  const publicDefinition = functionDefinition(privilegedMigration, 'public', functionName)
+
+  assert.match(privateDefinition, /security definer/i, `${functionName} debe conservar su implementación privilegiada en private`)
+  assert.match(publicDefinition, /security invoker/i, `${functionName} debe exponer solo un wrapper SECURITY INVOKER`)
+  assert.doesNotMatch(publicDefinition, /security definer/i, `${functionName} no puede quedar como SECURITY DEFINER en public`)
 }
 
 for (const functionName of ['list_my_workspaces', 'set_active_workspace']) {
-  assert.match(
-    workspaceMigration,
-    new RegExp(`create or replace function private\\.${functionName}\\(`, 'i'),
-    `${functionName} debe mantener la implementación privilegiada en private`,
-  )
-  assert.doesNotMatch(
-    workspaceMigration,
-    new RegExp(`create or replace function public\\.${functionName}\\([\\s\\S]*?security definer`, 'i'),
-    `${functionName} no puede quedar como SECURITY DEFINER en public`,
-  )
+  const privateDefinition = functionDefinition(workspaceMigration, 'private', functionName)
+  const publicDefinition = functionDefinition(workspaceMigration, 'public', functionName)
+
+  assert.match(privateDefinition, /security definer/i, `${functionName} debe mantener la implementación privilegiada en private`)
+  assert.match(publicDefinition, /security invoker/i, `${functionName} debe exponer un wrapper SECURITY INVOKER`)
+  assert.doesNotMatch(publicDefinition, /security definer/i, `${functionName} no puede quedar como SECURITY DEFINER en public`)
 }
 
 assert.match(privilegedMigration, /revoke all on function public\.is_organization_member\(uuid\) from public, anon/i)
 assert.match(privilegedMigration, /revoke all on function public\.create_document_record\(uuid, text, text, text\) from public, anon/i)
-assert.doesNotMatch(
-  privilegedMigration,
-  /create or replace function public\.(?:is_organization_member|create_document_record)\([\s\S]*?security definer/i,
-  'Ninguna función privilegiada debe quedar expuesta en public',
-)
 
 for (const signature of ['list_my_workspaces\\(\\)', 'set_active_workspace\\(uuid\\)']) {
   assert.match(workspaceMigration, new RegExp(`revoke all on function public\\.${signature} from public`, 'i'))
@@ -64,21 +65,10 @@ assert.match(
   'El workspace activo debe seguir siendo profiles.organization_id',
 )
 
-assert.match(
-  guidedMigration,
-  /create or replace function private\.start_guided_case_record\([\s\S]*?security definer/i,
-  'El bootstrap guiado debe mantener su implementación privilegiada en private',
-)
-assert.match(
-  guidedMigration,
-  /create or replace function public\.start_guided_case_record\(/i,
-  'El bootstrap guiado debe exponer un wrapper público',
-)
-assert.doesNotMatch(
-  guidedMigration,
-  /create or replace function public\.start_guided_case_record\([\s\S]*?security definer/i,
-  'El wrapper público del bootstrap guiado no puede ser SECURITY DEFINER',
-)
+const guidedPrivateDefinition = functionDefinition(guidedMigration, 'private', 'start_guided_case_record')
+const guidedPublicDefinition = functionDefinition(guidedMigration, 'public', 'start_guided_case_record')
+assert.match(guidedPrivateDefinition, /security definer/i, 'El bootstrap guiado debe mantener su implementación privilegiada en private')
+assert.doesNotMatch(guidedPublicDefinition, /security definer/i, 'El wrapper público del bootstrap guiado no puede ser SECURITY DEFINER')
 assert.match(
   guidedMigration,
   /revoke all on function public\.start_guided_case_record\([\s\S]*?from public, anon/i,
@@ -94,5 +84,11 @@ assert.match(
   /compliance_cases_guided_start_key_uidx/i,
   'La clave idempotente debe estar respaldada por una restricción única por organización',
 )
+
+const guidedFixDefinition = functionDefinition(guidedFixMigration, 'private', 'start_guided_case_record')
+assert.match(guidedFixDefinition, /v_case_id uuid/i, 'El fix debe usar v_case_id para evitar colisión con columnas')
+assert.match(guidedFixDefinition, /v_workflow_id uuid/i, 'El fix debe usar v_workflow_id para evitar colisión con columnas')
+assert.doesNotMatch(guidedFixDefinition, /\n\s*case_id uuid;/i, 'No debe reintroducirse la variable ambigua case_id')
+assert.doesNotMatch(guidedFixDefinition, /\n\s*workflow_id uuid;/i, 'No debe reintroducirse la variable ambigua workflow_id')
 
 console.log('Security function boundary validation passed.')

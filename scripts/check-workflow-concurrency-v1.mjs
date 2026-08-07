@@ -11,8 +11,9 @@ assert.match(migration, /old[.]status = 'running'/)
 assert.match(migration, /new[.]started_at is distinct from old[.]started_at/)
 assert.match(migration, /errcode = '40001'/)
 
-assert.match(reviewRoute, /reviewError[?][.]code === '23505'/)
-assert.match(reviewRoute, /code: 'already_reviewed'/)
-assert.match(reviewRoute, /status: 409/)
+assert.match(reviewRoute, /error[.]code === '23505'/)
+assert.match(reviewRoute, /'already_reviewed'/)
+assert.match(reviewRoute, /code === 'run_not_reviewable' \|\| code === 'already_reviewed' \? 409/)
+assert.match(reviewRoute, /Esta ejecución ya recibió una decisión final/)
 
 console.log('Workflow concurrency guard validation passed')
