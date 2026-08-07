@@ -20,7 +20,7 @@
     "check:sma": "node scripts/test-sma-snifa-fixtures.mjs",
     "check:sma-bootstrap": "node scripts/check-sma-snifa-bootstrap.mjs",
     "check:sma-detail": "node scripts/test-sma-snifa-detail-fixtures.mjs",
-    "check:sma-detail-bootstrap": "node scripts/check-sma-snifa-detail-bootstrap.mjs",
+    "check:sma-detail-bootstrap": "node scripts/test-sma-snifa-detail-bootstrap.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
     "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
@@ -43,7 +43,8 @@
     "check:agent-committee": "node scripts/check-agent-committee-v1.mjs",
     "check:operating-desk": "node scripts/check-operating-desk-v1.mjs",
     "check:case-operational-plan": "node scripts/check-case-operational-plan-v1.mjs",
-    "check:baseline-assurance": "node scripts/check-baseline-assurance-v1.mjs"
+    "check:baseline-assurance": "node scripts/check-baseline-assurance-v1.mjs",
+    "check:processing-inventory": "node scripts/check-processing-inventory-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
