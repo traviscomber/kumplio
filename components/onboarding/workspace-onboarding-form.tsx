@@ -83,7 +83,6 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
 
       const caseId = data.workspace?.caseId as string | null | undefined
       router.replace(caseId ? `/cases/${caseId}` : '/dashboard')
-      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No fue posible terminar la configuración')
     } finally {
