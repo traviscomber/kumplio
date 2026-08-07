@@ -56,6 +56,9 @@ const required = [
     'no acredita inventario completo ni cumplimiento legal',
     "operating_effectiveness from public.controls where id = v_control) <> 'partial'",
     "obligation_text like 'Requerimiento interno de preparación (no obligación legal validada):%'",
+    'target pilot data is not present in this environment',
+    'v_target_exists boolean',
+    'v_preexisting boolean',
   ]],
 ]
 
@@ -75,6 +78,14 @@ if (confidence.includes('if (total <= 0) return 100')) {
 const route = fs.readFileSync('app/api/cases/[caseId]/baseline-assurance/route.ts', 'utf8')
 if (!route.includes('access.canAssignWork') || !route.includes("String(mission.owner_id || '') !== user.id")) {
   throw new Error('Baseline closure must require assignment permission and the mission owner')
+}
+
+const officialMigration = fs.readFileSync('supabase/migrations/20260807141858_close_official_case_baseline_assurance.sql', 'utf8')
+if (!officialMigration.includes('if not v_target_exists then')) {
+  throw new Error('Supervised production data migration must be a no-op when pilot data is absent')
+}
+if (!officialMigration.includes('if not v_preexisting and coalesce')) {
+  throw new Error('Supervised migration must tolerate an already-closed restored production snapshot')
 }
 
 console.log('Baseline assurance guardrail: PASS')
