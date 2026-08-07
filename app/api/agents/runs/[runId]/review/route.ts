@@ -95,23 +95,25 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
 
   if (error) {
     const message = error.message || ''
-    const code = message.includes('not_found') ? 'run_not_found'
-      : message.includes('not_reviewable') ? 'run_not_reviewable'
-        : message.includes('approval_checklist_required') ? 'approval_checklist_required'
-          : message.includes('comment_required') ? 'review_comment_required'
-            : message.includes('review_forbidden') ? 'review_forbidden'
-              : 'review_transaction_failed'
+    const code = error.code === '23505' ? 'already_reviewed'
+      : message.includes('not_found') ? 'run_not_found'
+        : message.includes('not_reviewable') ? 'run_not_reviewable'
+          : message.includes('approval_checklist_required') ? 'approval_checklist_required'
+            : message.includes('comment_required') ? 'review_comment_required'
+              : message.includes('review_forbidden') ? 'review_forbidden'
+                : 'review_transaction_failed'
     const status = code === 'run_not_found' ? 404
-      : code === 'run_not_reviewable' ? 409
+      : code === 'run_not_reviewable' || code === 'already_reviewed' ? 409
         : code === 'review_forbidden' ? 403
           : code === 'review_comment_required' || code === 'approval_checklist_required' ? 400
             : 500
     const publicMessage = code === 'run_not_found' ? 'La ejecución no existe'
       : code === 'run_not_reviewable' ? 'La ejecución ya no admite esta revisión'
-        : code === 'review_forbidden' ? 'Tu rol no permite aprobar este resultado'
-          : code === 'approval_checklist_required' ? 'Confirma evidencia, limitaciones y respaldo antes de aprobar'
-            : code === 'review_comment_required' ? 'Registra una justificación breve para la decisión'
-              : 'No fue posible guardar la revisión de forma atómica'
+        : code === 'already_reviewed' ? 'Esta ejecución ya recibió una decisión final'
+          : code === 'review_forbidden' ? 'Tu rol no permite aprobar este resultado'
+            : code === 'approval_checklist_required' ? 'Confirma evidencia, limitaciones y respaldo antes de aprobar'
+              : code === 'review_comment_required' ? 'Registra una justificación breve para la decisión'
+                : 'No fue posible guardar la revisión de forma atómica'
 
     console.error('[agents/review]', error.code, code)
     return NextResponse.json({ error: publicMessage, code }, { status })
