@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, CheckSquare2, ClipboardCheck, Scale, UserRoundCheck } from 'lucide-react'
+import { Activity, ArrowRight, CheckSquare2, ClipboardCheck, Scale, UserRoundCheck } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
@@ -80,6 +80,19 @@ export default async function FollowUpPage() {
             No necesitas conocer la arquitectura de Kumplio. Empieza por lo que requiere atención y entra al detalle solo cuando sea necesario.
           </p>
         </section>
+
+        <Link href="/insights" className="group mt-6 flex flex-col gap-4 rounded-2xl border bg-card p-5 transition hover:border-primary/35 hover:shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-primary/10 text-primary">
+              <Activity className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black">Confianza e impacto</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Mira cuánto puedes demostrar hoy, la historia de cumplimiento y qué obligaciones concentran mayor impacto.</p>
+            </div>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
+        </Link>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2">
           {areas.map(({ href, title, description, value, label, icon: Icon }) => (
