@@ -30,6 +30,13 @@ const required = [
     "const caseId = data.workspace?.caseId as string | null | undefined",
     "router.replace(caseId ? `/cases/${caseId}` : '/dashboard')",
   ]],
+  ['lib/compliance/accountability/team.ts', [
+    ".select('id,user_id,role,joined_at')",
+    ".from('profiles')",
+    ".select('id,first_name,last_name,email')",
+    ".in('id', userIds)",
+    'profileByUserId',
+  ]],
   ['.github/workflows/ui-golden-path.yml', [
     'name: UI Golden Path',
     'id-token: write',
@@ -76,6 +83,11 @@ for (const [file, markers] of required) {
 const onboarding = fs.readFileSync('components/onboarding/workspace-onboarding-form.tsx', 'utf8')
 if (onboarding.includes('router.refresh()')) {
   throw new Error('Onboarding must not refresh the stale route immediately after router.replace')
+}
+
+const team = fs.readFileSync('lib/compliance/accountability/team.ts', 'utf8')
+if (/organization_members[\s\S]{0,240}profiles\s*\(/.test(team) || team.includes("profiles(first_name,last_name,email)")) {
+  throw new Error('Team profiles must be loaded separately because organization_members has no direct FK to profiles')
 }
 
 const route = fs.readFileSync('app/api/internal/ui-golden-path/route.ts', 'utf8')
