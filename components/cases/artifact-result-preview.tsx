@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, FileText, Link2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, FileText, Link2 } from 'lucide-react'
 import { CaseActionPlan } from '@/components/cases/case-action-plan'
 
 type JsonRecord = Record<string, unknown>
@@ -12,36 +12,36 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
   const hasRecognizedSummary = Boolean(summary || findings.length || sources.length || caveats.length)
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="mt-4 space-y-3 sm:space-y-4">
       <CaseActionPlan content={content} />
 
       {!hasRecognizedSummary && (
-        <p className="text-sm leading-6 text-muted-foreground">
-          El artefacto existe, pero su contenido no tiene todavía un formato reconocido para el resumen. Puede revisarse desde el expediente técnico.
+        <p className="rounded-xl border bg-muted/30 p-4 text-sm leading-6 text-muted-foreground">
+          El resultado está guardado, pero todavía no tiene un formato resumible. Puedes revisarlo desde la trazabilidad técnica.
         </p>
       )}
 
       {summary && (
-        <div className="rounded-xl bg-primary/5 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Resultado</p>
-          <p className="mt-2 text-sm leading-6">{summary}</p>
+        <div className="rounded-xl bg-primary/5 p-4 sm:p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">Conclusión principal</p>
+          <p className="mt-2 text-sm leading-6 sm:text-[15px] sm:leading-7">{summary}</p>
         </div>
       )}
 
       {findings.length > 0 && (
-        <PreviewSection icon={<CheckCircle2 className="h-4 w-4" />} title="Hallazgos">
+        <PreviewSection icon={<CheckCircle2 className="h-4 w-4" />} title={`Hallazgos (${findings.length})`} defaultOpen>
           {findings.slice(0, 6).map((item, index) => <PreviewItem key={`finding-${index}`} value={item} />)}
         </PreviewSection>
       )}
 
       {caveats.length > 0 && (
-        <PreviewSection icon={<AlertTriangle className="h-4 w-4" />} title="Reservas y pendientes">
+        <PreviewSection icon={<AlertTriangle className="h-4 w-4" />} title={`Reservas y pendientes (${caveats.length})`}>
           {caveats.slice(0, 6).map((item, index) => <PreviewItem key={`caveat-${index}`} value={item} />)}
         </PreviewSection>
       )}
 
       {sources.length > 0 && (
-        <PreviewSection icon={<Link2 className="h-4 w-4" />} title="Fuentes utilizadas">
+        <PreviewSection icon={<Link2 className="h-4 w-4" />} title={`Fuentes utilizadas (${sources.length})`}>
           {sources.slice(0, 6).map((item, index) => <PreviewItem key={`source-${index}`} value={item} />)}
         </PreviewSection>
       )}
@@ -49,24 +49,27 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
   )
 }
 
-function PreviewSection({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function PreviewSection({ icon, title, children, defaultOpen = false }: { icon: React.ReactNode; title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   return (
-    <div>
-      <div className="flex items-center gap-2 text-sm font-black">
-        <span className="text-primary">{icon}</span>
-        {title}
-      </div>
-      <div className="mt-2 space-y-2">{children}</div>
-    </div>
+    <details open={defaultOpen} className="group rounded-xl border bg-background">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-black [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2">
+          <span className="text-primary">{icon}</span>
+          {title}
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition group-open:rotate-180" />
+      </summary>
+      <div className="space-y-2 border-t px-3 py-3 sm:px-4">{children}</div>
+    </details>
   )
 }
 
 function PreviewItem({ value }: { value: unknown }) {
   const text = toDisplayText(value)
   return (
-    <div className="flex items-start gap-2 rounded-lg border bg-background p-3 text-sm leading-5">
-      <FileText className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-      <span>{text}</span>
+    <div className="flex items-start gap-2 rounded-lg bg-muted/25 p-3 text-sm leading-6">
+      <FileText className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+      <span className="min-w-0 break-words">{text}</span>
     </div>
   )
 }
