@@ -35,6 +35,8 @@ type Props = {
 const validationLabels: Record<string, string> = {
   pending: 'Pendiente',
   valid: 'Válida',
+  validated: 'Validada',
+  accepted: 'Aceptada',
   expiring: 'Por vencer',
   expired: 'Vencida',
   incomplete: 'Incompleta',

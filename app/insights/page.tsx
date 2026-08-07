@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Activity, ArrowRight, Clock3, ShieldCheck, Sparkles } from 'lucide-react'
+import { Activity, AlertTriangle, ArrowRight, Clock3, ShieldCheck, Sparkles } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { buildConfidence, buildImpact, buildTimeline } from '@/lib/compliance/insights'
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Confianza e impacto',
-  description: 'Timeline organizacional, confianza de cumplimiento e impacto de obligaciones.',
+  description: 'Timeline organizacional, confianza del alcance registrado e impacto de requerimientos.',
   robots: { index: false, follow: false },
 }
 
@@ -75,33 +75,54 @@ export default async function InsightsPage() {
           <p className="text-sm font-semibold text-primary">Inteligencia operacional</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Confianza, historia e impacto en una sola vista.</h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Kumplio transforma el trabajo acumulado en tres respuestas: qué ha pasado, cuánto puedes demostrar hoy y dónde un cambio tendría mayor impacto.
+            Kumplio transforma el trabajo acumulado en tres respuestas: qué ha pasado, cuánto puedes demostrar dentro del alcance registrado y dónde existe mayor exposición.
           </p>
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-2xl border bg-card p-5 sm:p-6">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-muted-foreground">Mapa de confianza</p>
-                <p className="mt-2 text-5xl font-extrabold tracking-tight">{confidence.overall}%</p>
+                <p className="text-sm font-semibold text-muted-foreground">Confianza del alcance registrado</p>
+                <p className="mt-2 text-5xl font-extrabold tracking-tight">
+                  {confidence.overall === null ? '—' : `${confidence.overall}%`}
+                </p>
+                <p className="mt-3 max-w-md text-xs leading-5 text-muted-foreground">{confidence.scope}</p>
               </div>
               <ShieldCheck className="h-9 w-9 text-primary" />
             </div>
-            <div className="mt-6 space-y-5">
-              {confidence.dimensions.map((dimension) => (
-                <Link key={dimension.key} href={dimension.href} className="block rounded-xl border p-4 transition hover:border-primary/40 hover:bg-muted/30">
-                  <div className="flex items-center justify-between gap-4 text-sm">
-                    <span className="font-semibold">{dimension.label}</span>
-                    <span className="font-bold">{dimension.score}%</span>
+
+            {confidence.overall === null ? (
+              <div className="mt-6 rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+                {confidence.basis[0]}
+              </div>
+            ) : (
+              <>
+                <div className="mt-6 space-y-5">
+                  {confidence.dimensions.map((dimension) => (
+                    <Link key={dimension.key} href={dimension.href} className="block rounded-xl border p-4 transition hover:border-primary/40 hover:bg-muted/30">
+                      <div className="flex items-center justify-between gap-4 text-sm">
+                        <span className="font-semibold">{dimension.label}</span>
+                        <span className="font-bold">{dimension.score}%</span>
+                      </div>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+                        <div className="h-full rounded-full bg-primary" style={{ width: `${dimension.score}%` }} />
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">{dimension.covered}/{dimension.total} · {dimension.detail}</p>
+                    </Link>
+                  ))}
+                </div>
+
+                {confidence.caps.length > 0 && (
+                  <div className="mt-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+                    <div className="flex items-center gap-2 text-sm font-black"><AlertTriangle className="h-4 w-4 text-amber-600" /> Por qué no puede subir más</div>
+                    <ul className="mt-3 space-y-2 text-xs leading-5 text-muted-foreground">
+                      {confidence.caps.map((cap) => <li key={cap.key}>• Máximo {cap.maximum}%: {cap.reason}</li>)}
+                    </ul>
                   </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${dimension.score}%` }} />
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">{dimension.covered}/{dimension.total} · {dimension.detail}</p>
-                </Link>
-              ))}
-            </div>
+                )}
+              </>
+            )}
           </div>
 
           <div className="rounded-2xl border bg-card p-5 sm:p-6">
@@ -109,10 +130,10 @@ export default async function InsightsPage() {
               <Activity className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold">Impacto prioritario</h2>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">Obligaciones que hoy concentran más exposición por falta de controles, evidencia, responsables o trabajo abierto.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Requerimientos que hoy concentran más exposición por falta de controles, evidencia, responsables o efectividad.</p>
             <div className="mt-5 space-y-3">
               {impact.length === 0 ? (
-                <p className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">No hay obligaciones para analizar todavía.</p>
+                <p className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">No hay requerimientos para analizar todavía.</p>
               ) : impact.slice(0, 12).map((item) => (
                 <article key={item.obligationId} className="rounded-xl border p-4">
                   <div className="flex items-start justify-between gap-4">
@@ -139,7 +160,7 @@ export default async function InsightsPage() {
             <Clock3 className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Timeline organizacional</h2>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Historia unificada de casos, misiones, solicitudes y movimientos de evidencia, evaluaciones y decisiones.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Historia unificada de casos, misiones, solicitudes, evidencia, evaluaciones y decisiones.</p>
           <div className="mt-6 grid gap-3 lg:grid-cols-2">
             {timeline.length === 0 ? (
               <p className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">La actividad futura aparecerá aquí automáticamente.</p>

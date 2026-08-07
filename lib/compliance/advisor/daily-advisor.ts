@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { calculateComplianceConfidence } from '@/lib/compliance/confidence'
 import { buildAdvisorReasoning, type AdvisorReasoning } from './reasoning'
 
 export type AdvisorCategory = 'critical' | 'decision' | 'assigned' | 'waiting' | 'evidence' | 'agentic'
@@ -478,48 +479,8 @@ function calculateWorkspaceConfidence(input: {
   controlEvidence: Array<Record<string, unknown>>
   evidence: Array<Record<string, unknown>>
 }) {
-  const dimensions: Array<{ covered: number; total: number; label: string }> = []
-  if (input.obligations.length > 0) {
-    dimensions.push({
-      covered: new Set(input.controlObligations.map((item) => String(item.obligation_id))).size,
-      total: input.obligations.length,
-      label: 'obligaciones con control',
-    })
-  }
-  if (input.controls.length > 0) {
-    dimensions.push({
-      covered: input.controls.filter((item) => Boolean(item.owner_id)).length,
-      total: input.controls.length,
-      label: 'controles con responsable',
-    })
-    dimensions.push({
-      covered: input.controls.filter((item) => item.design_effectiveness !== 'not_evaluated' || item.operating_effectiveness !== 'not_evaluated').length,
-      total: input.controls.length,
-      label: 'controles evaluados',
-    })
-    dimensions.push({
-      covered: new Set(input.controlEvidence.filter((item) => item.sufficiency_status === 'sufficient').map((item) => String(item.control_id))).size,
-      total: input.controls.length,
-      label: 'controles con evidencia suficiente',
-    })
-  }
-  if (input.evidence.length > 0) {
-    dimensions.push({
-      covered: input.evidence.filter((item) => ['validated', 'accepted'].includes(String(item.validation_status))).length,
-      total: input.evidence.length,
-      label: 'evidencia validada',
-    })
-  }
-
-  if (dimensions.length === 0) {
-    return { value: null, basis: ['Aún no existe una base operacional suficiente para calcular confianza.'] }
-  }
-
-  const scores = dimensions.map((item) => Math.round((item.covered / item.total) * 100))
-  return {
-    value: Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length),
-    basis: dimensions.map((item) => `${item.covered} de ${item.total} ${item.label}.`),
-  }
+  const model = calculateComplianceConfidence(input)
+  return { value: model.overall, basis: model.basis }
 }
 
 function rows(result: { data?: unknown[] | null; error?: { message?: string } | null }, label: string) {

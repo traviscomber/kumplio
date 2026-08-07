@@ -27,6 +27,7 @@ const checks = [
   ['check:agent-committee'],
   ['check:operating-desk'],
   ['check:case-operational-plan'],
+  ['check:baseline-assurance'],
   ['build'],
 ]
 
