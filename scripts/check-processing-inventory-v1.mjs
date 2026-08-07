@@ -52,6 +52,13 @@ const required = [
     "'partial',",
     'to service_role',
   ]],
+  ['supabase/migrations/20260807205000_processing_inventory_explicit_browser_deny.sql', [
+    'processing activity evidence browser deny',
+    'processing activity reviews browser deny',
+    'to anon, authenticated',
+    'using (false)',
+    'with check (false)',
+  ]],
   ['supabase/migrations/20260807213000_seed_n3uralia_commercial_processing_activity.sql', [
     'commercial_leads',
     "lower(btrim(organization.name)) = 'n3uralia'",
