@@ -26,6 +26,7 @@ const checks = [
   ['check:organizational-memory'],
   ['check:agent-committee'],
   ['check:operating-desk'],
+  ['check:case-operational-plan'],
   ['build'],
 ]
 
