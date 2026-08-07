@@ -37,7 +37,7 @@ const required = [
     'UI Golden Path: PASS',
   ]],
   ['playwright.ui-golden-path.config.mjs', [
-    'ui-golden-path.spec.mjs',
+    'ui-golden-path\\.spec\\.mjs',
     "trace: 'retain-on-failure'",
     "screenshot: 'only-on-failure'",
     "video: 'retain-on-failure'",
