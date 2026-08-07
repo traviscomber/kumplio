@@ -44,7 +44,8 @@
     "check:operating-desk": "node scripts/check-operating-desk-v1.mjs",
     "check:case-operational-plan": "node scripts/check-case-operational-plan-v1.mjs",
     "check:baseline-assurance": "node scripts/check-baseline-assurance-v1.mjs",
-    "check:processing-inventory": "node scripts/check-processing-inventory-v1.mjs"
+    "check:processing-inventory": "node scripts/check-processing-inventory-v1.mjs",
+    "check:tenant-assurance": "node scripts/check-tenant-assurance-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",

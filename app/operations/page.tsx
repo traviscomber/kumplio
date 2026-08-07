@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Activity, AlertTriangle, ArrowRight, Boxes, FileCheck2, PackageCheck, RefreshCw, ShieldCheck, Users } from 'lucide-react'
+import { Activity, AlertTriangle, ArrowRight, BadgeCheck, Boxes, FileCheck2, FlaskConical, LockKeyhole, PackageCheck, RefreshCw, ShieldCheck, Users } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
+import { getLatestTenantAssuranceRun } from '@/lib/compliance/assurance/tenant-assurance'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,7 @@ export default async function OperationsPage() {
   const access = await getWorkspaceAccess(admin, user.id)
   if (!access) redirect('/onboarding')
 
-  const [{ data: organization }, { data: projects }, { data: jobs }] = await Promise.all([
+  const [{ data: organization }, { data: projects }, { data: jobs }, assurance] = await Promise.all([
     admin.from('organizations').select('name').eq('id', access.organizationId).maybeSingle(),
     admin.from('projects').select('id,name').eq('organization_id', access.organizationId).order('created_at', { ascending: false }),
     admin.from('agent_jobs')
@@ -25,6 +26,7 @@ export default async function OperationsPage() {
       .eq('organization_id', access.organizationId)
       .order('updated_at', { ascending: false })
       .limit(200),
+    getLatestTenantAssuranceRun(admin, access.organizationId),
   ])
 
   const queue = summarizeQueue(jobs || [])
@@ -39,9 +41,11 @@ export default async function OperationsPage() {
             Cumplimiento de {organization?.name || 'tu organización'}.
           </h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Un solo lugar para revisar trabajo, evidencia y salud de las ejecuciones que Kumplio procesa en segundo plano.
+            Un solo lugar para revisar trabajo, evidencia, aislamiento multiempresa y salud de las ejecuciones que Kumplio procesa en segundo plano.
           </p>
         </section>
+
+        {assurance && <TenantAssuranceCard assurance={assurance} />}
 
         <section className="mt-8 rounded-3xl border bg-card p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -113,6 +117,64 @@ export default async function OperationsPage() {
   )
 }
 
+function TenantAssuranceCard({ assurance }: { assurance: NonNullable<Awaited<ReturnType<typeof getLatestTenantAssuranceRun>>> }) {
+  const checks = Object.values(assurance.checkResults)
+  const passedChecks = checks.filter(Boolean).length
+  const totalStages = metricNumber(assurance.metrics.totalStages)
+  const approvedStages = metricNumber(assurance.metrics.approvedStages)
+  const pendingReview = metricNumber(assurance.metrics.pendingReviewStages)
+  const deadLetters = metricNumber(assurance.metrics.deadLetterJobs)
+  const status = assuranceStatus(assurance.status)
+
+  return (
+    <section className={`mt-8 rounded-3xl border p-6 sm:p-8 ${status.className}`}>
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-2 text-primary">
+            <FlaskConical className="h-5 w-5" />
+            <p className="text-sm font-bold">Tenant assurance interno</p>
+          </div>
+          <h2 className="mt-3 text-2xl font-black">{status.label}</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            {assurance.sandboxOrganizationName} usa una cuenta E2E independiente, datos sintéticos y el mismo onboarding, expediente, workflow, plan, evidencia e inventario que un tenant real.
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Última comprobación: {new Date(assurance.lastCheckedAt).toLocaleString('es-CL')} · {assurance.sandboxUserLabel}
+          </p>
+        </div>
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border bg-background/70 text-primary">
+          {assurance.status === 'passed' ? <BadgeCheck className="h-7 w-7" /> : <LockKeyhole className="h-7 w-7" />}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <AssuranceMetric label="Controles de aislamiento" value={`${passedChecks}/${checks.length}`} detail="Pruebas estáticas aprobadas" />
+        <AssuranceMetric label="Etapas agentic" value={`${approvedStages}/${totalStages}`} detail={`${pendingReview} esperando revisión`} />
+        <AssuranceMetric label="Dead-letter" value={deadLetters} detail={deadLetters ? 'Requiere intervención' : 'Sin fallos terminales'} />
+        <AssuranceMetric label="Estado" value={status.shortLabel} detail="Golden path del sandbox" />
+      </div>
+
+      {assurance.latestError && (
+        <div className="mt-5 flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {assurance.latestError}
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link href={`/cases/${assurance.guidedCaseId}`} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground">
+          Abrir expediente de prueba <ArrowRight className="h-4 w-4" />
+        </Link>
+        <Link href="/review-center" className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold hover:bg-muted">
+          Revisar especialistas
+        </Link>
+        <Link href="/digital-twin" className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold hover:bg-muted">
+          Ver inventario del workspace actual
+        </Link>
+      </div>
+    </section>
+  )
+}
+
 function summarizeQueue(jobs: Array<{ status: string; lease_expires_at: string | null }>) {
   const now = Date.now()
   return {
@@ -135,6 +197,27 @@ function QueueMetric({ label, value, detail, alert = false }: { label: string; v
       <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
     </div>
   )
+}
+
+function AssuranceMetric({ label, value, detail }: { label: string; value: number | string; detail: string }) {
+  return (
+    <div className="rounded-2xl border bg-background/60 p-4">
+      <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
+      <p className="mt-2 text-2xl font-black">{value}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
+    </div>
+  )
+}
+
+function assuranceStatus(status: 'prepared' | 'running' | 'passed' | 'failed') {
+  if (status === 'passed') return { label: 'Aislamiento y golden path aprobados.', shortLabel: 'Aprobado', className: 'border-emerald-500/30 bg-emerald-500/5' }
+  if (status === 'failed') return { label: 'Tenant assurance requiere intervención.', shortLabel: 'Falló', className: 'border-destructive/30 bg-destructive/5' }
+  if (status === 'running') return { label: 'Golden path del segundo tenant en ejecución.', shortLabel: 'En curso', className: 'border-primary/30 bg-primary/5' }
+  return { label: 'Segundo tenant preparado para validación.', shortLabel: 'Preparado', className: 'bg-card' }
+}
+
+function metricNumber(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
 }
 
 function OperationCard({ href, icon: Icon, title, description }: { href: string; icon: typeof Users; title: string; description: string }) {
