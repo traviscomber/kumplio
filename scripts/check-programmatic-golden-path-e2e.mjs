@@ -41,7 +41,6 @@ assert.match(progression, /when p_decision = 'approved' and not v_is_final then 
 assert.match(progression, /'next_stage_index'/)
 assert.match(progression, /'currentStage'/)
 
-// Durable execution is part of the path: the user route queues; the internal worker runs the model.
 assert.match(advance, /enqueue_agent_job/)
 assert.doesNotMatch(advance, /runAgent\(/)
 assert.match(worker, /claim_agent_jobs/)
@@ -49,6 +48,8 @@ assert.match(worker, /heartbeat_agent_job/)
 assert.match(worker, /complete_agent_job/)
 assert.match(worker, /fail_agent_job/)
 
+assert.match(workflow, /BASE_URL: https:\/\/www\.kumplio\.app/)
+assert.doesNotMatch(workflow, /BASE_URL: https:\/\/kumplio\.app(?:\s|$)/)
 assert.match(workflow, /id-token: write/)
 assert.match(workflow, /statuses: write/)
 assert.match(workflow, /STATUS_CONTEXT: Golden path E2E/)
