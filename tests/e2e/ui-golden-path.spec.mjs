@@ -46,15 +46,16 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
 
   for (let stageIndex = 0; stageIndex < 5; stageIndex += 1) {
     await test.step(`revisar y aprobar la etapa ${stageIndex + 1} de 5`, async () => {
+      const review = page.getByRole('main')
       await waitForReview(page, stageIndex)
-      await page.getByPlaceholder('Justifica la aprobación o explica qué debe corregirse...').fill(
+      await review.getByPlaceholder('Justifica la aprobación o explica qué debe corregirse...').fill(
         `Aprobación UI E2E de la etapa ${stageIndex + 1}: se revisaron fuentes, evidencia, reservas y límites antes de continuar.`,
       )
-      await page.getByLabel('Revisé las fuentes y evidencias relacionadas.').check()
-      await page.getByLabel('Entiendo los supuestos, reservas y datos que todavía faltan.').check()
-      await page.getByLabel('La conclusión está suficientemente respaldada para avanzar.').check()
-      await page.getByRole('button', { name: 'Aprobar y continuar', exact: true }).click()
-      await expect(page.getByRole('button', { name: 'Aprobar y continuar', exact: true })).toBeHidden({ timeout: 90_000 })
+      await review.getByLabel('Revisé las fuentes y evidencias relacionadas.').check()
+      await review.getByLabel('Entiendo los supuestos, reservas y datos que todavía faltan.').check()
+      await review.getByLabel('La conclusión está suficientemente respaldada para avanzar.').check()
+      await review.getByRole('button', { name: 'Aprobar y continuar', exact: true }).click()
+      await expect(review.getByRole('button', { name: 'Aprobar y continuar', exact: true })).toBeHidden({ timeout: 90_000 })
     })
   }
 
@@ -127,22 +128,23 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
 
 async function waitForReview(page, stageIndex) {
   const deadline = Date.now() + 12 * 60 * 1000
+  const main = page.getByRole('main')
   while (Date.now() < deadline) {
     await page.reload({ waitUntil: 'domcontentloaded' })
-    const approve = page.getByRole('button', { name: 'Aprobar y continuar', exact: true })
+    const approve = main.getByRole('button', { name: 'Aprobar y continuar', exact: true })
     if (await approve.isVisible().catch(() => false)) return
 
-    const retry = page.getByRole('button', { name: 'Reintentar etapa', exact: true })
+    const retry = main.getByRole('button', { name: 'Reintentar etapa', exact: true })
     if (await retry.isVisible().catch(() => false)) {
       throw new Error(`La etapa ${stageIndex + 1} llegó a estado de reintento y no produjo un resultado aprobable.`)
     }
 
-    const exhausted = page.getByText(/Límite alcanzado:/)
+    const exhausted = main.getByText(/Límite alcanzado:/)
     if (await exhausted.isVisible().catch(() => false)) {
       throw new Error(`La etapa ${stageIndex + 1} agotó sus intentos.`)
     }
 
-    const recover = page.getByRole('button', { name: 'Recuperar ejecución detenida', exact: true })
+    const recover = main.getByRole('button', { name: 'Recuperar ejecución detenida', exact: true })
     if (await recover.isVisible().catch(() => false)) await recover.click()
     await page.waitForTimeout(10_000)
   }
