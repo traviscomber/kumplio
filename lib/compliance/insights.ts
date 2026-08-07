@@ -27,6 +27,7 @@ export function buildTimeline(input: {
   evidenceEvents: Array<Record<string, any>>
   evaluations: Array<Record<string, any>>
   decisions: Array<Record<string, any>>
+  processingReviews?: Array<Record<string, any>>
 }) {
   const events: TimelineEvent[] = []
 
@@ -84,6 +85,15 @@ export function buildTimeline(input: {
     href: '/decisions',
   })
 
+  for (const row of input.processingReviews || []) events.push({
+    id: `processing-review:${row.id}`,
+    type: 'processing_activity_review',
+    title: 'Actividad de tratamiento revisada',
+    detail: `${row.completeness === 'complete' ? 'Completa' : 'Parcial'} · ${Array.isArray(row.unknowns) ? row.unknowns.length : 0} desconocidos abiertos`,
+    occurredAt: row.reviewed_at || row.created_at,
+    href: '/digital-twin',
+  })
+
   return events
     .filter((event) => Boolean(event.occurredAt))
     .sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime())
@@ -96,6 +106,8 @@ export function buildConfidence(input: {
   controlObligations: Array<Record<string, any>>
   controlEvidence: Array<Record<string, any>>
   evidence: Array<Record<string, any>>
+  processingActivities?: Array<Record<string, any>>
+  processingReviews?: Array<Record<string, any>>
 }) {
   return calculateComplianceConfidence(input)
 }
