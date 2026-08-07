@@ -3,6 +3,7 @@ import 'server-only'
 import { createHash } from 'node:crypto'
 import OpenAI from 'openai'
 import type { AgentId } from './catalog'
+import { evaluateAgentQuality, type QualityGateReport } from './committee'
 import { buildAgentInstructions } from './prompts'
 import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './schemas'
 
@@ -60,6 +61,7 @@ export type RunAgentResult = {
   usage: NormalizedUsage
   promptVersion: string
   schemaVersion: string
+  qualityGate: QualityGateReport
 }
 
 function normalizeUsage(usage: unknown): NormalizedUsage {
@@ -176,6 +178,16 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     throw new AgentRuntimeError('schema_validation_failed', 'The agent output did not satisfy its contract', response.model)
   }
 
+  const qualityGate = evaluateAgentQuality(input.agentId, output)
+  if (qualityGate.status === 'block') {
+    console.error('[agents/runtime/quality-gate]', input.agentId, qualityGate.blockers)
+    throw new AgentRuntimeError(
+      'quality_gate_failed',
+      `El supervisor de calidad bloqueó el resultado: ${qualityGate.blockers.join(' ')}`,
+      response.model,
+    )
+  }
+
   return {
     responseId: response.id,
     model: response.model || MODEL_PRIMARY,
@@ -184,5 +196,6 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     usage: normalizeUsage(response.usage),
     promptVersion,
     schemaVersion: outputSchema.version,
+    qualityGate,
   }
 }
