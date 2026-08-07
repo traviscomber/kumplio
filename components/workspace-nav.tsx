@@ -10,7 +10,7 @@ import { WorkspaceSwitcher } from '@/components/workspace-switcher'
 const areas = [
   {
     href: '/advisor',
-    label: 'Hoy',
+    label: 'Escritorio',
     icon: Sparkles,
     routes: ['/advisor', '/dashboard'],
   },
