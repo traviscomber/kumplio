@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Brain, GitBranch, History, Network } from 'lucide-react'
+import { ArrowRight, Brain, Database, GitBranch, History, Network } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -31,13 +31,18 @@ export default async function ContextPage() {
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="rounded-3xl border bg-card p-6 sm:p-8">
           <p className="text-sm font-semibold text-primary">Contexto organizacional</p>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Kumplio recuerda cómo tu organización resolvió antes.</h1>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Kumplio recuerda cómo tu organización funciona y resolvió antes.</h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Situaciones, misiones y decisiones comparten un contexto único. Los especialistas reciben estos precedentes y casos similares antes de preparar una nueva respuesta.
+            Centraliza actividades, sistemas, datos, terceros, situaciones y decisiones. Los especialistas reciben este contexto y los precedentes aprobados antes de preparar una nueva respuesta.
           </p>
-          <Link href="/map" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
-            Abrir mapa de cumplimiento <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/digital-twin" className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
+              Abrir inventario de tratamientos <Database className="h-4 w-4" />
+            </Link>
+            <Link href="/map" className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-muted">
+              Abrir mapa de cumplimiento <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
