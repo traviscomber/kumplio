@@ -1,0 +1,261 @@
+name: Golden path Ley 21.719 E2E
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/golden-path-e2e.yml'
+      - 'app/api/internal/e2e/**'
+      - 'lib/security/github-actions-oidc.ts'
+      - 'lib/agents/openai-runtime.ts'
+      - 'app/api/agents/workflows/**'
+      - 'app/api/agents/runs/**'
+      - 'scripts/53-advance-workflow-after-approval.sql'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  statuses: read
+
+concurrency:
+  group: golden-path-e2e-production
+  cancel-in-progress: false
+
+jobs:
+  golden-path:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      BASE_URL: https://kumplio.app
+      CASE_ID: 91ae9174-be4c-4ddd-8980-4a671571afdc
+      WORKFLOW_ID: dcd5d171-ce3d-4425-9b17-83d48bfbae71
+      E2E_AUDIENCE: kumplio-golden-path-e2e
+      E2E_MARKER: block02-golden-path
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for production deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..60}; do
+            payload=$(curl --fail --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/status")
+
+            verdict=$(PAYLOAD="$payload" node <<'NODE'
+          const data = JSON.parse(process.env.PAYLOAD || '{}')
+          const wanted = new Set(['Vercel – kumplio', 'Vercel – v0-normative-compliance-analysis'])
+          const latest = new Map()
+          for (const status of data.statuses || []) {
+            if (!wanted.has(status.context) || latest.has(status.context)) continue
+            latest.set(status.context, status.state)
+          }
+          if ([...wanted].every((name) => latest.get(name) === 'success')) process.stdout.write('success')
+          else if ([...latest.values()].some((state) => state === 'failure' || state === 'error')) process.stdout.write('failure')
+          else process.stdout.write('pending')
+          NODE
+            )
+
+            if [[ "$verdict" == success ]]; then
+              echo 'Production Vercel deployments are green.'
+              exit 0
+            fi
+            if [[ "$verdict" == failure ]]; then
+              echo 'A production Vercel deployment failed.' >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          echo 'Timed out waiting for production Vercel deployments.' >&2
+          exit 1
+
+      - name: Acquire GitHub OIDC token
+        shell: bash
+        run: |
+          set -euo pipefail
+          oidc_response=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${E2E_AUDIENCE}")
+          OIDC_RESPONSE="$oidc_response" node <<'NODE' > /tmp/kumplio-e2e-oidc
+          const payload = JSON.parse(process.env.OIDC_RESPONSE || '{}')
+          if (!payload.value) process.exit(1)
+          process.stdout.write(payload.value)
+          NODE
+          chmod 600 /tmp/kumplio-e2e-oidc
+          echo "::add-mask::$(cat /tmp/kumplio-e2e-oidc)"
+
+      - name: Create temporary authenticated E2E session
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(cat /tmp/kumplio-e2e-oidc)
+          curl --fail --silent --show-error \
+            --cookie-jar /tmp/kumplio-e2e-cookies \
+            -H "Authorization: Bearer $token" \
+            -H "X-Kumplio-E2E: $E2E_MARKER" \
+            -H 'Content-Type: application/json' \
+            --data "{\"caseId\":\"$CASE_ID\"}" \
+            "$BASE_URL/api/internal/e2e/session" > /tmp/kumplio-e2e-session.json
+          chmod 600 /tmp/kumplio-e2e-cookies
+          SESSION_JSON=$(cat /tmp/kumplio-e2e-session.json) node <<'NODE'
+          const payload = JSON.parse(process.env.SESSION_JSON || '{}')
+          if (!payload.ok || !payload.serviceUserId) throw new Error('E2E session was not created')
+          console.log(`E2E session created for case ${payload.caseId}.`)
+          NODE
+
+      - name: Execute and approve five specialist stages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          get_workflow() {
+            curl --fail --silent --show-error \
+              --cookie /tmp/kumplio-e2e-cookies \
+              "$BASE_URL/api/agents/workflows/$WORKFLOW_ID"
+          }
+
+          for stage_index in 0 1 2 3 4; do
+            state=$(get_workflow)
+            stage_status=$(STATE="$state" STAGE_INDEX="$stage_index" node <<'NODE'
+          const payload = JSON.parse(process.env.STATE || '{}')
+          const stage = (payload.stages || []).find((item) => item.stage_index === Number(process.env.STAGE_INDEX))
+          if (!stage) throw new Error('Stage not found')
+          process.stdout.write(stage.status)
+          NODE
+            )
+
+            if [[ "$stage_status" == approved ]]; then
+              echo "Stage $stage_index already approved; continuing."
+              continue
+            fi
+
+            if [[ "$stage_status" == pending_review ]]; then
+              run_id=$(STATE="$state" STAGE_INDEX="$stage_index" node <<'NODE'
+          const payload = JSON.parse(process.env.STATE || '{}')
+          const stage = (payload.stages || []).find((item) => item.stage_index === Number(process.env.STAGE_INDEX))
+          if (!stage?.run_id) throw new Error('Pending-review stage has no run id')
+          process.stdout.write(stage.run_id)
+          NODE
+              )
+            else
+              advance_body='{}'
+              if [[ "$stage_status" == changes_requested ]]; then
+                advance_body='{"instructions":"Reintento E2E controlado: corrige únicamente las observaciones registradas y conserva trazabilidad."}'
+              fi
+
+              http_code=$(curl --silent --show-error \
+                --max-time 295 \
+                --output /tmp/kumplio-advance.json \
+                --write-out '%{http_code}' \
+                --cookie /tmp/kumplio-e2e-cookies \
+                -H 'Content-Type: application/json' \
+                --data "$advance_body" \
+                "$BASE_URL/api/agents/workflows/$WORKFLOW_ID/advance")
+              if [[ "$http_code" != 200 ]]; then
+                echo "Stage $stage_index advance failed with HTTP $http_code:" >&2
+                cat /tmp/kumplio-advance.json >&2
+                exit 1
+              fi
+
+              run_id=$(ADVANCE_JSON=$(cat /tmp/kumplio-advance.json) node <<'NODE'
+          const payload = JSON.parse(process.env.ADVANCE_JSON || '{}')
+          if (payload.status !== 'pending_review' || !payload.runId) throw new Error('Agent stage did not reach pending_review')
+          console.log(payload.runId)
+          NODE
+              )
+            fi
+
+            review_payload=$(RUN_ID="$run_id" STAGE_INDEX="$stage_index" node <<'NODE'
+          process.stdout.write(JSON.stringify({
+            decision: 'approved',
+            comment: `Aprobación E2E controlada de la etapa ${process.env.STAGE_INDEX}; evidencia, limitaciones y respaldo revisados por el runner de validación.`,
+            checklist: {
+              evidence_reviewed: true,
+              limitations_understood: true,
+              outcome_supported: true,
+            },
+          }))
+          NODE
+            )
+
+            http_code=$(curl --silent --show-error \
+              --output /tmp/kumplio-review.json \
+              --write-out '%{http_code}' \
+              --cookie /tmp/kumplio-e2e-cookies \
+              -H 'Content-Type: application/json' \
+              --data "$review_payload" \
+              "$BASE_URL/api/agents/runs/$run_id/review")
+            if [[ "$http_code" != 200 ]]; then
+              echo "Stage $stage_index review failed with HTTP $http_code:" >&2
+              cat /tmp/kumplio-review.json >&2
+              exit 1
+            fi
+
+            REVIEW_JSON=$(cat /tmp/kumplio-review.json) STAGE_INDEX="$stage_index" node <<'NODE'
+          const payload = JSON.parse(process.env.REVIEW_JSON || '{}')
+          if (payload.status !== 'approved') throw new Error('Review did not approve the stage')
+          console.log(`Stage ${process.env.STAGE_INDEX} approved; workflow status: ${payload.workflowStatus}.`)
+          NODE
+          done
+
+      - name: Close and verify auditable case
+        shell: bash
+        run: |
+          set -euo pipefail
+          http_code=$(curl --silent --show-error \
+            --output /tmp/kumplio-close.json \
+            --write-out '%{http_code}' \
+            --cookie /tmp/kumplio-e2e-cookies \
+            -X POST \
+            "$BASE_URL/api/cases/$CASE_ID/close")
+          if [[ "$http_code" != 200 ]]; then
+            echo "Case close failed with HTTP $http_code:" >&2
+            cat /tmp/kumplio-close.json >&2
+            exit 1
+          fi
+
+          state=$(curl --fail --silent --show-error \
+            --cookie /tmp/kumplio-e2e-cookies \
+            "$BASE_URL/api/agents/workflows/$WORKFLOW_ID")
+          STATE="$state" node <<'NODE'
+          const payload = JSON.parse(process.env.STATE || '{}')
+          const stages = payload.stages || []
+          if (payload.workflow?.status !== 'completed') throw new Error(`Workflow status is ${payload.workflow?.status}`)
+          if (stages.length !== 5 || stages.some((stage) => stage.status !== 'approved')) {
+            throw new Error('Not all five stages are approved')
+          }
+          const caseRecord = Array.isArray(payload.workflow?.compliance_cases)
+            ? payload.workflow.compliance_cases[0]
+            : payload.workflow?.compliance_cases
+          if (caseRecord?.status !== 'approved') throw new Error(`Case status is ${caseRecord?.status}`)
+          console.log('Golden path complete: 5/5 stages approved, workflow completed, case resolved.')
+          NODE
+
+      - name: Revoke E2E organization membership
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          oidc_response=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${E2E_AUDIENCE}")
+          cleanup_token=$(OIDC_RESPONSE="$oidc_response" node <<'NODE'
+          const payload = JSON.parse(process.env.OIDC_RESPONSE || '{}')
+          if (!payload.value) process.exit(1)
+          process.stdout.write(payload.value)
+          NODE
+          )
+          echo "::add-mask::$cleanup_token"
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $cleanup_token" \
+            -H "X-Kumplio-E2E: $E2E_MARKER" \
+            -H 'Content-Type: application/json' \
+            --data "{\"caseId\":\"$CASE_ID\"}" \
+            "$BASE_URL/api/internal/e2e/revoke" > /tmp/kumplio-e2e-revoke.json
+          echo 'E2E organization membership revoked.'
