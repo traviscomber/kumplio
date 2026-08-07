@@ -56,7 +56,7 @@ await expectIncludes('app/robots.ts', [
   'GPTBot',
   'ClaudeBot',
   'PerplexityBot',
-  "'/dashboard/'",
+  "'/dashboard'",
 ])
 
 await expectIncludes('app/sitemap.ts', [
