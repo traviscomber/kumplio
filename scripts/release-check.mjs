@@ -23,6 +23,7 @@ const checks = [
   ['check:control-evidence-lifecycle'],
   ['check:knowledge-graph'],
   ['check:insights'],
+  ['check:organizational-memory'],
   ['build'],
 ]
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { GuidedCaseWorkspace } from '@/components/cases/guided-case-workspace'
+import { SimilarCasesPanel } from '@/components/cases/similar-cases-panel'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 
 export default async function CasePage({ params }: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await params
-  return <GuidedCaseWorkspace caseId={caseId} />
+  return (
+    <>
+      <GuidedCaseWorkspace caseId={caseId} />
+      <SimilarCasesPanel caseId={caseId} />
+    </>
+  )
 }

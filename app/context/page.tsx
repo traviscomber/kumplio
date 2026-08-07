@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { getOrganizationContext } from '@/lib/compliance/context/context-graph'
+import { getMemoryPrecedents } from '@/lib/compliance/context/organizational-memory'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,9 +19,11 @@ export default async function ContextPage() {
   const access = await getWorkspaceAccess(admin, user.id)
   if (!access) redirect('/onboarding')
 
-  const context = await getOrganizationContext(admin, access.organizationId)
+  const [context, deepMemory] = await Promise.all([
+    getOrganizationContext(admin, access.organizationId),
+    getMemoryPrecedents(admin, access.organizationId, 20),
+  ])
   const situationNodes = context.nodes.filter((node) => node.nodeType === 'situation')
-  const precedents = context.memories.filter((memory) => memory.memoryType === 'decision_precedent')
 
   return (
     <>
@@ -28,9 +31,9 @@ export default async function ContextPage() {
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <section className="rounded-3xl border bg-card p-6 sm:p-8">
           <p className="text-sm font-semibold text-primary">Contexto organizacional</p>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Kumplio ya recuerda cómo se relaciona el trabajo.</h1>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Kumplio recuerda cómo tu organización resolvió antes.</h1>
           <p className="mt-4 max-w-3xl text-muted-foreground">
-            Situaciones, misiones y decisiones comparten un contexto único. Las decisiones resueltas quedan disponibles como precedentes.
+            Situaciones, misiones y decisiones comparten un contexto único. Los especialistas reciben estos precedentes y casos similares antes de preparar una nueva respuesta.
           </p>
           <Link href="/map" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
             Abrir mapa de cumplimiento <ArrowRight className="h-4 w-4" />
@@ -41,7 +44,7 @@ export default async function ContextPage() {
           <Metric label="Nodos" value={context.nodes.length} icon={Network} />
           <Metric label="Relaciones" value={context.edges.length} icon={GitBranch} />
           <Metric label="Situaciones conectadas" value={situationNodes.length} icon={Brain} />
-          <Metric label="Precedentes" value={precedents.length} icon={History} />
+          <Metric label="Precedentes utilizables" value={deepMemory.length} icon={History} />
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -68,17 +71,23 @@ export default async function ContextPage() {
 
           <div className="rounded-2xl border bg-card p-5 sm:p-6">
             <h2 className="text-xl font-bold">Memoria y precedentes</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Primero usamos la memoria estructurada; si todavía no está disponible, Kumplio recupera decisiones humanas resueltas como respaldo compatible.
+            </p>
             <div className="mt-5 space-y-4">
-              {context.memories.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Las decisiones resueltas desde ahora quedarán guardadas como precedentes.</p>
-              ) : context.memories.map((memory) => (
-                <article key={memory.id} className="rounded-xl border p-4">
+              {deepMemory.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Cuando existan decisiones resueltas aparecerán aquí y podrán alimentar casos futuros.</p>
+              ) : deepMemory.map((memory) => (
+                <article key={`${memory.source}-${memory.id}`} className="rounded-xl border p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="font-semibold">{memory.title}</p>
-                    <span className="text-xs text-muted-foreground">{new Date(memory.occurredAt).toLocaleDateString('es-CL')}</span>
+                    <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                      {memory.source === 'organization_memory' ? 'Memoria' : 'Decisión'}
+                    </span>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{memory.summary}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{memory.summary || 'Sin resumen adicional.'}</p>
                   {memory.outcome && <p className="mt-3 text-sm"><span className="font-semibold">Resultado:</span> {memory.outcome}</p>}
+                  <p className="mt-3 text-xs text-muted-foreground">{new Date(memory.occurredAt).toLocaleDateString('es-CL')}</p>
                 </article>
               ))}
             </div>
