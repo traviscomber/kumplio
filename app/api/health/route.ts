@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+type QueueStatus = 'queued' | 'working' | 'retry_wait' | 'dead_letter'
+
 export async function GET() {
   const startedAt = Date.now()
   try {
@@ -17,11 +19,18 @@ export async function GET() {
       return NextResponse.json({ status: 'degraded', database: !dbError, queue: !queueError }, { status: 503, headers: { 'Cache-Control': 'no-store' } })
     }
 
-    const summary = { queued: 0, working: 0, retry_wait: 0, dead_letter: 0, stale_leases: 0 }
+    const summary: Record<QueueStatus, number> & { stale_leases: number } = {
+      queued: 0,
+      working: 0,
+      retry_wait: 0,
+      dead_letter: 0,
+      stale_leases: 0,
+    }
     const now = Date.now()
     for (const job of jobs || []) {
-      if (job.status === 'queued' || job.status === 'working' || job.status === 'retry_wait' || job.status === 'dead_letter') summary[job.status] += 1
-      if (job.status === 'working' && job.lease_expires_at && new Date(job.lease_expires_at).getTime() < now) summary.stale_leases += 1
+      const status = job.status as QueueStatus
+      if (status === 'queued' || status === 'working' || status === 'retry_wait' || status === 'dead_letter') summary[status] += 1
+      if (status === 'working' && job.lease_expires_at && new Date(job.lease_expires_at).getTime() < now) summary.stale_leases += 1
     }
 
     const healthy = summary.dead_letter === 0 && summary.stale_leases === 0
