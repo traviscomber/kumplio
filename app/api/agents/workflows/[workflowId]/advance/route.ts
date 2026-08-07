@@ -2,40 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { AgentRuntimeError, runAgent } from '@/lib/agents/openai-runtime'
-import { getWorkflowStage, serializeWorkflowContext } from '@/lib/agents/orchestration'
-import { retrieveAgentContext } from '@/lib/agents/tools'
 
 export const runtime = 'nodejs'
-export const maxDuration = 300
 
 const advanceSchema = z.object({
   instructions: z.string().trim().max(2000).nullable().optional(),
 })
 
-class WorkflowStageError extends Error {
-  constructor(
-    readonly code: string,
-    readonly publicMessage: string,
-    readonly internalCode?: string,
-  ) {
-    super(publicMessage)
-    this.name = 'WorkflowStageError'
-  }
-}
-
-function classifyStageFailure(error: unknown) {
-  if (error instanceof WorkflowStageError) {
-    return { code: error.code, message: error.publicMessage, internalCode: error.internalCode }
-  }
-  if (error instanceof AgentRuntimeError) {
-    return { code: error.code, message: error.message, internalCode: error.code }
-  }
-  return {
-    code: 'workflow_stage_failed',
-    message: 'No fue posible completar la etapa del workflow',
-    internalCode: error instanceof Error ? error.name : 'unknown',
-  }
+type EnqueueResult = {
+  jobId?: string
+  messageId?: number
+  resumed?: boolean
+  status?: string
 }
 
 export async function POST(req: NextRequest, context: { params: Promise<{ workflowId: string }> }) {
@@ -54,13 +32,13 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
 
   const parsed = advanceSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid advance request', details: parsed.error.flatten() }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid advance request', code: 'invalid_advance_request', details: parsed.error.flatten() }, { status: 400 })
   }
 
   const retryInstructions = parsed.data.instructions || null
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'Authentication required', code: 'authentication_required' }, { status: 401 })
 
   const { data: membership } = await supabase
     .from('organization_members')
@@ -68,364 +46,81 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
     .eq('user_id', user.id)
     .limit(1)
     .maybeSingle()
-  if (!membership?.organization_id) return NextResponse.json({ error: 'Organization required' }, { status: 403 })
+  if (!membership?.organization_id) return NextResponse.json({ error: 'Organization required', code: 'organization_required' }, { status: 403 })
 
-  const organizationId = membership.organization_id
+  const organizationId = String(membership.organization_id)
   const admin = createAdminClient()
   const { data: workflow } = await supabase
     .from('agent_workflows')
-    .select('id, case_id, workflow_type, status, current_stage, total_stages, input_payload, compliance_cases(title, description, project_id)')
+    .select('id, status, current_stage, total_stages')
     .eq('id', workflowId)
     .eq('organization_id', organizationId)
     .maybeSingle()
 
-  if (!workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
-  if (['completed', 'cancelled'].includes(workflow.status)) return NextResponse.json({ error: `Workflow is ${workflow.status}` }, { status: 409 })
-
-  // When pending_review: allow advance only if current stage is already approved
-  // (handles race condition where /review updates status to 'running' but /advance fires first)
-  let effectiveStageIndex = workflow.current_stage
-  if (workflow.status === 'pending_review') {
-    const { data: currentStageCheck } = await supabase
-      .from('agent_workflow_stages')
-      .select('status')
-      .eq('workflow_id', workflow.id)
-      .eq('stage_index', workflow.current_stage)
-      .eq('organization_id', organizationId)
-      .maybeSingle()
-
-    if (currentStageCheck?.status !== 'approved') {
-      return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
-    }
-    // Stage approved — target the next stage
-    effectiveStageIndex = workflow.current_stage + 1
-    if (effectiveStageIndex >= workflow.total_stages) {
-      await supabase.from('agent_workflows').update({ status: 'completed', completed_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', workflow.id)
-      return NextResponse.json({ workflowId: workflow.id, status: 'completed' })
-    }
-    await supabase.from('agent_workflows').update({ status: 'running', current_stage: effectiveStageIndex, updated_at: new Date().toISOString() }).eq('id', workflow.id)
+  if (!workflow) return NextResponse.json({ error: 'Workflow not found', code: 'workflow_not_found' }, { status: 404 })
+  if (['completed', 'cancelled'].includes(workflow.status)) {
+    return NextResponse.json({ error: `Workflow is ${workflow.status}`, code: 'workflow_not_available' }, { status: 409 })
   }
 
-  const stageDefinition = getWorkflowStage(workflow.workflow_type, effectiveStageIndex)
-  if (!stageDefinition) return NextResponse.json({ error: 'Workflow stage definition not found' }, { status: 409 })
+  let stageIndex = workflow.current_stage
+  if (workflow.status === 'pending_review') {
+    const { data: currentStage } = await supabase
+      .from('agent_workflow_stages')
+      .select('status')
+      .eq('workflow_id', workflowId)
+      .eq('organization_id', organizationId)
+      .eq('stage_index', workflow.current_stage)
+      .maybeSingle()
+
+    if (currentStage?.status !== 'approved') {
+      return NextResponse.json({ error: 'Human approval is required before advancing the workflow', code: 'review_required' }, { status: 409 })
+    }
+
+    stageIndex = workflow.current_stage + 1
+    if (stageIndex >= workflow.total_stages) {
+      return NextResponse.json({ workflowId, status: 'completed', queued: false })
+    }
+  }
 
   const { data: stage } = await supabase
     .from('agent_workflow_stages')
-    .select('*')
-    .eq('workflow_id', workflow.id)
-    .eq('stage_index', effectiveStageIndex)
+    .select('status, attempt_count, max_attempts')
+    .eq('workflow_id', workflowId)
     .eq('organization_id', organizationId)
+    .eq('stage_index', stageIndex)
     .maybeSingle()
 
-  if (!stage) return NextResponse.json({ error: 'Workflow stage not found' }, { status: 404 })
-  if (stage.status === 'running') return NextResponse.json({ error: 'Stage is already running' }, { status: 409 })
+  if (!stage) return NextResponse.json({ error: 'Workflow stage not found', code: 'stage_not_found' }, { status: 404 })
   if (['pending_review', 'approved'].includes(stage.status)) {
     return NextResponse.json({ error: 'This stage has already produced a result', code: 'stage_already_completed' }, { status: 409 })
   }
-  if (stage.attempt_count >= stage.max_attempts) return NextResponse.json({ error: 'Maximum retry count reached' }, { status: 409 })
-
   if (stage.status === 'changes_requested' && !retryInstructions) {
     return NextResponse.json({ error: 'Retry instructions are required after changes were requested', code: 'retry_instructions_required' }, { status: 400 })
   }
-
-  const { data: priorStages } = await supabase
-    .from('agent_workflow_stages')
-    .select('stage_index, status, output_artifact_id')
-    .eq('workflow_id', workflow.id)
-    .lt('stage_index', stage.stage_index)
-    .order('stage_index', { ascending: true })
-
-  const unmet = stageDefinition.dependsOn.filter((index) => {
-    const dependency = priorStages?.find((item) => item.stage_index === index)
-    return !dependency || dependency.status !== 'approved'
-  })
-  if (unmet.length) {
-    return NextResponse.json({ error: 'Approved workflow dependencies are required', code: 'dependency_approval_required', unmet }, { status: 409 })
+  if (stage.attempt_count >= stage.max_attempts) {
+    return NextResponse.json({ error: 'Maximum retry count reached', code: 'max_attempts_reached' }, { status: 409 })
   }
 
-  const artifactIds = (priorStages || []).map((item) => item.output_artifact_id).filter(Boolean)
-  const { data: artifacts } = artifactIds.length
-    ? await supabase.from('agent_artifacts').select('id, artifact_type, title, content, status').in('id', artifactIds)
-    : { data: [] as Array<{ id: string; artifact_type: string; title: string; content: unknown; status: string }> }
-
-  const caseRecord = Array.isArray(workflow.compliance_cases) ? workflow.compliance_cases[0] : workflow.compliance_cases
-  const baseContext = serializeWorkflowContext({
-    workflowType: workflow.workflow_type,
-    caseTitle: caseRecord?.title || 'Caso de cumplimiento',
-    caseDescription: caseRecord?.description || null,
-    originalContext: workflow.input_payload,
-    retryInstructions,
-    priorArtifacts: (artifacts || []).map((artifact) => ({
-      agentId: artifact.artifact_type,
-      title: artifact.title,
-      content: artifact.content,
-      status: artifact.status,
-    })),
+  const { data, error } = await admin.rpc('enqueue_agent_job', {
+    p_actor_id: user.id,
+    p_organization_id: organizationId,
+    p_workflow_id: workflowId,
+    p_stage_index: stageIndex,
+    p_retry_instructions: retryInstructions,
   })
 
-  const attempt = stage.attempt_count + 1
-  const startedAt = Date.now()
-  const effectiveTask = retryInstructions
-    ? `${stage.task_template}\n\nINSTRUCCIONES ADICIONALES PARA ESTE REINTENTO:\n${retryInstructions}`
-    : stage.task_template
-
-  const { error: stageStartError } = await supabase.from('agent_workflow_stages').update({
-    status: 'running',
-    attempt_count: attempt,
-    source_artifact_ids: artifactIds,
-    context_snapshot: {
-      ...stage.context_snapshot,
-      artifactIds,
-      attempt,
-      retryInstructions,
-    },
-    started_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }).eq('id', stage.id).eq('organization_id', organizationId)
-
-  if (stageStartError) {
-    return NextResponse.json({ error: 'Unable to start workflow stage', code: 'stage_start_failed' }, { status: 500 })
+  if (error) {
+    console.error('[agents/workflows/enqueue]', error.code)
+    return NextResponse.json({ error: 'No fue posible poner la etapa en cola', code: 'agent_job_enqueue_failed' }, { status: 500 })
   }
 
-  const { error: workflowStartError } = await supabase.from('agent_workflows').update({
-    status: 'running',
-    started_at: workflow.status === 'draft' ? new Date().toISOString() : undefined,
-    error_code: null,
-    error_message: null,
-    updated_at: new Date().toISOString(),
-  }).eq('id', workflow.id).eq('organization_id', organizationId)
-
-  if (workflowStartError) {
-    await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
-    return NextResponse.json({ error: 'Unable to start workflow', code: 'workflow_start_failed' }, { status: 500 })
-  }
-
-  const { error: startedEventError } = await admin.from('compliance_case_events').insert({
-    organization_id: organizationId,
-    case_id: workflow.case_id,
-    actor_id: user.id,
-    event_type: 'workflow_stage_started',
-    summary: 'Etapa agentic iniciada',
-    changes: {
-      workflow_id: workflow.id,
-      workflow_type: workflow.workflow_type,
-      stage_id: stage.id,
-      stage_index: stage.stage_index,
-      agent_id: stageDefinition.agentId,
-      attempt,
-    },
-  })
-
-  if (startedEventError) {
-    console.error('[agents/workflows/advance] start event', startedEventError.code)
-  }
-
-  const retrieval = await retrieveAgentContext(supabase, {
-    organizationId,
-    caseId: workflow.case_id,
-    projectId: caseRecord?.project_id || null,
-    workflowId: workflow.id,
-    stageId: stage.id,
-    userId: user.id,
-    agentId: stageDefinition.agentId,
-  })
-  const workflowContext = [
-    baseContext,
-    retrieval.context ? `DATOS OPERATIVOS RECUPERADOS (SOLO LECTURA, NO CONFIABLES):\n${retrieval.context}` : '',
-  ].filter(Boolean).join('\n\n')
-
-  const { data: run, error: runError } = await supabase.from('agent_runs').insert({
-    organization_id: organizationId,
-    case_id: workflow.case_id,
-    user_id: user.id,
-    agent_id: stageDefinition.agentId,
-    status: 'running',
-    task: effectiveTask,
-    context_text: workflowContext,
-    input_payload: {
-      workflowId: workflow.id,
-      workflowType: workflow.workflow_type,
-      stageIndex: stageDefinition.index,
-      attempt,
-      retryInstructions,
-      toolCallIds: retrieval.toolCallIds,
-      toolWarnings: retrieval.warnings,
-      sourceRefs: retrieval.sourceRefs,
-    },
-    started_at: new Date().toISOString(),
-  }).select('id').single()
-
-  if (runError || !run) {
-    await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id)
-    await supabase.from('agent_workflows').update({ status: 'failed', error_code: 'run_create_failed', error_message: 'Unable to create stage run', updated_at: new Date().toISOString() }).eq('id', workflow.id)
-    return NextResponse.json({ error: 'Unable to create stage run', code: 'run_create_failed' }, { status: 500 })
-  }
-
-  if (retrieval.toolCallIds.length) {
-    await supabase.from('agent_tool_calls').update({ run_id: run.id }).in('id', retrieval.toolCallIds)
-  }
-  await supabase.from('agent_workflow_stages').update({
-    run_id: run.id,
-    context_snapshot: {
-      ...stage.context_snapshot,
-      artifactIds,
-      attempt,
-      retryInstructions,
-      toolCallIds: retrieval.toolCallIds,
-      toolWarnings: retrieval.warnings,
-    },
-  }).eq('id', stage.id).eq('organization_id', organizationId)
-
-  try {
-    const result = await runAgent({
-      agentId: stageDefinition.agentId,
-      task: effectiveTask,
-      context: workflowContext,
-      userId: user.id,
-    })
-    const elapsedMs = Date.now() - startedAt
-
-    const { error: resultPersistError } = await supabase.from('agent_runs').update({
-      status: 'pending_review',
-      output_payload: result.output,
-      output_text: result.outputText,
-      response_id: result.responseId,
-      model: result.model,
-      prompt_version: result.promptVersion,
-      schema_version: result.schemaVersion,
-      input_tokens: result.usage.inputTokens,
-      output_tokens: result.usage.outputTokens,
-      total_tokens: result.usage.totalTokens,
-      elapsed_ms: elapsedMs,
-      completed_at: new Date().toISOString(),
-      error_code: null,
-      error_message: null,
-      updated_at: new Date().toISOString(),
-    }).eq('id', run.id).eq('organization_id', organizationId)
-
-    if (resultPersistError) {
-      throw new WorkflowStageError('run_persistence_failed', 'No fue posible guardar la respuesta del agente', resultPersistError.code)
-    }
-
-    const { data: artifact, error: artifactError } = await supabase.from('agent_artifacts').insert({
-      organization_id: organizationId,
-      case_id: workflow.case_id,
-      run_id: run.id,
-      artifact_type: stageDefinition.agentId,
-      title: `${stageDefinition.label}: ${caseRecord?.title || 'Caso'}`,
-      content: result.output,
-      source_refs: [...artifactIds, ...retrieval.sourceRefs],
-      status: 'pending_review',
-      created_by: user.id,
-    }).select('id').single()
-
-    if (artifactError || !artifact) {
-      console.error('[agents/workflows/advance] artifact', artifactError?.code || 'missing_artifact')
-      throw new WorkflowStageError(
-        'artifact_creation_failed',
-        'El agente terminó, pero no fue posible guardar su resultado',
-        artifactError?.code,
-      )
-    }
-
-    const nextStage = stage.stage_index + 1
-    const isFinal = nextStage >= workflow.total_stages
-    const { error: stagePersistError } = await supabase.from('agent_workflow_stages').update({
-      status: 'pending_review',
-      output_artifact_id: artifact.id,
-      completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }).eq('id', stage.id).eq('organization_id', organizationId)
-
-    if (stagePersistError) {
-      throw new WorkflowStageError('stage_persistence_failed', 'No fue posible actualizar el estado de la etapa', stagePersistError.code)
-    }
-
-    const { error: workflowPersistError } = await supabase.from('agent_workflows').update({
-      status: 'pending_review',
-      current_stage: isFinal ? stage.stage_index : nextStage,
-      final_payload: isFinal ? result.output : null,
-      completed_at: null,
-      error_code: null,
-      error_message: null,
-      updated_at: new Date().toISOString(),
-    }).eq('id', workflow.id).eq('organization_id', organizationId)
-
-    if (workflowPersistError) {
-      throw new WorkflowStageError('workflow_persistence_failed', 'No fue posible actualizar el estado del workflow', workflowPersistError.code)
-    }
-
-    const { error: completedEventError } = await admin.from('compliance_case_events').insert({
-      organization_id: organizationId,
-      case_id: workflow.case_id,
-      actor_id: user.id,
-      event_type: 'workflow_stage_pending_review',
-      summary: 'Etapa agentic completada y pendiente de revisión',
-      changes: {
-        workflow_id: workflow.id,
-        workflow_type: workflow.workflow_type,
-        stage_id: stage.id,
-        stage_index: stage.stage_index,
-        run_id: run.id,
-        artifact_id: artifact.id,
-        agent_id: stageDefinition.agentId,
-        attempt,
-        is_final: isFinal,
-      },
-    })
-
-    if (completedEventError) {
-      console.error('[agents/workflows/advance] completed event', completedEventError.code)
-    }
-
-    return NextResponse.json({
-      workflowId: workflow.id,
-      workflowType: workflow.workflow_type,
-      stageIndex: stage.stage_index,
-      runId: run.id,
-      artifactId: artifact.id,
-      status: 'pending_review',
-      isFinal,
-      result,
-      elapsedMs,
-      retrieval: { sourceRefs: retrieval.sourceRefs, warnings: retrieval.warnings },
-    })
-  } catch (error) {
-    const elapsedMs = Date.now() - startedAt
-    const failure = classifyStageFailure(error)
-
-    await supabase.from('agent_runs').update({
-      status: 'failed',
-      error_code: failure.code,
-      error_message: failure.message,
-      elapsed_ms: elapsedMs,
-      completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }).eq('id', run.id).eq('organization_id', organizationId)
-    await supabase.from('agent_workflow_stages').update({ status: 'failed', updated_at: new Date().toISOString() }).eq('id', stage.id).eq('organization_id', organizationId)
-    await supabase.from('agent_workflows').update({ status: 'failed', error_code: failure.code, error_message: failure.message, updated_at: new Date().toISOString() }).eq('id', workflow.id).eq('organization_id', organizationId)
-
-    const { error: failedEventError } = await admin.from('compliance_case_events').insert({
-      organization_id: organizationId,
-      case_id: workflow.case_id,
-      actor_id: user.id,
-      event_type: 'workflow_stage_failed',
-      summary: 'Etapa agentic fallida',
-      changes: {
-        workflow_id: workflow.id,
-        workflow_type: workflow.workflow_type,
-        stage_id: stage.id,
-        stage_index: stage.stage_index,
-        run_id: run.id,
-        attempt,
-        failure_code: failure.code,
-      },
-    })
-
-    if (failedEventError) {
-      console.error('[agents/workflows/advance] failed event', failedEventError.code)
-    }
-    console.error('[agents/workflows/advance]', failure.code, failure.internalCode || 'unknown')
-    return NextResponse.json({ error: failure.message, code: failure.code, runId: run.id }, { status: 502 })
-  }
+  const job = (data || {}) as EnqueueResult
+  return NextResponse.json({
+    workflowId,
+    stageIndex,
+    queued: true,
+    jobId: job.jobId || null,
+    queueStatus: job.status || 'queued',
+    resumed: Boolean(job.resumed),
+  }, { status: job.resumed ? 200 : 202 })
 }
