@@ -103,7 +103,7 @@ begin
       'country', 'Estados Unidos',
       'processesPersonalData', true,
       'crossBorderTransfer', true,
-      'riskTier', 'high'
+      'riskTier', 'medium'
     ),
     'source', jsonb_build_object(
       'type', 'code_and_database',
@@ -118,6 +118,7 @@ begin
         'Plazo de retención no aprobado.',
         'Base de licitud pendiente de validación jurídica.',
         'Listado completo de destinatarios y subencargados pendiente.',
+        'Clasificación de riesgo del proveedor pendiente de metodología y aprobación.',
         'Versión del aviso de privacidad no adjuntada.',
         'Mecanismo de eliminación no evidenciado.'
       )
