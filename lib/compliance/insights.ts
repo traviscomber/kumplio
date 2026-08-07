@@ -1,3 +1,5 @@
+import { calculateComplianceConfidence } from './confidence'
+
 export type TimelineEvent = {
   id: string
   type: string
@@ -5,16 +7,6 @@ export type TimelineEvent = {
   detail: string
   occurredAt: string
   href?: string
-}
-
-export type ConfidenceDimension = {
-  key: string
-  label: string
-  score: number
-  covered: number
-  total: number
-  detail: string
-  href: string
 }
 
 export type ImpactItem = {
@@ -53,7 +45,7 @@ export function buildTimeline(input: {
     title: row.title || 'Misión',
     detail: `Misión ${row.status || 'sin estado'}`,
     occurredAt: row.updated_at || row.created_at,
-    href: '/missions',
+    href: `/missions/${row.id}`,
   })
 
   for (const row of input.evidenceRequests) events.push({
@@ -98,11 +90,6 @@ export function buildTimeline(input: {
     .slice(0, 150)
 }
 
-function pct(covered: number, total: number) {
-  if (total <= 0) return 100
-  return Math.max(0, Math.min(100, Math.round((covered / total) * 100)))
-}
-
 export function buildConfidence(input: {
   obligations: Array<Record<string, any>>
   controls: Array<Record<string, any>>
@@ -110,49 +97,7 @@ export function buildConfidence(input: {
   controlEvidence: Array<Record<string, any>>
   evidence: Array<Record<string, any>>
 }) {
-  const obligationIdsWithControl = new Set(input.controlObligations.map((row) => row.obligation_id))
-  const controlsWithOwner = input.controls.filter((row) => Boolean(row.owner_id)).length
-  const controlsEvaluated = input.controls.filter((row) => row.design_effectiveness !== 'not_evaluated' || row.operating_effectiveness !== 'not_evaluated').length
-  const controlsWithSufficientEvidence = new Set(
-    input.controlEvidence.filter((row) => row.sufficiency_status === 'sufficient').map((row) => row.control_id),
-  ).size
-  const validEvidence = input.evidence.filter((row) => row.validation_status === 'validated' || row.validation_status === 'accepted').length
-
-  const dimensions: ConfidenceDimension[] = [
-    {
-      key: 'obligations', label: 'Obligaciones con control',
-      score: pct(obligationIdsWithControl.size, input.obligations.length),
-      covered: obligationIdsWithControl.size, total: input.obligations.length,
-      detail: 'Obligaciones aplicables vinculadas al menos a un control.', href: '/obligations',
-    },
-    {
-      key: 'owners', label: 'Responsables definidos',
-      score: pct(controlsWithOwner, input.controls.length),
-      covered: controlsWithOwner, total: input.controls.length,
-      detail: 'Controles con una persona responsable asignada.', href: '/accountability',
-    },
-    {
-      key: 'evidence', label: 'Controles con evidencia suficiente',
-      score: pct(controlsWithSufficientEvidence, input.controls.length),
-      covered: controlsWithSufficientEvidence, total: input.controls.length,
-      detail: 'Controles respaldados por evidencia aceptada como suficiente.', href: '/evidence',
-    },
-    {
-      key: 'evaluations', label: 'Controles evaluados',
-      score: pct(controlsEvaluated, input.controls.length),
-      covered: controlsEvaluated, total: input.controls.length,
-      detail: 'Controles con evaluación de diseño u operación.', href: '/controls',
-    },
-    {
-      key: 'evidence_quality', label: 'Evidencia validada',
-      score: pct(validEvidence, input.evidence.length),
-      covered: validEvidence, total: input.evidence.length,
-      detail: 'Evidencias validadas o aceptadas sobre el total registrado.', href: '/evidence',
-    },
-  ]
-
-  const overall = dimensions.length ? Math.round(dimensions.reduce((sum, item) => sum + item.score, 0) / dimensions.length) : 100
-  return { overall, dimensions }
+  return calculateComplianceConfidence(input)
 }
 
 export function buildImpact(input: {
@@ -188,9 +133,18 @@ export function buildImpact(input: {
     const evidenceIds = new Set(controlIds.flatMap((id) => [...(evidenceByControl.get(id) || new Set<string>())]))
     const owners = new Set(linkedControls.map((row) => row.owner_id).filter(Boolean)).size
     const weakControls = linkedControls.filter((row) => row.design_effectiveness === 'ineffective' || row.operating_effectiveness === 'ineffective').length
+    const partialControls = linkedControls.filter((row) => row.design_effectiveness === 'partial' || row.operating_effectiveness === 'partial').length
     const openCases = openCasesByProject.get(obligation.project_id) || 0
     const base = obligation.priority === 'critical' ? 40 : obligation.priority === 'high' ? 30 : obligation.priority === 'medium' ? 20 : 10
-    const riskScore = Math.min(100, base + (controlIds.length === 0 ? 35 : 0) + weakControls * 15 + (evidenceIds.size === 0 ? 15 : 0) + Math.min(10, openCases * 2))
+    const riskScore = Math.min(
+      100,
+      base
+        + (controlIds.length === 0 ? 35 : 0)
+        + weakControls * 15
+        + partialControls * 8
+        + (evidenceIds.size === 0 ? 15 : 0)
+        + Math.min(10, openCases * 2),
+    )
     return {
       obligationId: obligation.id,
       title: obligation.obligation_text,
