@@ -3,8 +3,10 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Activity, AlertTriangle, ArrowRight, Clock3, ShieldCheck, Sparkles } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
-import { createClient } from '@/lib/supabase/server'
+import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { buildConfidence, buildImpact, buildTimeline } from '@/lib/compliance/insights'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,34 +21,44 @@ export default async function InsightsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in?next=/insights')
 
-  const { data: membership } = await supabase
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle()
-  if (!membership?.organization_id) redirect('/onboarding')
-  const organizationId = membership.organization_id
+  const admin = createAdminClient()
+  const access = await getWorkspaceAccess(admin, user.id)
+  if (!access) redirect('/onboarding')
+  const organizationId = access.organizationId
 
-  const [projectsResult, controlsResult, evidenceResult, casesResult, missionsResult, requestsResult, evidenceEventsResult, evaluationsResult, decisionsResult] = await Promise.all([
-    supabase.from('projects').select('id,name').eq('organization_id', organizationId).limit(100),
-    supabase.from('controls').select('id,project_id,name,owner_id,design_effectiveness,operating_effectiveness,lifecycle_status').eq('organization_id', organizationId).limit(1000),
-    supabase.from('evidence').select('id,project_id,name,validation_status,expires_at').eq('organization_id', organizationId).limit(1000),
-    supabase.from('compliance_cases').select('id,project_id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
-    supabase.from('missions').select('id,case_id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
-    supabase.from('evidence_requests').select('id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
-    supabase.from('evidence_request_events').select('id,event_type,created_at').eq('organization_id', organizationId).limit(1000),
-    supabase.from('control_evaluations').select('id,control_id,evaluation_type,result,evaluated_at,created_at').eq('organization_id', organizationId).limit(1000),
-    supabase.from('mission_decisions').select('id,title,status,requested_at,resolved_at,created_at').eq('organization_id', organizationId).limit(500),
+  const [
+    projectsResult,
+    controlsResult,
+    evidenceResult,
+    casesResult,
+    missionsResult,
+    requestsResult,
+    evidenceEventsResult,
+    evaluationsResult,
+    decisionsResult,
+    processingActivitiesResult,
+    processingReviewsResult,
+  ] = await Promise.all([
+    admin.from('projects').select('id,name').eq('organization_id', organizationId).limit(100),
+    admin.from('controls').select('id,project_id,name,owner_id,design_effectiveness,operating_effectiveness,lifecycle_status').eq('organization_id', organizationId).limit(1000),
+    admin.from('evidence').select('id,project_id,name,validation_status,expires_at').eq('organization_id', organizationId).limit(1000),
+    admin.from('compliance_cases').select('id,project_id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
+    admin.from('missions').select('id,case_id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
+    admin.from('evidence_requests').select('id,title,status,created_at,updated_at').eq('organization_id', organizationId).limit(500),
+    admin.from('evidence_request_events').select('id,event_type,created_at').eq('organization_id', organizationId).limit(1000),
+    admin.from('control_evaluations').select('id,control_id,evaluation_type,result,evaluated_at,created_at').eq('organization_id', organizationId).limit(1000),
+    admin.from('mission_decisions').select('id,title,status,requested_at,resolved_at,created_at').eq('organization_id', organizationId).limit(500),
+    admin.from('organization_processes').select('id,owner_user_id,lifecycle_status').eq('organization_id', organizationId).eq('process_type', 'processing_activity').neq('lifecycle_status', 'retired').limit(1000),
+    admin.from('processing_activity_reviews').select('id,process_id,decision,completeness,unknowns,reviewed_at,created_at').eq('organization_id', organizationId).order('reviewed_at', { ascending: false }).limit(2000),
   ])
 
   const projectIds = (projectsResult.data || []).map((row) => row.id)
   const [obligationsResult, controlObligationsResult, controlEvidenceResult] = await Promise.all([
     projectIds.length
-      ? supabase.from('obligations').select('id,project_id,obligation_text,priority,status').in('project_id', projectIds).limit(2000)
+      ? admin.from('obligations').select('id,project_id,obligation_text,priority,status').in('project_id', projectIds).limit(2000)
       : Promise.resolve({ data: [] }),
-    supabase.from('control_obligations').select('control_id,obligation_id,relationship_type').eq('organization_id', organizationId).limit(2000),
-    supabase.from('control_evidence').select('control_id,evidence_id,sufficiency_status').eq('organization_id', organizationId).limit(2000),
+    admin.from('control_obligations').select('control_id,obligation_id,relationship_type').eq('organization_id', organizationId).limit(2000),
+    admin.from('control_evidence').select('control_id,evidence_id,sufficiency_status').eq('organization_id', organizationId).limit(2000),
   ])
 
   const controls = controlsResult.data || []
@@ -55,6 +67,8 @@ export default async function InsightsPage() {
   const obligations = obligationsResult.data || []
   const controlObligations = controlObligationsResult.data || []
   const controlEvidence = controlEvidenceResult.data || []
+  const processingActivities = processingActivitiesResult.data || []
+  const processingReviews = processingReviewsResult.data || []
 
   const timeline = buildTimeline({
     cases,
@@ -63,8 +77,17 @@ export default async function InsightsPage() {
     evidenceEvents: evidenceEventsResult.data || [],
     evaluations: evaluationsResult.data || [],
     decisions: decisionsResult.data || [],
+    processingReviews,
   })
-  const confidence = buildConfidence({ obligations, controls, controlObligations, controlEvidence, evidence })
+  const confidence = buildConfidence({
+    obligations,
+    controls,
+    controlObligations,
+    controlEvidence,
+    evidence,
+    processingActivities,
+    processingReviews,
+  })
   const impact = buildImpact({ obligations, controls, controlObligations, controlEvidence, cases })
 
   return (
@@ -160,7 +183,7 @@ export default async function InsightsPage() {
             <Clock3 className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">Timeline organizacional</h2>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Historia unificada de casos, misiones, solicitudes, evidencia, evaluaciones y decisiones.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Historia unificada de casos, misiones, solicitudes, evidencia, evaluaciones, decisiones y tratamientos revisados.</p>
           <div className="mt-6 grid gap-3 lg:grid-cols-2">
             {timeline.length === 0 ? (
               <p className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">La actividad futura aparecerá aquí automáticamente.</p>
