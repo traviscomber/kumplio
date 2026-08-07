@@ -30,6 +30,7 @@ const checks = [
   ['check:baseline-assurance'],
   ['check:processing-inventory'],
   ['check:tenant-assurance'],
+  ['check:ui-golden-path'],
   ['build'],
 ]
 
