@@ -26,6 +26,10 @@ const required = [
     'durableQueueCompleted',
     'processingActivityReviewed',
   ]],
+  ['components/onboarding/workspace-onboarding-form.tsx', [
+    "const caseId = data.workspace?.caseId as string | null | undefined",
+    "router.replace(caseId ? `/cases/${caseId}` : '/dashboard')",
+  ]],
   ['.github/workflows/ui-golden-path.yml', [
     'name: UI Golden Path',
     'id-token: write',
@@ -67,6 +71,11 @@ for (const [file, markers] of required) {
   for (const marker of markers) {
     if (!text.includes(marker)) throw new Error(`${file} missing marker: ${marker}`)
   }
+}
+
+const onboarding = fs.readFileSync('components/onboarding/workspace-onboarding-form.tsx', 'utf8')
+if (onboarding.includes('router.refresh()')) {
+  throw new Error('Onboarding must not refresh the stale route immediately after router.replace')
 }
 
 const route = fs.readFileSync('app/api/internal/ui-golden-path/route.ts', 'utf8')
