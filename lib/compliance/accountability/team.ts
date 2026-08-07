@@ -16,23 +16,37 @@ export async function listTeamMembers(
   admin: SupabaseClient,
   organizationId: string,
 ): Promise<TeamMember[]> {
-  const { data, error } = await admin
+  const { data: memberships, error: membershipError } = await admin
     .from('organization_members')
-    .select('id,user_id,role,joined_at,profiles(first_name,last_name,email)')
+    .select('id,user_id,role,joined_at')
     .eq('organization_id', organizationId)
     .order('joined_at', { ascending: true })
 
-  if (error) throw new Error(`No fue posible cargar el equipo: ${error.message}`)
+  if (membershipError) throw new Error(`No fue posible cargar el equipo: ${membershipError.message}`)
 
-  return (data || []).map((row) => {
-    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
-    const firstName = profile && typeof profile === 'object' && 'first_name' in profile && typeof profile.first_name === 'string'
+  const userIds = [...new Set((memberships || []).map((row) => String(row.user_id)).filter(Boolean))]
+  const profilesResult = userIds.length
+    ? await admin
+      .from('profiles')
+      .select('id,first_name,last_name,email')
+      .in('id', userIds)
+    : { data: [], error: null }
+
+  if (profilesResult.error) throw new Error(`No fue posible cargar los perfiles del equipo: ${profilesResult.error.message}`)
+
+  const profileByUserId = new Map(
+    (profilesResult.data || []).map((profile) => [String(profile.id), profile]),
+  )
+
+  return (memberships || []).map((row) => {
+    const profile = profileByUserId.get(String(row.user_id))
+    const firstName = profile && typeof profile.first_name === 'string'
       ? profile.first_name.trim() || null
       : null
-    const lastName = profile && typeof profile === 'object' && 'last_name' in profile && typeof profile.last_name === 'string'
+    const lastName = profile && typeof profile.last_name === 'string'
       ? profile.last_name.trim() || null
       : null
-    const email = profile && typeof profile === 'object' && 'email' in profile && typeof profile.email === 'string'
+    const email = profile && typeof profile.email === 'string'
       ? profile.email.trim() || null
       : null
     const fullName = [firstName, lastName].filter(Boolean).join(' ')
