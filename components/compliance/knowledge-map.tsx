@@ -29,8 +29,9 @@ const icons: Record<KnowledgeNodeType, typeof Network> = {
 
 const nodeKey = (node: KnowledgeNode) => `${node.type}:${node.id}`
 
-export function KnowledgeMap({ graph }: { graph: KnowledgeGraph }) {
-  const [selected, setSelected] = useState<string | null>(null)
+export function KnowledgeMap({ graph, initialSelected = null }: { graph: KnowledgeGraph; initialSelected?: string | null }) {
+  const validInitial = initialSelected && graph.nodes.some((node) => nodeKey(node) === initialSelected) ? initialSelected : null
+  const [selected, setSelected] = useState<string | null>(validInitial)
   const selectedNode = graph.nodes.find((node) => nodeKey(node) === selected) || null
 
   const related = useMemo(() => {
