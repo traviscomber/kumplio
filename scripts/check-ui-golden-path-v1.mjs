@@ -43,6 +43,9 @@ const required = [
     'statuses: write',
     '@playwright/test@1.61.1',
     'npx playwright test --config=playwright.ui-golden-path.config.mjs',
+    'echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"',
+    "if: ${{ steps.browser.outputs.exit_code == '0' }}",
+    "if: ${{ steps.browser.outputs.exit_code != '0' }}",
     'api/internal/ui-golden-path',
     'actions/upload-artifact@v4',
     'UI Golden Path: PASS',
@@ -108,8 +111,11 @@ if (/\$\{\{\s*secrets[.]/.test(workflow)) throw new Error('The UI workflow must 
 if (workflow.includes('SUPABASE_SERVICE_ROLE_KEY') || workflow.includes('SUPABASE_SECRET_KEY')) {
   throw new Error('Supabase privileged keys must never enter GitHub Actions')
 }
-if (!workflow.includes('continue-on-error: true') || !workflow.includes("if: steps.browser.outcome == 'success'")) {
-  throw new Error('The workflow must preserve browser evidence and persist a final assertion or failure')
+if (workflow.includes('continue-on-error: true') || workflow.includes('steps.browser.outcome')) {
+  throw new Error('The browser result must be routed through an explicit exit-code output')
+}
+if (!workflow.includes("if: ${{ steps.browser.outputs.exit_code == '0' }}") || !workflow.includes("if: ${{ steps.browser.outputs.exit_code != '0' }}")) {
+  throw new Error('The workflow must route success and failure from the explicit browser exit code')
 }
 
 const oidc = fs.readFileSync('lib/security/github-actions-ui-oidc.ts', 'utf8')
