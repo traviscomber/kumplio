@@ -21,6 +21,23 @@ const required = [
     'tenant assurance browser deny',
     'to service_role',
     "status in ('prepared', 'running', 'passed', 'failed')",
+    'join public.agent_runs run',
+    'join public.agent_artifacts artifact',
+    'join public.agent_reviews review',
+    'run.id = stage.run_id',
+    'artifact.run_id = stage.run_id',
+    'review.run_id = stage.run_id',
+  ]],
+  ['supabase/migrations/20260807223200_fix_tenant_assurance_refresh_joins_v1.sql', [
+    'refresh_tenant_assurance_run_v1',
+    "set search_path to ''",
+    'join public.agent_runs run',
+    'join public.agent_artifacts artifact',
+    'join public.agent_reviews review',
+    'count(distinct run.id)',
+    'count(distinct artifact.id)',
+    'count(distinct review.id)',
+    'to service_role',
   ]],
   ['supabase/migrations/20260807223500_seed_tenant_assurance_sandbox_v1.sql', [
     'Kumplio Tenant Assurance Sandbox',
@@ -55,12 +72,22 @@ for (const [file, markers] of required) {
 }
 
 const foundation = fs.readFileSync('supabase/migrations/20260807223000_tenant_assurance_foundation_v1.sql', 'utf8')
-if (/security\s+definer/i.test(foundation)) {
-  throw new Error('Tenant assurance refresh must remain SECURITY INVOKER')
+const hotfix = fs.readFileSync('supabase/migrations/20260807223200_fix_tenant_assurance_refresh_joins_v1.sql', 'utf8')
+for (const [name, sql] of [['foundation', foundation], ['hotfix', hotfix]]) {
+  if (/security\s+definer/i.test(sql)) {
+    throw new Error(`Tenant assurance ${name} refresh must remain SECURITY INVOKER`)
+  }
+  if (!sql.includes('from public, anon, authenticated')) {
+    throw new Error(`Tenant assurance ${name} refresh RPC must be revoked from browser roles`)
+  }
+  if (sql.includes('run.workflow_id = v_run.workflow_id')) {
+    throw new Error(`Tenant assurance ${name} cannot read workflow_id from agent_runs`)
+  }
+  if (sql.includes('artifact.workflow_id = v_run.workflow_id')) {
+    throw new Error(`Tenant assurance ${name} cannot read workflow_id from agent_artifacts`)
+  }
 }
-if (!foundation.includes('from public, anon, authenticated')) {
-  throw new Error('Tenant assurance table and refresh RPC must be revoked from browser roles')
-}
+
 if (!foundation.includes('using (false)') || !foundation.includes('with check (false)')) {
   throw new Error('Tenant assurance registry requires explicit browser-deny RLS')
 }
