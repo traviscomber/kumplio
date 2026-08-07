@@ -13,7 +13,7 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
   await test.step('iniciar sesión con una cuenta E2E confirmada', async () => {
     await page.goto('/sign-in?next=/onboarding')
     await page.getByLabel('Correo electrónico').fill(email)
-    await page.getByLabel('Contraseña').fill(password)
+    await page.locator('input#password').fill(password)
     await page.getByRole('button', { name: 'Iniciar sesión' }).click()
     await expect(page).toHaveURL(/\/onboarding(?:\?|$)/, { timeout: 45_000 })
     await expect(page.getByRole('heading', { name: /Quiero entender tu organización/ })).toBeVisible()
