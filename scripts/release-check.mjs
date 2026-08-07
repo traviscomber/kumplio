@@ -28,6 +28,7 @@ const checks = [
   ['check:operating-desk'],
   ['check:case-operational-plan'],
   ['check:baseline-assurance'],
+  ['check:processing-inventory'],
   ['build'],
 ]
 

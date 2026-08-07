@@ -24,12 +24,14 @@ export type ComplianceConfidence = {
   scope: string
 }
 
-type ConfidenceInput = {
+export type ConfidenceInput = {
   obligations: Array<Record<string, unknown>>
   controls: Array<Record<string, unknown>>
   controlObligations: Array<Record<string, unknown>>
   controlEvidence: Array<Record<string, unknown>>
   evidence: Array<Record<string, unknown>>
+  processingActivities?: Array<Record<string, unknown>>
+  processingReviews?: Array<Record<string, unknown>>
 }
 
 const SCOPE = 'Confianza del alcance registrado. No equivale a cumplimiento global ni a una certificación.'
@@ -64,6 +66,7 @@ export function calculateComplianceConfidence(input: ConfidenceInput): Complianc
 
   const design = effectivenessSummary(input.controls, 'design_effectiveness')
   const operating = effectivenessSummary(input.controls, 'operating_effectiveness')
+  const processing = processingSummary(input.processingActivities, input.processingReviews)
 
   const dimensions: ConfidenceDimension[] = []
   if (input.obligations.length > 0) {
@@ -122,6 +125,19 @@ export function calculateComplianceConfidence(input: ConfidenceInput): Complianc
     },
   )
 
+  if (processing.available) {
+    dimensions.push({
+      key: 'processing_inventory',
+      label: 'Inventario de tratamientos',
+      score: processing.score,
+      covered: processing.approved,
+      total: processing.total,
+      detail: `${processing.approved} revisadas, ${processing.complete} completas, ${processing.partial} parciales y ${processing.unknowns} desconocidos abiertos.`,
+      href: '/digital-twin',
+      weight: 15,
+    })
+  }
+
   if (input.evidence.length > 0) {
     dimensions.push({
       key: 'evidence_quality',
@@ -137,7 +153,7 @@ export function calculateComplianceConfidence(input: ConfidenceInput): Complianc
 
   const totalWeight = dimensions.reduce((sum, item) => sum + item.weight, 0)
   const raw = Math.round(dimensions.reduce((sum, item) => sum + item.score * item.weight, 0) / totalWeight)
-  const caps = confidenceCaps(input, design, operating, controlsWithSufficientEvidence)
+  const caps = confidenceCaps(input, design, operating, controlsWithSufficientEvidence, processing)
   const overall = Math.min(raw, ...caps.map((cap) => cap.maximum), 100)
 
   return {
@@ -163,6 +179,17 @@ type EffectivenessSummary = {
   score: number
 }
 
+type ProcessingSummary = {
+  available: boolean
+  total: number
+  approved: number
+  partial: number
+  complete: number
+  unreviewed: number
+  unknowns: number
+  score: number
+}
+
 function effectivenessSummary(controls: Array<Record<string, unknown>>, field: string): EffectivenessSummary {
   const applicable = controls.filter((row) => String(row[field] || 'not_evaluated') !== 'not_applicable')
   const values = applicable.map((row) => String(row[field] || 'not_evaluated'))
@@ -181,11 +208,68 @@ function effectivenessSummary(controls: Array<Record<string, unknown>>, field: s
   }
 }
 
+function processingSummary(
+  activities: Array<Record<string, unknown>> | undefined,
+  reviews: Array<Record<string, unknown>> | undefined,
+): ProcessingSummary {
+  if (!activities || !reviews) {
+    return { available: false, total: 0, approved: 0, partial: 0, complete: 0, unreviewed: 0, unknowns: 0, score: 0 }
+  }
+
+  const latest = new Map<string, Record<string, unknown>>()
+  for (const review of [...reviews].sort((left, right) =>
+    new Date(String(right.reviewed_at || 0)).getTime() - new Date(String(left.reviewed_at || 0)).getTime())) {
+    const processId = String(review.process_id || '')
+    if (processId && !latest.has(processId)) latest.set(processId, review)
+  }
+
+  let approved = 0
+  let partial = 0
+  let complete = 0
+  let unknowns = 0
+  let points = 0
+
+  for (const activity of activities) {
+    const review = latest.get(String(activity.id))
+    if (!review) continue
+    const decision = String(review.decision || '')
+    const completeness = String(review.completeness || '')
+    const openUnknowns = Array.isArray(review.unknowns) ? review.unknowns.length : 0
+    unknowns += openUnknowns
+
+    if (decision === 'approved') {
+      approved += 1
+      if (completeness === 'complete') {
+        complete += 1
+        points += 100
+      } else {
+        partial += 1
+        points += 70
+      }
+    } else if (decision === 'changes_requested') {
+      points += 30
+    }
+  }
+
+  const total = activities.length
+  return {
+    available: true,
+    total,
+    approved,
+    partial,
+    complete,
+    unreviewed: Math.max(0, total - approved),
+    unknowns,
+    score: total > 0 ? Math.round(points / total) : 0,
+  }
+}
+
 function confidenceCaps(
   input: ConfidenceInput,
   design: EffectivenessSummary,
   operating: EffectivenessSummary,
   controlsWithSufficientEvidence: number,
+  processing: ProcessingSummary,
 ): ConfidenceCap[] {
   const caps: ConfidenceCap[] = []
   if (input.obligations.length === 0) {
@@ -205,6 +289,13 @@ function confidenceCaps(
   }
   if (controlsWithSufficientEvidence === 0) {
     caps.push({ key: 'no_sufficient_evidence', maximum: 50, reason: 'ningún control tiene evidencia revisada como suficiente.' })
+  }
+  if (processing.available && processing.total === 0) {
+    caps.push({ key: 'no_processing_inventory', maximum: 45, reason: 'no existe ninguna actividad de tratamiento revisada en el alcance.' })
+  } else if (processing.available && processing.unreviewed > 0) {
+    caps.push({ key: 'processing_unreviewed', maximum: 55, reason: 'existen actividades de tratamiento sin revisión humana aprobada.' })
+  } else if (processing.available && (processing.partial > 0 || processing.unknowns > 0)) {
+    caps.push({ key: 'inventory_partial', maximum: 65, reason: 'el inventario de tratamientos conserva actividades parciales o desconocidos abiertos.' })
   }
   return caps
 }
