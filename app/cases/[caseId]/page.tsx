@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CaseOperationalPlan } from '@/components/cases/case-operational-plan'
 import { GuidedCaseWorkspace } from '@/components/cases/guided-case-workspace'
 import { SimilarCasesPanel } from '@/components/cases/similar-cases-panel'
 
@@ -16,6 +17,7 @@ export default async function CasePage({ params }: { params: Promise<{ caseId: s
     <>
       <GuidedCaseWorkspace caseId={caseId} />
       <SimilarCasesPanel caseId={caseId} />
+      <CaseOperationalPlan caseId={caseId} />
     </>
   )
 }
