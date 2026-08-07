@@ -354,13 +354,13 @@ function assertServiceUser(user: User, body: Pick<RequestBody, 'commitSha' | 'ru
 async function selectMany(admin: AdminClient, table: string, columns: string, field: string, value: string) {
   const { data, error } = await admin.from(table).select(columns).eq(field, value)
   if (error) throw new Error(`ui_e2e_query_failed_${table}`)
-  return (data || []) as JsonRecord[]
+  return (data || []) as unknown as JsonRecord[]
 }
 
 async function selectIn(admin: AdminClient, table: string, columns: string, field: string, values: string[]) {
   const { data, error } = await admin.from(table).select(columns).in(field, values)
   if (error) throw new Error(`ui_e2e_query_failed_${table}`)
-  return (data || []) as JsonRecord[]
+  return (data || []) as unknown as JsonRecord[]
 }
 
 function serviceEmail(runId: string, runAttempt: string) {
