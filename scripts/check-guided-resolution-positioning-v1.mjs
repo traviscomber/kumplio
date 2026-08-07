@@ -25,7 +25,7 @@ assert.match(home, /Casos concretos/)
 
 assert.match(entry, /kumplio:case-draft/)
 assert.match(entry, /¿Qué necesitas proteger o resolver\?/)
-assert.match(entry, /Empezar a resolver/)
+assert.match(entry, /Empezar con guía experta/)
 assert.match(caseEntry, /sessionStorage\.getItem\('kumplio:case-draft'\)/)
 assert.match(caseEntry, /sessionStorage\.removeItem\('kumplio:case-draft'\)/)
 assert.match(caseEntry, /Protección de datos · Ley 21\.719/)
