@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 55
     env:
-      BASE_URL: https://kumplio.app
+      BASE_URL: https://www.kumplio.app
       CASE_ID: 91ae9174-be4c-4ddd-8980-4a671571afdc
       WORKFLOW_ID: dcd5d171-ce3d-4425-9b17-83d48bfbae71
       E2E_AUDIENCE: kumplio-golden-path-e2e
