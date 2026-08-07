@@ -1,5 +1,6 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Brain, GitBranch, History, Network } from 'lucide-react'
+import { ArrowRight, Brain, GitBranch, History, Network } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -31,6 +32,9 @@ export default async function ContextPage() {
           <p className="mt-4 max-w-3xl text-muted-foreground">
             Situaciones, misiones y decisiones comparten un contexto único. Las decisiones resueltas quedan disponibles como precedentes.
           </p>
+          <Link href="/map" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
+            Abrir mapa de cumplimiento <ArrowRight className="h-4 w-4" />
+          </Link>
         </section>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
