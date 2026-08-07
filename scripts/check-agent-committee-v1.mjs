@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 
 const required = [
-  ['lib/agents/committee.ts', ['buildCommitteeContrast', 'evaluateAgentQuality', 'quality_gate_failed']],
-  ['lib/agents/tools.ts', ['CONTRASTE DEL COMITÉ', 'agent_artifacts']],
+  ['lib/agents/committee.ts', ['buildCommitteeContrast', 'evaluateAgentQuality', 'CONTRASTE DEL COMITÉ']],
+  ['lib/agents/tools.ts', ['buildCommitteeContrast', 'agent_artifacts']],
   ['lib/agents/prompts.ts', ['DECIDE:', 'NO DECIDE:', 'segunda línea del comité']],
   ['lib/agents/openai-runtime.ts', ['evaluateAgentQuality', 'quality_gate_failed', 'qualityGate']],
 ]
