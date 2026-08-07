@@ -51,6 +51,12 @@ const required = [
     'v_evidence_id',
     'link.evidence_id = v_evidence_id',
   ]],
+  ['supabase/migrations/20260807141858_close_official_case_baseline_assurance.sql', [
+    'official baseline second call was not idempotent',
+    'no acredita inventario completo ni cumplimiento legal',
+    "operating_effectiveness from public.controls where id = v_control) <> 'partial'",
+    "obligation_text like 'Requerimiento interno de preparación (no obligación legal validada):%'",
+  ]],
 ]
 
 for (const [file, markers] of required) {
