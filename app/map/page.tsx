@@ -13,7 +13,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function ComplianceMapPage() {
+export default async function ComplianceMapPage({ searchParams }: { searchParams: Promise<{ node?: string }> }) {
+  const { node } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in?next=/map')
@@ -78,7 +79,7 @@ export default async function ComplianceMapPage() {
           Recorre cómo una obligación se convierte en control, quién la gestiona, qué evidencia la respalda y en qué expedientes o misiones se está trabajando.
         </p>
         <div className="mt-8">
-          <KnowledgeMap graph={graph} />
+          <KnowledgeMap graph={graph} initialSelected={node || null} />
         </div>
       </main>
     </>

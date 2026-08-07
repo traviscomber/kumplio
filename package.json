@@ -37,7 +37,8 @@
     "check:authenticated-resolution": "node scripts/check-authenticated-guided-resolution-v1.mjs",
     "check:durable-agent-queue": "node scripts/check-durable-agent-queue-v1.mjs",
     "check:control-evidence-lifecycle": "node scripts/check-control-evidence-lifecycle-v1.mjs",
-    "check:knowledge-graph": "node scripts/check-knowledge-graph-v1.mjs"
+    "check:knowledge-graph": "node scripts/check-knowledge-graph-v1.mjs",
+    "check:insights": "node scripts/check-insights-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
