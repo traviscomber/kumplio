@@ -66,6 +66,7 @@ jobs:
           npm run check:case-lifecycle
           npm run check:operational-security
           npm run check:agent-dashboard
+          node scripts/check-agent-runtime-reliability.mjs
           npm run check:workflow-persistence
           npm run check:case-close-audit
           npm run check:agent-retry-versioning
