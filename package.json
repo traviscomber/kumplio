@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --pretty false",
+    "release:check": "node scripts/release-check.mjs",
+    "smoke": "node scripts/smoke-release.mjs",
     "check:discovery": "node scripts/check-public-discovery.mjs",
     "check:boundaries": "node scripts/check-client-boundaries.mjs",
     "check:auth": "node scripts/check-auth-password-policy.mjs",
