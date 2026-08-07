@@ -188,10 +188,12 @@ export async function getDailyAdvisorSummary(
   const { data: profiles } = ownerIds.length
     ? await db.from('profiles').select('id,first_name,last_name,email').in('id', ownerIds)
     : { data: [] }
-  const profileLabels = new Map((profiles || []).map((profile: Record<string, unknown>) => [
-    String(profile.id),
-    [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || String(profile.email || 'Miembro'),
-  ]))
+  const profileLabels: Map<string, string> = new Map(
+    (profiles || []).map((profile: Record<string, unknown>): [string, string] => [
+      String(profile.id),
+      [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || String(profile.email || 'Miembro'),
+    ]),
+  )
 
   const precedentCount = memories.length
   const priorityCandidates: AdvisorItem[] = [
