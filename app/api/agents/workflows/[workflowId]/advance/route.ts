@@ -52,7 +52,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
   const admin = createAdminClient()
   const { data: workflow } = await supabase
     .from('agent_workflows')
-    .select('id, status, current_stage, total_stages')
+    .select('id, case_id, status, current_stage, total_stages')
     .eq('id', workflowId)
     .eq('organization_id', organizationId)
     .maybeSingle()
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
 
   const { data: stage } = await supabase
     .from('agent_workflow_stages')
-    .select('status, attempt_count, max_attempts')
+    .select('id, status, attempt_count, max_attempts')
     .eq('workflow_id', workflowId)
     .eq('organization_id', organizationId)
     .eq('stage_index', stageIndex)
@@ -115,6 +115,22 @@ export async function POST(req: NextRequest, context: { params: Promise<{ workfl
   }
 
   const job = (data || {}) as EnqueueResult
+  if (!job.resumed) {
+    const now = new Date().toISOString()
+    await Promise.all([
+      admin.from('agent_workflows').update({ status: 'queued', current_stage: stageIndex, updated_at: now }).eq('id', workflowId).eq('organization_id', organizationId),
+      admin.from('agent_workflow_stages').update({ status: 'queued', updated_at: now }).eq('id', stage.id).eq('organization_id', organizationId),
+      admin.from('compliance_case_events').insert({
+        organization_id: organizationId,
+        case_id: workflow.case_id,
+        actor_id: user.id,
+        event_type: 'workflow_stage_queued',
+        summary: 'Etapa agentic puesta en cola durable',
+        changes: { workflow_id: workflowId, stage_id: stage.id, stage_index: stageIndex, job_id: job.jobId || null },
+      }),
+    ])
+  }
+
   return NextResponse.json({
     workflowId,
     stageIndex,
