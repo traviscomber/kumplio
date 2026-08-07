@@ -16,7 +16,7 @@ on:
 permissions:
   contents: read
   id-token: write
-  statuses: read
+  statuses: write
 
 concurrency:
   group: golden-path-e2e-production
@@ -32,9 +32,25 @@ jobs:
       WORKFLOW_ID: dcd5d171-ce3d-4425-9b17-83d48bfbae71
       E2E_AUDIENCE: kumplio-golden-path-e2e
       E2E_MARKER: block02-golden-path
+      STATUS_CONTEXT: Golden path E2E
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Mark golden path pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=$(STATE=pending DESCRIPTION='Golden path Ley 21.719 running' TARGET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" CONTEXT="$STATUS_CONTEXT" node -e "process.stdout.write(JSON.stringify({state:process.env.STATE,description:process.env.DESCRIPTION,target_url:process.env.TARGET_URL,context:process.env.CONTEXT}))")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" > /dev/null
 
       - name: Wait for production deployment
         env:
@@ -195,3 +211,27 @@ jobs:
             --data "{\"caseId\":\"$CASE_ID\"}" \
             "$BASE_URL/api/internal/e2e/revoke" > /tmp/kumplio-e2e-revoke.json
           echo 'E2E organization membership revoked.'
+
+      - name: Publish golden path result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$JOB_STATUS" == success ]]; then
+            state=success
+            description='Golden path Ley 21.719 completed'
+          else
+            state=failure
+            description="Golden path Ley 21.719 ${JOB_STATUS}"
+          fi
+          payload=$(STATE="$state" DESCRIPTION="$description" TARGET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" CONTEXT="$STATUS_CONTEXT" node -e "process.stdout.write(JSON.stringify({state:process.env.STATE,description:process.env.DESCRIPTION,target_url:process.env.TARGET_URL,context:process.env.CONTEXT}))")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" > /dev/null
