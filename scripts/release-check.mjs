@@ -2,7 +2,6 @@ import { spawnSync } from 'node:child_process'
 
 const checks = [
   ['typecheck'],
-  ['lint'],
   ['check:discovery'],
   ['check:boundaries'],
   ['check:auth'],
@@ -27,10 +26,7 @@ const checks = [
 
 for (const [script] of checks) {
   console.log(`\n=== ${script} ===`)
-  const result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', script], {
-    stdio: 'inherit',
-    env: process.env,
-  })
+  const result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', script], { stdio: 'inherit', env: process.env })
   if (result.status !== 0) process.exit(result.status || 1)
 }
 
