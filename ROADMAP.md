@@ -5,15 +5,15 @@
 > Revisión: 7 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Baseline técnico y documental: `9b031cbbc8bc96488c6d97b48a78fd263ec25511`  
-> Última migración aplicada y versionada: `20260807141858_close_official_case_baseline_assurance`  
+> Baseline técnico y documental: `0dd11fb69e83a25908e776c0ffae910191771fcc`  
+> Última migración aplicada: `20260807194153_seed_n3uralia_commercial_processing_activity`  
 > Repositorio: `traviscomber/kumplio`
 
 ---
 
 ## 1. Regla de este roadmap
 
-Este archivo representa el **estado comprobable del producto**, no una lista de ideas ni el historial de issues.
+Este archivo representa el **estado comprobable del producto**, no el historial de ideas, conversaciones, issues o PRs.
 
 Prioridad de evidencia para marcar algo como hecho:
 
@@ -24,7 +24,7 @@ Prioridad de evidencia para marcar algo como hecho:
 5. uso real por una persona o piloto;
 6. métrica de resultado cuando el bloque lo requiera.
 
-Si una PR, una conversación o una pantalla contradice `main`, Supabase o una prueba real, prevalece la evidencia técnica. `DEPLOYED` no equivale a `VALIDATED`, y `VALIDATED` no equivale necesariamente a `DONE`.
+Si una conversación, una pantalla o una PR contradice `main`, Supabase o una prueba real, prevalece la evidencia técnica.
 
 ### Estados oficiales
 
@@ -34,9 +34,12 @@ Si una PR, una conversación o una pantalla contradice `main`, Supabase o una pr
 | `ACTIVE` | Desarrollo, prueba o cierre en curso. |
 | `DEPLOYED` | Código y/o migración ya están en producción. |
 | `VALIDATED` | Flujo probado con datos reales o una prueba transaccional representativa. |
+| `VALIDATED INICIAL` | Primer caso real comprobado; falta repetibilidad o cobertura. |
 | `DONE` | Validado, medido y sin gate relevante pendiente. |
 | `BLOCKED` | Requiere acción externa, permiso o decisión explícita. |
 | `DEFERRED` | Tiene valor, pero no debe competir con la ruta crítica. |
+
+`DEPLOYED` no equivale a `VALIDATED`. Un único caso exitoso tampoco equivale a cobertura organizacional completa.
 
 ---
 
@@ -55,14 +58,14 @@ Una persona describe una situación
 → una persona valida decisiones sensibles
 → quedan controles, acciones, responsables y plazos
 → la organización demuestra el avance con trazabilidad
-→ lo aprendido mejora el siguiente caso
+→ el conocimiento aprobado mejora el siguiente caso
 ```
 
 ### Propuesta de valor
 
 **Proteger y ordenar la información de cumplimiento para resolver situaciones con guía experta, evidencia y revisión humana, dejando cada decisión trazable.**
 
-### Promesas que sí podemos sostener
+### Promesas sostenibles
 
 1. Reunir información dispersa en un expediente controlado.
 2. Separar hechos, fuentes, inferencias, reservas y decisiones humanas.
@@ -71,14 +74,16 @@ Una persona describe una situación
 5. Explicar por qué aparece una prioridad o un nivel de confianza.
 6. Reutilizar controles, evidencia y precedentes cuando exista una relación defendible.
 7. Coordinar especialistas sin presentar una salida generada como decisión aprobada.
+8. Registrar actividades de tratamiento sin inventar datos ausentes ni presentar una base propuesta como conclusión jurídica.
 
 ### Lo que Kumplio no debe afirmar
 
 - que una empresa cumple globalmente por tener un score alto;
-- que la ausencia de datos en la plataforma demuestra que algo no existe;
-- que un documento aislado acredita la operación de un control;
+- que la ausencia de datos en Kumplio demuestra que algo no existe;
+- que un documento aislado acredita la operación completa de un control;
 - que una recomendación de IA sustituye revisión legal, auditoría o decisión humana;
-- que una línea base inicial equivale a inventario completo o certificación.
+- que una línea base o una actividad inicial equivale a inventario completo;
+- que una clasificación de riesgo es definitiva si la metodología y la aprobación siguen pendientes.
 
 ### Principios no negociables
 
@@ -93,7 +98,8 @@ Una persona describe una situación
 9. Versionar antes que sobrescribir.
 10. La UI habla de resultados, decisiones y trabajo; no de infraestructura.
 11. La confianza siempre declara su alcance y sus límites.
-12. No se agregan módulos nuevos si el siguiente gate real sigue abierto.
+12. Los desconocidos se conservan hasta ser resueltos con evidencia.
+13. No se agregan módulos atractivos si un gate P0 continúa abierto.
 
 ---
 
@@ -103,7 +109,7 @@ Una persona describe una situación
 
 `main` está en:
 
-`9b031cbbc8bc96488c6d97b48a78fd263ec25511`
+`0dd11fb69e83a25908e776c0ffae910191771fcc`
 
 Sobre este baseline quedaron en `SUCCESS`:
 
@@ -115,6 +121,16 @@ Sobre este baseline quedaron en `SUCCESS`:
 - smoke test;
 - ambos despliegues Vercel;
 - IndexNow production.
+
+La PR de referencia es **#217 — Inventario mínimo real de tratamientos**.
+
+### Migraciones vigentes más recientes
+
+| Versión | Migración |
+|---|---|
+| `20260807192320` | `processing_activity_inventory_v1` |
+| `20260807192428` | `processing_inventory_explicit_browser_deny` |
+| `20260807194153` | `seed_n3uralia_commercial_processing_activity` |
 
 ### Preparación actual
 
@@ -140,27 +156,36 @@ Sobre este baseline quedaron en `SUCCESS`:
 | Etapas de workflow | 25 |
 | Ejecuciones de agentes | 14 |
 | Artefactos agentic | 8 |
-| Revisiones humanas | 7 |
+| Revisiones humanas de agentes | 7 |
 | Jobs durables | 5 |
 | Misiones | 1 |
 | Resultados de misión | 1 |
 | Decisiones de misión | 0 |
 | Requerimientos internos/obligaciones del ámbito | 1 |
 | Controles operacionales | 1 |
-| Evidencias operacionales | 1 |
+| Evidencias operacionales | 2 |
 | Solicitudes de evidencia | 1 |
-| Evaluaciones de control | 2 |
+| Evaluaciones de control | 3 |
+| Actividades de tratamiento | 1 |
+| Revisiones de tratamiento | 1 |
+| Sistemas/repositorios inventariados | 1 |
+| Conjuntos de datos inventariados | 1 |
+| Terceros inventariados | 1 |
 | Memorias organizacionales persistidas | 0 |
 | Claims regulatorios | 186 |
 | Secciones regulatorias | 2.104 |
 
-### Hito validado: caso oficial Ley N.º 21.719
+---
 
-Caso:
+## 4. Hitos validados
+
+### Hito A — Golden path y baseline assurance — `VALIDATED`
+
+Caso oficial:
 
 `91ae9174-be4c-4ddd-8980-4a671571afdc`
 
-La cadena persistente quedó:
+Cadena persistente:
 
 ```text
 Caso aprobado
@@ -181,60 +206,145 @@ IDs principales:
 
 - requerimiento interno: `65c1dd70-8ed1-4c0b-a74b-de8d7b3ce1eb`;
 - control: `81c256bd-0a5e-4663-a96a-67bf7de2008a`;
-- evidencia: `d90ccc9b-dc71-4aa8-921a-a303353acac1`;
+- evidencia inicial: `d90ccc9b-dc71-4aa8-921a-a303353acac1`;
 - evaluación de diseño: `8a6f9f61-494e-4e88-b115-ee6d88fcf4ba`;
-- evaluación operacional: `70bd4020-5811-430b-ab9f-e2949604529b`;
+- evaluación operacional inicial: `70bd4020-5811-430b-ab9f-e2949604529b`;
 - resultado de misión: `c2bc1493-8403-4d05-aea8-58a26df3e860`.
 
-La evidencia conserva como desconocidos:
+La operación permanece parcial y la confianza nunca se presenta como certificación.
 
-- procesos y tratamientos;
-- sistemas, repositorios y activos;
-- categorías y conjuntos de datos;
-- terceros, proveedores y destinatarios;
-- documentos fuente.
+### Hito B — Primer tratamiento real de N3uralia — `VALIDATED INICIAL`
 
-Por eso la confianza del alcance registrado se calcula en **88% bruto**, pero se limita correctamente a **65%** por operación parcial. Esto no es confianza de cumplimiento global.
+Actividad:
 
-Próxima revisión del control y vencimiento de la evidencia: **6 de septiembre de 2026**.
+> **Gestión de contactos comerciales y solicitudes de demostración**
+
+La fuente real combina:
+
+- endpoint `app/api/leads/route.ts`;
+- tabla operacional `public.commercial_leads`;
+- al menos un registro persistido;
+- región Supabase `us-east-1`.
+
+Cadena persistente:
+
+```text
+Actividad real
+→ propósito
+→ base propuesta
+→ titulares y categorías de datos
+→ dataset
+→ sistema/repositorio
+→ tercero
+→ evidencia estructurada con hash
+→ revisión humana
+→ control y evaluación operacional parcial
+→ evento del expediente
+```
+
+IDs principales:
+
+- request key: `e6956b38-25e1-3bca-9f78-9293bb26af3c`;
+- actividad: `26233189-3335-43e6-b382-99fcf2cc4090`;
+- dataset: `7eed3f2c-0402-466f-8b0f-6ca84d6a28cd`;
+- sistema/repositorio: `aabbcc76-f48c-4aad-b251-55aa2cc9185b`;
+- tercero: `1f5fa52c-7b34-47f4-9e49-bd8007dad191`;
+- evidencia: `ab080fbd-c189-4059-b5c4-752e65daaac5`;
+- revisión humana: `3cc95dac-0026-42de-bcac-c5ac26ae19d6`;
+- evaluación operacional adicional: `59fcfa84-4587-4eb2-81a7-5b07f0beed62`.
+
+Hash del snapshot:
+
+`6e5c93c63295b308858baa054ffad95787cfadeeacbe2e5fda7e0f2e1da0e39d`
+
+La evidencia quedó:
+
+- `accepted`;
+- integridad `verified`;
+- vencimiento el **5 de noviembre de 2026**;
+- alcance `processing_activity_inventory`;
+- limitaciones preservadas explícitamente.
+
+La revisión conserva seis desconocidos:
+
+1. plazo de retención no aprobado;
+2. base de licitud pendiente de validación jurídica;
+3. destinatarios y subencargados incompletos;
+4. clasificación de riesgo del proveedor pendiente de metodología y aprobación;
+5. aviso de privacidad no adjuntado;
+6. mecanismo de eliminación no evidenciado.
+
+La tercera ejecución del mismo contrato devolvió:
+
+```text
+resumed: true
+created.*: false
+mismos IDs
+unknownCount: 6
+```
+
+No se generaron duplicados.
+
+### Confianza actual del alcance registrado
+
+Dimensiones actuales:
+
+| Dimensión | Resultado |
+|---|---:|
+| Requerimientos con control | 100% |
+| Responsables definidos | 100% |
+| Evidencia suficiente | 100% |
+| Efectividad de diseño | 100% |
+| Efectividad operacional | 50% |
+| Inventario de tratamientos | 70% |
+| Evidencia validada | 100% |
+| **Resultado bruto ponderado** | **85%** |
+| **Resultado mostrado** | **65%** |
+
+El máximo sigue en **65%** por dos razones independientes:
+
+- operación parcial del control;
+- inventario con actividad parcial y desconocidos abiertos.
+
+Esto demuestra progreso sin ocultar la falta de cobertura organizacional completa.
 
 ---
 
-## 4. Capacidades actuales
+## 5. Capacidades actuales
 
-### A. Narrativa, seguridad y entrada al producto — `DEPLOYED`
+### A. Narrativa, seguridad y entrada — `DEPLOYED`
 
 - narrativa pública centrada en protección de datos, centralización y guía experta;
 - separación entre información pública y workspaces privados;
 - rutas privadas con `noindex` y `no-store`;
 - autenticación y onboarding;
 - workspace activo explícito;
-- navegación simplificada: Hoy, Casos, Seguimiento y Organización;
+- navegación simplificada: Escritorio, Casos, Seguimiento y Organización;
 - equipo con nombres, correo, invitaciones, roles y revocación.
 
-### B. Expedientes y golden path — `VALIDATED PARCIAL`
+### B. Expedientes y golden path — `VALIDATED INICIAL`
 
-- caso canónico `/cases/[caseId]`;
+- expediente canónico `/cases/[caseId]`;
 - contexto, fuentes, artefactos, revisiones y timeline;
 - inicio idempotente de caso y workflow;
-- cinco especialistas principales en el caso oficial;
+- especialistas con revisión humana;
 - cierre y archivo atómicos;
 - caso convertido a plan operativo;
 - misión, solicitud y baseline cerrados de extremo a extremo.
 
-Pendiente para `DONE`: repetir el flujo en tenants limpios y con más de una organización, sin intervención administrativa.
+Pendiente para `DONE`: repetir el flujo en tenants limpios y con más de una organización.
 
-### C. Plataforma agentic y Consejo de Especialistas — `DEPLOYED / VALIDATED`
+### C. Consejo de Especialistas — `DEPLOYED / VALIDATED`
 
 - Structured Outputs y Zod;
 - timeouts, límites, retries y clasificación de errores;
 - `store: false`;
 - versionado de prompt y schema;
 - herramientas autorizadas y tool-call logging;
-- fronteras `DECIDE / NO DECIDE` por especialista;
-- contexto de comité entre especialistas;
-- detección de coincidencias, contradicciones y evidencia faltante;
-- supervisor determinístico antes de aceptar el resultado;
+- fronteras `DECIDE / NO DECIDE`;
+- contexto de comité;
+- detección de contradicciones y evidencia faltante;
+- supervisor determinístico;
 - revisión humana y aprobación con justificación;
 - retry sin sobrescribir resultados anteriores;
 - recuperación de workflows stale.
@@ -254,31 +364,45 @@ Pendiente para `DONE`: repetir el flujo en tenants limpios y con más de una org
 ### E. Controles, evidencia y aseguramiento — `VALIDATED INICIAL`
 
 - catálogo de controles;
-- biblioteca de evidencia;
-- solicitudes de evidencia;
+- biblioteca y solicitudes de evidencia;
 - vínculo control–requerimiento;
 - vínculo control–evidencia;
 - suficiencia revisada;
 - evaluación separada de diseño y operación;
 - evidencia con hash y vigencia;
 - baseline assurance idempotente;
-- cierre de misión y resultado aprobado;
-- operación parcial visible, sin falsear 100%.
+- operación parcial visible.
 
-Pendiente: poblar el inventario real y demostrar controles recurrentes, no solo una línea base inicial.
+### F. Inventario de tratamientos — `VALIDATED INICIAL`
 
-### F. Grafo, mapeo e impacto — `DEPLOYED`
+- workspace accionable en `/digital-twin`;
+- actividad, propósito y base propuesta;
+- titulares y categorías de datos;
+- responsable y criticidad;
+- sistema/repositorio y hosting;
+- dataset, retención y transferencia;
+- tercero, ubicación y riesgo provisional;
+- fuente verificable;
+- snapshot JSONB con SHA-256;
+- revisión humana y desconocidos explícitos;
+- vínculos del gemelo digital;
+- evento del expediente;
+- dimensión de confianza y tope por inventario parcial.
+
+Pendiente: ampliar a más tratamientos y validar jurídicamente bases, retención, destinatarios y eliminación.
+
+### G. Grafo, mapeo e impacto — `DEPLOYED`
 
 - mapa navegable `/map`;
 - obligaciones, controles, evidencia, casos, misiones, documentos y responsables;
 - relaciones bidireccionales;
-- búsqueda de controles similares antes de crear;
+- búsqueda de controles similares;
 - timeline organizacional;
 - análisis de impacto;
-- deep-links a nodos del mapa;
-- confianza del alcance registrado con dimensiones y topes explícitos.
+- deep-links;
+- confianza por dimensiones y topes explícitos.
 
-### G. Memoria y contexto organizacional — `DEPLOYED / SIN DATOS REALES`
+### H. Memoria organizacional — `DEPLOYED / SIN DATOS REALES`
 
 - lectura de `organization_memory`;
 - fallback a decisiones humanas;
@@ -286,11 +410,10 @@ Pendiente: poblar el inventario real y demostrar controles recurrentes, no solo 
 - precedentes inyectados al contexto de agentes;
 - separación entre contexto operativo y autoridad normativa.
 
-Pendiente: capturar, versionar y aprobar aprendizajes organizacionales reales. Producción aún tiene 0 memorias persistidas.
+Pendiente: capturar, versionar y aprobar aprendizajes reales. Producción aún tiene 0 memorias persistidas.
 
-### H. Escritorio y responsabilidad operacional — `VALIDATED INICIAL`
+### I. Escritorio y responsabilidad — `VALIDATED INICIAL`
 
-- Escritorio `/advisor`;
 - prioridades por riesgo, vencimiento y accionabilidad;
 - “¿Por qué aparece esto?”;
 - briefing de 24 horas;
@@ -301,9 +424,7 @@ Pendiente: capturar, versionar y aprobar aprendizajes organizacionales reales. P
 - SLA y escalamiento visible;
 - seguimiento y bitácora.
 
-El cierre oficial dejó de aparecer como trabajo activo y quedó visible en briefing y timeline, que es el comportamiento esperado.
-
-### I. Motor regulatorio — `DEPLOYED`
+### J. Motor regulatorio — `DEPLOYED`
 
 - Regulatory Evidence Engine;
 - fuentes, capturas, versiones y hashes;
@@ -315,24 +436,25 @@ El cierre oficial dejó de aparecer como trabajo activo y quedó visible en brie
 - procedencia y cambios;
 - plataforma común de scrapers.
 
-### J. Release y seguridad — `DONE / DEUDA EXTERNA CONOCIDA`
+### K. Release y seguridad — `DONE / DEUDA EXTERNA CONOCIDA`
 
 - `npm ci` reproducible;
 - Release Gate único;
-- typecheck y build obligatorios;
+- typecheck, build y smoke obligatorios;
 - checks de dominio;
 - dependency audit crítico;
-- smoke de preview y producción;
 - previews Vercel antes de merge;
 - funciones nuevas `SECURITY INVOKER`;
 - `search_path=''`;
-- RPC críticas disponibles solo a `service_role` cuando corresponde.
+- RPC críticas solo para `service_role`;
+- RLS y denegación explícita para tablas internas del inventario;
+- corrección del contrato CI de SMA SNIFA detail.
 
 Deuda externa conocida: **Supabase Auth Leaked Password Protection está desactivada**.
 
 ---
 
-## 5. Estado de los bloques 1–13
+## 6. Estado de los bloques 1–14
 
 | Bloque | Resultado | Estado |
 |---:|---|---|
@@ -349,120 +471,120 @@ Deuda externa conocida: **Supabase Auth Leaked Password Protection está desacti
 | 11 | Escritorio, explicabilidad, SLA y delegación | `DEPLOYED / VALIDATED INICIAL` |
 | 12 | Expediente → plan operativo | `VALIDATED` |
 | 13 | Baseline assurance honesto | `VALIDATED` |
+| 14 | Inventario mínimo real de tratamientos | `VALIDATED INICIAL` |
 
 ---
 
-## 6. Gates pendientes
+## 7. Gates P0 antes de beta privada autoservicio
 
-### P0 — Antes de beta privada autoservicio
+### 1. Leaked Password Protection — `BLOCKED`
 
-1. **Leaked Password Protection** — `BLOCKED`
-   - activar en Supabase Auth;
-   - verificar política real del servidor;
-   - cerrar issue asociado.
+- activar en Supabase Auth;
+- verificar política real del servidor;
+- cerrar issue asociado.
 
-2. **Multiempresa real** — `ACTIVE`
-   - segunda organización;
-   - segundo usuario;
-   - pruebas positivas y negativas de acceso cruzado;
-   - selector de workspace y sesión explícita;
-   - ningún query crítico puede depender de `.limit(1)`.
+### 2. Multiempresa real — `ACTIVE`
 
-3. **Inventario mínimo real Ley N.º 21.719** — `ACTIVE`
-   - actividades de tratamiento;
-   - finalidades y bases;
-   - categorías de datos y titulares;
-   - sistemas y repositorios;
-   - terceros y transferencias;
-   - responsables, retención y evidencia fuente.
+- segunda organización;
+- segundo usuario;
+- pruebas positivas y negativas de acceso cruzado;
+- selector de workspace y sesión explícita;
+- ningún query crítico puede depender de `.limit(1)`.
 
-4. **Repetibilidad del golden path** — `ACTIVE`
-   - ejecutar el flujo completo al menos 3 veces en tenants limpios;
-   - cero duplicados;
-   - cero registros huérfanos;
-   - cero intervención SQL manual;
-   - tiempos y costos registrados.
+### 3. Inventario mínimo Ley N.º 21.719 — `VALIDATED INICIAL / ACTIVE`
 
-5. **Piloto supervisado externo** — `PLANNED`
-   - 1–3 organizaciones;
-   - responsable real de cumplimiento;
-   - tareas reales;
-   - feedback de UX y confianza;
-   - sin ampliar alcance durante la observación.
+Ya existe un tratamiento real con sistema, dataset, tercero, evidencia y revisión.
+
+Falta:
+
+- registrar al menos dos actividades adicionales;
+- validar bases de licitud;
+- aprobar retención;
+- completar destinatarios y subencargados;
+- adjuntar aviso de privacidad;
+- demostrar eliminación;
+- revisar riesgo de terceros con metodología aprobada.
+
+### 4. Repetibilidad del golden path — `ACTIVE`
+
+- ejecutar el flujo completo al menos 3 veces en tenants limpios;
+- cero duplicados;
+- cero registros huérfanos;
+- cero intervención SQL manual;
+- tiempos y costos registrados.
+
+### 5. Piloto supervisado externo — `PLANNED`
+
+- 1–3 organizaciones;
+- responsable real de cumplimiento;
+- tareas reales;
+- feedback de UX y confianza;
+- sin ampliar alcance durante la observación.
+
+---
+
+## 8. Backlog ordenado
 
 ### P1 — Valor acumulativo
 
-6. Aprendizaje desde correcciones humanas, con tipo, vigencia, versión y aprobación.
-7. Biblioteca viva por dominio de cumplimiento.
-8. Recomendaciones proactivas explicables, con máximo de asuntos prioritarios.
-9. Seguimiento automático y notificaciones sin spam.
-10. Reutilización de evidencia entre varios controles y marcos.
-11. Gestión de terceros críticos y dependencias.
-12. Preparación continua para auditoría.
+1. Aprendizaje desde correcciones humanas, con tipo, vigencia, versión y aprobación.
+2. Biblioteca viva por dominio de cumplimiento.
+3. Recomendaciones proactivas explicables.
+4. Seguimiento automático y notificaciones sin spam.
+5. Reutilización de evidencia entre controles y marcos.
+6. Gestión de terceros críticos y dependencias.
+7. Preparación continua para auditoría.
 
 ### P2 — Operación avanzada
 
-13. Modo incidente y sala ejecutiva.
-14. Cadena de custodia y preservación de evidencia.
-15. Post-mortem estructurado y aprendizaje.
-16. Portal de auditor y Data Room con autorización.
-17. Paquetes versionados de fiscalización.
-18. Retención, eliminación y divulgaciones controladas.
+1. Modo incidente y sala ejecutiva.
+2. Cadena de custodia y preservación de evidencia.
+3. Post-mortem estructurado y aprendizaje.
+4. Portal de auditor y Data Room con autorización.
+5. Paquetes versionados de fiscalización.
+6. Retención, eliminación y divulgaciones controladas.
 
 ### P3 — Enterprise y expansión
 
-19. Holdings, filiales y países.
-20. Multi-framework: Ley N.º 21.719, ISO 27001, NIST, SOC 2 y otros.
-21. API pública, webhooks e integraciones.
-22. SSO y gobierno corporativo.
-23. Motor de capacidad, dependencias y simulación.
-24. Verticales Transporte, Minería y Agro.
-25. Marketplace, internacionalización y ecosistema.
+1. Holdings, filiales y países.
+2. Multi-framework: Ley N.º 21.719, ISO 27001, NIST y SOC 2.
+3. API pública, webhooks e integraciones.
+4. SSO y gobierno corporativo.
+5. Motor de capacidad, dependencias y simulación.
+6. Verticales Transporte, Minería y Agro.
+7. Marketplace e internacionalización.
 
 ---
 
-## 7. Próximos bloques de 3
+## 9. Próximos bloques de 3
 
-### Bloque 14 — Inventario mínimo real de tratamientos — `NEXT`
+### Bloque 15 — Tenant assurance y repetibilidad — `NEXT`
 
-1. **Actividad y propósito**
-   - registrar al menos una actividad de tratamiento real;
-   - finalidad, base propuesta, titulares y categorías de datos;
-   - owner y estado de validación.
+1. crear segunda organización y segundo usuario;
+2. ejecutar pruebas positivas y negativas cross-tenant sobre casos, evidencia, tratamientos y RPC;
+3. repetir el golden path completo en un tenant limpio y medir duplicados, tiempo y costo.
 
-2. **Sistemas, datos y terceros**
-   - vincular sistema/repositorio;
-   - conjunto de datos;
-   - proveedor o destinatario;
-   - ubicación, transferencia y retención cuando se conozcan.
+**Salida:** aislamiento multiempresa defendible y segunda ejecución completa sin intervención SQL manual.
 
-3. **Evidencia y revisión**
-   - adjuntar fuente real;
-   - revisión humana;
-   - actualizar control y baseline;
-   - recalcular confianza sin eliminar desconocidos no resueltos.
+### Bloque 16 — Ampliación del inventario real
 
-**Salida:** un tratamiento real puede recorrerse desde requerimiento → proceso → sistema/datos/tercero → control → evidencia → revisión, sin inferir información inexistente.
+1. registrar dos actividades adicionales representativas;
+2. validar bases, retención, destinatarios, subencargados y transferencias;
+3. adjuntar aviso de privacidad y evidencia de eliminación o crear acciones explícitas.
 
-### Bloque 15 — Aprendizaje organizacional
+**Salida:** el inventario deja de depender de un solo proceso y reduce los desconocidos con evidencia aprobada.
+
+### Bloque 17 — Aprendizaje organizacional
 
 1. capturar correcciones humanas clasificadas;
 2. versionar vigencia, supersesión y conflictos;
-3. crear biblioteca viva y usar un aprendizaje en un caso equivalente.
+3. crear biblioteca viva y reutilizar un aprendizaje en un caso equivalente.
 
 **Salida:** un error corregido una vez no se repite silenciosamente en un caso similar.
 
-### Bloque 16 — Piloto y tenant assurance
-
-1. crear segunda organización y ejecutar pruebas cross-tenant;
-2. repetir golden path completo con datos limpios;
-3. ejecutar piloto supervisado y medir tiempo, retrabajo y confianza.
-
-**Salida:** beta privada defendible y decisión informada de comercialización.
-
 ---
 
-## 8. Métricas de cierre v1.0
+## 10. Métricas de cierre v1.0
 
 | Indicador | Gate |
 |---|---:|
@@ -471,44 +593,47 @@ Deuda externa conocida: **Supabase Auth Leaked Password Protection está desacti
 | Golden paths repetidos en tenants limpios | ≥ 3 |
 | Duplicados o huérfanos por retry | 0 |
 | Fugas cross-tenant en pruebas | 0 |
+| Actividades reales revisadas | ≥ 3 para el piloto inicial |
 | Controles con owner | 100% del alcance piloto |
 | Evidencia aceptada con procedencia | 100% de controles declarados como demostrados |
 | Decisiones sensibles con revisión humana | 100% |
 | Recomendaciones con explicación verificable | 100% |
+| Bases/retención pendientes | visibles y accionables, nunca ocultas |
 | Tiempo para preparar una vista de auditoría | medir en piloto |
 | Tiempo para cerrar un caso supervisado | medir en piloto |
 | Controles/evidencias reutilizados | medir, sin meta artificial inicial |
 
 ---
 
-## 9. Congelamiento de alcance
+## 11. Congelamiento de alcance
 
 Hasta cerrar P0:
 
 - no crear módulos nuevos solo porque son atractivos;
 - no construir Enterprise antes de validar un segundo tenant;
-- no presentar la línea base como inventario completo;
+- no presentar la línea base o una actividad como inventario completo;
 - no aumentar scores ocultando operación parcial;
-- no automatizar una decisión irreversible sin aprobación;
+- no convertir bases propuestas o riesgos provisionales en conclusiones aprobadas;
+- no automatizar decisiones irreversibles sin aprobación;
 - no mezclar modernización de dependencias con cambios funcionales grandes;
-- no marcar `DONE` sin evidencia y métrica cuando corresponda.
+- no marcar `DONE` sin evidencia y métrica.
 
 Toda idea nueva debe demostrar que:
 
 1. elimina una fricción real;
 2. reduce tiempo o retrabajo;
-3. mejora la calidad o trazabilidad de una decisión;
+3. mejora calidad o trazabilidad;
 4. aumenta seguridad o aislamiento;
 5. o es necesaria para un piloto concreto.
 
 ---
 
-## 10. Decisión vigente
+## 12. Decisión vigente
 
-La prioridad inmediata no es agregar más módulos. Es **convertir la línea base parcial en conocimiento organizacional real**, probar el flujo en un segundo tenant y observar a una persona externa usando Kumplio.
+Bloque 14 está cerrado como **VALIDATED INICIAL**. Kumplio ya puede registrar y recorrer un tratamiento real sin inventar información ni esconder sus desconocidos.
 
-El siguiente bloque ejecutable es:
+La prioridad inmediata es:
 
-> **Bloque 14 — Inventario mínimo real de tratamientos.**
+> **Bloque 15 — Tenant assurance y repetibilidad.**
 
-Ese trabajo debe reducir los cinco desconocidos actuales sin inventar respuestas y mostrar cómo cambia, de forma explicable, la confianza del alcance registrado.
+No se habilitará beta autoservicio ni se avanzará a funciones Enterprise hasta demostrar aislamiento entre dos organizaciones y repetir el golden path en un tenant limpio.
