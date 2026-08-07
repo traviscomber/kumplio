@@ -6,6 +6,10 @@ export type TeamMember = {
   userId: string
   role: WorkspaceRole
   joinedAt: string
+  firstName: string | null
+  lastName: string | null
+  email: string | null
+  displayName: string
 }
 
 export async function listTeamMembers(
@@ -14,18 +18,135 @@ export async function listTeamMembers(
 ): Promise<TeamMember[]> {
   const { data, error } = await admin
     .from('organization_members')
-    .select('id,user_id,role,joined_at')
+    .select('id,user_id,role,joined_at,profiles(first_name,last_name,email)')
     .eq('organization_id', organizationId)
     .order('joined_at', { ascending: true })
 
   if (error) throw new Error(`No fue posible cargar el equipo: ${error.message}`)
 
-  return (data || []).map((row) => ({
-    membershipId: String(row.id),
-    userId: String(row.user_id),
-    role: normalizeRole(row.role),
-    joinedAt: String(row.joined_at || new Date().toISOString()),
-  }))
+  return (data || []).map((row) => {
+    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+    const firstName = profile && typeof profile === 'object' && 'first_name' in profile && typeof profile.first_name === 'string'
+      ? profile.first_name.trim() || null
+      : null
+    const lastName = profile && typeof profile === 'object' && 'last_name' in profile && typeof profile.last_name === 'string'
+      ? profile.last_name.trim() || null
+      : null
+    const email = profile && typeof profile === 'object' && 'email' in profile && typeof profile.email === 'string'
+      ? profile.email.trim() || null
+      : null
+    const fullName = [firstName, lastName].filter(Boolean).join(' ')
+
+    return {
+      membershipId: String(row.id),
+      userId: String(row.user_id),
+      role: normalizeRole(row.role),
+      joinedAt: String(row.joined_at || new Date().toISOString()),
+      firstName,
+      lastName,
+      email,
+      displayName: fullName || email || 'Persona del equipo',
+    }
+  })
+}
+
+export async function inviteTeamMember(
+  admin: SupabaseClient,
+  access: WorkspaceAccess,
+  email: string,
+  role: WorkspaceRole,
+  redirectTo?: string,
+): Promise<void> {
+  if (!['owner', 'admin'].includes(access.role)) {
+    throw new Error('Tu rol no permite invitar personas al equipo.')
+  }
+  if (role === 'owner' && access.role !== 'owner') {
+    throw new Error('Solo el propietario puede invitar a otro propietario.')
+  }
+
+  const normalizedEmail = email.trim().toLowerCase()
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    throw new Error('Ingresa un correo válido.')
+  }
+
+  const { data: existingProfile, error: profileError } = await admin
+    .from('profiles')
+    .select('id,email')
+    .ilike('email', normalizedEmail)
+    .limit(1)
+    .maybeSingle()
+
+  if (profileError) throw new Error(`No fue posible validar el correo: ${profileError.message}`)
+
+  let userId = existingProfile?.id ? String(existingProfile.id) : null
+
+  if (!userId) {
+    const { data, error } = await admin.auth.admin.inviteUserByEmail(normalizedEmail, {
+      ...(redirectTo ? { redirectTo } : {}),
+      data: {
+        invited_to_organization_id: access.organizationId,
+        invited_role: role,
+      },
+    })
+    if (error || !data.user) {
+      throw new Error(`No fue posible enviar la invitación: ${error?.message || 'usuario no creado'}`)
+    }
+    userId = data.user.id
+
+    await admin.from('profiles').upsert({
+      id: userId,
+      email: normalizedEmail,
+      organization_id: access.organizationId,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'id' })
+  }
+
+  const { data: existingMembership, error: membershipLookupError } = await admin
+    .from('organization_members')
+    .select('id')
+    .eq('organization_id', access.organizationId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (membershipLookupError) throw new Error(`No fue posible validar la membresía: ${membershipLookupError.message}`)
+  if (existingMembership) throw new Error('Esta persona ya pertenece a la organización.')
+
+  const { error: membershipError } = await admin.from('organization_members').insert({
+    organization_id: access.organizationId,
+    user_id: userId,
+    role,
+  })
+  if (membershipError) throw new Error(`La invitación fue creada, pero no se pudo asignar el acceso: ${membershipError.message}`)
+}
+
+export async function revokeTeamMember(
+  admin: SupabaseClient,
+  access: WorkspaceAccess,
+  membershipId: string,
+): Promise<void> {
+  if (!['owner', 'admin'].includes(access.role)) {
+    throw new Error('Tu rol no permite revocar accesos.')
+  }
+
+  const { data: membership, error: lookupError } = await admin
+    .from('organization_members')
+    .select('id,user_id,role')
+    .eq('id', membershipId)
+    .eq('organization_id', access.organizationId)
+    .maybeSingle()
+
+  if (lookupError) throw new Error(`No fue posible validar el acceso: ${lookupError.message}`)
+  if (!membership) throw new Error('La membresía no existe o no pertenece a tu organización.')
+  if (String(membership.user_id) === access.userId) throw new Error('No puedes revocar tu propio acceso desde esta pantalla.')
+  if (membership.role === 'owner' && access.role !== 'owner') throw new Error('Solo el propietario puede revocar a otro propietario.')
+
+  const { error } = await admin
+    .from('organization_members')
+    .delete()
+    .eq('id', membershipId)
+    .eq('organization_id', access.organizationId)
+
+  if (error) throw new Error(`No fue posible revocar el acceso: ${error.message}`)
 }
 
 export async function updateMemberRole(
