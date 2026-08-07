@@ -133,8 +133,15 @@ jobs:
 
       - name: Execute production UI golden path
         id: browser
-        continue-on-error: true
-        run: npx playwright test --config=playwright.ui-golden-path.config.mjs
+        shell: bash
+        run: |
+          set +e
+          npx playwright test --config=playwright.ui-golden-path.config.mjs
+          exit_code=$?
+          set -e
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          echo "Playwright exit code: $exit_code"
+          exit 0
 
       - name: Acquire fresh OIDC token for final assertion
         if: always()
@@ -150,7 +157,7 @@ jobs:
 
       - name: Assert persisted golden-path result
         id: assertion
-        if: steps.browser.outcome == 'success'
+        if: ${{ steps.browser.outputs.exit_code == '0' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -182,12 +189,12 @@ jobs:
           NODE
 
       - name: Record browser failure
-        if: steps.browser.outcome != 'success'
+        if: ${{ steps.browser.outputs.exit_code != '0' }}
         shell: bash
         run: |
           set -euo pipefail
           token=$(cat /tmp/kumplio-ui-oidc-final)
-          error="Playwright failed. Review ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} and the uploaded trace."
+          error="Playwright failed with exit code ${BROWSER_EXIT_CODE}. Review ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} and the uploaded trace."
           body=$(ACTION=fail COMMIT_SHA="$GITHUB_SHA" RUN_ID="$GITHUB_RUN_ID" RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" ERROR_TEXT="$error" node -e "process.stdout.write(JSON.stringify({action:process.env.ACTION,commitSha:process.env.COMMIT_SHA,runId:process.env.RUN_ID,runAttempt:process.env.RUN_ATTEMPT,error:process.env.ERROR_TEXT}))")
           curl --fail --silent --show-error \
             -H "Authorization: Bearer $token" \
@@ -195,6 +202,8 @@ jobs:
             --data "$body" \
             "$BASE_URL/api/internal/ui-golden-path" > /tmp/ui-failure.json
           exit 1
+        env:
+          BROWSER_EXIT_CODE: ${{ steps.browser.outputs.exit_code }}
 
       - name: Upload browser evidence
         if: always()
@@ -206,6 +215,7 @@ jobs:
             test-results
             /tmp/ui-prepare.json
             /tmp/ui-assertion.json
+            /tmp/ui-failure.json
           if-no-files-found: warn
           retention-days: 14
 
