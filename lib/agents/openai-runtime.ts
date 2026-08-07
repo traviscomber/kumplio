@@ -9,8 +9,18 @@ import { getAgentOutputSchema, parseAgentOutput, type AgentOutput } from './sche
 const MODEL_PRIMARY = process.env.OPENAI_REASONING_MODEL || process.env.OPENAI_COPILOT_MODEL || 'gpt-5.6'
 const MODEL_FALLBACK = process.env.OPENAI_FALLBACK_MODEL || 'gpt-4.1'
 const MAX_OUTPUT_TOKENS = 10000
-const PRIMARY_TIMEOUT_MS = 75000
+const PRIMARY_TIMEOUT_MS = 210000
 const FALLBACK_TIMEOUT_MS = 60000
+
+const REASONING_EFFORT: Record<AgentId, 'medium' | 'high'> = {
+  isidora: 'medium',
+  rodrigo: 'medium',
+  javier: 'medium',
+  beatriz: 'medium',
+  veronica: 'medium',
+  andres: 'medium',
+  catalina: 'high',
+}
 
 let client: OpenAI | null = null
 
@@ -18,7 +28,7 @@ function getOpenAI() {
   if (client) return client
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) throw new AgentRuntimeError('configuration_error', 'Agent service is not configured')
-  client = new OpenAI({ apiKey })
+  client = new OpenAI({ apiKey, maxRetries: 0 })
   return client
 }
 
@@ -61,17 +71,39 @@ function normalizeUsage(usage: unknown): NormalizedUsage {
 
 function classifyProviderError(error: unknown, model: string) {
   if (error instanceof AgentRuntimeError) return error
-  if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
-    return new AgentRuntimeError(model === MODEL_PRIMARY ? 'primary_timeout' : 'fallback_timeout', 'The model exceeded its execution budget', model)
+
+  const name = error instanceof Error ? error.name : ''
+  if (
+    name === 'TimeoutError'
+    || name === 'AbortError'
+    || name === 'APIConnectionTimeoutError'
+    || name === 'APITimeoutError'
+    || name.includes('Timeout')
+  ) {
+    return new AgentRuntimeError(
+      model === MODEL_PRIMARY ? 'primary_timeout' : 'fallback_timeout',
+      'The model exceeded its execution budget',
+      model,
+    )
+  }
+
+  if (name === 'APIConnectionError') {
+    return new AgentRuntimeError('provider_connection_error', 'The reasoning provider could not be reached', model)
   }
 
   const value = error as { status?: number; code?: string; type?: string; message?: string }
   const status = Number(value?.status || 0)
   const code = String(value?.code || value?.type || '')
+
+  if (status === 401) return new AgentRuntimeError('provider_authentication_error', 'The reasoning provider rejected authentication', model)
+  if (status === 403) return new AgentRuntimeError('provider_permission_denied', 'The reasoning provider denied the request', model)
   if (status === 429 || code.includes('rate_limit')) return new AgentRuntimeError('rate_limited', 'The provider rate limit was reached', model)
   if (status === 404 || code.includes('model_not_found')) return new AgentRuntimeError('model_unavailable', 'The requested model is unavailable', model)
   if (status >= 500) return new AgentRuntimeError('provider_5xx', 'The provider returned a temporary server error', model)
-  if (code.includes('invalid_request') || status === 400) return new AgentRuntimeError('provider_request_rejected', 'The provider rejected the structured request', model)
+  if (code.includes('invalid_request') || status === 400 || status === 422) {
+    return new AgentRuntimeError('provider_request_rejected', 'The provider rejected the structured request', model)
+  }
+
   return new AgentRuntimeError('provider_error', 'The reasoning provider could not complete the request', model)
 }
 
@@ -94,6 +126,7 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
   let lastFailure: AgentRuntimeError | null = null
 
   for (const model of models) {
+    const timeout = model === MODEL_PRIMARY ? PRIMARY_TIMEOUT_MS : FALLBACK_TIMEOUT_MS
     try {
       const params: Record<string, unknown> = {
         model,
@@ -104,11 +137,17 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
         safety_identifier: safetyIdentifier,
         store: false,
       }
-      if (model.startsWith('o') || model.startsWith('gpt-5')) params.reasoning = { effort: 'high' }
+      if (model.startsWith('o') || model.startsWith('gpt-5')) {
+        params.reasoning = { effort: REASONING_EFFORT[input.agentId] }
+      }
 
       response = await openai.responses.create(
         params as any,
-        { signal: AbortSignal.timeout(model === MODEL_PRIMARY ? PRIMARY_TIMEOUT_MS : FALLBACK_TIMEOUT_MS) },
+        {
+          timeout,
+          maxRetries: 0,
+          signal: AbortSignal.timeout(timeout),
+        },
       )
       break
     } catch (error) {
@@ -118,6 +157,9 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
   }
 
   if (!response) throw lastFailure || new AgentRuntimeError('provider_error', 'The reasoning provider could not complete the request')
+  if (response.status === 'incomplete') {
+    throw new AgentRuntimeError('incomplete_response', 'The reasoning model did not finish within its output budget', response.model)
+  }
   if (!response.output_text?.trim()) throw new AgentRuntimeError('empty_response', 'The reasoning model returned an empty response', response.model)
 
   let rawOutput: unknown
