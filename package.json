@@ -40,7 +40,8 @@
     "check:knowledge-graph": "node scripts/check-knowledge-graph-v1.mjs",
     "check:insights": "node scripts/check-insights-v1.mjs",
     "check:organizational-memory": "node scripts/check-organizational-memory-v1.mjs",
-    "check:agent-committee": "node scripts/check-agent-committee-v1.mjs"
+    "check:agent-committee": "node scripts/check-agent-committee-v1.mjs",
+    "check:operating-desk": "node scripts/check-operating-desk-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
