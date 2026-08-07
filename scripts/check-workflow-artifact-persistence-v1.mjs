@@ -33,16 +33,18 @@ assert.match(advanceRoute, /artifact_creation_failed/)
 assert.match(advanceRoute, /classifyStageFailure/)
 assert.match(advanceRoute, /error_code: failure[.]code/)
 
-// La etiqueta de etapa viene del contrato canónico, no de una columna inexistente.
-for (const page of [betaPage, livePage, agentsPage]) {
+// La ruta beta es legacy y debe redirigir al expediente canónico.
+assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.doesNotMatch(betaPage, /agent_workflow_stages|getWorkflowStage/)
+
+// Las superficies activas resuelven la etiqueta desde el contrato canónico.
+for (const page of [livePage, agentsPage]) {
   assert.doesNotMatch(page, /agent_workflow_stages'[\s\S]{0,180}label/)
   assert.match(page, /getWorkflowStage/)
 }
 
 // La revisión debe apuntar a la etapa pendiente, aunque current_stage ya avance.
-assert.match(betaPage, /find\(\(stage\) => \['pending_review', 'changes_requested'\][.]includes\(stage[.]status\)\)/)
 assert.match(livePage, /find\(\(stage\) => \['pending_review', 'changes_requested'\][.]includes\(stage[.]status\)\)/)
-assert.match(betaPage, /runId=\{actionableStage[?][.]run_id/)
 assert.match(livePage, /runId=\{actionableStage[?][.]run_id/)
 
 console.log('Workflow artifact persistence v1 validation passed')
