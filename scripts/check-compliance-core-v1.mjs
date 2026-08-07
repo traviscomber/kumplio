@@ -14,6 +14,21 @@ const candidateRulesMigration = await readFile(
   'utf8',
 )
 
+function assertNoUnsafeExecuteGrants(sql, label) {
+  const grants = sql
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter((statement) => /^grant\s+execute\s+on\s+function\b/i.test(statement))
+
+  for (const grant of grants) {
+    assert.doesNotMatch(
+      grant,
+      /\bto\s+(?:public|anon|authenticated)\b/i,
+      `${label}: EXECUTE no puede concederse a public, anon o authenticated`,
+    )
+  }
+}
+
 for (const table of [
   'organization_compliance_profiles',
   'compliance_applicability_rules',
@@ -39,7 +54,7 @@ assert.match(coreMigration, /on conflict \(idempotency_key\) do update/)
 assert.match(coreMigration, /revoke all on function public[.]queue_regulatory_impact_run/)
 assert.match(coreMigration, /grant execute on function public[.]queue_regulatory_impact_run[\s\S]*to service_role/)
 assert.doesNotMatch(coreMigration, /security definer/i)
-assert.doesNotMatch(coreMigration, /grant execute[\s\S]*to (?:public|anon|authenticated)/i)
+assertNoUnsafeExecuteGrants(coreMigration, 'compliance_core_v1')
 
 assert.match(evaluatorMigration, /private[.]evaluate_compliance_conditions/)
 assert.match(evaluatorMigration, /public[.]run_regulatory_impact/)
@@ -62,7 +77,7 @@ assert.match(evaluatorMigration, /revoke all on function private[.]evaluate_comp
 assert.match(evaluatorMigration, /revoke all on function public[.]run_regulatory_impact/)
 assert.match(evaluatorMigration, /grant execute on function public[.]run_regulatory_impact[\s\S]*to service_role/)
 assert.doesNotMatch(evaluatorMigration, /security definer/i)
-assert.doesNotMatch(evaluatorMigration, /grant execute[\s\S]*to (?:public|anon|authenticated)/i)
+assertNoUnsafeExecuteGrants(evaluatorMigration, 'compliance_applicability_evaluator_v1')
 
 assert.match(candidateRulesMigration, /generate_ley21719_candidate_rules_v1/)
 assert.match(candidateRulesMigration, /preview_organization_applicability_v1/)
@@ -76,6 +91,6 @@ assert.match(candidateRulesMigration, /revoke all on function public[.]generate_
 assert.match(candidateRulesMigration, /revoke all on function public[.]preview_organization_applicability_v1/)
 assert.match(candidateRulesMigration, /grant execute on function public[.]preview_organization_applicability_v1[\s\S]*to service_role/)
 assert.doesNotMatch(candidateRulesMigration, /security definer/i)
-assert.doesNotMatch(candidateRulesMigration, /grant execute[\s\S]*to (?:public|anon|authenticated)/i)
+assertNoUnsafeExecuteGrants(candidateRulesMigration, 'ley21719_candidate_applicability_rules_v1')
 
 console.log('Compliance Core v1 validation passed')
