@@ -14,7 +14,7 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.goto('/sign-in?next=/onboarding')
     await page.getByLabel('Correo electrónico').fill(email)
     await page.locator('input#password').fill(password)
-    await page.getByRole('button', { name: 'Iniciar sesión' }).click()
+    await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click()
     await expect(page).toHaveURL(/\/onboarding(?:\?|$)/, { timeout: 45_000 })
     await expect(page.getByRole('heading', { name: /Quiero entender tu organización/ })).toBeVisible()
   })
@@ -22,24 +22,24 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
   await test.step('crear el workspace desde el onboarding visual', async () => {
     await page.getByPlaceholder('Nombre').fill('UI Golden Path')
     await page.getByPlaceholder('Apellido (opcional)').fill('E2E')
-    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
     await page.getByPlaceholder('Ej. Empresa Andes SpA').fill(organizationName)
-    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByRole('button', { name: 'Servicios generales' }).click()
-    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.getByRole('button', { name: 'Servicios generales', exact: true }).click()
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByRole('button', { name: '10–49 personas' }).click()
-    await page.getByRole('button', { name: 'Preparar mi diagnóstico' }).click()
+    await page.getByRole('button', { name: '10–49 personas', exact: true }).click()
+    await page.getByRole('button', { name: 'Preparar mi diagnóstico', exact: true }).click()
     await expect(page).toHaveURL(/\/cases\/[0-9a-f-]{36}(?:\?|$)/i, { timeout: 60_000 })
   })
 
   await test.step('abrir un expediente guiado desde la UI', async () => {
     await page.goto('/cases/new')
-    await page.getByRole('button', { name: 'Empresa' }).click()
+    await page.getByRole('button', { name: 'Empresa', exact: true }).click()
     await page.getByLabel('¿Qué necesitas proteger o resolver?').fill(goal)
-    await page.getByRole('button', { name: 'Preparar mi caso' }).click()
+    await page.getByRole('button', { name: 'Preparar mi caso', exact: true }).click()
     await expect(page).toHaveURL(/\/cases\/[0-9a-f-]{36}(?:\?|$)/i, { timeout: 90_000 })
     await expect(page.getByRole('heading', { name: goal })).toBeVisible()
   })
@@ -53,19 +53,19 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
       await page.getByLabel('Revisé las fuentes y evidencias relacionadas.').check()
       await page.getByLabel('Entiendo los supuestos, reservas y datos que todavía faltan.').check()
       await page.getByLabel('La conclusión está suficientemente respaldada para avanzar.').check()
-      await page.getByRole('button', { name: 'Aprobar y continuar' }).click()
-      await expect(page.getByRole('button', { name: 'Aprobar y continuar' })).toBeHidden({ timeout: 90_000 })
+      await page.getByRole('button', { name: 'Aprobar y continuar', exact: true }).click()
+      await expect(page.getByRole('button', { name: 'Aprobar y continuar', exact: true })).toBeHidden({ timeout: 90_000 })
     })
   }
 
   await test.step('crear misión y solicitud de evidencia desde el expediente', async () => {
     await waitForWorkflowCompletion(page)
-    await page.getByRole('button', { name: 'Convertir en plan operativo' }).click()
+    await page.getByRole('button', { name: 'Convertir en plan operativo', exact: true }).click()
     const dialog = page.getByRole('dialog', { name: 'Plan operativo del expediente' })
     await expect(dialog).toBeVisible()
-    await dialog.getByRole('button', { name: 'Crear misión y solicitud' }).click()
+    await dialog.getByRole('button', { name: 'Crear misión y solicitud', exact: true }).click()
     await expect(dialog.getByText('Plan operativo creado.')).toBeVisible({ timeout: 60_000 })
-    await dialog.getByRole('button', { name: 'Cerrar' }).click()
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click()
     await expect(dialog).toBeHidden()
   })
 
@@ -74,7 +74,7 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await expect(page.getByRole('heading', { name: 'Cerrar una línea base honesta y verificable' })).toBeVisible({ timeout: 60_000 })
     await page.getByLabel(/Acepto el alcance inicial/).check()
     await page.getByLabel(/Acepto la operación parcial/).check()
-    await page.getByRole('button', { name: 'Aceptar línea base y cerrar misión' }).click()
+    await page.getByRole('button', { name: 'Aceptar línea base y cerrar misión', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Línea base inicial cerrada.' })).toBeVisible({ timeout: 90_000 })
   })
 
@@ -82,7 +82,7 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.goto('/digital-twin')
     await expect(page.getByRole('heading', { name: 'Qué datos usas, para qué y dónde están.' })).toBeVisible()
 
-    const registerButton = page.getByRole('button', { name: 'Registrar actividad' })
+    const registerButton = page.getByRole('button', { name: 'Registrar actividad', exact: true })
     if (await registerButton.isVisible().catch(() => false)) await registerButton.click()
 
     await page.getByLabel('Expediente relacionado').selectOption({ label: goal })
@@ -112,7 +112,7 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.getByLabel('Justificación de revisión').fill('Se verificó el recorrido visual y la persistencia del alcance sintético. La revisión no acredita cumplimiento legal ni cobertura organizacional completa.')
     await page.getByLabel('Revisé esta actividad y confirmo que la evidencia solo respalda el alcance declarado.').check()
     await page.getByLabel('Entiendo que la base registrada es una propuesta pendiente de validación jurídica.').check()
-    await page.getByRole('button', { name: 'Registrar y revisar' }).click()
+    await page.getByRole('button', { name: 'Registrar y revisar', exact: true }).click()
 
     await expect(page.getByText('Actividad registrada y revisada.')).toBeVisible({ timeout: 60_000 })
     await expect(page.getByRole('heading', { name: activityName })).toBeVisible()
@@ -129,10 +129,10 @@ async function waitForReview(page, stageIndex) {
   const deadline = Date.now() + 12 * 60 * 1000
   while (Date.now() < deadline) {
     await page.reload({ waitUntil: 'domcontentloaded' })
-    const approve = page.getByRole('button', { name: 'Aprobar y continuar' })
+    const approve = page.getByRole('button', { name: 'Aprobar y continuar', exact: true })
     if (await approve.isVisible().catch(() => false)) return
 
-    const retry = page.getByRole('button', { name: 'Reintentar etapa' })
+    const retry = page.getByRole('button', { name: 'Reintentar etapa', exact: true })
     if (await retry.isVisible().catch(() => false)) {
       throw new Error(`La etapa ${stageIndex + 1} llegó a estado de reintento y no produjo un resultado aprobable.`)
     }
@@ -142,7 +142,7 @@ async function waitForReview(page, stageIndex) {
       throw new Error(`La etapa ${stageIndex + 1} agotó sus intentos.`)
     }
 
-    const recover = page.getByRole('button', { name: 'Recuperar ejecución detenida' })
+    const recover = page.getByRole('button', { name: 'Recuperar ejecución detenida', exact: true })
     if (await recover.isVisible().catch(() => false)) await recover.click()
     await page.waitForTimeout(10_000)
   }
@@ -154,7 +154,7 @@ async function waitForWorkflowCompletion(page) {
   while (Date.now() < deadline) {
     await page.reload({ waitUntil: 'domcontentloaded' })
     const progress = page.getByText('5 de 5', { exact: true })
-    const close = page.getByRole('button', { name: 'Marcar como resuelto' })
+    const close = page.getByRole('button', { name: 'Marcar como resuelto', exact: true })
     if (await progress.isVisible().catch(() => false) && await close.isVisible().catch(() => false)) return
     await page.waitForTimeout(5_000)
   }
