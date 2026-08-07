@@ -16,11 +16,11 @@ assert.match(actions, /recover-stale/)
 assert.match(actions, /Recuperar ejecución detenida/)
 assert.match(actions, /busy === 'recover'/)
 
-for (const page of [betaPage, livePage]) {
-  assert.match(page, /STALE_EXECUTION_MS = 7 \* 60 \* 1000/)
-  assert.match(page, /actionableStage[.]started_at/)
-  assert.match(page, /canRecoverStale=\{canRecoverStale\}/)
-}
+// Beta es una ruta legacy; la recuperación vive en la vista canónica.
+assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.match(livePage, /STALE_EXECUTION_MS = 7 \* 60 \* 1000/)
+assert.match(livePage, /actionableStage[.]started_at/)
+assert.match(livePage, /canRecoverStale=\{canRecoverStale\}/)
 
 assert.match(migration, /recover_stale_workflow_stage/)
 assert.match(migration, /p_stale_after_seconds integer default 420/)
