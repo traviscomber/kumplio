@@ -21,6 +21,7 @@ const checks = [
   ['check:authenticated-resolution'],
   ['check:durable-agent-queue'],
   ['check:control-evidence-lifecycle'],
+  ['check:knowledge-graph'],
   ['build'],
 ]
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { findReuseCandidates } from '@/lib/compliance/reuse'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
@@ -16,6 +17,7 @@ const createControlSchema = z.object({
   ownerId: z.string().uuid().nullable().optional(),
   nextEvaluationAt: z.string().datetime({ offset: true }).nullable().optional(),
   obligationId: z.string().uuid().nullable().optional(),
+  allowSimilar: z.boolean().optional().default(false),
 })
 
 export async function POST(request: NextRequest) {
@@ -87,6 +89,32 @@ export async function POST(request: NextRequest) {
 
     if (!obligation) {
       return NextResponse.json({ error: 'Obligation not found in this project', code: 'obligation_not_found' }, { status: 404 })
+    }
+  }
+
+  if (!parsed.data.allowSimilar) {
+    const { data: existingControls } = await supabase
+      .from('controls')
+      .select('id, name, control_objective')
+      .eq('organization_id', organizationId)
+      .eq('project_id', parsed.data.projectId)
+      .neq('lifecycle_status', 'retired')
+      .limit(300)
+
+    const reuseCandidates = findReuseCandidates(
+      { name: parsed.data.name, objective: parsed.data.objective },
+      existingControls || [],
+    )
+
+    if (reuseCandidates.length) {
+      return NextResponse.json(
+        {
+          error: 'Encontramos controles parecidos. Revisa si puedes reutilizar uno antes de crear otro.',
+          code: 'reuse_candidate_found',
+          reuseCandidates,
+        },
+        { status: 409 },
+      )
     }
   }
 

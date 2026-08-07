@@ -32,6 +32,7 @@ const areas = [
     icon: Building2,
     routes: [
       '/context',
+      '/map',
       '/team',
       '/libraries',
       '/digital-twin',
