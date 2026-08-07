@@ -1,0 +1,234 @@
+name: UI Golden Path
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ui-golden-path.yml'
+      - 'app/api/internal/ui-golden-path/**'
+      - 'lib/security/github-actions-ui-oidc.ts'
+      - 'tests/e2e/ui-golden-path.spec.mjs'
+      - 'playwright.ui-golden-path.config.mjs'
+      - 'scripts/check-ui-golden-path-v1.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  statuses: write
+
+concurrency:
+  group: ui-golden-path-production
+  cancel-in-progress: false
+
+jobs:
+  ui-golden-path:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      BASE_URL: https://www.kumplio.app
+      OIDC_AUDIENCE: kumplio-ui-golden-path
+      STATUS_CONTEXT: UI Golden Path
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mark UI golden path pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload=$(STATE=pending DESCRIPTION='Third golden path running through production UI' TARGET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" CONTEXT="$STATUS_CONTEXT" node -e "process.stdout.write(JSON.stringify({state:process.env.STATE,description:process.env.DESCRIPTION,target_url:process.env.TARGET_URL,context:process.env.CONTEXT}))")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" > /dev/null
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install pinned Playwright and Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --ignore-scripts @playwright/test@1.61.1
+          npx playwright install --with-deps chromium
+
+      - name: Wait for production deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..72}; do
+            payload=$(curl --fail --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/status")
+            verdict=$(PAYLOAD="$payload" node -e "const d=JSON.parse(process.env.PAYLOAD||'{}');const w=['Vercel – kumplio','Vercel – v0-normative-compliance-analysis'];const m=new Map();for(const s of d.statuses||[]){if(w.includes(s.context)&&!m.has(s.context))m.set(s.context,s.state)};process.stdout.write(w.every(n=>m.get(n)==='success')?'success':[...m.values()].some(s=>s==='failure'||s==='error')?'failure':'pending')")
+            [[ "$verdict" == success ]] && { echo 'Production Vercel deployments are green.'; exit 0; }
+            [[ "$verdict" == failure ]] && { echo 'A production Vercel deployment failed.' >&2; exit 1; }
+            sleep 10
+          done
+          echo 'Timed out waiting for production Vercel deployments.' >&2
+          exit 1
+
+      - name: Acquire OIDC token for provisioning
+        shell: bash
+        run: |
+          set -euo pipefail
+          response=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${OIDC_AUDIENCE}")
+          OIDC_RESPONSE="$response" node -e "const p=JSON.parse(process.env.OIDC_RESPONSE||'{}');if(!p.value)process.exit(1);process.stdout.write(p.value)" > /tmp/kumplio-ui-oidc
+          chmod 600 /tmp/kumplio-ui-oidc
+          echo "::add-mask::$(cat /tmp/kumplio-ui-oidc)"
+
+      - name: Provision isolated E2E identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          password="UiE2E-$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))")-aA1!"
+          echo "::add-mask::$password"
+          token=$(cat /tmp/kumplio-ui-oidc)
+          body=$(ACTION=prepare COMMIT_SHA="$GITHUB_SHA" RUN_ID="$GITHUB_RUN_ID" RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" PASSWORD="$password" node -e "process.stdout.write(JSON.stringify({action:process.env.ACTION,commitSha:process.env.COMMIT_SHA,runId:process.env.RUN_ID,runAttempt:process.env.RUN_ATTEMPT,password:process.env.PASSWORD}))")
+
+          ready=false
+          for attempt in {1..36}; do
+            http_code=$(curl --silent --show-error \
+              --output /tmp/ui-prepare.json \
+              --write-out '%{http_code}' \
+              -H "Authorization: Bearer $token" \
+              -H 'Content-Type: application/json' \
+              --data "$body" \
+              "$BASE_URL/api/internal/ui-golden-path")
+            if [[ "$http_code" == 200 ]]; then ready=true; break; fi
+            if [[ "$http_code" != 404 && "$http_code" != 409 && "$http_code" != 503 ]]; then
+              echo "Provisioning failed with HTTP $http_code:" >&2
+              cat /tmp/ui-prepare.json >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          [[ "$ready" == true ]] || { echo 'Production endpoint did not become ready.' >&2; cat /tmp/ui-prepare.json >&2; exit 1; }
+
+          EMAIL=$(PREPARE_JSON="$(cat /tmp/ui-prepare.json)" node -e "const p=JSON.parse(process.env.PREPARE_JSON||'{}');if(!p.ok||!p.email||!p.organizationName)process.exit(1);process.stdout.write(p.email)")
+          ORG=$(PREPARE_JSON="$(cat /tmp/ui-prepare.json)" node -e "const p=JSON.parse(process.env.PREPARE_JSON||'{}');process.stdout.write(p.organizationName)")
+          {
+            echo "E2E_EMAIL=$EMAIL"
+            echo "E2E_PASSWORD=$password"
+            echo "E2E_ORGANIZATION_NAME=$ORG"
+          } >> "$GITHUB_ENV"
+          echo "Provisioned isolated UI identity for run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}."
+
+      - name: Execute production UI golden path
+        id: browser
+        continue-on-error: true
+        run: npx playwright test --config=playwright.ui-golden-path.config.mjs
+
+      - name: Acquire fresh OIDC token for final assertion
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          response=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${OIDC_AUDIENCE}")
+          OIDC_RESPONSE="$response" node -e "const p=JSON.parse(process.env.OIDC_RESPONSE||'{}');if(!p.value)process.exit(1);process.stdout.write(p.value)" > /tmp/kumplio-ui-oidc-final
+          chmod 600 /tmp/kumplio-ui-oidc-final
+          echo "::add-mask::$(cat /tmp/kumplio-ui-oidc-final)"
+
+      - name: Assert persisted golden-path result
+        id: assertion
+        if: steps.browser.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(cat /tmp/kumplio-ui-oidc-final)
+          body=$(ACTION=assert COMMIT_SHA="$GITHUB_SHA" RUN_ID="$GITHUB_RUN_ID" RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" node -e "process.stdout.write(JSON.stringify({action:process.env.ACTION,commitSha:process.env.COMMIT_SHA,runId:process.env.RUN_ID,runAttempt:process.env.RUN_ATTEMPT}))")
+          http_code=$(curl --silent --show-error \
+            --output /tmp/ui-assertion.json \
+            --write-out '%{http_code}' \
+            -H "Authorization: Bearer $token" \
+            -H 'Content-Type: application/json' \
+            --data "$body" \
+            "$BASE_URL/api/internal/ui-golden-path")
+          if [[ "$http_code" != 200 ]]; then
+            echo "Persisted assertion failed with HTTP $http_code:" >&2
+            cat /tmp/ui-assertion.json >&2
+            exit 1
+          fi
+          cat /tmp/ui-assertion.json
+          ASSERTION_JSON="$(cat /tmp/ui-assertion.json)" node <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const p = JSON.parse(process.env.ASSERTION_JSON || '{}')
+          const c = p.summary?.counts || {}
+          const u = p.summary?.usage || {}
+          console.log('## UI Golden Path: PASS')
+          console.log(`- Organización: ${p.summary?.organizationName || '—'}`)
+          console.log(`- Etapas / runs / artefactos / revisiones: ${c.stages}/${c.runs}/${c.artifacts}/${c.reviews}`)
+          console.log(`- Jobs activos / dead-letter: ${c.activeJobs}/${c.deadLetters}`)
+          console.log(`- Tokens totales: ${u.totalTokens || 0}`)
+          console.log(`- Tiempo de modelo acumulado: ${u.elapsedMs || 0} ms`)
+          NODE
+
+      - name: Record browser failure
+        if: steps.browser.outcome != 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          token=$(cat /tmp/kumplio-ui-oidc-final)
+          error="Playwright failed. Review ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} and the uploaded trace."
+          body=$(ACTION=fail COMMIT_SHA="$GITHUB_SHA" RUN_ID="$GITHUB_RUN_ID" RUN_ATTEMPT="$GITHUB_RUN_ATTEMPT" ERROR_TEXT="$error" node -e "process.stdout.write(JSON.stringify({action:process.env.ACTION,commitSha:process.env.COMMIT_SHA,runId:process.env.RUN_ID,runAttempt:process.env.RUN_ATTEMPT,error:process.env.ERROR_TEXT}))")
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $token" \
+            -H 'Content-Type: application/json' \
+            --data "$body" \
+            "$BASE_URL/api/internal/ui-golden-path" > /tmp/ui-failure.json
+          exit 1
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-golden-path-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/ui-golden-path
+            test-results
+            /tmp/ui-prepare.json
+            /tmp/ui-assertion.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Publish UI golden-path result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$JOB_STATUS" == success ]]; then
+            state=success
+            description='Third golden path completed through production UI'
+          else
+            state=failure
+            description="UI golden path ${JOB_STATUS}"
+          fi
+          payload=$(STATE="$state" DESCRIPTION="$description" TARGET_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" CONTEXT="$STATUS_CONTEXT" node -e "process.stdout.write(JSON.stringify({state:process.env.STATE,description:process.env.DESCRIPTION,target_url:process.env.TARGET_URL,context:process.env.CONTEXT}))")
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'Content-Type: application/json' \
+            --data "$payload" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" > /dev/null
