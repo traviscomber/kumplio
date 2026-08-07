@@ -1,6 +1,7 @@
 import 'server-only'
 
 import type { AgentId } from './catalog'
+import { buildCommitteeContrast } from './committee'
 import { getOrganizationalMemoryContext } from '@/lib/compliance/context/organizational-memory'
 
 type SupabaseClientLike = any
@@ -219,6 +220,24 @@ export async function retrieveAgentContext(
     }
   } catch {
     warnings.push('organizational_memory: unavailable')
+  }
+
+  if (scope.caseId) {
+    const { data: committeeArtifacts, error: committeeError } = await supabase
+      .from('agent_artifacts')
+      .select('artifact_type,title,content,status,created_at')
+      .eq('organization_id', scope.organizationId)
+      .eq('case_id', scope.caseId)
+      .neq('status', 'superseded')
+      .order('created_at', { ascending: true })
+      .limit(12)
+
+    if (committeeError) {
+      warnings.push('committee_context: unavailable')
+    } else {
+      const contrast = buildCommitteeContrast(scope.agentId, committeeArtifacts || [])
+      if (contrast) sections.push(contrast)
+    }
   }
 
   const serialized = sections.join('\n\n')
