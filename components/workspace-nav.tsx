@@ -21,10 +21,10 @@ const areas = [
     routes: ['/cases', '/dashboard/agents', '/agents'],
   },
   {
-    href: '/my-work',
+    href: '/follow-up',
     label: 'Seguimiento',
     icon: ListTodo,
-    routes: ['/my-work', '/missions', '/decisions', '/review-center', '/operations', '/accountability'],
+    routes: ['/follow-up', '/my-work', '/missions', '/decisions', '/review-center', '/operations', '/accountability'],
   },
   {
     href: '/context',
@@ -48,9 +48,7 @@ const areas = [
 export function WorkspaceNav() {
   const pathname = usePathname()
   const accountabilityActive = pathname === '/accountability' || pathname.startsWith('/accountability/')
-  const activeArea = areas.find(({ routes }) =>
-    routes.some((route) => pathname === route || pathname.startsWith(`${route}/`)),
-  )?.href
+  const activeArea = areas.find(({ routes }) => routes.some((route) => pathname === route || pathname.startsWith(`${route}/`)))?.href
 
   return (
     <nav aria-label="Áreas principales de Kumplio" className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
@@ -64,12 +62,12 @@ export function WorkspaceNav() {
                 href={href}
                 aria-current={active && !accountabilityActive ? 'page' : undefined}
                 className={cn(
-                  'inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+                  'inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
                   active ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
-                {label}
+                <span className="hidden min-[390px]:inline">{label}</span>
               </Link>
             )
           })}
