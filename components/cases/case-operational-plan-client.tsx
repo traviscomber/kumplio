@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
@@ -53,7 +53,10 @@ type Result = {
   resumed: boolean
 }
 
+const CONTROL_CLASS = 'min-h-11 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-muted/50 disabled:text-muted-foreground'
+
 const statusLabels: Record<string, string> = {
+  pending: 'Pendiente',
   ready: 'Lista para iniciar',
   active: 'En curso',
   blocked: 'Bloqueada',
@@ -84,18 +87,20 @@ export function CaseOperationalPlanClient({
   const [projectId, setProjectId] = useState(caseProjectId || projects[0]?.id || '')
   const [playbookId, setPlaybookId] = useState(playbooks[0]?.id || '')
   const [ownerId, setOwnerId] = useState(defaultOwnerId)
-  const [missionTitle, setMissionTitle] = useState(`Ejecutar: ${caseTitle}`.slice(0, 160))
+  const [missionTitle, setMissionTitle] = useState(existingMission?.title || `Ejecutar: ${caseTitle}`.slice(0, 160))
   const [missionObjective, setMissionObjective] = useState(
     caseDescription?.trim()
       || 'Organizar responsables, plazos, evidencia y criterios de cierre para resolver este expediente de forma verificable.',
   )
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('high')
-  const [missionDueDate, setMissionDueDate] = useState(dateAfterDays(14))
-  const [evidenceTitle, setEvidenceTitle] = useState('Inventario de datos, procesos, responsables y terceros vinculados al expediente')
+  const [missionDueDate, setMissionDueDate] = useState(dateInputValue(existingMission?.dueAt) || dateAfterDays(14))
+  const [evidenceTitle, setEvidenceTitle] = useState(
+    existingRequest?.title || 'Inventario de datos, procesos, responsables y terceros vinculados al expediente',
+  )
   const [evidenceDescription, setEvidenceDescription] = useState(
     'Centralizar un respaldo vigente que identifique el alcance, los responsables, los sistemas, los terceros y la ubicación de la evidencia disponible.',
   )
-  const [evidenceDueDate, setEvidenceDueDate] = useState(dateAfterDays(7))
+  const [evidenceDueDate, setEvidenceDueDate] = useState(dateInputValue(existingRequest?.dueAt) || dateAfterDays(7))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<Result | null>(null)
@@ -226,7 +231,7 @@ export function CaseOperationalPlanClient({
                     </div>
                     <div className="mt-5 grid gap-4 sm:grid-cols-2">
                       <Field label="Ámbito">
-                        <select value={projectId} onChange={(event) => setProjectId(event.target.value)} disabled={Boolean(caseProjectId)} required className="field-control">
+                        <select value={projectId} onChange={(event) => setProjectId(event.target.value)} disabled={Boolean(caseProjectId)} required className={CONTROL_CLASS}>
                           {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
                         </select>
                       </Field>
@@ -235,15 +240,15 @@ export function CaseOperationalPlanClient({
                           setPlaybookId(event.target.value)
                           const playbook = playbooks.find((item) => item.id === event.target.value)
                           if (playbook?.objective && !caseDescription?.trim()) setMissionObjective(playbook.objective)
-                        }} required className="field-control">
+                        }} required className={CONTROL_CLASS}>
                           {playbooks.map((playbook) => <option key={playbook.id} value={playbook.id}>{playbook.name}</option>)}
                         </select>
                       </Field>
                       <Field label="Nombre de la misión" wide>
-                        <input value={missionTitle} onChange={(event) => setMissionTitle(event.target.value)} minLength={3} maxLength={160} required className="field-control" />
+                        <input value={missionTitle} onChange={(event) => setMissionTitle(event.target.value)} minLength={3} maxLength={160} required className={CONTROL_CLASS} />
                       </Field>
                       <Field label="Objetivo verificable" wide>
-                        <textarea value={missionObjective} onChange={(event) => setMissionObjective(event.target.value)} rows={3} maxLength={3000} className="field-control py-3" placeholder={selectedPlaybook?.objective || 'Qué debe quedar resuelto y demostrado.'} />
+                        <textarea value={missionObjective} onChange={(event) => setMissionObjective(event.target.value)} rows={3} maxLength={3000} className={`${CONTROL_CLASS} py-3`} placeholder={selectedPlaybook?.objective || 'Qué debe quedar resuelto y demostrado.'} />
                       </Field>
                     </div>
                   </section>
@@ -258,12 +263,12 @@ export function CaseOperationalPlanClient({
                     </div>
                     <div className="mt-5 grid gap-4 sm:grid-cols-3">
                       <Field label="Responsable">
-                        <select value={ownerId} onChange={(event) => setOwnerId(event.target.value)} required className="field-control">
+                        <select value={ownerId} onChange={(event) => setOwnerId(event.target.value)} required className={CONTROL_CLASS}>
                           {members.map((member) => <option key={member.id} value={member.id}>{member.name} · {roleLabel(member.role)}</option>)}
                         </select>
                       </Field>
                       <Field label="Prioridad">
-                        <select value={priority} onChange={(event) => setPriority(event.target.value as typeof priority)} className="field-control">
+                        <select value={priority} onChange={(event) => setPriority(event.target.value as typeof priority)} className={CONTROL_CLASS}>
                           <option value="low">Baja</option>
                           <option value="medium">Media</option>
                           <option value="high">Alta</option>
@@ -271,7 +276,18 @@ export function CaseOperationalPlanClient({
                         </select>
                       </Field>
                       <Field label="Cierre de misión">
-                        <input type="date" value={missionDueDate} onChange={(event) => setMissionDueDate(event.target.value)} min={dateAfterDays(1)} required className="field-control" />
+                        <input
+                          type="date"
+                          value={missionDueDate}
+                          onChange={(event) => {
+                            const value = event.target.value
+                            setMissionDueDate(value)
+                            if (evidenceDueDate > value) setEvidenceDueDate(value)
+                          }}
+                          min={dateAfterDays(1)}
+                          required
+                          className={CONTROL_CLASS}
+                        />
                       </Field>
                     </div>
                   </section>
@@ -286,13 +302,13 @@ export function CaseOperationalPlanClient({
                     </div>
                     <div className="mt-5 grid gap-4 sm:grid-cols-2">
                       <Field label="Qué necesitamos" wide>
-                        <input value={evidenceTitle} onChange={(event) => setEvidenceTitle(event.target.value)} minLength={3} maxLength={180} required className="field-control" />
+                        <input value={evidenceTitle} onChange={(event) => setEvidenceTitle(event.target.value)} minLength={3} maxLength={180} required className={CONTROL_CLASS} />
                       </Field>
                       <Field label="Qué debe demostrar" wide>
-                        <textarea value={evidenceDescription} onChange={(event) => setEvidenceDescription(event.target.value)} rows={3} maxLength={3000} className="field-control py-3" />
+                        <textarea value={evidenceDescription} onChange={(event) => setEvidenceDescription(event.target.value)} rows={3} maxLength={3000} className={`${CONTROL_CLASS} py-3`} />
                       </Field>
                       <Field label="Fecha de entrega">
-                        <input type="date" value={evidenceDueDate} onChange={(event) => setEvidenceDueDate(event.target.value)} min={dateAfterDays(1)} max={missionDueDate} required className="field-control" />
+                        <input type="date" value={evidenceDueDate} onChange={(event) => setEvidenceDueDate(event.target.value)} min={dateAfterDays(1)} max={missionDueDate} required className={CONTROL_CLASS} />
                       </Field>
                     </div>
                   </section>
@@ -315,6 +331,12 @@ export function CaseOperationalPlanClient({
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">Continúa desde la misión o revisa la bandeja de evidencias. Volver a abrir este panel no crea duplicados.</p>
                 </div>
               )}
+
+              {!complete && !result && !canCreate && (
+                <div className="rounded-2xl border bg-muted/40 p-5 text-sm text-muted-foreground">
+                  Tu rol permite consultar este expediente, pero no crear ni asignar trabajo operativo.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -323,7 +345,7 @@ export function CaseOperationalPlanClient({
   )
 }
 
-function Field({ label, wide = false, children }: { label: string; wide?: boolean; children: React.ReactNode }) {
+function Field({ label, wide = false, children }: { label: string; wide?: boolean; children: ReactNode }) {
   return <label className={`space-y-2 text-sm font-bold ${wide ? 'sm:col-span-2' : ''}`}><span>{label}</span>{children}</label>
 }
 
@@ -361,6 +383,16 @@ function StatusCard({
 function dateAfterDays(days: number) {
   const date = new Date()
   date.setDate(date.getDate() + days)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function dateInputValue(value: string | null | undefined) {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
