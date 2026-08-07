@@ -32,7 +32,8 @@
     "check:atomic-agent-review": "node scripts/check-atomic-agent-review-v1.mjs",
     "check:stale-workflow-recovery": "node scripts/check-stale-workflow-recovery-v1.mjs",
     "check:guided-resolution": "node scripts/check-guided-resolution-positioning-v1.mjs",
-    "check:authenticated-resolution": "node scripts/check-authenticated-guided-resolution-v1.mjs"
+    "check:authenticated-resolution": "node scripts/check-authenticated-guided-resolution-v1.mjs",
+    "check:durable-agent-queue": "node scripts/check-durable-agent-queue-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
