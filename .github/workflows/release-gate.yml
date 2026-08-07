@@ -21,13 +21,15 @@ jobs:
           cache: npm
       - name: Install reproducibly
         run: npm ci --ignore-scripts
+      - name: Block critical dependency vulnerabilities
+        run: npm audit --audit-level=critical
       - name: Release qualification
         run: npm run release:check
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'ci-placeholder-anon-key' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'ci-placeholder-service-role-key' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'ci-placeholder-openai-key' }}
 
   production-smoke:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
