@@ -111,26 +111,35 @@ begin
   where stage.workflow_id = v_run.workflow_id
     and stage.organization_id = v_run.sandbox_organization_id;
 
-  select count(*)
+  select count(distinct run.id)
   into v_completed_runs
-  from public.agent_runs run
-  where run.workflow_id = v_run.workflow_id
-    and run.organization_id = v_run.sandbox_organization_id
+  from public.agent_workflow_stages stage
+  join public.agent_runs run
+    on run.id = stage.run_id
+   and run.organization_id = stage.organization_id
+  where stage.workflow_id = v_run.workflow_id
+    and stage.organization_id = v_run.sandbox_organization_id
     and run.status in ('completed', 'pending_review', 'approved');
 
-  select count(*)
+  select count(distinct artifact.id)
   into v_approved_artifacts
-  from public.agent_artifacts artifact
-  where artifact.workflow_id = v_run.workflow_id
-    and artifact.organization_id = v_run.sandbox_organization_id
+  from public.agent_workflow_stages stage
+  join public.agent_artifacts artifact
+    on artifact.run_id = stage.run_id
+   and artifact.organization_id = stage.organization_id
+  where stage.workflow_id = v_run.workflow_id
+    and stage.organization_id = v_run.sandbox_organization_id
     and artifact.status = 'approved'
     and artifact.superseded_at is null;
 
-  select count(*)
+  select count(distinct review.id)
   into v_reviews
-  from public.agent_reviews review
-  where review.organization_id = v_run.sandbox_organization_id
-    and review.case_id = v_run.guided_case_id
+  from public.agent_workflow_stages stage
+  join public.agent_reviews review
+    on review.run_id = stage.run_id
+   and review.organization_id = stage.organization_id
+  where stage.workflow_id = v_run.workflow_id
+    and stage.organization_id = v_run.sandbox_organization_id
     and review.decision = 'approved';
 
   select
