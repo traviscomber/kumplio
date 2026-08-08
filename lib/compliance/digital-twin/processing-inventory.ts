@@ -1,5 +1,40 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+export type LifecycleDimensionStatus = 'validated' | 'needs_changes' | 'pending_evidence' | 'not_applicable'
+
+export type ProcessingLifecycleReview = {
+  id: string
+  version: number
+  decision: 'approved' | 'changes_requested' | 'rejected'
+  statuses: {
+    basis: LifecycleDimensionStatus
+    retention: LifecycleDimensionStatus
+    recipients: LifecycleDimensionStatus
+    subprocessors: LifecycleDimensionStatus
+    transfers: LifecycleDimensionStatus
+  }
+  basisType: string | null
+  basisSummary: string | null
+  retentionRule: string | null
+  retentionTrigger: string | null
+  retentionPeriod: string | null
+  recipients: Array<Record<string, string | null>>
+  subprocessors: Array<Record<string, string | null>>
+  transfers: Array<Record<string, string | null>>
+  sourceRefs: Array<Record<string, string | null>>
+  unknowns: string[]
+  reviewNote: string
+  reviewedAt: string
+  reviewedByLabel: string | null
+  snapshotHash: string
+  evidence: {
+    id: string
+    validationStatus: string
+    integrityStatus: string
+    integrityHash: string | null
+  } | null
+}
+
 export type ProcessingInventoryActivity = {
   id: string
   code: string
@@ -21,6 +56,7 @@ export type ProcessingInventoryActivity = {
   reviewedAt: string | null
   reviewedByLabel: string | null
   unknowns: string[]
+  lifecycleReview: ProcessingLifecycleReview | null
   score: number
   dataset: {
     id: string
@@ -75,6 +111,9 @@ export type ProcessingInventorySummary = {
   vendors: number
   evidence: number
   unknowns: number
+  lifecycleReviewed: number
+  lifecycleApproved: number
+  lifecycleNeedsChanges: number
   averageScore: number | null
 }
 
@@ -86,7 +125,7 @@ export async function getProcessingInventory(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any
 
-  const [processesResult, reviewsResult, evidenceLinksResult] = await Promise.all([
+  const [processesResult, reviewsResult, lifecycleReviewsResult, evidenceLinksResult] = await Promise.all([
     db.from('organization_processes')
       .select('id,code,name,description,criticality,owner_user_id,lifecycle_status,attributes,created_at,updated_at')
       .eq('organization_id', organizationId)
@@ -99,6 +138,11 @@ export async function getProcessingInventory(
       .eq('organization_id', organizationId)
       .order('reviewed_at', { ascending: false })
       .limit(1000),
+    db.from('processing_activity_lifecycle_reviews')
+      .select('id,project_id,case_id,process_id,evidence_id,control_id,version,decision,basis_status,retention_status,recipients_status,subprocessors_status,transfers_status,basis_type,basis_summary,retention_rule,retention_trigger,retention_period,recipients,subprocessors,transfers,source_refs,unknowns,review_note,snapshot_hash,reviewed_by,reviewed_at')
+      .eq('organization_id', organizationId)
+      .order('reviewed_at', { ascending: false })
+      .limit(1000),
     db.from('processing_activity_evidence')
       .select('process_id,evidence_id,relationship_type,linked_at')
       .eq('organization_id', organizationId)
@@ -108,24 +152,14 @@ export async function getProcessingInventory(
 
   const processes = requiredRows(processesResult, 'actividades de tratamiento')
   const reviews = optionalRows(reviewsResult)
+  const lifecycleReviews = optionalRows(lifecycleReviewsResult)
   const evidenceLinks = optionalRows(evidenceLinksResult)
   const processIds = processes.map((row) => String(row.id))
 
   if (processIds.length === 0) {
     return {
       activities: [],
-      summary: {
-        activities: 0,
-        reviewed: 0,
-        partial: 0,
-        complete: 0,
-        systems: 0,
-        datasets: 0,
-        vendors: 0,
-        evidence: 0,
-        unknowns: 0,
-        averageScore: null,
-      },
+      summary: emptySummary(),
     }
   }
 
@@ -146,6 +180,7 @@ export async function getProcessingInventory(
   const assetIds = unique(processAssets.map((row) => row.asset_id))
   const reviewEvidenceIds = unique([
     ...reviews.map((row) => row.evidence_id),
+    ...lifecycleReviews.map((row) => row.evidence_id),
     ...evidenceLinks.map((row) => row.evidence_id),
   ])
 
@@ -190,6 +225,7 @@ export async function getProcessingInventory(
   const userIds = unique([
     ...processes.map((row) => row.owner_user_id),
     ...reviews.map((row) => row.reviewed_by),
+    ...lifecycleReviews.map((row) => row.reviewed_by),
   ])
   const profilesResult = userIds.length
     ? await db.from('profiles').select('id,first_name,last_name,email').in('id', userIds)
@@ -201,6 +237,7 @@ export async function getProcessingInventory(
   ]))
 
   const latestReviewByProcess = firstBy(reviews, 'process_id')
+  const latestLifecycleByProcess = firstBy(lifecycleReviews, 'process_id')
   const datasetById = indexBy(datasets)
   const assetById = indexBy(assets)
   const vendorById = indexBy(vendors)
@@ -214,6 +251,7 @@ export async function getProcessingInventory(
     const attributes = asObject(process.attributes)
     const source = asObject(attributes.source)
     const review = latestReviewByProcess.get(String(process.id))
+    const lifecycle = latestLifecycleByProcess.get(String(process.id))
     const processDataset = processDatasetByProcess.get(String(process.id))
     const processAsset = processAssetByProcess.get(String(process.id))
     const dataset = processDataset ? datasetById.get(String(processDataset.dataset_id)) : undefined
@@ -226,12 +264,52 @@ export async function getProcessingInventory(
       : evidenceLink?.evidence_id
         ? evidenceById.get(String(evidenceLink.evidence_id))
         : undefined
+    const lifecycleEvidence = lifecycle?.evidence_id
+      ? evidenceById.get(String(lifecycle.evidence_id))
+      : undefined
     const completeness = review?.completeness === 'complete'
       ? 'complete'
       : review?.completeness === 'partial'
         ? 'partial'
         : 'unreviewed'
     const unknowns = arrayOfStrings(review?.unknowns ?? attributes.unknowns)
+
+    const lifecycleReview: ProcessingLifecycleReview | null = lifecycle ? {
+      id: String(lifecycle.id),
+      version: Number(lifecycle.version || 1),
+      decision: lifecycle.decision === 'approved'
+        ? 'approved'
+        : lifecycle.decision === 'rejected'
+          ? 'rejected'
+          : 'changes_requested',
+      statuses: {
+        basis: lifecycleStatus(lifecycle.basis_status),
+        retention: lifecycleStatus(lifecycle.retention_status),
+        recipients: lifecycleStatus(lifecycle.recipients_status),
+        subprocessors: lifecycleStatus(lifecycle.subprocessors_status),
+        transfers: lifecycleStatus(lifecycle.transfers_status),
+      },
+      basisType: text(lifecycle.basis_type),
+      basisSummary: text(lifecycle.basis_summary),
+      retentionRule: text(lifecycle.retention_rule),
+      retentionTrigger: text(lifecycle.retention_trigger),
+      retentionPeriod: text(lifecycle.retention_period),
+      recipients: objectArray(lifecycle.recipients),
+      subprocessors: objectArray(lifecycle.subprocessors),
+      transfers: objectArray(lifecycle.transfers),
+      sourceRefs: objectArray(lifecycle.source_refs),
+      unknowns: arrayOfStrings(lifecycle.unknowns),
+      reviewNote: String(lifecycle.review_note || ''),
+      reviewedAt: String(lifecycle.reviewed_at || ''),
+      reviewedByLabel: lifecycle.reviewed_by ? profileLabels.get(String(lifecycle.reviewed_by)) || 'Revisor' : null,
+      snapshotHash: String(lifecycle.snapshot_hash || ''),
+      evidence: lifecycleEvidence ? {
+        id: String(lifecycleEvidence.id),
+        validationStatus: String(lifecycleEvidence.validation_status || 'pending'),
+        integrityStatus: String(lifecycleEvidence.integrity_status || 'pending'),
+        integrityHash: text(lifecycleEvidence.integrity_hash),
+      } : null,
+    } : null
 
     const activity: ProcessingInventoryActivity = {
       id: String(process.id),
@@ -254,6 +332,7 @@ export async function getProcessingInventory(
       reviewedAt: text(review?.reviewed_at),
       reviewedByLabel: review?.reviewed_by ? profileLabels.get(String(review.reviewed_by)) || 'Revisor' : null,
       unknowns,
+      lifecycleReview,
       score: 0,
       dataset: dataset ? {
         id: String(dataset.id),
@@ -311,8 +390,11 @@ export async function getProcessingInventory(
       systems: new Set(activities.flatMap((item) => item.asset ? [item.asset.id] : [])).size,
       datasets: new Set(activities.flatMap((item) => item.dataset ? [item.dataset.id] : [])).size,
       vendors: new Set(activities.flatMap((item) => item.vendor ? [item.vendor.id] : [])).size,
-      evidence: new Set(activities.flatMap((item) => item.evidence ? [item.evidence.id] : [])).size,
-      unknowns: activities.reduce((sum, item) => sum + item.unknowns.length, 0),
+      evidence: new Set(activities.flatMap((item) => [item.evidence?.id, item.lifecycleReview?.evidence?.id].filter(Boolean) as string[])).size,
+      unknowns: activities.reduce((sum, item) => sum + item.unknowns.length + (item.lifecycleReview?.unknowns.length || 0), 0),
+      lifecycleReviewed: activities.filter((item) => item.lifecycleReview).length,
+      lifecycleApproved: activities.filter((item) => item.lifecycleReview?.decision === 'approved').length,
+      lifecycleNeedsChanges: activities.filter((item) => item.lifecycleReview?.decision === 'changes_requested').length,
       averageScore: activities.length
         ? Math.round(activities.reduce((sum, item) => sum + item.score, 0) / activities.length)
         : null,
@@ -323,18 +405,43 @@ export async function getProcessingInventory(
 function activityScore(activity: ProcessingInventoryActivity) {
   let score = 0
   if (activity.purpose) score += 10
-  if (activity.proposedLegalBasis) score += 10
+  if (activity.proposedLegalBasis) score += 5
+  if (activity.lifecycleReview?.statuses.basis === 'validated') score += 5
   if (activity.ownerId) score += 10
   if (activity.dataset?.dataSubjects.length) score += 10
   if (activity.dataset?.dataCategories.length) score += 10
-  if (activity.dataset?.retentionRule) score += 10
+  if (activity.dataset?.retentionRule) score += 5
+  if (activity.lifecycleReview?.statuses.retention === 'validated') score += 5
   if (activity.asset) score += 10
-  if (activity.vendor) score += 10
+  if (activity.vendor) score += 5
   if (activity.evidence?.validationStatus === 'accepted' && activity.evidence.integrityStatus === 'verified') score += 10
   if (activity.reviewDecision === 'approved') score += 10
+  if (finalDimension(activity.lifecycleReview?.statuses.recipients)) score += 2
+  if (finalDimension(activity.lifecycleReview?.statuses.subprocessors)) score += 2
+  if (finalDimension(activity.lifecycleReview?.statuses.transfers)) score += 1
+
+  if (!activity.lifecycleReview || activity.lifecycleReview.decision !== 'approved') return Math.min(score, 65)
   if (activity.completeness === 'partial') return Math.min(score, 80)
   if (activity.completeness === 'unreviewed') return Math.min(score, 50)
   return score
+}
+
+function emptySummary(): ProcessingInventorySummary {
+  return {
+    activities: 0,
+    reviewed: 0,
+    partial: 0,
+    complete: 0,
+    systems: 0,
+    datasets: 0,
+    vendors: 0,
+    evidence: 0,
+    unknowns: 0,
+    lifecycleReviewed: 0,
+    lifecycleApproved: 0,
+    lifecycleNeedsChanges: 0,
+    averageScore: null,
+  }
 }
 
 function requiredRows(result: { data?: unknown[] | null; error?: { message?: string } | null }, label: string) {
@@ -369,8 +476,28 @@ function asObject(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 }
 
+function objectArray(value: unknown): Array<Record<string, string | null>> {
+  if (!Array.isArray(value)) return []
+  return value
+    .filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+    .map((item) => Object.fromEntries(
+      Object.entries(item as Record<string, unknown>)
+        .map(([key, entry]) => [key, text(entry)]),
+    ))
+}
+
 function arrayOfStrings(value: unknown) {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : []
+}
+
+function lifecycleStatus(value: unknown): LifecycleDimensionStatus {
+  return value === 'validated' || value === 'needs_changes' || value === 'not_applicable'
+    ? value
+    : 'pending_evidence'
+}
+
+function finalDimension(value: LifecycleDimensionStatus | undefined) {
+  return value === 'validated' || value === 'not_applicable'
 }
 
 function text(value: unknown) {
