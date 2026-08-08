@@ -5,10 +5,11 @@
 > Revisión: 8 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Baseline funcional probado: `14a67f2a15423362ed1ed403182fb8b80d5348ba`  
-> Última migración aplicada: `20260808020905_seed_n3uralia_core_processing_activities_v1`  
+> Baseline estable en `main`: `9b2ef72d9e1128671111b8e1cfec0612e4e04890`  
+> Última migración aplicada: `20260808044018_seed_n3uralia_processing_lifecycle_reviews_v1`  
 > Assurance UI 3/3: `docs/assurance/ui-golden-path-production-3x-2026-08-07.md`  
-> Assurance inventario real: `docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md`  
+> Assurance inventario 3/3: `docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md`  
+> Assurance lifecycle 3/3: `docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md`  
 > Repositorio: `traviscomber/kumplio`
 
 ---
@@ -87,8 +88,9 @@ Una persona describe una situación
 - que un documento aislado acredita la operación completa de un control;
 - que una recomendación de IA sustituye revisión legal, auditoría o decisión humana;
 - que una base propuesta ya fue validada jurídicamente;
-- que una línea base o tres actividades equivalen a inventario organizacional completo;
-- que una clasificación de riesgo es definitiva sin metodología y aprobación;
+- que tres actividades equivalen a un inventario organizacional completo;
+- que un aviso general acredita cada actividad específica;
+- que existe eliminación demostrada sin una prueba auditable;
 - que un tenant sintético equivale a una empresa cliente real;
 - que aprobar un artefacto equivale a cerrar un expediente.
 
@@ -112,38 +114,44 @@ Una persona describe una situación
 
 ## 3. Estado ejecutivo al 8 de agosto de 2026
 
-### Baseline funcional verde
+### Baseline estable
 
-El baseline funcional validado es:
+El baseline estable y desplegado en `main` es:
 
 ```text
-14a67f2a15423362ed1ed403182fb8b80d5348ba
+9b2ef72d9e1128671111b8e1cfec0612e4e04890
 ```
 
-Sobre el cambio funcional de inventario quedaron en `SUCCESS`:
+Este baseline incorpora la ampliación a tres actividades reales y la revisión lifecycle de cinco dimensiones. Para su cierre quedaron verdes:
 
 - Canonical Roadmap Guardrail;
 - Processing Inventory Guardrail;
+- Processing Lifecycle Review Guardrail;
 - Release Gate;
 - Application Validation;
 - Release Qualification Foundation;
 - typecheck;
 - build de producción;
 - smoke test;
-- ambos previews de Vercel;
-- verificaciones de producción de solo lectura.
+- ambos despliegues Vercel;
+- verificaciones productivas de solo lectura;
+- pruebas negativas cross-tenant;
+- pruebas reversibles de versionado e idempotencia.
 
-PRs de referencia recientes:
+### PRs recientes de referencia
 
 - **#217** — inventario mínimo real de tratamientos;
-- **#219–#220** — segundo tenant, aislamiento y tenant assurance;
+- **#219–#220** — segundo tenant, aislamiento y Tenant Assurance;
 - **#223–#229** — Golden Path productivo por UI y correcciones derivadas;
-- **#230** — evidencia técnica 3/3;
+- **#230** — evidencia técnica UI 3/3;
 - **#231** — ciclo de vida seguro de tenants E2E;
 - **#232** — ampliación a tres actividades reales de N3uralia;
-- **#233** — README único y contrato de roadmap canónico.
+- **#233** — README único y contrato de roadmap canónico;
+- **#234** — reconciliación documental del inventario 3/3;
+- **#235** — revisión jurídica y lifecycle 3/3;
+- **#236** — aviso, mapeo y eliminación convertidos en trabajo; `ACTIVE`, todavía no fusionada.
 
-### Migraciones vigentes más recientes
+### Migraciones aplicadas más recientes
 
 | Versión aplicada | Migración |
 |---|---|
@@ -154,8 +162,10 @@ PRs de referencia recientes:
 | `20260807210440` | `fix_tenant_assurance_refresh_joins_v1` |
 | `20260807210713` | `seed_tenant_assurance_sandbox_v1` |
 | `20260808020905` | `seed_n3uralia_core_processing_activities_v1` |
+| `20260808043810` | `processing_activity_lifecycle_review_v1` |
+| `20260808044018` | `seed_n3uralia_processing_lifecycle_reviews_v1` |
 
-La versión `20260808020905` fue reconciliada entre el historial real de producción y el repositorio. No existe una segunda migración duplicada con otro timestamp.
+Las migraciones de aviso y eliminación de la PR #236 todavía no se consideran aplicadas ni productivas.
 
 ### Preparación actual
 
@@ -163,12 +173,14 @@ La versión `20260808020905` fue reconciliada entre el historial real de producc
 |---|---|
 | Desarrollo técnico | sólido |
 | Demo comercial acompañada | apta |
-| Golden Path productivo por UI | validado 3/3 con actor E2E automatizado |
-| Assurance multiempresa interno | validado |
-| Inventario real de N3uralia | 3 actividades revisadas; legal y lifecycle pendientes |
-| Piloto supervisado | apto para iniciar después de cerrar los gaps P0 seleccionados |
+| Golden Path productivo por UI | `VALIDATED x3` con actor E2E |
+| Assurance multiempresa interno | `VALIDATED` |
+| Inventario real de N3uralia | 3 actividades revisadas |
+| Lifecycle de cinco dimensiones | 3/3 con `changes_requested` |
+| Aviso y eliminación | `ACTIVE` en PR #236 |
+| Piloto supervisado externo | pendiente |
 | Beta privada autoservicio | no habilitar todavía |
-| Registro público autoservicio | no habilitar |
+| Registro público autoservicio | no habilitado |
 | Escalamiento Enterprise | diferido hasta pilotos externos |
 
 ### Separación de datos reales y sintéticos
@@ -204,7 +216,6 @@ caso aprobado
 → ámbito asignado
 → misión con owner y vencimiento
 → solicitud de evidencia
-→ requerimiento interno diferenciado de obligación legal
 → control de línea base
 → evidencia aceptada con SHA-256
 → evaluación de diseño: effective
@@ -233,10 +244,10 @@ Cada actividad contiene:
 - sistema o repositorio;
 - tercero;
 - fuente verificable;
-- revisión `approved / partial`;
+- revisión inicial `approved / partial`;
 - evidencia `accepted · verified`;
 - snapshot SHA-256;
-- desconocidos explícitos.
+- unknowns explícitos.
 
 Evidencia detallada:
 
@@ -244,27 +255,34 @@ Evidencia detallada:
 docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md
 ```
 
-La validación productiva confirmó para las dos actividades nuevas:
+### Hito C — Revisión jurídica y lifecycle — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
 
-| Control | Resultado |
-|---|---:|
-| Actividades nuevas | 2 |
-| Revisiones `approved / partial` | 2/2 |
-| Evidencia `accepted · verified` | 2/2 |
-| Hash revisión = hash evidencia | 2/2 |
-| Desconocidos de cuentas | 7 |
-| Desconocidos de IA | 8 |
-| Cadenas proceso → dataset → sistema → tercero | 2/2 |
-| Runs aprobados observados | 8 |
-| Runs completos con modelo y uso | 9 |
-| Artefactos | 8 |
-| Revisiones de agentes | 7 |
-| Tool calls | 19 |
-| Tokens acumulados | 171.727 |
+Las tres actividades tienen una revisión lifecycle `v1`, separada de la revisión inicial:
 
-El estado sigue siendo `VALIDATED INICIAL / ACTIVE` porque todavía faltan validaciones jurídicas, reglas de retención, destinatarios, subencargados, transferencias, avisos y eliminación demostrada.
+| Actividad | Decisión | Base | Retención | Destinatarios | Subencargados | Transferencias | Unknowns |
+|---|---|---|---|---|---|---|---:|
+| Contactos comerciales y demos | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+| Cuentas, autenticación y workspace | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+| Expedientes y especialistas IA | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
 
-### Hito C — Segundo tenant aislado y Tenant Assurance — `VALIDATED`
+Resultado persistido:
+
+- 3/3 revisiones `changes_requested`;
+- 3/3 evidencias `accepted · verified`;
+- hash de revisión igual al hash de evidencia en 3/3;
+- versiones y `supersedes_id` probados reversiblemente;
+- aprobación bloqueada mientras existan dimensiones pendientes o unknowns;
+- acceso cross-tenant rechazado.
+
+Evidencia detallada:
+
+```text
+docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md
+```
+
+La tarea se considera revisada y operacionalizada, no jurídicamente aprobada.
+
+### Hito D — Segundo tenant aislado y Tenant Assurance — `VALIDATED`
 
 El sandbox interno demostró:
 
@@ -280,7 +298,7 @@ El sandbox interno demostró:
 
 La conclusión final mantuvo `request_changes`; se aprobó la calidad del artefacto, no una conclusión de cumplimiento.
 
-### Hito D — UI Golden Path productivo — `VALIDATED x3`
+### Hito E — UI Golden Path productivo — `VALIDATED x3`
 
 Tres ejecuciones consecutivas contra producción completaron por interfaz:
 
@@ -293,13 +311,10 @@ login
 → plan operativo
 → misión y solicitud
 → baseline
-→ cierre humano simulado por actor E2E
 → actividad de tratamiento
 → sistema, dataset, tercero y evidencia
 → revisión parcial
 ```
-
-Resultado agregado:
 
 | Métrica | Resultado 3/3 |
 |---|---:|
@@ -366,7 +381,7 @@ Todos trabajan con contratos estructurados, fronteras `DECIDE / NO DECIDE`, herr
 
 - expediente → plan operativo;
 - misión con owner, prioridad y vencimiento;
-- solicitud de evidencia;
+- solicitudes de evidencia;
 - delegación asistida;
 - SLA, seguimiento y escalamiento;
 - briefing y continuidad diaria.
@@ -378,29 +393,31 @@ Todos trabajan con contratos estructurados, fronteras `DECIDE / NO DECIDE`, herr
 - SHA-256 e integridad;
 - suficiencia revisada;
 - diseño y operación separados;
-- baseline con límites y desconocidos;
+- baseline con límites y unknowns;
 - confianza con topes por parcialidad.
 
-### G. Inventario de tratamientos — `VALIDATED INICIAL / ACTIVE`
+### G. Inventario y lifecycle de tratamientos — `VALIDATED INICIAL / ACTIVE`
 
-- tres actividades reales de N3uralia;
-- actividad, finalidad y base propuesta;
-- titulares, categorías y sensibilidad;
+- tres actividades reales;
+- propósito, titulares y categorías;
 - dataset, sistema y tercero;
-- retención y transferencia;
-- fuente, snapshot y hash;
-- revisión y unknowns;
-- lectura en Digital Twin e Insights.
+- fuente, evidencia y hash;
+- revisión inicial;
+- cinco dimensiones lifecycle separadas;
+- versiones y supersesión;
+- aprobación bloqueada cuando faltan antecedentes;
+- lectura y revisión desde Digital Twin.
 
-La cobertura de cantidad ya cumple el gate mínimo. La calidad jurídica y de ciclo de vida sigue abierta.
+La cobertura cuantitativa está validada. La resolución de los gaps sigue abierta.
 
-### H. Escritorio e Insights — `VALIDATED INICIAL`
+### H. Escritorio, Insights, grafo e impacto — `DEPLOYED / VALIDATED INICIAL`
 
-- prioridades y explicabilidad;
+- prioridades y explicación “¿Por qué aparece esto?”;
 - briefing de 24 horas;
-- trabajo asignado y bloqueos;
+- trabajo asignado y bloqueado;
 - confianza por dimensiones;
-- grafo e impacto;
+- grafo de casos, controles, evidencia y activos;
+- análisis de impacto;
 - reutilización de controles y evidencia.
 
 ### I. Motor regulatorio Chile — `DEPLOYED`
@@ -416,7 +433,7 @@ La cobertura de cantidad ya cumple el gate mínimo. La calidad jurídica y de ci
 
 - infraestructura de nodos, relaciones y versiones;
 - casos similares;
-- precedentes en contexto de agentes;
+- precedentes en contexto de especialistas;
 - vigencia y supersesión preparadas.
 
 Pendiente: primer aprendizaje aprobado, versionado y reutilizado.
@@ -482,7 +499,7 @@ Falta:
 
 - organización externa real;
 - observación con personas;
-- repetir pruebas al ampliar superficie tenant-scoped.
+- repetir pruebas al ampliar la superficie tenant-scoped.
 
 ### 3. Inventario mínimo Ley N.º 21.719 — `3/3 REAL / ACTIVE`
 
@@ -494,16 +511,21 @@ Completado:
 - evidencia `accepted · verified`;
 - hash SHA-256;
 - unknowns explícitos;
-- separación de datos E2E.
+- revisión lifecycle de cinco dimensiones;
+- versionado, supersesión y fronteras de aprobación.
+
+Resultado de lifecycle:
+
+- 3/3 con `changes_requested`;
+- 0/3 bases jurídicamente validadas;
+- 0/3 retenciones aprobadas;
+- destinatarios, subencargados y transferencias pendientes en 3/3.
 
 Falta:
 
-- bases de licitud validadas por finalidad;
-- retención aprobada por categoría;
-- destinatarios y subencargados completos;
-- transferencias y garantías contractuales;
-- avisos de privacidad relacionados;
+- aviso relacionado por actividad;
 - eliminación demostrada;
+- resolución con evidencia de las dimensiones abiertas;
 - riesgo de terceros con metodología aprobada.
 
 ### 4. Repetibilidad del Golden Path — `3/3 / VALIDATED`
@@ -523,7 +545,22 @@ Pendiente fuera de este gate:
 - retrabajo y claridad percibida;
 - validación externa.
 
-### 5. Piloto supervisado externo — `PLANNED`
+### 5. Aviso y eliminación — `ACTIVE`
+
+La PR #236 prepara:
+
+- snapshot versionado del aviso público;
+- enlace como evidencia general, sin sobreafirmar cobertura;
+- misión con owner y vencimiento por actividad;
+- solicitud de mapeo del aviso;
+- solicitud de prueba de eliminación o anonimización;
+- criterios auditables de cierre;
+- visibilidad en Digital Twin;
+- idempotencia y fronteras cross-tenant.
+
+No se considera desplegado hasta que CI, migraciones, verificación productiva y pruebas negativas estén verdes.
+
+### 6. Piloto supervisado externo — `PLANNED`
 
 - 1–3 organizaciones;
 - responsable real de cumplimiento;
@@ -537,14 +574,13 @@ Pendiente fuera de este gate:
 
 ### P1 — Valor acumulativo
 
-1. Calidad jurídica y lifecycle del inventario real.
-2. Aprendizaje desde correcciones humanas con vigencia y aprobación.
-3. Biblioteca viva por dominio de cumplimiento.
-4. Recomendaciones proactivas explicables.
-5. Seguimiento automático sin spam.
-6. Reutilización de evidencia entre controles y marcos.
-7. Gestión de terceros críticos y dependencias.
-8. Preparación continua para auditoría.
+1. Cerrar aviso y eliminación como trabajo trazable.
+2. Resolver lifecycle mediante evidencia aprobada.
+3. Aprender desde correcciones humanas con vigencia y aprobación.
+4. Crear biblioteca viva por dominio de cumplimiento.
+5. Reutilizar evidencia entre controles y marcos.
+6. Gestionar terceros críticos y dependencias.
+7. Preparar auditoría continuamente.
 
 ### P2 — Operación avanzada
 
@@ -571,11 +607,11 @@ Pendiente fuera de este gate:
 
 ### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`
 
-1. **Completado:** registrar dos actividades reales adicionales representativas y validar tres actividades reales en total.
-2. **En curso:** validar base, retención, destinatarios, subencargados y transferencias para las tres actividades.
-3. **Pendiente:** adjuntar aviso de privacidad y evidencia de eliminación, o crear acciones explícitas con owner y fecha.
+1. **Completado:** registrar dos actividades reales adicionales y validar tres actividades reales en total.
+2. **Completado en su alcance de revisión:** separar y revisar base, retención, destinatarios, subencargados y transferencias. El resultado conservador es `changes_requested` en 3/3; los gaps no se consideran resueltos.
+3. **Active en PR #236:** vincular el aviso vigente y convertir la falta de mapeo o eliminación en misiones y solicitudes de evidencia con owner, fecha y criterio auditable de cierre.
 
-**Salida:** tres actividades reales con lifecycle defendible, unknowns reducidos solo mediante evidencia aprobada y acciones explícitas para todo gap restante.
+**Salida:** tres actividades reales con lifecycle versionado y todo gap restante convertido en trabajo trazable, sin confundir una acción creada con cumplimiento demostrado.
 
 ### Bloque 17 — Aprendizaje organizacional
 
@@ -599,7 +635,7 @@ Pendiente fuera de este gate:
 
 | Indicador | Gate | Estado actual |
 |---|---:|---:|
-| Bugs críticos abiertos | 0 | 0 conocidos en el recorrido validado |
+| Bugs críticos abiertos en baseline estable | 0 | 0 conocidos |
 | Release Gate en cambios críticos | 100% | 100% |
 | Golden Paths productivos | ≥ 3 | 3/3 técnicos con actor E2E |
 | Aserciones persistidas | 100% | 51/51 |
@@ -608,13 +644,14 @@ Pendiente fuera de este gate:
 | Fugas cross-tenant | 0 | 0 en assurance interno |
 | Actividades reales revisadas | ≥ 3 | 3/3 N3uralia |
 | Actividades reales con evidencia verificada | 100% | 3/3 |
-| Actividades reales con base validada | 100% | 0/3; bases propuestas visibles |
-| Actividades reales con retención aprobada | 100% | 0/3 |
-| Destinatarios/subencargados completos | 100% | pendiente |
+| Actividades con lifecycle versionado | 100% | 3/3 |
+| Actividades con base validada | 100% | 0/3 |
+| Actividades con retención aprobada | 100% | 0/3 |
+| Destinatarios/subencargados completos | 100% | 0/3 |
+| Aviso mapeado por actividad | 100% | 0/3 en baseline estable |
 | Eliminación demostrada | 100% | 0/3 |
 | Controles con owner | 100% del alcance piloto | 100% del alcance actual |
 | Evidencia con procedencia | 100% | 100% del alcance declarado |
-| Recomendaciones con explicación | 100% | 100% del assurance |
 | Recorridos completos por persona externa | ≥ 1 | 0 |
 | Organizaciones externas observadas | ≥ 1 | 0 |
 | Tiempo humano del piloto | medir | pendiente |
@@ -657,11 +694,13 @@ Hasta cerrar P0:
 - no presentar tres actividades como inventario completo;
 - no aumentar scores ocultando operación parcial;
 - no convertir bases propuestas o riesgos provisionales en conclusiones aprobadas;
+- no presentar el aviso general como cobertura específica;
+- no presentar una solicitud de eliminación como eliminación demostrada;
 - no automatizar decisiones irreversibles sin aprobación;
 - no confundir aprobación de artefactos con cierre del expediente;
 - no mezclar modernización de dependencias con cambios funcionales grandes;
 - no marcar `DONE` fuera del alcance que la evidencia cubre;
-- no pasar al Bloque 17 hasta cerrar o registrar explícitamente las tareas 2 y 3 del Bloque 16.
+- no pasar al Bloque 17 hasta cerrar o registrar explícitamente la tarea 3 del Bloque 16.
 
 Toda idea nueva debe demostrar que:
 
@@ -677,19 +716,29 @@ Toda idea nueva debe demostrar que:
 
 El Bloque 15 permanece `DONE` dentro del assurance técnico interno.
 
-La tarea 1 del Bloque 16 quedó completada y validada:
+Dentro del Bloque 16:
 
-> **N3uralia tiene tres actividades reales observadas, revisadas y respaldadas con evidencia de integridad verificable.**
+1. la ampliación a tres actividades reales está `VALIDATED`;
+2. la revisión lifecycle está `VALIDATED INICIAL / CAMBIOS REQUERIDOS`;
+3. aviso y eliminación están `ACTIVE` en la PR #236 y todavía no forman parte del baseline estable.
 
-Esto no acredita inventario completo ni cumplimiento integral. Las tres actividades conservan bases propuestas, retención pendiente y otros unknowns.
+La única continuidad funcional autorizada es:
 
-La única continuidad autorizada es:
+> **Cerrar la tarea 3 del Bloque 16 sin sobreafirmar evidencia: aviso general versionado, mapeo por actividad y prueba de eliminación convertidos en trabajo trazable con owner, fecha y criterio de cierre.**
 
-> **Bloque 16, tarea 2 — validar base, retención, destinatarios, subencargados y transferencias para las tres actividades reales.**
+La tarea se considerará desplegada únicamente después de:
 
-Después corresponde la tarea 3:
-
-> **Adjuntar aviso de privacidad y evidencia de eliminación, o convertir cada ausencia en una acción explícita con owner y vencimiento.**
+- CI y previews verdes;
+- migraciones aplicadas y reconciliadas;
+- verificación productiva de solo lectura;
+- idempotencia comprobada;
+- rechazo cross-tenant;
+- una evidencia general del aviso;
+- tres enlaces a actividades;
+- tres misiones;
+- tres solicitudes de mapeo;
+- tres solicitudes de eliminación;
+- eventos auditables.
 
 En paralelo siguen abiertos, sin alterar la secuencia principal:
 
@@ -697,4 +746,4 @@ En paralelo siguen abiertos, sin alterar la secuencia principal:
 2. ciclo de vida seguro de tenants E2E históricos;
 3. preparación del primer piloto externo supervisado.
 
-No se habilitará beta autoservicio hasta cerrar la deuda de leaked passwords, mejorar el lifecycle del inventario real y observar al menos una organización externa supervisada.
+No se habilitará beta autoservicio hasta cerrar la deuda de leaked passwords, completar la trazabilidad de aviso/eliminación y observar al menos una organización externa supervisada.
