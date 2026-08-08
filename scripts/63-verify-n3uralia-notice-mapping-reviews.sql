@@ -200,7 +200,10 @@ begin
     raise exception 'Notice mapping review RPC is missing.';
   end if;
 
-  if pg_catalog.prosecdef(v_function_oid)
+  if exists (
+       select 1 from pg_catalog.pg_proc function
+       where function.oid = v_function_oid and function.prosecdef
+     )
      or pg_catalog.pg_get_functiondef(v_function_oid) not like '%SET search_path TO ''''%'
      or pg_catalog.has_function_privilege('public', v_function_oid, 'EXECUTE')
      or pg_catalog.has_function_privilege('anon', v_function_oid, 'EXECUTE')
