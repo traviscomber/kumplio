@@ -39,7 +39,7 @@ if (nextBlocks.length !== 1) {
   throw new Error(`ROADMAP.md must contain exactly one NEXT block; found ${nextBlocks.length}`)
 }
 
-if (!roadmap.includes('No se agregan módulos nuevos solo porque son atractivos')) {
+if (!roadmap.includes('- no crear módulos nuevos solo porque son atractivos;')) {
   throw new Error('ROADMAP.md must preserve the scope-freeze rule against attractive unprioritized modules')
 }
 
