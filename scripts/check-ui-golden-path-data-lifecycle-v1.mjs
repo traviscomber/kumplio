@@ -36,10 +36,16 @@ for (const marker of [
   'Expected exactly 4 pre-mission E2E users',
   'Expected exactly 3 pre-mission E2E organizations',
   'Expected exactly 3 pre-mission E2E projects',
+  'Expected all three official 3x organizations to exist',
   'Official 3x organization entered cleanup target',
   'Target contains immutable mission events',
   'Target contains immutable knowledge events',
   'Target is referenced by tenant assurance',
+  'Inspect every public FK to auth.users',
+  'Public user reference escaped the reviewed tenant scope',
+  "r.table_name = 'profiles' and r.column_name = 'id'",
+  "r.table_name = 'ai_platform_runs' and r.column_name = 'actor_user_id'",
+  "r.table_name = 'scraper_runs' and r.column_name = 'requested_by'",
   "con.confdeltype in ('a', 'r')",
   'delete from public.ai_platform_runs',
   'delete from public.scraper_runs',
@@ -60,6 +66,15 @@ if (/\bcommit\s*;/i.test(sql)) {
   throw new Error('The committed maintenance script must not contain COMMIT;')
 }
 
+for (const forbidden of [
+  /disable\s+trigger/i,
+  /session_replication_role/i,
+  /truncate\s+/i,
+  /drop\s+table/i,
+]) {
+  if (forbidden.test(sql)) throw new Error(`${sqlPath} contains a forbidden control bypass: ${forbidden}`)
+}
+
 for (const id of [...targetUsers, ...targetOrganizations, ...officialOrganizations]) {
   if (!sql.includes(id)) throw new Error(`${sqlPath} missing reviewed UUID: ${id}`)
 }
@@ -73,6 +88,7 @@ for (const id of targetOrganizations) {
 for (const id of officialOrganizations) {
   if (targetOrgBlock.includes(id)) throw new Error(`Official organization entered target_orgs: ${id}`)
 }
+assertExactUuidSet(targetOrgBlock, targetOrganizations, 'target_orgs')
 
 const targetUserBlock = sql.match(/insert into target_users[\s\S]*?create temporary table target_orgs/i)?.[0]
 if (!targetUserBlock) throw new Error('Could not isolate the target_users allowlist')
@@ -81,6 +97,18 @@ for (const id of targetUsers) {
 }
 if (targetUserBlock.includes('31229627159-')) {
   throw new Error('An official 3x identity entered target_users')
+}
+assertExactUuidSet(targetUserBlock, targetUsers, 'target_users')
+
+const publicReferenceGuard = sql.match(/-- Inspect every public FK to auth[.]users[\s\S]*?-- These FKs use SET NULL/i)?.[0]
+if (!publicReferenceGuard) throw new Error('Could not isolate the public user-reference guard')
+if (publicReferenceGuard.includes('con.confdeltype in')) {
+  throw new Error('The pre-delete user-reference guard must inspect every FK action, not only blocking actions')
+}
+const tableExceptions = [...publicReferenceGuard.matchAll(/r[.]table_name = '([^']+)'/g)].map((match) => match[1])
+const expectedExceptions = ['profiles', 'ai_platform_runs', 'scraper_runs']
+if (JSON.stringify([...new Set(tableExceptions)].sort()) !== JSON.stringify(expectedExceptions.sort())) {
+  throw new Error(`Unexpected public user-reference exception set: ${[...new Set(tableExceptions)].sort().join(', ')}`)
 }
 
 const profilesDelete = sql.indexOf('delete from public.profiles')
@@ -102,6 +130,7 @@ for (const marker of [
   'Pre‑misión e incompletos — candidatos a limpieza',
   'scripts/maintenance/cleanup-ui-golden-path-pre-mission.sql',
   'termina en `ROLLBACK` por defecto',
+  'todas las FKs públicas hacia `auth.users`',
   'La automatización usada en este cierre no obtuvo autorización de la herramienta para ejecutar SQL destructivo en producción.',
   '| Usuarios E2E | 10 | 6 |',
   '| Organizaciones E2E | 9 | 6 |',
@@ -110,3 +139,11 @@ for (const marker of [
 }
 
 console.log('UI golden-path E2E data lifecycle guardrail: PASS')
+
+function assertExactUuidSet(block, expected, label) {
+  const actual = [...new Set(block.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi) || [])].sort()
+  const wanted = [...expected].sort()
+  if (JSON.stringify(actual) !== JSON.stringify(wanted)) {
+    throw new Error(`${label} UUID allowlist changed: ${actual.join(', ')}`)
+  }
+}
