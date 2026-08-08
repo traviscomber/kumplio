@@ -31,6 +31,7 @@ const checks = [
   ['check:processing-inventory'],
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
+  ['check:e2e-data-lifecycle'],
   ['build'],
 ]
 
