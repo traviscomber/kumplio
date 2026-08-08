@@ -157,6 +157,7 @@ declare
   v_review_id uuid;
   v_source_label text;
   v_event_created boolean := false;
+  v_all_statuses text[] := array['validated', 'needs_changes', 'pending_evidence', 'not_applicable'];
   v_final_statuses text[] := array['validated', 'not_applicable'];
 begin
   if p_actor_id is null or not exists (
@@ -200,11 +201,11 @@ begin
     raise exception using errcode = '22023', message = 'Invalid lifecycle review decision';
   end if;
 
-  if v_basis_status <> all(array['validated', 'needs_changes', 'pending_evidence', 'not_applicable'])
-     or v_retention_status <> all(array['validated', 'needs_changes', 'pending_evidence', 'not_applicable'])
-     or v_recipients_status <> all(array['validated', 'needs_changes', 'pending_evidence', 'not_applicable'])
-     or v_subprocessors_status <> all(array['validated', 'needs_changes', 'pending_evidence', 'not_applicable'])
-     or v_transfers_status <> all(array['validated', 'needs_changes', 'pending_evidence', 'not_applicable']) then
+  if not (v_basis_status = any(v_all_statuses))
+     or not (v_retention_status = any(v_all_statuses))
+     or not (v_recipients_status = any(v_all_statuses))
+     or not (v_subprocessors_status = any(v_all_statuses))
+     or not (v_transfers_status = any(v_all_statuses)) then
     raise exception using errcode = '22023', message = 'Invalid lifecycle dimension status';
   end if;
 
@@ -281,8 +282,8 @@ begin
     )
   );
 
-  select review.id, review.snapshot_hash, review.evidence_id, review.version
-  into v_existing_review_id, v_existing_hash, v_existing_evidence_id, v_version
+  select review.id, review.snapshot_hash, review.evidence_id, review.version, review.supersedes_id
+  into v_existing_review_id, v_existing_hash, v_existing_evidence_id, v_version, v_previous_review_id
   from public.processing_activity_lifecycle_reviews review
   where review.organization_id = p_organization_id
     and review.request_key = p_request_key
