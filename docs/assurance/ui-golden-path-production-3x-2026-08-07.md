@@ -12,7 +12,9 @@
 
 ## 1. Objetivo
 
-Demostrar que una persona puede completar el tercer golden path de Kumplio **usando únicamente la interfaz productiva**, en un tenant limpio y aislado, sin intervención SQL administrativa para crear o avanzar registros de negocio.
+Demostrar que el recorrido técnico que seguiría una persona puede completarse **usando únicamente la interfaz productiva**, en un tenant limpio y aislado, sin intervención SQL administrativa para crear o avanzar registros de negocio.
+
+La ejecución fue realizada por Playwright con una cuenta E2E, no por una persona real. La prueba ejerció los controles de aceptación y trazabilidad que la aplicación reserva para revisión humana; por tanto, valida el contrato técnico de esa revisión, pero no reemplaza una observación de usabilidad con usuarios humanos.
 
 La prueba debía recorrer y persistir:
 
@@ -24,14 +26,14 @@ cuenta E2E confirmada
 → caso inicial
 → expediente guiado adicional
 → workflow de cinco especialistas
-→ cinco revisiones humanas explícitas
+→ cinco aprobaciones explícitas mediante el contrato de revisión humana
 → plan operativo
 → misión y solicitud de evidencia
 → baseline assurance
-→ cierre humano de la misión
+→ aceptación explícita de la línea base
 → inventario de actividad de tratamiento
 → sistema, dataset, tercero, fuente y evidencia
-→ revisión humana parcial con desconocidos abiertos
+→ revisión parcial con desconocidos abiertos
 ```
 
 La prueba se consideraba válida solo si el navegador terminaba correctamente **y** una aserción server-side independiente confirmaba el estado persistido.
@@ -96,6 +98,8 @@ Cada ejecución aprobó las siguientes 17 condiciones:
 16. `designAndOperatingEvaluationsSeparated`;
 17. `processingActivityReviewed`.
 
+`fiveApprovedHumanReviews` es el nombre del contrato persistido: exige justificación y aceptación explícita de fuentes, supuestos y respaldo. En este assurance el actor que ejerció ese contrato fue una cuenta E2E automatizada.
+
 El contrato no confunde calidad del artefacto con cumplimiento legal: las revisiones aprueban el alcance declarado, conservan reservas y mantienen la operación parcial cuando la evidencia no respalda una conclusión más fuerte.
 
 ---
@@ -130,7 +134,7 @@ Esta comprobación representa estado durable y vuelve a fallar si la escritura, 
 Interpretación:
 
 - el tiempo de modelo es la suma de las cinco ejecuciones agentic de cada tenant;
-- la duración del navegador incluye esperas, navegación, revisión humana sintética, render y persistencia;
+- la duración del navegador incluye esperas, navegación, aceptación sintética, render y persistencia;
 - estas métricas permiten estimar costo técnico, pero todavía no equivalen a tiempo humano de un piloto ni a costo comercial completo.
 
 ---
@@ -147,9 +151,20 @@ Cada paquete contiene el reporte Playwright, identidad lógica del tenant, resul
 
 ---
 
-## 8. Hallazgos corregidos durante la construcción del gate
+## 8. Hallazgos corregidos durante la construcción del assurance
 
-La prueba productiva detectó fallos que los checks estáticos no mostraban:
+El tenant assurance fundacional detectó que `refresh_tenant_assurance_run_v1` intentaba leer `workflow_id` directamente desde `agent_runs` y `agent_artifacts`, columnas que no existen. La PR `#220` corrigió el recorrido canónico:
+
+```text
+agent_workflows
+→ agent_workflow_stages
+→ agent_runs
+→ agent_artifacts / agent_reviews
+```
+
+El Release Gate impide reintroducir esos joins inválidos. Además, la verificación reversible `scripts/59-verify-tenant-assurance.sql` pasó dentro de `BEGIN ... ROLLBACK` sin alterar producción.
+
+La prueba productiva por UI detectó después fallos que los checks estáticos no mostraban:
 
 1. selector ambiguo entre `Contraseña` y `Mostrar contraseña`;
 2. selector parcial de `Empresa` que también coincidía con sugerencias;
@@ -163,6 +178,7 @@ Los fixes se protegieron con Release Gate y guardrails de fuente para impedir re
 
 PRs finales de referencia:
 
+- `#220` — joins correctos del tenant assurance;
 - `#223` — campo de contraseña no ambiguo;
 - `#224` — nombres accesibles exactos;
 - `#225` — revisión limitada al workspace principal;
@@ -203,7 +219,7 @@ Este assurance **sí demuestra**:
 - navegación exclusivamente por UI para registros de negocio;
 - persistencia durable;
 - coordinación de cinco especialistas;
-- revisión humana explícita;
+- funcionamiento del contrato de revisión humana ejercido por un actor E2E;
 - cola durable sin retries en tres ejecuciones consecutivas;
 - baseline honesto;
 - inventario parcial con desconocidos visibles;
@@ -216,6 +232,7 @@ Este assurance **no demuestra**:
 - cobertura completa del inventario de tratamientos;
 - ausencia de defectos fuera del recorrido probado;
 - éxito de una beta autoservicio;
+- que una persona real haya completado las aprobaciones observadas;
 - usabilidad por una organización externa sin acompañamiento;
 - tiempo humano, retrabajo, confianza o willingness-to-pay de un piloto real.
 
