@@ -31,6 +31,10 @@ declare
   v_notice_evidence_id uuid;
   v_existing_notice_hash text;
   v_mission_id uuid;
+  v_existing_mission_process_id text;
+  v_existing_mission_notice_version text;
+  v_existing_mission_request_key text;
+  v_effective_request_key text := p_request_key::text;
   v_notice_request_id uuid;
   v_deletion_request_id uuid;
   v_notice_title text;
@@ -137,6 +141,13 @@ begin
 
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(
+      p_organization_id::text || ':processing-privacy-remediation-request:' || p_request_key::text,
+      21719
+    )
+  );
+
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
       p_organization_id::text || ':processing-privacy-remediation:' || p_process_id::text,
       21719
     )
@@ -227,14 +238,38 @@ begin
   v_notice_title := left('Aviso aplicable y mapeado — ' || v_process.name || ' (' || v_process.code || ')', 180);
   v_deletion_title := left('Evidencia de eliminación — ' || v_process.name || ' (' || v_process.code || ')', 180);
 
-  select mission.id
-  into v_mission_id
+  select
+    mission.id,
+    mission.metadata ->> 'processingActivityId',
+    mission.metadata ->> 'privacyNoticeVersion',
+    mission.metadata ->> 'processingPrivacyRemediationKey'
+  into
+    v_mission_id,
+    v_existing_mission_process_id,
+    v_existing_mission_notice_version,
+    v_existing_mission_request_key
   from public.missions mission
   where mission.organization_id = p_organization_id
-    and mission.metadata ->> 'processingPrivacyRemediationKey' = p_request_key::text
-  order by mission.created_at
+    and mission.metadata ->> 'source' = 'processing_privacy_and_deletion_remediation'
+    and (
+      mission.metadata ->> 'processingPrivacyRemediationKey' = p_request_key::text
+      or (
+        mission.metadata ->> 'processingActivityId' = p_process_id::text
+        and mission.metadata ->> 'privacyNoticeVersion' = v_notice_version
+      )
+    )
+  order by
+    case when mission.metadata ->> 'processingPrivacyRemediationKey' = p_request_key::text then 0 else 1 end,
+    mission.created_at
   limit 1
   for update;
+
+  if v_mission_id is not null and (
+    v_existing_mission_process_id is distinct from p_process_id::text
+    or v_existing_mission_notice_version is distinct from v_notice_version
+  ) then
+    raise exception using errcode = '23514', message = 'Privacy remediation request key already belongs to another activity or notice version';
+  end if;
 
   if v_mission_id is null then
     select public.create_mission_from_playbook(
@@ -263,8 +298,11 @@ begin
       )
     ) into v_mission_id;
 
+    v_existing_mission_request_key := p_request_key::text;
     v_mission_created := true;
   end if;
+
+  v_effective_request_key := coalesce(v_existing_mission_request_key, p_request_key::text);
 
   select request.id
   into v_notice_request_id
@@ -324,7 +362,7 @@ begin
 
   update public.missions mission
   set metadata = coalesce(mission.metadata, '{}'::jsonb) || jsonb_build_object(
-        'processingPrivacyRemediationKey', p_request_key,
+        'processingPrivacyRemediationKey', v_effective_request_key,
         'processingActivityId', p_process_id,
         'lifecycleReviewId', v_lifecycle_review_id,
         'projectId', v_project_id,
@@ -362,7 +400,8 @@ begin
     where event.organization_id = p_organization_id
       and event.case_id = v_case_id
       and event.event_type = 'processing_privacy_remediation_ready'
-      and event.changes ->> 'request_key' = p_request_key::text
+      and event.changes ->> 'process_id' = p_process_id::text
+      and event.changes ->> 'privacy_notice_version' = v_notice_version
   ) then
     insert into public.compliance_case_events (
       organization_id,
@@ -378,7 +417,7 @@ begin
       'processing_privacy_remediation_ready',
       'Aviso y eliminación convertidos en trabajo trazable',
       jsonb_build_object(
-        'request_key', p_request_key,
+        'request_key', v_effective_request_key,
         'process_id', p_process_id,
         'lifecycle_review_id', v_lifecycle_review_id,
         'privacy_notice_evidence_id', v_notice_evidence_id,
@@ -396,7 +435,7 @@ begin
   end if;
 
   return jsonb_build_object(
-    'requestKey', p_request_key,
+    'requestKey', v_effective_request_key,
     'processId', p_process_id,
     'lifecycleReviewId', v_lifecycle_review_id,
     'privacyNoticeEvidenceId', v_notice_evidence_id,
