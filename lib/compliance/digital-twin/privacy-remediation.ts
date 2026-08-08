@@ -28,6 +28,7 @@ export type ProcessingPrivacyRemediation = {
     status: string
     dueAt: string | null
     ownerLabel: string | null
+    submittedEvidenceId: string | null
   } | null
   deletionRequest: {
     id: string
@@ -35,6 +36,7 @@ export type ProcessingPrivacyRemediation = {
     status: string
     dueAt: string | null
     ownerLabel: string | null
+    submittedEvidenceId: string | null
   } | null
   deletionEvidenceStatus: string
 }
@@ -89,7 +91,7 @@ export async function getProcessingPrivacyRemediation(
       : Promise.resolve({ data: [], error: null }),
     requestIds.length
       ? db.from('evidence_requests')
-        .select('id,title,status,requested_from,due_at,reviewed_at,review_note')
+        .select('id,title,status,requested_from,due_at,submitted_evidence_id,reviewed_at,review_comment')
         .eq('organization_id', organizationId)
         .in('id', requestIds)
       : Promise.resolve({ data: [], error: null }),
@@ -156,13 +158,18 @@ export async function getProcessingPrivacyRemediation(
       } : null,
       noticeRequest: requestView(noticeRequest, profileLabels),
       deletionRequest: requestView(deletionRequest, profileLabels),
-      deletionEvidenceStatus: deletionRequest?.status === 'accepted'
+      deletionEvidenceStatus: deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id
         ? 'accepted'
         : String(attributes.deletionEvidenceStatus || 'pending_evidence'),
     }
   })
 
-  const open = (status: string | undefined) => status === 'open' || status === 'submitted'
+  const isOpenWork = (status: string | undefined) => [
+    'open',
+    'submitted',
+    'under_review',
+    'changes_requested',
+  ].includes(status || '')
 
   return {
     actions,
@@ -170,9 +177,11 @@ export async function getProcessingPrivacyRemediation(
       activities: actions.length,
       noticesLinked: actions.filter((item) => item.notice.evidenceId).length,
       plansReady: actions.filter((item) => item.mission).length,
-      noticeRequestsOpen: actions.filter((item) => open(item.noticeRequest?.status)).length,
-      deletionRequestsOpen: actions.filter((item) => open(item.deletionRequest?.status)).length,
-      deletionRequestsAccepted: actions.filter((item) => item.deletionRequest?.status === 'accepted').length,
+      noticeRequestsOpen: actions.filter((item) => isOpenWork(item.noticeRequest?.status)).length,
+      deletionRequestsOpen: actions.filter((item) => isOpenWork(item.deletionRequest?.status)).length,
+      deletionRequestsAccepted: actions.filter((item) => (
+        item.deletionRequest?.status === 'accepted' && item.deletionRequest.submittedEvidenceId
+      )).length,
     },
   }
 }
@@ -188,12 +197,13 @@ function requestView(
     status: String(request.status || 'open'),
     dueAt: text(request.due_at),
     ownerLabel: request.requested_from ? labels.get(String(request.requested_from)) || 'Miembro asignado' : null,
+    submittedEvidenceId: text(request.submitted_evidence_id),
   }
 }
 
 function optionalRows(result: { data?: unknown[] | null; error?: { code?: string; message?: string } | null }) {
   if (!result.error) return (result.data || []) as Array<Record<string, unknown>>
-  if (['42P01', '42703', 'PGRST204', 'PGRST205'].includes(String(result.error.code || ''))) return []
+  if (['42P01', 'PGRST204', 'PGRST205'].includes(String(result.error.code || ''))) return []
   throw new Error(result.error.message || 'No fue posible cargar las acciones de privacidad.')
 }
 
