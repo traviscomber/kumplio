@@ -111,11 +111,15 @@ begin
     raise exception 'AI processing activity source, owner, basis or request key is invalid.';
   end if;
 
-  select count(*) into v_count
+  select count(*)
+  into v_count
   from public.processing_activity_reviews review
   where review.organization_id = v_organization_id
     and review.process_id = v_account_process_id;
-  if v_count <> 1 then raise exception 'Account activity must have exactly one review, found %.', v_count; end if;
+
+  if v_count <> 1 then
+    raise exception 'Account activity must have exactly one review, found %.', v_count;
+  end if;
 
   select review.id, review.evidence_id
   into v_account_review_id, v_account_evidence_id
@@ -124,11 +128,15 @@ begin
     and review.process_id = v_account_process_id
   limit 1;
 
-  select count(*) into v_count
+  select count(*)
+  into v_count
   from public.processing_activity_reviews review
   where review.organization_id = v_organization_id
     and review.process_id = v_ai_process_id;
-  if v_count <> 1 then raise exception 'AI activity must have exactly one review, found %.', v_count; end if;
+
+  if v_count <> 1 then
+    raise exception 'AI activity must have exactly one review, found %.', v_count;
+  end if;
 
   select review.id, review.evidence_id
   into v_ai_review_id, v_ai_evidence_id
@@ -149,9 +157,9 @@ begin
       and review.completeness = 'partial'
       and review.reviewed_by = v_actor_id
       and review.snapshot_hash ~ '^[0-9a-f]{64}$'
-      and jsonb_array_length(review.unknowns) >= 7
-      and review.unknowns ? 'Verificar y habilitar Leaked Password Protection; el advisor de producción la reportó desactivada el 7 de agosto de 2026.'
-      and review.unknowns ? 'Procedimiento de cierre, exportación y eliminación de cuenta no evidenciado.'
+      and cardinality(review.unknowns) >= 7
+      and 'Verificar y habilitar Leaked Password Protection; el advisor de producción la reportó desactivada el 7 de agosto de 2026.' = any(review.unknowns)
+      and 'Procedimiento de cierre, exportación y eliminación de cuenta no evidenciado.' = any(review.unknowns)
   ) then
     raise exception 'Account activity review does not preserve its partial scope and security unknowns.';
   end if;
@@ -168,9 +176,9 @@ begin
       and review.completeness = 'partial'
       and review.reviewed_by = v_actor_id
       and review.snapshot_hash ~ '^[0-9a-f]{64}$'
-      and jsonb_array_length(review.unknowns) >= 8
-      and review.unknowns ? 'Política de minimización, redacción y exclusión de secretos antes de enviar contexto no aprobada.'
-      and review.unknowns ? 'No se ha validado mediante piloto humano que la revisión impida exposición o aprobación indebida de datos.'
+      and cardinality(review.unknowns) >= 8
+      and 'Política de minimización, redacción y exclusión de secretos antes de enviar contexto no aprobada.' = any(review.unknowns)
+      and 'No se ha validado mediante piloto humano que la revisión impida exposición o aprobación indebida de datos.' = any(review.unknowns)
   ) then
     raise exception 'AI activity review does not preserve its partial scope and privacy unknowns.';
   end if;
@@ -178,12 +186,13 @@ begin
   if not exists (
     select 1
     from public.evidence evidence_row
+    join public.processing_activity_reviews review on review.id = v_account_review_id
     where evidence_row.id = v_account_evidence_id
       and evidence_row.organization_id = v_organization_id
       and evidence_row.validation_status = 'accepted'
       and evidence_row.integrity_status = 'verified'
       and evidence_row.integrity_hash ~ '^[0-9a-f]{64}$'
-      and evidence_row.integrity_hash = (select snapshot_hash from public.processing_activity_reviews where id = v_account_review_id)
+      and evidence_row.integrity_hash = review.snapshot_hash
   ) then
     raise exception 'Account activity evidence is not accepted and integrity-verified.';
   end if;
@@ -191,23 +200,29 @@ begin
   if not exists (
     select 1
     from public.evidence evidence_row
+    join public.processing_activity_reviews review on review.id = v_ai_review_id
     where evidence_row.id = v_ai_evidence_id
       and evidence_row.organization_id = v_organization_id
       and evidence_row.validation_status = 'accepted'
       and evidence_row.integrity_status = 'verified'
       and evidence_row.integrity_hash ~ '^[0-9a-f]{64}$'
-      and evidence_row.integrity_hash = (select snapshot_hash from public.processing_activity_reviews where id = v_ai_review_id)
+      and evidence_row.integrity_hash = review.snapshot_hash
   ) then
     raise exception 'AI activity evidence is not accepted and integrity-verified.';
   end if;
 
-  select count(*) into v_count
+  select count(*)
+  into v_count
   from public.processing_activity_evidence link
   where link.organization_id = v_organization_id
     and link.process_id in (v_account_process_id, v_ai_process_id);
-  if v_count <> 2 then raise exception 'Expected two processing-evidence links, found %.', v_count; end if;
 
-  select count(*) into v_count
+  if v_count <> 2 then
+    raise exception 'Expected two processing-evidence links, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
   from public.organization_process_datasets process_dataset
   join public.organization_datasets dataset on dataset.id = process_dataset.dataset_id
   where process_dataset.process_id = v_account_process_id
@@ -218,9 +233,13 @@ begin
     and cardinality(dataset.data_subjects) >= 2
     and cardinality(dataset.data_categories) >= 5
     and dataset.retention_rule like 'Pendiente de definir y aprobar%';
-  if v_count <> 1 then raise exception 'Account activity must have one complete tenant-scoped dataset, found %.', v_count; end if;
 
-  select count(*) into v_count
+  if v_count <> 1 then
+    raise exception 'Account activity must have one complete tenant-scoped dataset, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
   from public.organization_process_datasets process_dataset
   join public.organization_datasets dataset on dataset.id = process_dataset.dataset_id
   where process_dataset.process_id = v_ai_process_id
@@ -231,9 +250,13 @@ begin
     and cardinality(dataset.data_subjects) >= 3
     and cardinality(dataset.data_categories) >= 6
     and dataset.retention_rule like 'Pendiente de definir y aprobar%';
-  if v_count <> 1 then raise exception 'AI activity must have one complete tenant-scoped dataset, found %.', v_count; end if;
 
-  select count(*) into v_count
+  if v_count <> 1 then
+    raise exception 'AI activity must have one complete tenant-scoped dataset, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
   from public.organization_process_assets process_asset
   join public.organization_assets asset on asset.id = process_asset.asset_id
   join public.organization_vendor_assets vendor_asset on vendor_asset.asset_id = asset.id
@@ -251,9 +274,13 @@ begin
     and vendor.cross_border_transfer = true
     and vendor.risk_tier = 'medium'
     and vendor.lifecycle_status = 'active';
-  if v_count <> 1 then raise exception 'Account activity must have one tenant-scoped Supabase asset/vendor chain, found %.', v_count; end if;
 
-  select count(*) into v_count
+  if v_count <> 1 then
+    raise exception 'Account activity must have one tenant-scoped Supabase asset/vendor chain, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
   from public.organization_process_assets process_asset
   join public.organization_assets asset on asset.id = process_asset.asset_id
   join public.organization_vendor_assets vendor_asset on vendor_asset.asset_id = asset.id
@@ -272,13 +299,20 @@ begin
     and vendor.risk_tier = 'high'
     and vendor.country = 'Pendiente de confirmar contractualmente'
     and vendor.lifecycle_status = 'active';
-  if v_count <> 1 then raise exception 'AI activity must have one tenant-scoped OpenAI asset/vendor chain, found %.', v_count; end if;
 
-  select count(*) into v_count
+  if v_count <> 1 then
+    raise exception 'AI activity must have one tenant-scoped OpenAI asset/vendor chain, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
   from auth.users auth_user
   where auth_user.id = v_actor_id
     and auth_user.email_confirmed_at is not null;
-  if v_count <> 1 then raise exception 'Account evidence lost the confirmed user.'; end if;
+
+  if v_count <> 1 then
+    raise exception 'Account evidence lost the confirmed user.';
+  end if;
 
   select count(*) into v_count from auth.identities identity where identity.user_id = v_actor_id;
   if v_count < 1 then raise exception 'Account evidence lost its identity.'; end if;
@@ -289,26 +323,37 @@ begin
   select count(*) into v_count from auth.refresh_tokens token where token.user_id::text = v_actor_id::text;
   if v_count < 1 then raise exception 'Account evidence lost all refresh tokens.'; end if;
 
-  select count(*) into v_count
+  select count(*)
+  into v_count
   from public.agent_runs run
   where run.organization_id = v_organization_id
     and run.status = 'approved';
-  if v_count < 1 then raise exception 'AI evidence has no approved run.'; end if;
 
-  select count(*) into v_count
+  if v_count < 1 then
+    raise exception 'AI evidence has no approved run.';
+  end if;
+
+  select count(*)
+  into v_count
   from public.agent_runs run
   where run.organization_id = v_organization_id
     and nullif(btrim(run.context_text), '') is not null
     and run.output_payload is not null
     and nullif(btrim(run.model), '') is not null
     and coalesce(run.total_tokens, 0) > 0;
-  if v_count < 1 then raise exception 'AI evidence has no complete context/output/model/usage run.'; end if;
+
+  if v_count < 1 then
+    raise exception 'AI evidence has no complete context/output/model/usage run.';
+  end if;
 
   select coalesce(sum(run.total_tokens), 0)::bigint
   into v_total_tokens
   from public.agent_runs run
   where run.organization_id = v_organization_id;
-  if v_total_tokens < 1 then raise exception 'AI evidence has no token usage.'; end if;
+
+  if v_total_tokens < 1 then
+    raise exception 'AI evidence has no token usage.';
+  end if;
 
   select count(*) into v_count from public.agent_artifacts artifact where artifact.organization_id = v_organization_id;
   if v_count < 1 then raise exception 'AI evidence has no artifact.'; end if;
@@ -333,7 +378,7 @@ with n3uralia as (
     process.attributes ->> 'processingRequestKey' as request_key,
     review.decision,
     review.completeness,
-    jsonb_array_length(review.unknowns) as unknowns,
+    cardinality(review.unknowns) as unknowns,
     review.snapshot_hash,
     evidence_row.validation_status,
     evidence_row.integrity_status,
