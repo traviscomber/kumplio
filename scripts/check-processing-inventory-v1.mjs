@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 
-const coreSeedPath = 'supabase/migrations/20260808023000_seed_n3uralia_core_processing_activities_v1.sql'
+const coreSeedPath = 'supabase/migrations/20260808020905_seed_n3uralia_core_processing_activities_v1.sql'
+const obsoleteCoreSeedPath = 'supabase/migrations/20260808023000_seed_n3uralia_core_processing_activities_v1.sql'
 const coreVerificationPath = 'scripts/60-verify-n3uralia-core-processing-activities.sql'
 
 const required = [
@@ -120,6 +121,8 @@ const required = [
     'Expected exactly three supervised N3uralia processing activities',
     ':account-auth-access-v1',
     ':guided-cases-ai-specialists-v1',
+    'cardinality(review.unknowns)',
+    '= any(review.unknowns)',
     'Account activity review does not preserve its partial scope and security unknowns.',
     'AI activity review does not preserve its partial scope and privacy unknowns.',
     'one tenant-scoped Supabase asset/vendor chain',
@@ -136,6 +139,10 @@ for (const [file, markers] of required) {
   for (const marker of markers) {
     if (!text.includes(marker)) throw new Error(`${file} missing marker: ${marker}`)
   }
+}
+
+if (fs.existsSync(obsoleteCoreSeedPath)) {
+  throw new Error(`Obsolete duplicate migration timestamp remains: ${obsoleteCoreSeedPath}`)
 }
 
 const migration = fs.readFileSync('supabase/migrations/20260807204500_processing_activity_inventory_v1.sql', 'utf8')
@@ -196,6 +203,9 @@ if (/\b(insert|update|delete|merge|truncate|alter|drop|create)\b/i.test(stripSql
 }
 if (verification.includes('create_processing_activity_inventory_v1')) {
   throw new Error('Read-only verification must not call the inventory mutation RPC')
+}
+if (verification.includes('jsonb_array_length(review.unknowns)') || verification.includes('review.unknowns ?')) {
+  throw new Error('processing_activity_reviews.unknowns is text[]; verification must use cardinality and ANY')
 }
 const verificationLiteralIds = [...new Set(verification.match(uuidPattern) || [])]
 if (verificationLiteralIds.length) {
