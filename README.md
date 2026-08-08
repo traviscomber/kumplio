@@ -13,11 +13,13 @@
   ·
   <a href="./ROADMAP.md">Roadmap canónico</a>
   ·
-  <a href="./docs/assurance/ui-golden-path-production-3x-2026-08-07.md">Assurance UI 3/3</a>
+  <a href="./docs/assurance/ui-golden-path-production-3x-2026-08-07.md">UI 3/3</a>
   ·
-  <a href="./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md">Inventario real 3/3</a>
+  <a href="./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md">Inventario 3/3</a>
   ·
   <a href="./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md">Lifecycle 3/3</a>
+  ·
+  <a href="./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md">Aviso y eliminación 3/3</a>
 </p>
 
 ---
@@ -46,14 +48,15 @@ La promesa central es:
 
 | Área | Estado comprobado |
 |---|---|
-| Baseline estable en `main` | `9b2ef72d9e1128671111b8e1cfec0612e4e04890` |
 | Desarrollo técnico | sólido |
 | Demo comercial acompañada | apta |
 | Golden Path productivo | `VALIDATED x3` con actor E2E |
 | Multiempresa y aislamiento interno | `VALIDATED` |
 | Inventario real de N3uralia | 3 actividades revisadas |
 | Revisión jurídica y lifecycle | 3/3 con `changes_requested` |
-| Aviso y eliminación | `ACTIVE` en PR #236; no desplegado todavía |
+| Aviso y eliminación como trabajo trazable | `DEPLOYED / VALIDATED INICIAL` |
+| Mapeos de aviso aceptados con evidencia | 0/3 |
+| Eliminaciones demostradas con evidencia | 0/3 |
 | Piloto externo con personas | pendiente |
 | Beta privada autoservicio | no habilitar todavía |
 | Registro público autoservicio | no habilitado |
@@ -154,7 +157,7 @@ Cada actividad contiene:
 - snapshot SHA-256;
 - unknowns visibles.
 
-La cantidad mínima ya está cubierta. La calidad jurídica y operacional continúa abierta.
+La cantidad mínima ya está cubierta. La resolución jurídica y operacional continúa abierta.
 
 ### 8. Revisión jurídica y de ciclo de vida — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
 
@@ -163,7 +166,7 @@ Kumplio separa cinco decisiones que antes podían confundirse dentro del inventa
 ```text
 base jurídica
 retención
- destinatarios
+destinatarios
 subencargados
 transferencias internacionales
 ```
@@ -178,7 +181,49 @@ Resultado productivo de las tres actividades:
 
 Cada revisión tiene versión, fuentes, evidencia, hash, unknowns y supersesión. Ninguna dimensión pendiente puede presentarse como aprobada.
 
-### 9. Escritorio, Insights, grafo e impacto — `DEPLOYED / VALIDATED INICIAL`
+### 9. Aviso y eliminación — `DEPLOYED / VALIDATED INICIAL`
+
+El aviso público versión `2026-08-03` quedó capturado como evidencia general con integridad verificada. Kumplio no lo presenta como prueba específica de cada actividad.
+
+Resultado productivo:
+
+| Objeto | Resultado |
+|---|---:|
+| Evidencia versionada del aviso | 1 |
+| Enlaces específicos a actividades | 3 |
+| Misiones con owner y fecha | 3 |
+| Solicitudes de mapeo | 3 |
+| Solicitudes de eliminación | 3 |
+| Eventos de expediente | 3 |
+| Mapeos aceptados con evidencia | 0 |
+| Eliminaciones aceptadas con evidencia | 0 |
+
+Cada actividad quedó con:
+
+```text
+aviso público vinculado
+→ mapeo específico requerido
+→ misión de cierre
+→ solicitud de evidencia de eliminación
+→ owner y vencimientos persistidos
+```
+
+Los estados actuales son:
+
+- mapeo del aviso: `needs_changes` en 3/3;
+- eliminación: `pending_evidence` en 3/3;
+- misiones: `ready` en 3/3.
+
+Una eliminación solo cuenta como demostrada cuando la solicitud está `accepted` y tiene `submitted_evidence_id`. La prueba debe incluir timestamp, proveedor, activo o dataset, alcance, responsable, resultado, `backup_purga_programada` y `backup_purga_confirmada`.
+
+Migraciones productivas:
+
+```text
+20260808151723_processing_activity_privacy_remediation_v1
+20260808152005_seed_n3uralia_privacy_remediation_v1
+```
+
+### 10. Escritorio, Insights, grafo e impacto — `DEPLOYED / VALIDATED INICIAL`
 
 - prioridades y explicación “¿Por qué aparece esto?”;
 - briefing de las últimas 24 horas;
@@ -188,7 +233,7 @@ Cada revisión tiene versión, fuentes, evidencia, hash, unknowns y supersesión
 - análisis de impacto;
 - reutilización de controles y evidencia.
 
-### 10. Motor regulatorio Chile — `DEPLOYED`
+### 11. Motor regulatorio Chile — `DEPLOYED`
 
 - BCN y LeyChile;
 - Diario Oficial;
@@ -199,11 +244,11 @@ Cada revisión tiene versión, fuentes, evidencia, hash, unknowns y supersesión
 - claims con citas;
 - separación entre publicación, vigencia, aplicabilidad y revisión.
 
-### 11. Memoria organizacional — `DEPLOYED / SIN APRENDIZAJES REALES`
+### 12. Memoria organizacional — `DEPLOYED / SIN APRENDIZAJES REALES`
 
 La infraestructura de nodos, relaciones, versiones, vigencia y supersesión existe. Todavía falta capturar, aprobar y reutilizar el primer aprendizaje real antes de considerarla una ventaja medida.
 
-### 12. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
+### 13. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
 
 - `npm ci` reproducible;
 - typecheck, build y smoke;
@@ -213,6 +258,7 @@ La infraestructura de nodos, relaciones, versiones, vigencia y supersesión exis
 - UI Golden Path productivo;
 - aserciones server-side independientes;
 - assurance multiempresa;
+- verificaciones read-only de inventario, lifecycle y privacidad;
 - procedimiento documentado para datos E2E.
 
 ---
@@ -238,29 +284,24 @@ El recorrido incluyó login, onboarding, expediente, cinco especialistas, cinco 
 - [`UI Golden Path productivo 3/3`](./docs/assurance/ui-golden-path-production-3x-2026-08-07.md)
 - [`Inventario real de N3uralia 3/3`](./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md)
 - [`Revisión lifecycle de N3uralia 3/3`](./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md)
+- [`Aviso y eliminación de N3uralia 3/3`](./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md)
 - [`Ciclo de vida de datos E2E`](./docs/operations/ui-golden-path-data-lifecycle.md)
 
 > Esta evidencia demuestra arquitectura, persistencia, seguridad e idempotencia dentro del alcance probado. No sustituye revisión legal, auditoría, certificación ni observación de una organización externa.
 
 ---
 
-## En desarrollo ahora
+## Trabajo abierto ahora
 
-### Bloque 16, tarea 3 — aviso de privacidad y eliminación — `ACTIVE`
+El sistema ya convirtió los gaps del Bloque 16 en trabajo operacional. El resultado de cumplimiento sigue abierto:
 
-La PR **#236** implementa, pero todavía no acredita como desplegado:
+1. responder y aprobar las tres solicitudes de mapeo del aviso;
+2. ejecutar y acreditar las tres pruebas de eliminación o anonimización;
+3. resolver base, retención, destinatarios, subencargados y transferencias con evidencia;
+4. activar Supabase Auth Leaked Password Protection;
+5. observar una organización externa supervisada.
 
-- snapshot versionado del aviso público;
-- una evidencia general compartida con SHA-256;
-- vínculo del aviso con cada actividad;
-- misión por actividad con owner y vencimiento;
-- solicitud de mapeo del aviso a 14 días;
-- solicitud de prueba de eliminación a 30 días;
-- cierre de misión a 35 días;
-- criterios auditables de eliminación: timestamp, proveedor, activo o dataset, alcance, responsable, resultado, `backup_purga_programada` y `backup_purga_confirmada`;
-- estado visible en Digital Twin.
-
-El aviso general no se considera prueba de cobertura específica y no se inventa evidencia de eliminación. La tarea seguirá `ACTIVE` hasta que CI, migraciones, verificación productiva, idempotencia y pruebas cross-tenant estén verdes.
+No se iniciará el Bloque 17 como prioridad principal mientras el cierre real del Bloque 16 continúe sin evidencia aceptada.
 
 ---
 
@@ -271,13 +312,14 @@ El aviso general no se considera prueba de cobertura específica y no se inventa
 | Leaked Password Protection | `BLOCKED` por configuración externa |
 | Tres actividades reales | `VALIDATED` |
 | Lifecycle de cinco dimensiones | `VALIDATED INICIAL / CAMBIOS REQUERIDOS` |
-| Aviso y eliminación | `ACTIVE` |
+| Aviso convertido en trabajo | `DEPLOYED / VALIDATED INICIAL` |
+| Eliminación demostrada | 0/3 |
 | Multiempresa interno | `VALIDATED` |
 | Golden Path repetible | `VALIDATED x3` |
 | Organización externa observada | pendiente |
 | Tiempo humano, retrabajo y costo real | pendiente |
 
-No se habilitará beta autoservicio mientras permanezcan abiertos los gates críticos de seguridad, lifecycle y validación externa.
+No se habilitará beta autoservicio mientras permanezcan abiertos los gates críticos de seguridad, evidencia y validación externa.
 
 ---
 
@@ -400,7 +442,7 @@ npm run release:check
 npm run smoke
 ```
 
-`release:check` ejecuta contratos de seguridad, producto, orquestación, evidencia, inventario, tenant assurance y build de producción.
+`release:check` ejecuta contratos de seguridad, producto, orquestación, evidencia, inventario, lifecycle, privacidad, tenant assurance y build de producción.
 
 ---
 
@@ -425,7 +467,7 @@ Kumplio no debe afirmar:
 - aplicabilidad jurídica sin fuente y validación;
 - operación efectiva por un documento aislado;
 - inventario completo mientras existan unknowns relevantes;
-- eliminación demostrada sin una prueba auditable;
+- eliminación demostrada sin una prueba auditable aceptada;
 - auditoría aprobada por una salida generada;
 - reemplazo de abogado, auditor, DPO o autoridad;
 - éxito comercial basándose en tenants sintéticos;
