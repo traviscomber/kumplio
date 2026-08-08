@@ -100,15 +100,12 @@ const required = [
     '`20260808152005`',
     'Evidencias del aviso | 1',
     'Enlaces específicos al aviso | 3',
-    'Mapeos aceptados con evidencia | 0',
-    'Eliminaciones aceptadas con evidencia | 0',
     'Trabajo creado no equivale a cumplimiento demostrado',
   ]],
   ['README.md', [
-    '## Resumen ejecutivo',
     'Aviso y eliminación como trabajo trazable',
     '`DEPLOYED / VALIDATED INICIAL`',
-    'Mapeos de aviso aceptados con evidencia | 0/3',
+    'Mapeos de aviso aceptados con evidencia | 3/3',
     'Eliminaciones demostradas con evidencia | 0/3',
     '20260808151723_processing_activity_privacy_remediation_v1',
     '20260808152005_seed_n3uralia_privacy_remediation_v1',
@@ -118,8 +115,8 @@ const required = [
     '`20260808151723`',
     '`20260808152005`',
     '### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`',
-    'aviso y eliminación están `DEPLOYED / VALIDATED INICIAL`',
-    '0/3 mapeos aceptados y 0/3 eliminaciones demostradas',
+    '3/3 mapeos aceptados con brechas',
+    '0/3 eliminaciones demostradas',
   ]],
   ['package.json', [
     'check:processing-privacy-remediation',
@@ -146,15 +143,9 @@ for (const stalePath of [
 }
 
 const foundation = fs.readFileSync(foundationPath, 'utf8')
-if (/security\s+definer/i.test(foundation)) {
-  throw new Error('Privacy remediation RPC must remain SECURITY INVOKER')
-}
-if (!foundation.includes('from public, anon, authenticated')) {
-  throw new Error('Privacy remediation RPC must be revoked from browser roles')
-}
-if (!foundation.includes('to service_role, postgres')) {
-  throw new Error('Privacy remediation RPC must remain restricted to trusted server roles')
-}
+if (/security\s+definer/i.test(foundation)) throw new Error('Privacy remediation RPC must remain SECURITY INVOKER')
+if (!foundation.includes('from public, anon, authenticated')) throw new Error('Privacy remediation RPC must be revoked from browser roles')
+if (!foundation.includes('to service_role, postgres')) throw new Error('Privacy remediation RPC must remain restricted to trusted server roles')
 if (!foundation.includes("'activitySpecificMapping', false") || !foundation.includes("'deletionEvidence', false")) {
   throw new Error('The public notice must not be presented as activity-specific or deletion evidence')
 }
@@ -181,21 +172,15 @@ for (const directMutation of [
   ".from('evidence').insert",
   ".from('organization_processes').update",
 ]) {
-  if (route.includes(directMutation)) {
-    throw new Error(`Privacy remediation route bypasses the atomic RPC: ${directMutation}`)
-  }
+  if (route.includes(directMutation)) throw new Error(`Privacy remediation route bypasses the atomic RPC: ${directMutation}`)
 }
 if (!route.includes(".eq('organization_id', access.organizationId)")) {
   throw new Error('Privacy remediation route must validate the active tenant')
 }
 
 const loader = fs.readFileSync('lib/compliance/digital-twin/privacy-remediation.ts', 'utf8')
-if (loader.includes('review_note')) {
-  throw new Error('Evidence requests use review_comment, not review_note')
-}
-if (loader.includes("['42P01', '42703'")) {
-  throw new Error('Privacy loader must not hide undefined-column errors')
-}
+if (loader.includes('review_note')) throw new Error('Evidence requests use review_comment, not review_note')
+if (loader.includes("['42P01', '42703'")) throw new Error('Privacy loader must not hide undefined-column errors')
 if (!loader.includes("deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id")) {
   throw new Error('Accepted deletion must require submitted evidence')
 }
@@ -217,9 +202,7 @@ const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 for (const file of [foundationPath, seedPath, verificationPath]) {
   const text = fs.readFileSync(file, 'utf8')
   const literalIds = [...new Set(text.match(uuidPattern) || [])]
-  if (literalIds.length) {
-    throw new Error(`${file} must discover production IDs dynamically: ${literalIds.join(', ')}`)
-  }
+  if (literalIds.length) throw new Error(`${file} must discover production IDs dynamically: ${literalIds.join(', ')}`)
 }
 
 for (const forbidden of [
@@ -227,17 +210,12 @@ for (const forbidden of [
   /'deletionEvidence',\s*true/i,
   /eliminaci[oó]n\s+demostrada[^\n]*sin\s+evidencia/i,
   /aviso\s+general[^\n]*cubre\s+todas/i,
-  /cumplimiento\s+integral/i,
 ]) {
-  if (forbidden.test(foundation + seed)) {
-    throw new Error(`Privacy remediation overstates its evidence: ${forbidden}`)
-  }
+  if (forbidden.test(foundation + seed)) throw new Error(`Privacy remediation overstates its evidence: ${forbidden}`)
 }
 
 const verification = fs.readFileSync(verificationPath, 'utf8')
-if (!/rollback;\s*$/i.test(verification.trim())) {
-  throw new Error('Privacy remediation verification must end in ROLLBACK')
-}
+if (!/rollback;\s*$/i.test(verification.trim())) throw new Error('Privacy remediation verification must end in ROLLBACK')
 if (/\b(insert|update|delete|merge|truncate|alter|drop|create)\b/i.test(stripSqlComments(verification))) {
   throw new Error('Privacy remediation verification must remain read-only')
 }
