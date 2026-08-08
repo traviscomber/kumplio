@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 
 const checks = [
   ['typecheck'],
+  ['check:canonical-roadmap'],
   ['check:discovery'],
   ['check:boundaries'],
   ['check:auth'],

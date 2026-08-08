@@ -47,7 +47,8 @@
     "check:processing-inventory": "node scripts/check-processing-inventory-v1.mjs",
     "check:tenant-assurance": "node scripts/check-tenant-assurance-v1.mjs",
     "check:ui-golden-path": "node scripts/check-ui-golden-path-v1.mjs",
-    "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs"
+    "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
+    "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
