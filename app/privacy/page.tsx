@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Footer } from '@/components/footer'
+import { PRIVACY_NOTICE } from '@/lib/privacy/notice'
 
 export const metadata: Metadata = {
   title: 'Política de privacidad',
   description: 'Cómo Kumplio trata y protege los datos personales y la información de las organizaciones usuarias.',
-  alternates: { canonical: '/privacy' },
+  alternates: { canonical: PRIVACY_NOTICE.route },
 }
 
 const updatedAt = '3 de agosto de 2026'
@@ -25,7 +26,9 @@ export default function PrivacyPage() {
           <div className="mx-auto max-w-4xl">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Privacidad</p>
             <h1 className="mt-4 text-4xl font-black tracking-tight md:text-6xl">Política de privacidad</h1>
-            <p className="mt-5 text-muted-foreground">Última actualización: {updatedAt}</p>
+            <p className="mt-5 text-muted-foreground">
+              Última actualización: {updatedAt} · versión {PRIVACY_NOTICE.version}
+            </p>
           </div>
         </section>
 
@@ -76,7 +79,10 @@ export default function PrivacyPage() {
             </LegalSection>
 
             <LegalSection title="12. Contacto">
-              Para consultas o solicitudes de privacidad, escribe a <a href="mailto:info@kumplio.app" className="font-semibold text-primary hover:underline">info@kumplio.app</a>. Kumplio opera desde Santiago, Chile.
+              Para consultas o solicitudes de privacidad, escribe a{' '}
+              <a href={`mailto:${PRIVACY_NOTICE.contact}`} className="font-semibold text-primary hover:underline">
+                {PRIVACY_NOTICE.contact}
+              </a>. Kumplio opera desde Santiago, Chile.
             </LegalSection>
           </div>
         </section>
