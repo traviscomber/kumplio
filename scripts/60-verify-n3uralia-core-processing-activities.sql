@@ -4,7 +4,6 @@
 begin;
 set transaction read only;
 
-
 do $verify$
 declare
   v_organization_id uuid;
@@ -15,12 +14,6 @@ declare
   v_ai_review_id uuid;
   v_account_evidence_id uuid;
   v_ai_evidence_id uuid;
-  v_account_dataset_id uuid;
-  v_ai_dataset_id uuid;
-  v_account_asset_id uuid;
-  v_ai_asset_id uuid;
-  v_account_vendor_id uuid;
-  v_ai_vendor_id uuid;
   v_count integer;
   v_total_tokens bigint;
 begin
@@ -214,134 +207,72 @@ begin
     and link.process_id in (v_account_process_id, v_ai_process_id);
   if v_count <> 2 then raise exception 'Expected two processing-evidence links, found %.', v_count; end if;
 
-  select link.dataset_id
-  into v_account_dataset_id
-  from public.organization_process_datasets link
-  where link.organization_id = v_organization_id
-    and link.process_id = v_account_process_id
-  limit 1;
+  select count(*) into v_count
+  from public.organization_process_datasets process_dataset
+  join public.organization_datasets dataset on dataset.id = process_dataset.dataset_id
+  where process_dataset.process_id = v_account_process_id
+    and dataset.organization_id = v_organization_id
+    and dataset.sensitivity = 'restricted'
+    and dataset.cross_border_transfer = true
+    and dataset.lifecycle_status = 'active'
+    and cardinality(dataset.data_subjects) >= 2
+    and cardinality(dataset.data_categories) >= 5
+    and dataset.retention_rule like 'Pendiente de definir y aprobar%';
+  if v_count <> 1 then raise exception 'Account activity must have one complete tenant-scoped dataset, found %.', v_count; end if;
 
-  select link.dataset_id
-  into v_ai_dataset_id
-  from public.organization_process_datasets link
-  where link.organization_id = v_organization_id
-    and link.process_id = v_ai_process_id
-  limit 1;
+  select count(*) into v_count
+  from public.organization_process_datasets process_dataset
+  join public.organization_datasets dataset on dataset.id = process_dataset.dataset_id
+  where process_dataset.process_id = v_ai_process_id
+    and dataset.organization_id = v_organization_id
+    and dataset.sensitivity = 'restricted'
+    and dataset.cross_border_transfer = true
+    and dataset.lifecycle_status = 'active'
+    and cardinality(dataset.data_subjects) >= 3
+    and cardinality(dataset.data_categories) >= 6
+    and dataset.retention_rule like 'Pendiente de definir y aprobar%';
+  if v_count <> 1 then raise exception 'AI activity must have one complete tenant-scoped dataset, found %.', v_count; end if;
 
-  if not exists (
-    select 1
-    from public.organization_datasets dataset
-    where dataset.id = v_account_dataset_id
-      and dataset.organization_id = v_organization_id
-      and dataset.sensitivity = 'restricted'
-      and dataset.cross_border_transfer = true
-      and dataset.lifecycle_status = 'active'
-      and cardinality(dataset.data_subjects) >= 2
-      and cardinality(dataset.data_categories) >= 5
-      and dataset.retention_rule like 'Pendiente de definir y aprobar%'
-  ) then
-    raise exception 'Account dataset is incomplete or overstates retention.';
-  end if;
+  select count(*) into v_count
+  from public.organization_process_assets process_asset
+  join public.organization_assets asset on asset.id = process_asset.asset_id
+  join public.organization_vendor_assets vendor_asset on vendor_asset.asset_id = asset.id
+  join public.organization_vendors vendor on vendor.id = vendor_asset.vendor_id
+  where process_asset.process_id = v_account_process_id
+    and asset.organization_id = v_organization_id
+    and asset.name = 'Supabase Auth, profiles y organization_members'
+    and asset.asset_type = 'identity_access_management_database'
+    and asset.hosting_country = 'Estados Unidos (us-east-1)'
+    and asset.provider_name = 'Supabase'
+    and asset.lifecycle_status = 'active'
+    and vendor.organization_id = v_organization_id
+    and vendor.name = 'Supabase'
+    and vendor.processes_personal_data = true
+    and vendor.cross_border_transfer = true
+    and vendor.risk_tier = 'medium'
+    and vendor.lifecycle_status = 'active';
+  if v_count <> 1 then raise exception 'Account activity must have one tenant-scoped Supabase asset/vendor chain, found %.', v_count; end if;
 
-  if not exists (
-    select 1
-    from public.organization_datasets dataset
-    where dataset.id = v_ai_dataset_id
-      and dataset.organization_id = v_organization_id
-      and dataset.sensitivity = 'restricted'
-      and dataset.cross_border_transfer = true
-      and dataset.lifecycle_status = 'active'
-      and cardinality(dataset.data_subjects) >= 3
-      and cardinality(dataset.data_categories) >= 6
-      and dataset.retention_rule like 'Pendiente de definir y aprobar%'
-  ) then
-    raise exception 'AI dataset is incomplete or overstates retention.';
-  end if;
-
-  select link.asset_id
-  into v_account_asset_id
-  from public.organization_process_assets link
-  where link.organization_id = v_organization_id
-    and link.process_id = v_account_process_id
-  limit 1;
-
-  select link.asset_id
-  into v_ai_asset_id
-  from public.organization_process_assets link
-  where link.organization_id = v_organization_id
-    and link.process_id = v_ai_process_id
-  limit 1;
-
-  if not exists (
-    select 1
-    from public.organization_assets asset
-    where asset.id = v_account_asset_id
-      and asset.organization_id = v_organization_id
-      and asset.name = 'Supabase Auth, profiles y organization_members'
-      and asset.asset_type = 'identity_access_management_database'
-      and asset.hosting_country = 'Estados Unidos (us-east-1)'
-      and asset.provider_name = 'Supabase'
-      and asset.lifecycle_status = 'active'
-  ) then
-    raise exception 'Account asset is missing or inconsistent.';
-  end if;
-
-  if not exists (
-    select 1
-    from public.organization_assets asset
-    where asset.id = v_ai_asset_id
-      and asset.organization_id = v_organization_id
-      and asset.name = 'Motor de especialistas IA y OpenAI Responses API'
-      and asset.asset_type = 'ai_reasoning_service'
-      and asset.hosting_country = 'Pendiente de confirmar contractualmente'
-      and asset.provider_name = 'OpenAI'
-      and asset.lifecycle_status = 'active'
-  ) then
-    raise exception 'AI asset is missing or inconsistent.';
-  end if;
-
-  select vendor_asset.vendor_id
-  into v_account_vendor_id
-  from public.organization_vendor_assets vendor_asset
-  where vendor_asset.organization_id = v_organization_id
-    and vendor_asset.asset_id = v_account_asset_id
-  limit 1;
-
-  select vendor_asset.vendor_id
-  into v_ai_vendor_id
-  from public.organization_vendor_assets vendor_asset
-  where vendor_asset.organization_id = v_organization_id
-    and vendor_asset.asset_id = v_ai_asset_id
-  limit 1;
-
-  if not exists (
-    select 1
-    from public.organization_vendors vendor
-    where vendor.id = v_account_vendor_id
-      and vendor.organization_id = v_organization_id
-      and vendor.name = 'Supabase'
-      and vendor.processes_personal_data = true
-      and vendor.cross_border_transfer = true
-      and vendor.risk_tier = 'medium'
-      and vendor.lifecycle_status = 'active'
-  ) then
-    raise exception 'Supabase vendor link is missing or inconsistent.';
-  end if;
-
-  if not exists (
-    select 1
-    from public.organization_vendors vendor
-    where vendor.id = v_ai_vendor_id
-      and vendor.organization_id = v_organization_id
-      and vendor.name = 'OpenAI'
-      and vendor.processes_personal_data = true
-      and vendor.cross_border_transfer = true
-      and vendor.risk_tier = 'high'
-      and vendor.country = 'Pendiente de confirmar contractualmente'
-      and vendor.lifecycle_status = 'active'
-  ) then
-    raise exception 'OpenAI vendor link is missing or inconsistent.';
-  end if;
+  select count(*) into v_count
+  from public.organization_process_assets process_asset
+  join public.organization_assets asset on asset.id = process_asset.asset_id
+  join public.organization_vendor_assets vendor_asset on vendor_asset.asset_id = asset.id
+  join public.organization_vendors vendor on vendor.id = vendor_asset.vendor_id
+  where process_asset.process_id = v_ai_process_id
+    and asset.organization_id = v_organization_id
+    and asset.name = 'Motor de especialistas IA y OpenAI Responses API'
+    and asset.asset_type = 'ai_reasoning_service'
+    and asset.hosting_country = 'Pendiente de confirmar contractualmente'
+    and asset.provider_name = 'OpenAI'
+    and asset.lifecycle_status = 'active'
+    and vendor.organization_id = v_organization_id
+    and vendor.name = 'OpenAI'
+    and vendor.processes_personal_data = true
+    and vendor.cross_border_transfer = true
+    and vendor.risk_tier = 'high'
+    and vendor.country = 'Pendiente de confirmar contractualmente'
+    and vendor.lifecycle_status = 'active';
+  if v_count <> 1 then raise exception 'AI activity must have one tenant-scoped OpenAI asset/vendor chain, found %.', v_count; end if;
 
   select count(*) into v_count
   from auth.users auth_user
@@ -379,19 +310,13 @@ begin
   where run.organization_id = v_organization_id;
   if v_total_tokens < 1 then raise exception 'AI evidence has no token usage.'; end if;
 
-  select count(*) into v_count
-  from public.agent_artifacts artifact
-  where artifact.organization_id = v_organization_id;
+  select count(*) into v_count from public.agent_artifacts artifact where artifact.organization_id = v_organization_id;
   if v_count < 1 then raise exception 'AI evidence has no artifact.'; end if;
 
-  select count(*) into v_count
-  from public.agent_reviews review
-  where review.organization_id = v_organization_id;
+  select count(*) into v_count from public.agent_reviews review where review.organization_id = v_organization_id;
   if v_count < 1 then raise exception 'AI evidence has no explicit review.'; end if;
 
-  select count(*) into v_count
-  from public.agent_tool_calls tool_call
-  where tool_call.organization_id = v_organization_id;
+  select count(*) into v_count from public.agent_tool_calls tool_call where tool_call.organization_id = v_organization_id;
   if v_count < 1 then raise exception 'AI evidence has no authorized tool call.'; end if;
 end;
 $verify$;
@@ -428,6 +353,13 @@ with n3uralia as (
   join public.organization_vendors vendor on vendor.id = vendor_asset.vendor_id
   where process.organization_id = (select id from n3uralia)
     and process.process_type = 'processing_activity'
+), actor as (
+  select member.user_id
+  from public.organization_members member
+  where member.organization_id = (select id from n3uralia)
+    and member.role in ('owner', 'admin', 'compliance')
+  order by case member.role when 'owner' then 1 when 'admin' then 2 else 3 end, member.joined_at
+  limit 1
 )
 select jsonb_build_object(
   'status', 'passed',
@@ -435,10 +367,10 @@ select jsonb_build_object(
   'activityCount', (select count(*) from activities),
   'activities', (select jsonb_agg(to_jsonb(activities) order by name) from activities),
   'accountEvidence', jsonb_build_object(
-    'confirmedUsers', (select count(*) from auth.users user_row join public.organization_members member on member.user_id = user_row.id where member.organization_id = (select id from n3uralia) and user_row.email_confirmed_at is not null),
-    'identities', (select count(*) from auth.identities identity join public.organization_members member on member.user_id = identity.user_id where member.organization_id = (select id from n3uralia)),
-    'sessions', (select count(*) from auth.sessions session_row join public.organization_members member on member.user_id = session_row.user_id where member.organization_id = (select id from n3uralia)),
-    'refreshTokens', (select count(*) from auth.refresh_tokens token join public.organization_members member on member.user_id::text = token.user_id::text where member.organization_id = (select id from n3uralia))
+    'confirmedUsers', (select count(*) from auth.users where id = (select user_id from actor) and email_confirmed_at is not null),
+    'identities', (select count(*) from auth.identities where user_id = (select user_id from actor)),
+    'sessions', (select count(*) from auth.sessions where user_id = (select user_id from actor)),
+    'refreshTokens', (select count(*) from auth.refresh_tokens where user_id::text = (select user_id::text from actor))
   ),
   'aiEvidence', jsonb_build_object(
     'cases', (select count(*) from public.compliance_cases where organization_id = (select id from n3uralia)),
