@@ -9,7 +9,7 @@ const required = [
     "version: '2026-08-03'",
     "route: '/privacy'",
     "contact: 'info@kumplio.app'",
-    'activity-specific proof',
+    'mapeo por actividad de tratamiento',
     'evidencia operativa y trazable',
   ]],
   ['app/privacy/page.tsx', [
@@ -98,6 +98,20 @@ const required = [
     'Bloque 16, tarea 3 — aviso de privacidad y eliminación — `ACTIVE`',
     'La tarea seguirá `ACTIVE` hasta que CI, migraciones, verificación productiva, idempotencia y pruebas cross-tenant estén verdes.',
   ]],
+  ['ROADMAP.md', [
+    'Baseline estable en `main`',
+    'Assurance lifecycle 3/3',
+    '### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`',
+    'Active en PR #236',
+    'aviso y eliminación están `ACTIVE` en la PR #236',
+  ]],
+  ['package.json', [
+    'check:processing-privacy-remediation',
+    'node scripts/check-processing-privacy-remediation-v1.mjs',
+  ]],
+  ['scripts/release-check.mjs', [
+    "['check:processing-privacy-remediation']",
+  ]],
 ]
 
 for (const [file, markers] of required) {
@@ -168,11 +182,18 @@ if (!privacyPage.includes('PRIVACY_NOTICE.contact') || !privacyPage.includes('PR
   throw new Error('The public privacy page must render canonical notice metadata')
 }
 
-if ((seed.match(/prepare_processing_activity_privacy_remediation_v1/g) || []).length !== 6) {
-  throw new Error('N3uralia privacy seed must call the RPC twice for each of three activities')
+if ((seed.match(/prepare_processing_activity_privacy_remediation_v1/g) || []).length !== 2) {
+  throw new Error('The looped N3uralia privacy seed must call the RPC twice per activity')
 }
 if ((seed.match(/second call was not idempotent/g) || []).length !== 1) {
   throw new Error('N3uralia privacy seed must prove idempotency for each looped activity')
+}
+for (const processName of [
+  'Gestión de contactos comerciales y solicitudes de demostración',
+  'Gestión de cuentas, autenticación y acceso al workspace',
+  'Gestión de expedientes y análisis asistido por especialistas IA',
+]) {
+  if (!seed.includes(processName)) throw new Error(`Seed missing supervised activity: ${processName}`)
 }
 
 const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
