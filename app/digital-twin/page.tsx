@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { ControlledDeletionDrillWorkspace } from '@/components/digital-twin/controlled-deletion-drill-workspace'
 import { ProcessingInventoryWorkspace } from '@/components/digital-twin/processing-inventory-workspace'
 import { ProcessingLifecycleReviewWorkspace } from '@/components/digital-twin/processing-lifecycle-review-workspace'
 import { ProcessingPrivacyRemediationWorkspace } from '@/components/digital-twin/processing-privacy-remediation-workspace'
@@ -92,6 +93,10 @@ export default async function DigitalTwinPage() {
         <ProcessingPrivacyRemediationWorkspace
           actions={privacyRemediation.actions}
           summary={privacyRemediation.summary}
+          canManage={access.canAssignWork}
+        />
+        <ControlledDeletionDrillWorkspace
+          actions={privacyRemediation.actions}
           canManage={access.canAssignWork}
         />
       </main>
