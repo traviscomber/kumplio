@@ -200,7 +200,7 @@ begin
     'source', jsonb_build_object(
       'type', 'code_and_database',
       'label', 'Registro y autenticación, onboarding, perfiles, membresías y sesiones de Supabase',
-      'reference', 'app/(auth)/sign-up/page.tsx · app/api/onboarding/initialize/route.ts · lib/compliance/accountability/workspace-access.ts · lib/compliance/accountability/team.ts · auth.users/auth.identities/auth.sessions/auth.refresh_tokens · public.profiles/public.organization_members · us-east-1'
+      'reference', 'app/(auth)/sign-up/page.tsx · app/api/onboarding/initialize/route.ts · lib/compliance/accountability/workspace-access.ts · lib/compliance/accountability/team.ts · auth.users/auth.identities/auth.sessions/auth.refresh_tokens · public.profiles/public.organization_members · us-east-1 · Supabase security advisor snapshot 2026-08-07'
     ),
     'review', jsonb_build_object(
       'decision', 'approved',
@@ -218,7 +218,7 @@ begin
         'Plazo de retención y eliminación de cuenta, sesiones, refresh tokens y perfil no aprobado.',
         'Base de licitud por finalidad y rol de responsable o encargado pendiente de validación jurídica.',
         v_account_legal_unknown,
-        'Leaked Password Protection fue reportada como desactivada por el advisor de Supabase al revisar el proyecto piloto.',
+        'Verificar y habilitar Leaked Password Protection; el advisor de producción la reportó desactivada el 7 de agosto de 2026.',
         'MFA y procedimiento de recuperación o compromiso de cuenta no evidenciados end-to-end.',
         'Listado contractual de subencargados y garantías de transferencia pendiente.',
         'Procedimiento de cierre, exportación y eliminación de cuenta no evidenciado.'
@@ -328,6 +328,7 @@ begin
   if v_case_count < 1
      or v_workflow_count < 1
      or v_run_count < 1
+     or v_approved_run_count < 1
      or v_context_run_count < 1
      or v_output_run_count < 1
      or v_model_run_count < 1
@@ -335,8 +336,8 @@ begin
      or v_review_count < 1
      or v_tool_call_count < 1
      or v_total_tokens < 1 then
-    raise notice 'Skipping AI processing activity: cases %, workflows %, runs %, contexts %, outputs %, model runs %, artifacts %, reviews %, tool calls %, tokens %.',
-      v_case_count, v_workflow_count, v_run_count, v_context_run_count, v_output_run_count,
+    raise notice 'Skipping AI processing activity: cases %, workflows %, runs %, approved runs %, contexts %, outputs %, model runs %, artifacts %, reviews %, tool calls %, tokens %.',
+      v_case_count, v_workflow_count, v_run_count, v_approved_run_count, v_context_run_count, v_output_run_count,
       v_model_run_count, v_artifact_count, v_review_count, v_tool_call_count, v_total_tokens;
     return;
   end if;
