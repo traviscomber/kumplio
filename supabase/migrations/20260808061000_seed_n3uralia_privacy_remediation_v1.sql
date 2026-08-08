@@ -49,7 +49,7 @@ begin
     'publicUrl', 'https://www.kumplio.app/privacy',
     'title', 'Política de Privacidad de Kumplio',
     'controllerLabel', 'Kumplio',
-    'contact', 'privacidad@kumplio.app',
+    'contact', 'info@kumplio.app',
     'country', 'Chile',
     'scopes', jsonb_build_array(
       'Navegación y seguridad del sitio',
@@ -137,24 +137,55 @@ begin
   select count(*)
   into v_count
   from public.missions mission
+  join public.organization_processes process
+    on process.id = (mission.metadata ->> 'processingActivityId')::uuid
   where mission.organization_id = v_organization_id
-    and mission.metadata ->> 'source' = 'processing_privacy_and_deletion_remediation';
+    and process.organization_id = v_organization_id
+    and mission.metadata ->> 'source' = 'processing_privacy_and_deletion_remediation'
+    and mission.metadata ->> 'privacyNoticeVersion' = '2026-08-03'
+    and mission.owner_id = process.owner_user_id
+    and mission.priority = 'high'
+    and mission.status = 'ready'
+    and mission.due_at = v_mission_due_at;
 
   if v_count <> 3 then
-    raise exception 'Expected three privacy remediation missions, found %.', v_count;
+    raise exception 'Expected three owner-scoped privacy remediation missions, found %.', v_count;
   end if;
 
   select count(*)
   into v_count
   from public.evidence_requests request
+  join public.organization_processes process
+    on process.attributes ->> 'privacyNoticeRequestId' = request.id::text
   where request.organization_id = v_organization_id
-    and (
-      request.title like 'Aviso aplicable y mapeado — %'
-      or request.title like 'Evidencia de eliminación — %'
-    );
+    and process.organization_id = v_organization_id
+    and request.title like 'Aviso aplicable y mapeado — %'
+    and request.requested_from = process.owner_user_id
+    and request.status = 'open'
+    and request.due_at = v_notice_due_at
+    and request.description like '%matriz%finalidades%titulares%categorías%destinatarios%derechos%transferencias%';
 
-  if v_count <> 6 then
-    raise exception 'Expected six notice/deletion evidence requests, found %.', v_count;
+  if v_count <> 3 then
+    raise exception 'Expected three owner-scoped notice mapping requests, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
+  from public.evidence_requests request
+  join public.organization_processes process
+    on process.attributes ->> 'deletionEvidenceRequestId' = request.id::text
+  where request.organization_id = v_organization_id
+    and process.organization_id = v_organization_id
+    and request.title like 'Evidencia de eliminación — %'
+    and request.requested_from = process.owner_user_id
+    and request.status = 'open'
+    and request.due_at = v_deletion_due_at
+    and request.description like '%backup_purga_programada%'
+    and request.description like '%backup_purga_confirmada%'
+    and request.description like '%timestamp%proveedor%activo o dataset%alcance%responsable%resultado%';
+
+  if v_count <> 3 then
+    raise exception 'Expected three auditable deletion evidence requests, found %.', v_count;
   end if;
 
   select count(*)
@@ -163,6 +194,9 @@ begin
   where evidence.organization_id = v_organization_id
     and evidence.metadata ->> 'scope' = 'public_privacy_notice'
     and evidence.metadata ->> 'privacyNoticeVersion' = '2026-08-03'
+    and evidence.metadata ->> 'activitySpecificMapping' = 'false'
+    and evidence.metadata ->> 'deletionEvidence' = 'false'
+    and evidence.metadata #>> '{privacyNoticeSnapshot,contact}' = 'info@kumplio.app'
     and evidence.validation_status = 'accepted'
     and evidence.integrity_status = 'verified'
     and evidence.integrity_hash ~ '^[0-9a-f]{64}$';
@@ -176,10 +210,22 @@ begin
   from public.processing_activity_evidence link
   join public.evidence evidence on evidence.id = link.evidence_id
   where link.organization_id = v_organization_id
+    and link.relationship_type = 'supporting'
     and evidence.metadata ->> 'scope' = 'public_privacy_notice';
 
   if v_count <> 3 then
-    raise exception 'Expected three activity links to the privacy notice, found %.', v_count;
+    raise exception 'Expected three supporting activity links to the privacy notice, found %.', v_count;
+  end if;
+
+  select count(*)
+  into v_count
+  from public.compliance_case_events event
+  where event.organization_id = v_organization_id
+    and event.event_type = 'processing_privacy_remediation_ready'
+    and event.changes ->> 'privacy_notice_version' = '2026-08-03';
+
+  if v_count <> 3 then
+    raise exception 'Expected three auditable privacy remediation case events, found %.', v_count;
   end if;
 end;
 $seed$;
