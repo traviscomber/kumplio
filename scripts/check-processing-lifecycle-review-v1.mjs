@@ -13,7 +13,7 @@ const required = [
     'supersedes_id',
     'unique (process_id, version)',
     'processing_activity_lifecycle_approved_check',
-    'processing activity lifecycle review',
+    "'processing_activity_lifecycle_review'",
     "'processing_activity_lifecycle_reviewed'",
     'create_evidence_record',
     'extensions.digest',
@@ -26,7 +26,7 @@ const required = [
     'scopeConfirmed: z.literal(true)',
     'legalDecisionConfirmed: z.literal(true)',
     "decision: z.enum(['approved', 'changes_requested', 'rejected'])",
-    'Approved lifecycle review cannot retain',
+    'No se puede aprobar mientras existan dimensiones o desconocidos abiertos.',
   ]],
   ['lib/compliance/digital-twin/processing-inventory.ts', [
     'ProcessingLifecycleReview',
@@ -34,7 +34,7 @@ const required = [
     'lifecycleReview',
     'lifecycleNeedsChanges',
     "activity.lifecycleReview?.statuses.basis === 'validated'",
-    "return Math.min(score, 65)",
+    'return Math.min(score, 65)',
   ]],
   ['components/digital-twin/processing-lifecycle-review-workspace.tsx', [
     'Cinco decisiones que no deben mezclarse.',
@@ -65,8 +65,8 @@ const required = [
     'set transaction read only;',
     'exactly three lifecycle reviews',
     'cardinality(review.unknowns)',
-    "review.decision = 'changes_requested'",
-    'evidence.integrity_hash = review.snapshot_hash',
+    "review.decision <> 'changes_requested'",
+    'evidence.integrity_hash <> review.snapshot_hash',
     'rollback;',
   ]],
 ]
@@ -90,10 +90,10 @@ if (!foundation.includes('for all\n  to anon, authenticated\n  using (false)\n  
 if (!foundation.includes("decision <> 'approved'") || !foundation.includes('cardinality(unknowns) = 0')) {
   throw new Error('Approved lifecycle reviews must be blocked while unknowns remain')
 }
-if (!foundation.includes('review.request_key = p_request_key') || !foundation.includes('snapshot_hash is distinct from v_snapshot_hash')) {
+if (!foundation.includes('review.request_key = p_request_key') || !foundation.includes('v_existing_hash is distinct from v_snapshot_hash')) {
   throw new Error('Lifecycle review idempotency contract is missing')
 }
-if (!foundation.includes('review.supersedes_id')) {
+if (!foundation.includes('review.supersedes_id') || !foundation.includes("'supersedesId', v_previous_review_id")) {
   throw new Error('Retry and version snapshot must preserve supersedes_id')
 }
 
@@ -121,7 +121,7 @@ for (const forbidden of [
   /'decision',\s*'approved'/i,
   /'basis',\s*jsonb_build_object\(\s*'status',\s*'validated'/i,
   /'retention',\s*jsonb_build_object\(\s*'status',\s*'validated'/i,
-  /cumplimiento\s+integral/i,
+  /acredita\s+cumplimiento\s+integral/i,
 ]) {
   if (forbidden.test(seed)) throw new Error(`Lifecycle seed overstates its evidence: ${forbidden}`)
 }
