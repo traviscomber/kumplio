@@ -24,11 +24,19 @@ Un cambio puede iniciarse únicamente cuando cumple al menos una condición:
 ### No desviarse
 
 - No iniciar módulos, integraciones, rediseños o experimentos fuera del roadmap por novedad, preferencia técnica o entusiasmo del agente.
-- No reinterpretar “sigamos”, “vamos” o “continúa” como autorización para cambiar de bloque: significa tomar la siguiente tarea incompleta del bloque canónico vigente.
+- No reinterpretar “sigamos”, “vamos” o “continúa” como autorización para cambiar de bloque.
 - No usar conversaciones, issues, comentarios, documentos secundarios o una PR como sustituto de `ROADMAP.md`.
 - No marcar `DONE`, `VALIDATED` o `DEPLOYED` sin la evidencia exigida por el propio roadmap.
 - No mover prioridades silenciosamente. Si cambia la secuencia, el roadmap debe cambiar primero o dentro de la misma PR.
 - No mantener dos roadmaps maestros ni duplicar el estado canónico en otro archivo.
+
+### Interpretación de continuidad
+
+Cuando el owner diga “vamos”, “sigamos”, “continúa”, “go”, “siguiente bloque” o una instrucción equivalente, significa:
+
+> **Tomar la siguiente tarea incompleta del bloque canónico vigente, sin cambiar de prioridad ni abrir un frente nuevo.**
+
+Si el bloque está cerrado con evidencia suficiente, se continúa con el siguiente bloque definido en `ROADMAP.md`.
 
 ### Excepciones de emergencia
 
