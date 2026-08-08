@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 
-const foundationPath = 'supabase/migrations/20260808050000_processing_activity_lifecycle_review_v1.sql'
-const seedPath = 'supabase/migrations/20260808051000_seed_n3uralia_processing_lifecycle_reviews_v1.sql'
+const foundationPath = 'supabase/migrations/20260808043810_processing_activity_lifecycle_review_v1.sql'
+const seedPath = 'supabase/migrations/20260808044018_seed_n3uralia_processing_lifecycle_reviews_v1.sql'
 const verificationPath = 'scripts/61-verify-n3uralia-processing-lifecycle-reviews.sql'
 
 const required = [
@@ -84,7 +84,7 @@ if (/security\s+definer/i.test(foundation)) throw new Error('Lifecycle review RP
 if (!foundation.includes('revoke all on table public.processing_activity_lifecycle_reviews from public, anon, authenticated')) {
   throw new Error('Lifecycle review table must remain unavailable to browser roles')
 }
-if (!foundation.includes('for all\n  to anon, authenticated\n  using (false)\n  with check (false)')) {
+if (!foundation.includes('for all to anon, authenticated using (false) with check (false)')) {
   throw new Error('Lifecycle review table must keep an explicit browser deny policy')
 }
 if (!foundation.includes("decision <> 'approved'") || !foundation.includes('cardinality(unknowns) = 0')) {
