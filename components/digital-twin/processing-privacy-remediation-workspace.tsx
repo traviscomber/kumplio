@@ -99,59 +99,64 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
       </div>
 
       <div className="space-y-4">
-        {actions.map((action) => (
-          <article key={action.processId} className="rounded-2xl border bg-background/40 p-4 sm:p-5">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-black">{action.processName}</h3>
-                  <StateBadge ready={Boolean(action.mission)} />
-                  <span className="rounded-full border px-2.5 py-1 text-xs font-semibold">Owner: {action.ownerLabel || 'Sin responsable'}</span>
-                </div>
+        {actions.map((action) => {
+          const deletionAccepted = action.deletionRequest?.status === 'accepted'
+            && Boolean(action.deletionRequest.submittedEvidenceId)
 
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <EvidenceCard
-                    icon={<FileCheck2 className="h-4 w-4" />}
-                    title="Aviso público"
-                    status={action.notice.evidenceId ? `Vinculado · v${action.notice.version || PRIVACY_NOTICE.version}` : 'Sin vincular'}
-                    due={action.notice.integrityHash ? `SHA-256 ${shortHash(action.notice.integrityHash)}` : null}
-                    success={Boolean(action.notice.evidenceId)}
-                  />
-                  <EvidenceCard
-                    icon={<FileClock className="h-4 w-4" />}
-                    title="Mapeo aplicable"
-                    status={requestStatus(action.noticeRequest?.status)}
-                    due={formatDue(action.noticeRequest?.dueAt)}
-                    success={action.noticeRequest?.status === 'accepted'}
-                  />
-                  <EvidenceCard
-                    icon={<Trash2 className="h-4 w-4" />}
-                    title="Eliminación demostrada"
-                    status={requestStatus(action.deletionRequest?.status)}
-                    due={formatDue(action.deletionRequest?.dueAt)}
-                    success={action.deletionRequest?.status === 'accepted'}
-                  />
-                </div>
-
-                {action.mission && (
-                  <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border bg-muted/20 px-4 py-3 text-sm">
-                    <CalendarClock className="h-4 w-4 text-primary" />
-                    <span className="font-semibold">{action.mission.title}</span>
-                    <span className="text-muted-foreground">Estado: {missionStatus(action.mission.status)}</span>
-                    <span className="text-muted-foreground">Vence: {formatDate(action.mission.dueAt)}</span>
+          return (
+            <article key={action.processId} className="rounded-2xl border bg-background/40 p-4 sm:p-5">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-black">{action.processName}</h3>
+                    <StateBadge ready={Boolean(action.mission)} />
+                    <span className="rounded-full border px-2.5 py-1 text-xs font-semibold">Owner: {action.ownerLabel || 'Sin responsable'}</span>
                   </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    <EvidenceCard
+                      icon={<FileCheck2 className="h-4 w-4" />}
+                      title="Aviso público"
+                      status={action.notice.evidenceId ? `Vinculado · v${action.notice.version || PRIVACY_NOTICE.version}` : 'Sin vincular'}
+                      due={action.notice.integrityHash ? `SHA-256 ${shortHash(action.notice.integrityHash)}` : null}
+                      success={Boolean(action.notice.evidenceId)}
+                    />
+                    <EvidenceCard
+                      icon={<FileClock className="h-4 w-4" />}
+                      title="Mapeo aplicable"
+                      status={requestStatus(action.noticeRequest?.status)}
+                      due={formatDue(action.noticeRequest?.dueAt)}
+                      success={action.noticeRequest?.status === 'accepted' && Boolean(action.noticeRequest.submittedEvidenceId)}
+                    />
+                    <EvidenceCard
+                      icon={<Trash2 className="h-4 w-4" />}
+                      title="Eliminación demostrada"
+                      status={requestStatus(action.deletionRequest?.status)}
+                      due={formatDue(action.deletionRequest?.dueAt)}
+                      success={deletionAccepted}
+                    />
+                  </div>
+
+                  {action.mission && (
+                    <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border bg-muted/20 px-4 py-3 text-sm">
+                      <CalendarClock className="h-4 w-4 text-primary" />
+                      <span className="font-semibold">{action.mission.title}</span>
+                      <span className="text-muted-foreground">Estado: {missionStatus(action.mission.status)}</span>
+                      <span className="text-muted-foreground">Vence: {formatDate(action.mission.dueAt)}</span>
+                    </div>
+                  )}
+                </div>
+
+                {canManage && !action.mission && (
+                  <Button type="button" variant="outline" onClick={() => open(action)} className="gap-2">
+                    <ShieldCheck className="h-4 w-4" />
+                    Crear plan de cierre
+                  </Button>
                 )}
               </div>
-
-              {canManage && !action.mission && (
-                <Button type="button" variant="outline" onClick={() => open(action)} className="gap-2">
-                  <ShieldCheck className="h-4 w-4" />
-                  Crear plan de cierre
-                </Button>
-              )}
-            </div>
-          </article>
-        ))}
+            </article>
+          )
+        })}
       </div>
 
       {selected && (
@@ -230,11 +235,23 @@ function Confirmation({ checked, onChange, label }: { checked: boolean; onChange
 }
 
 function requestStatus(status: string | undefined) {
-  return status === 'accepted' ? 'Aceptada' : status === 'rejected' ? 'Rechazada' : status === 'submitted' ? 'Entregada · en revisión' : status === 'cancelled' ? 'Cancelada' : status ? 'Pendiente de entrega' : 'Sin solicitud'
+  if (status === 'accepted') return 'Aceptada con evidencia'
+  if (status === 'rejected') return 'Rechazada'
+  if (status === 'submitted') return 'Entregada · pendiente de revisión'
+  if (status === 'under_review') return 'En revisión'
+  if (status === 'changes_requested') return 'Cambios solicitados'
+  if (status === 'cancelled') return 'Cancelada'
+  return status ? 'Pendiente de entrega' : 'Sin solicitud'
 }
 
 function missionStatus(status: string) {
-  return status === 'completed' ? 'completada' : status === 'in_progress' ? 'en curso' : status === 'blocked' ? 'bloqueada' : status === 'cancelled' ? 'cancelada' : 'lista para iniciar'
+  if (status === 'completed') return 'completada'
+  if (status === 'active') return 'en curso'
+  if (status === 'in_review') return 'en revisión'
+  if (status === 'blocked') return 'bloqueada'
+  if (status === 'cancelled') return 'cancelada'
+  if (status === 'draft') return 'borrador'
+  return 'lista para iniciar'
 }
 
 function formatDue(value: string | null | undefined) {
