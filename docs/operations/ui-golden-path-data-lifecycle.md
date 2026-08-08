@@ -104,6 +104,10 @@ Antes de diseñar el borrado se comprobó:
 - ningún perfil target apunta a una organización ajena;
 - los proyectos candidatos no tienen referencias `RESTRICT` o `NO ACTION`;
 - todas las referencias bloqueantes de los usuarios pre‑misión están dentro de sus propias organizaciones;
+- todas las FKs públicas hacia `auth.users`, incluidas `CASCADE` y `SET NULL`, fueron inventariadas;
+- no existen referencias públicas de los usuarios target fuera de sus tenants o proyectos revisados;
+- la única fila sin organización es el perfil de la identidad huérfana, incluido explícitamente en la allowlist;
+- `ai_platform_runs` y `scraper_runs` se tratan explícitamente para impedir telemetría sintética sin tenant;
 - los tres candidatos de organización no tienen `mission_events` ni `knowledge_events`.
 
 La simulación con los seis tenants históricos completos fue descartada porque encontró eventos de misión inmutables. Ese resultado se considera una validación de seguridad, no un obstáculo que deba rodearse.
@@ -118,13 +122,14 @@ El orden es importante por las reglas de integridad:
 1. adquirir advisory lock transaccional
 2. construir allowlist exacta de usuarios y organizaciones
 3. validar conteos, emails, ausencia de misiones y referencias externas
-4. eliminar telemetría cuya FK haría SET NULL
-5. eliminar perfiles para liberar profiles.organization_id (NO ACTION)
-6. eliminar organizaciones y dejar actuar cascadas tenant-scoped
-7. comprobar que no quedan FK RESTRICT/NO ACTION hacia usuarios target
-8. eliminar auth.users
-9. verificar targets en cero y recursos retenidos sin cambios
-10. ROLLBACK por defecto
+4. inspeccionar todas las FKs públicas hacia auth.users y abortar ante referencias globales
+5. eliminar telemetría cuya FK haría SET NULL
+6. eliminar perfiles para liberar profiles.organization_id (NO ACTION)
+7. eliminar organizaciones y dejar actuar cascadas tenant-scoped
+8. comprobar que no quedan FK RESTRICT/NO ACTION hacia usuarios target
+9. eliminar auth.users
+10. verificar targets en cero y recursos retenidos sin cambios
+11. ROLLBACK por defecto
 ```
 
 ¿Por qué no se elimina primero `auth.users`?
@@ -133,11 +138,11 @@ Porque tablas como `agent_runs`, `agent_jobs`, `agent_artifacts`, `agent_reviews
 
 ¿Por qué se elimina `profiles` antes de `organizations`?
 
-Porque `profiles.organization_id` usa `NO ACTION`, por lo que impediría borrar la organización. El perfil pertenece a la identidad E2E incluida explícitamente en el target.
+Porque `profiles.organization_id` usa `NO ACTION`, por lo que impediría borrar la organización. El perfil pertenece a la identidad E2E incluida explícitamente en el target. El perfil de la identidad huérfana es la única excepción autorizada sin `organization_id`.
 
 ¿Por qué se tratan `ai_platform_runs` y `scraper_runs` por separado?
 
-Porque su FK hacia organización usa `SET NULL`. Sin una eliminación explícita, la limpieza dejaría telemetría sintética sin tenant.
+Porque sus FKs hacia organización o usuario pueden usar `SET NULL`. Sin una eliminación explícita, la limpieza podría dejar telemetría sintética sin tenant o actor.
 
 ---
 
@@ -155,8 +160,11 @@ Características:
 - aborta si aparece una misión, `mission_event` o `knowledge_event`;
 - aborta si existe referencia de tenant assurance;
 - aborta ante membresía cruzada;
-- inspecciona dinámicamente FKs `RESTRICT` y `NO ACTION` antes de borrar usuarios;
+- inspecciona todas las FKs públicas hacia `auth.users` antes de borrar y rechaza referencias fuera del tenant/proyecto permitido;
+- permite únicamente tres excepciones explícitas: el perfil propio y las dos tablas de telemetría que se eliminan antes;
+- vuelve a inspeccionar FKs `RESTRICT` y `NO ACTION` después de la cascada del tenant;
 - compara conteos retenidos antes y después;
+- prohíbe `DISABLE TRIGGER`, `session_replication_role`, `TRUNCATE` y `DROP TABLE` mediante el guardrail de release;
 - termina en `ROLLBACK` por defecto.
 
 Para una aplicación real, un operador con acceso de base debe revisar el reporte de la misma sesión y cambiar el `ROLLBACK` final por `COMMIT` únicamente después de confirmar respaldo, ventana de mantenimiento y ausencia de cambios concurrentes.
