@@ -3,10 +3,12 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { ProcessingInventoryWorkspace } from '@/components/digital-twin/processing-inventory-workspace'
 import { ProcessingLifecycleReviewWorkspace } from '@/components/digital-twin/processing-lifecycle-review-workspace'
+import { ProcessingPrivacyRemediationWorkspace } from '@/components/digital-twin/processing-privacy-remediation-workspace'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { listTeamMembers } from '@/lib/compliance/accountability/team'
 import { getProcessingInventory } from '@/lib/compliance/digital-twin/processing-inventory'
+import { getProcessingPrivacyRemediation } from '@/lib/compliance/digital-twin/privacy-remediation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
@@ -27,8 +29,9 @@ export default async function DigitalTwinPage() {
   const access = await getWorkspaceAccess(admin, user.id)
   if (!access) redirect('/onboarding')
 
-  const [inventory, members, projectsResult, casesResult, controlsResult] = await Promise.all([
+  const [inventory, privacyRemediation, members, projectsResult, casesResult, controlsResult] = await Promise.all([
     getProcessingInventory(admin, access.organizationId),
+    getProcessingPrivacyRemediation(admin, access.organizationId),
     listTeamMembers(admin, access.organizationId),
     admin.from('projects')
       .select('id,name')
@@ -84,6 +87,11 @@ export default async function DigitalTwinPage() {
         />
         <ProcessingLifecycleReviewWorkspace
           activities={inventory.activities}
+          canManage={access.canAssignWork}
+        />
+        <ProcessingPrivacyRemediationWorkspace
+          actions={privacyRemediation.actions}
+          summary={privacyRemediation.summary}
           canManage={access.canAssignWork}
         />
       </main>
