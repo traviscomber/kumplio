@@ -5,7 +5,7 @@
 <h1 align="center">Del problema de cumplimiento a la evidencia defendible.</h1>
 
 <p align="center">
-  Sistema operativo de cumplimiento para centralizar información sensible, coordinar especialistas, convertir análisis en trabajo y demostrar qué hizo una organización.
+  Sistema operativo de cumplimiento para Chile: centraliza información sensible, coordina especialistas, convierte análisis en trabajo y deja cada decisión trazable.
 </p>
 
 <p align="center">
@@ -13,246 +13,271 @@
   ·
   <a href="./ROADMAP.md">Roadmap canónico</a>
   ·
-  <a href="./docs/assurance/ui-golden-path-production-3x-2026-08-07.md">Assurance productivo 3/3</a>
+  <a href="./docs/assurance/ui-golden-path-production-3x-2026-08-07.md">Assurance UI 3/3</a>
   ·
-  <a href="./docs/governance/canonical-roadmap-contract.md">Contrato de ejecución</a>
+  <a href="./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md">Inventario real 3/3</a>
+  ·
+  <a href="./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md">Lifecycle 3/3</a>
 </p>
 
 ---
 
-## Qué es Kumplio
+## Resumen ejecutivo
 
-Kumplio no es un chatbot jurídico, un repositorio de documentos ni una colección de checklists. Es una plataforma **Chile-first** que transforma una situación de cumplimiento en un expediente vivo, coordina análisis especializados, exige revisión humana y deja controles, responsables, plazos y evidencia trazable.
+Kumplio no es un chatbot jurídico ni un repositorio de documentos. Es una plataforma **Chile-first** que transforma una situación de cumplimiento en un expediente vivo y conecta:
 
-Su promesa central es simple:
+```text
+situación
+→ fuentes y evidencia
+→ especialistas
+→ revisión humana
+→ plan operativo
+→ misión, responsable y plazo
+→ controles y solicitudes de evidencia
+→ confianza explicable
+→ memoria organizacional
+```
+
+La promesa central es:
 
 > **Protege tus datos. Entiende qué hacer. Avanza con una guía clara.**
 
-El producto está diseñado para que la organización no tenga que reconstruir su historia cada vez que aparece una auditoría, una nueva exigencia, un incidente o una decisión compleja.
+### Estado real al 8 de agosto de 2026
 
-## El ciclo operativo
-
-```mermaid
-flowchart LR
-  A[Situación o cambio] --> B[Expediente vivo]
-  B --> C[Consejo de Especialistas]
-  C --> D[Supervisor de calidad]
-  D --> E[Revisión humana]
-  E --> F[Plan operativo]
-  F --> G[Misión, owner y plazo]
-  G --> H[Control y evidencia]
-  H --> I[Confianza explicable]
-  I --> J[Memoria organizacional]
-  J --> B
-```
-
-La diferencia no está en generar más texto. Está en **cerrar el ciclo completo**:
-
-```text
-entender
-→ contrastar
-→ decidir
-→ asignar
-→ ejecutar
-→ demostrar
-→ aprender
-```
-
----
-
-## Por qué Kumplio es diferente
-
-| Enfoque habitual | Kumplio |
+| Área | Estado comprobado |
 |---|---|
-| Respuesta aislada | Expediente versionado y vivo |
-| Documento almacenado | Evidencia con procedencia, vigencia e integridad |
-| Recomendación genérica | Acción con responsable, plazo y criterio de cierre |
-| IA presentada como autoridad | Especialistas con fronteras y revisión humana |
-| Score decorativo | Confianza por dimensiones, alcance y límites |
-| Checklist estático | Relación entre obligación, control, evidencia, caso y decisión |
-| Trabajo disperso por correo | Seguimiento centralizado y auditable |
-| Cada caso empieza desde cero | Precedentes, grafo y memoria organizacional |
+| Baseline estable en `main` | `9b2ef72d9e1128671111b8e1cfec0612e4e04890` |
+| Desarrollo técnico | sólido |
+| Demo comercial acompañada | apta |
+| Golden Path productivo | `VALIDATED x3` con actor E2E |
+| Multiempresa y aislamiento interno | `VALIDATED` |
+| Inventario real de N3uralia | 3 actividades revisadas |
+| Revisión jurídica y lifecycle | 3/3 con `changes_requested` |
+| Aviso y eliminación | `ACTIVE` en PR #236; no desplegado todavía |
+| Piloto externo con personas | pendiente |
+| Beta privada autoservicio | no habilitar todavía |
+| Registro público autoservicio | no habilitado |
 
-### Ocho decisiones de diseño que forman la ventaja
-
-1. **Trabajo antes que chat.** Cada análisis debe terminar en una decisión, una acción o una reserva explícita.
-2. **Evidencia antes que afirmación.** Sin fuente no hay conclusión regulatoria; sin evidencia no hay conclusión de cumplimiento.
-3. **La persona conserva la decisión.** Aprobar, publicar, cerrar, eliminar o escalar requiere autorización explícita.
-4. **La incertidumbre es un dato.** Lo desconocido se conserva hasta resolverse; nunca se rellena para mejorar un score.
-5. **La confianza tiene alcance.** Kumplio explica por qué existe un porcentaje y qué podría cambiarlo.
-6. **La ejecución es durable.** Los especialistas trabajan mediante cola, lease, heartbeat, retry y dead-letter controlado.
-7. **Cada organización permanece aislada.** El modelo multiempresa se prueba en ambos sentidos, no se asume.
-8. **Cada caso debe mejorar el siguiente.** Correcciones, precedentes y aprendizajes aprobados forman memoria organizacional.
+`VALIDATED` internamente no significa certificación, cumplimiento integral ni piloto externo.
 
 ---
 
-## Funcionalidades actuales
+## Qué existe y está probado
 
-### 1. Workspace seguro y multiempresa — `VALIDATED`
+### 1. Workspace seguro y multiempresa — `VALIDATED INTERNO`
 
 - autenticación y confirmación de cuenta;
 - onboarding guiado;
 - workspace activo explícito;
-- organizaciones, miembros, roles e invitaciones;
-- aislamiento tenant-scoped mediante RLS, RPC y verificaciones negativas;
-- operaciones privilegiadas limitadas al servidor;
+- organizaciones, miembros, roles, invitaciones y revocación;
+- operaciones tenant-scoped;
+- aislamiento positivo y negativo mediante RLS, RPC y pruebas de frontera;
+- mutaciones privilegiadas limitadas al servidor;
 - auditoría de cambios sensibles.
+
+La deuda externa conocida más importante sigue siendo **Supabase Auth Leaked Password Protection desactivada**.
 
 ### 2. Expedientes de cumplimiento — `VALIDATED x3`
 
-- creación de casos desde una situación real;
-- contexto, prioridad, owner y estado;
+- situación inicial, contexto, prioridad, owner y estado;
 - timeline de eventos;
-- documentos, evidencia, controles y relaciones;
-- flujo guiado sin exponer infraestructura interna;
-- trazabilidad completa desde la situación hasta el cierre operacional.
+- documentos, fuentes, controles y evidencia;
+- relaciones navegables;
+- flujo guiado desde el problema hasta el cierre operacional;
+- cierre conservador cuando faltan antecedentes.
 
 ### 3. Consejo de Especialistas — `VALIDATED x3`
 
-Kumplio coordina especialistas con misiones y límites explícitos:
-
 | Especialista | Función |
 |---|---|
-| **Isidora** | Obligaciones, fuentes y evidencia documental |
-| **Beatriz** | Cambios regulatorios y vigencia |
-| **Rodrigo** | Riesgo, urgencia, escenarios e incertidumbre |
-| **Verónica** | Controles, evidencia, hallazgos y readiness |
-| **Javier** | Planes, dependencias, responsables y criterios de cierre |
-| **Andrés** | Desempeño, recurrencias y aprendizaje |
-| **Julieta** | Revisión jurídica, calidad, consistencia y comunicación |
+| **Isidora** | obligaciones, fuentes y evidencia documental |
+| **Beatriz** | cambios regulatorios y vigencia |
+| **Rodrigo** | riesgo, urgencia, escenarios e incertidumbre |
+| **Verónica** | controles, evidencia, hallazgos y readiness |
+| **Javier** | planes, dependencias, responsables y criterios de cierre |
+| **Andrés** | desempeño, recurrencias y aprendizaje |
+| **Julieta** | revisión jurídica, calidad, consistencia y comunicación |
 
-Cada salida usa contratos estructurados, fuentes autorizadas y un supervisor que puede bloquear resultados insuficientes antes de presentarlos.
+Los especialistas usan salidas estructuradas, herramientas autorizadas y fronteras `DECIDE / NO DECIDE`. Una persona aprueba o solicita cambios; generar una salida no equivale a aprobarla.
 
-### 4. Revisión humana obligatoria — `VALIDATED`
+### 4. Ejecución durable — `VALIDATED x3`
 
-- aprobación o solicitud de cambios por etapa;
-- justificación escrita;
-- checklist de evidencia, supuestos y reservas;
-- versiones nuevas sin sobrescribir resultados previos;
-- separación entre **generado**, **revisado** y **aprobado**;
-- cierre conservador cuando aún falta evidencia.
-
-### 5. Ejecución durable de agentes — `VALIDATED x3`
-
-- jobs tenant-scoped;
+- cola PGMQ;
 - enqueue idempotente;
 - lease y heartbeat;
-- reintentos controlados;
+- retry controlado;
 - recuperación de ejecuciones detenidas;
 - dead-letter visible;
 - procesamiento desacoplado de la solicitud web;
-- consumo de tokens, tiempos y errores persistidos.
+- runs, artefactos, herramientas, errores, modelos, tokens y tiempos persistidos.
 
-### 6. Plan operativo, misiones y responsabilidad — `VALIDATED x3`
+### 5. Plan operativo, misiones y responsabilidad — `VALIDATED x3`
 
-- conversión de un expediente en plan operativo;
+- expediente → plan operativo;
 - misión con owner, prioridad y vencimiento;
-- solicitud inicial de evidencia;
-- asignación asistida según experiencia y carga;
-- SLA, seguimiento y escalamiento visibles;
-- briefing de trabajo y continuidad diaria;
-- acciones idempotentes para evitar duplicados.
+- solicitudes de evidencia;
+- delegación asistida;
+- SLA, carga, bloqueos y escalamiento;
+- briefing y continuidad diaria;
+- idempotencia para impedir duplicados.
 
-### 7. Controles, evidencia y aseguramiento — `VALIDATED x3`
+### 6. Controles, evidencia y assurance — `VALIDATED x3`
 
-- controles conectados con obligaciones y casos;
-- evidencia con fuente, período, vigencia y confidencialidad;
-- integridad mediante hash SHA-256;
+- controles conectados con obligaciones, casos y evidencia;
+- procedencia, período, vigencia y confidencialidad;
+- integridad mediante SHA-256;
 - suficiencia revisada;
-- evaluación de diseño y operación separadas;
-- baseline assurance con desconocidos explícitos;
-- confianza acotada cuando la operación es parcial.
+- diseño y operación evaluados por separado;
+- baseline con unknowns explícitos;
+- confianza limitada cuando la operación es parcial.
 
-### 8. Inventario de actividades de tratamiento — `VALIDATED INICIAL`
+### 7. Inventario real de actividades de tratamiento — `VALIDATED INICIAL / ACTIVE`
 
-- actividad, propósito y base propuesta;
+N3uralia tiene tres actividades reales observadas:
+
+1. **Gestión de contactos comerciales y solicitudes de demostración**.
+2. **Gestión de cuentas, autenticación y acceso al workspace**.
+3. **Gestión de expedientes y análisis asistido por especialistas IA**.
+
+Cada actividad contiene:
+
+- propósito y base expresamente propuesta;
+- owner;
 - titulares y categorías de datos;
-- sistema o repositorio;
 - dataset;
-- tercero o proveedor;
-- transferencia internacional y retención;
+- sistema o repositorio;
+- proveedor o tercero;
+- transferencia y retención declaradas;
 - fuente verificable;
-- snapshot con hash;
-- revisión humana;
-- desconocidos abiertos visibles.
+- revisión humana `approved / partial`;
+- evidencia `accepted · verified`;
+- snapshot SHA-256;
+- unknowns visibles.
 
-Una base propuesta nunca se muestra como conclusión jurídica y una actividad inicial nunca se presenta como inventario completo.
+La cantidad mínima ya está cubierta. La calidad jurídica y operacional continúa abierta.
 
-### 9. Escritorio operacional — `VALIDATED INICIAL`
+### 8. Revisión jurídica y de ciclo de vida — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
 
-- prioridades de hoy;
-- asuntos críticos, decisiones y bloqueos;
-- “¿Por qué aparece esto?” para cada prioridad;
+Kumplio separa cinco decisiones que antes podían confundirse dentro del inventario:
+
+```text
+base jurídica
+retención
+ destinatarios
+subencargados
+transferencias internacionales
+```
+
+Resultado productivo de las tres actividades:
+
+| Actividad | Decisión | Base | Retención | Destinatarios | Subencargados | Transferencias | Unknowns |
+|---|---|---|---|---|---|---|---:|
+| Contactos comerciales y demos | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+| Cuentas, autenticación y workspace | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+| Expedientes y especialistas IA | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+
+Cada revisión tiene versión, fuentes, evidencia, hash, unknowns y supersesión. Ninguna dimensión pendiente puede presentarse como aprobada.
+
+### 9. Escritorio, Insights, grafo e impacto — `DEPLOYED / VALIDATED INICIAL`
+
+- prioridades y explicación “¿Por qué aparece esto?”;
 - briefing de las últimas 24 horas;
-- trabajo delegado y esperando respuesta;
-- confianza del alcance registrado;
-- siguiente acción recomendada.
-
-### 10. Insights, grafo e impacto — `DEPLOYED`
-
-- relaciones navegables entre casos, controles, evidencia y activos;
-- análisis de impacto;
-- reutilización de controles y evidencia;
-- tendencias y señales operacionales;
+- trabajo asignado, delegado y bloqueado;
 - confianza por dimensiones;
-- topes para evitar sobreafirmaciones.
+- grafo de casos, controles, evidencia, activos y decisiones;
+- análisis de impacto;
+- reutilización de controles y evidencia.
 
-### 11. Motor regulatorio Chile — `DEPLOYED`
+### 10. Motor regulatorio Chile — `DEPLOYED`
 
-- fuentes oficiales y versiones;
-- claims con citas;
 - BCN y LeyChile;
 - Diario Oficial;
 - Dirección del Trabajo;
 - SMA y SNIFA;
-- comparación de cambios;
-- separación entre publicado, vigente, anticipado y pendiente de revisión.
+- capturas controladas;
+- versiones, hashes y comparación de cambios;
+- claims con citas;
+- separación entre publicación, vigencia, aplicabilidad y revisión.
 
-### 12. Memoria organizacional — `DEPLOYED / EN POBLAMIENTO`
+### 11. Memoria organizacional — `DEPLOYED / SIN APRENDIZAJES REALES`
 
-- casos similares;
-- precedentes en el contexto de los especialistas;
-- infraestructura de nodos, relaciones y versiones;
-- vigencia y supersesión;
-- preparación para reutilizar correcciones humanas aprobadas.
+La infraestructura de nodos, relaciones, versiones, vigencia y supersesión existe. Todavía falta capturar, aprobar y reutilizar el primer aprendizaje real antes de considerarla una ventaja medida.
 
-La infraestructura existe; los aprendizajes reales todavía deben poblarse y validarse antes de considerarla una ventaja medida.
-
-### 13. Assurance y release — `DONE EN SU ALCANCE TÉCNICO`
+### 12. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
 
 - `npm ci` reproducible;
 - typecheck, build y smoke;
 - Release Gate único;
-- validaciones de fronteras cliente-servidor;
-- pruebas de seguridad e idempotencia;
-- previews de Vercel antes del merge;
+- guardrails de producto, seguridad y roadmap;
+- previews antes de merge;
 - UI Golden Path productivo;
 - aserciones server-side independientes;
-- ciclo de vida documentado para tenants E2E.
+- assurance multiempresa;
+- procedimiento documentado para datos E2E.
 
 ---
 
-## Validación productiva comprobada
+## Evidencia productiva
 
-El Golden Path se ejecutó tres veces consecutivas contra producción, usando una identidad y organización independientes en cada intento.
+### Golden Path por UI — 3/3
 
-| Métrica del assurance 3/3 | Resultado |
+| Métrica | Resultado |
 |---|---:|
-| Ejecuciones Playwright exitosas | 3/3 |
+| Ejecuciones Playwright | 3/3 |
 | Aserciones persistidas | 51/51 |
 | Etapas aprobadas | 15/15 |
 | Jobs exitosos | 15/15 |
 | Intentos por job | 1 |
-| Retry | 0 |
-| Recovery manual | 0 |
-| Dead-letter | 0 |
-| Tokens totales observados | 185.091 |
+| Retry / recovery / dead-letter | 0 / 0 / 0 |
+| Tokens observados | 185.091 |
 
-El recorrido incluyó login, onboarding, expediente, cinco especialistas, cinco revisiones, plan, misión, evidencia, baseline e inventario de tratamiento.
+El recorrido incluyó login, onboarding, expediente, cinco especialistas, cinco revisiones explícitas, plan, misión, evidencia, baseline e inventario de tratamiento.
 
-> Esta evidencia demuestra repetibilidad técnica interna. No equivale a un piloto externo, una certificación ni una conclusión de cumplimiento legal.
+### Assurance disponibles
 
-El detalle se conserva en [`docs/assurance/ui-golden-path-production-3x-2026-08-07.md`](./docs/assurance/ui-golden-path-production-3x-2026-08-07.md).
+- [`UI Golden Path productivo 3/3`](./docs/assurance/ui-golden-path-production-3x-2026-08-07.md)
+- [`Inventario real de N3uralia 3/3`](./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md)
+- [`Revisión lifecycle de N3uralia 3/3`](./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md)
+- [`Ciclo de vida de datos E2E`](./docs/operations/ui-golden-path-data-lifecycle.md)
+
+> Esta evidencia demuestra arquitectura, persistencia, seguridad e idempotencia dentro del alcance probado. No sustituye revisión legal, auditoría, certificación ni observación de una organización externa.
+
+---
+
+## En desarrollo ahora
+
+### Bloque 16, tarea 3 — aviso de privacidad y eliminación — `ACTIVE`
+
+La PR **#236** implementa, pero todavía no acredita como desplegado:
+
+- snapshot versionado del aviso público;
+- una evidencia general compartida con SHA-256;
+- vínculo del aviso con cada actividad;
+- misión por actividad con owner y vencimiento;
+- solicitud de mapeo del aviso a 14 días;
+- solicitud de prueba de eliminación a 30 días;
+- cierre de misión a 35 días;
+- criterios auditables de eliminación: timestamp, proveedor, activo o dataset, alcance, responsable, resultado, `backup_purga_programada` y `backup_purga_confirmada`;
+- estado visible en Digital Twin.
+
+El aviso general no se considera prueba de cobertura específica y no se inventa evidencia de eliminación. La tarea seguirá `ACTIVE` hasta que CI, migraciones, verificación productiva, idempotencia y pruebas cross-tenant estén verdes.
+
+---
+
+## Gates antes de beta privada autoservicio
+
+| Gate | Estado |
+|---|---|
+| Leaked Password Protection | `BLOCKED` por configuración externa |
+| Tres actividades reales | `VALIDATED` |
+| Lifecycle de cinco dimensiones | `VALIDATED INICIAL / CAMBIOS REQUERIDOS` |
+| Aviso y eliminación | `ACTIVE` |
+| Multiempresa interno | `VALIDATED` |
+| Golden Path repetible | `VALIDATED x3` |
+| Organización externa observada | pendiente |
+| Tiempo humano, retrabajo y costo real | pendiente |
+
+No se habilitará beta autoservicio mientras permanezcan abiertos los gates críticos de seguridad, lifecycle y validación externa.
 
 ---
 
@@ -269,20 +294,21 @@ flowchart TB
   Worker --> OpenAI[OpenAI Responses API]
   Worker --> Runs[Runs, artefactos y métricas]
   Runs --> Review[Revisión humana]
-  Review --> DB
-  DB --> Evidence[Evidencia, controles y grafo]
-  Evidence --> UI
+  Review --> Work[Misiones, solicitudes y controles]
+  Work --> Evidence[Evidencia e integridad]
+  Evidence --> Memory[Grafo y memoria organizacional]
+  Memory --> UI
   Vercel[Vercel previews y producción] --> UI
 ```
 
 ### Stack principal
 
-- **Frontend y backend:** Next.js App Router, React, TypeScript.
+- **Frontend y backend:** Next.js App Router, React y TypeScript.
 - **Datos y seguridad:** Supabase Auth, Postgres, RLS y RPC transaccionales.
-- **IA:** OpenAI Responses API con salidas estructuradas y control de calidad.
-- **Orquestación:** workflows por etapas, jobs durables y cron de worker.
-- **Interfaz:** Tailwind CSS y componentes accesibles reutilizables.
-- **Despliegue:** Vercel con previews y validación antes de merge.
+- **IA:** OpenAI Responses API con Structured Outputs y control de calidad.
+- **Orquestación:** workflows por etapas, PGMQ, lease, heartbeat y cron.
+- **Interfaz:** Tailwind CSS y componentes reutilizables accesibles.
+- **Despliegue:** Vercel con previews y gates antes de merge.
 
 ---
 
@@ -293,6 +319,7 @@ app/                         rutas públicas, autenticadas y API
 components/                  experiencia y componentes reutilizables
 lib/agents/                  catálogo, prompts, schemas y runtime
 lib/compliance/              expedientes, controles, evidencia y confianza
+lib/privacy/                 contrato versionado del aviso público
 lib/supabase/                clientes de navegador, servidor y administración
 supabase/migrations/         esquema y cambios reproducibles
 scripts/                     guardrails, verificaciones y smoke tests
@@ -301,6 +328,7 @@ tests/e2e/                   Golden Path productivo
 ROADMAP.md                   fuente canónica de prioridad y estado
 docs/assurance/              evidencia técnica de recorridos validados
 docs/governance/             contrato de ejecución y cambio de prioridades
+docs/operations/             procedimientos operacionales y de datos
 ```
 
 ---
@@ -316,9 +344,7 @@ Un cambio está autorizado cuando cumple al menos una condición:
 3. corrige un bug, una regresión, un riesgo de seguridad o integridad;
 4. responde a una decisión explícita del owner que actualiza el roadmap en la misma PR.
 
-No se debe iniciar trabajo de bloques `PLANNED`, `DEFERRED` o ideas nuevas solo porque parezcan atractivas. Una conversación, issue o PR no cambia la prioridad por sí sola.
-
-El contrato completo está en [`docs/governance/canonical-roadmap-contract.md`](./docs/governance/canonical-roadmap-contract.md) y se valida automáticamente mediante:
+No se inicia trabajo `PLANNED` o `DEFERRED` solo porque parezca atractivo. El contrato completo está en [`docs/governance/canonical-roadmap-contract.md`](./docs/governance/canonical-roadmap-contract.md) y se verifica mediante:
 
 ```bash
 npm run check:canonical-roadmap
@@ -336,7 +362,7 @@ Cuando una PR cambia alcance, prioridad o estado, debe actualizar `ROADMAP.md` d
 - npm y el lockfile comprometido;
 - proyecto Supabase;
 - credenciales de OpenAI para ejecutar especialistas;
-- variables de servidor gestionadas fuera del cliente.
+- secretos gestionados exclusivamente en servidor.
 
 ### Variables mínimas
 
@@ -374,7 +400,7 @@ npm run release:check
 npm run smoke
 ```
 
-`release:check` ejecuta los contratos de seguridad, producto, orquestación, evidencia, tenant assurance y build de producción.
+`release:check` ejecuta contratos de seguridad, producto, orquestación, evidencia, inventario, tenant assurance y build de producción.
 
 ---
 
@@ -386,10 +412,8 @@ npm run smoke
 4. Implementar el cambio más pequeño, reversible y verificable.
 5. Ejecutar las validaciones relevantes.
 6. Abrir una PR con alineación explícita al roadmap.
-7. Esperar Release Gate y previews verdes.
+7. Esperar gates y previews verdes.
 8. Fusionar solo cuando la evidencia sostenga el estado declarado.
-
-La plantilla de PR obliga a declarar la alineación con el roadmap y evita cambiar prioridades silenciosamente.
 
 ---
 
@@ -400,29 +424,14 @@ Kumplio no debe afirmar:
 - cumplimiento global por un score alto;
 - aplicabilidad jurídica sin fuente y validación;
 - operación efectiva por un documento aislado;
-- inventario completo cuando existen desconocidos;
+- inventario completo mientras existan unknowns relevantes;
+- eliminación demostrada sin una prueba auditable;
 - auditoría aprobada por una salida generada;
 - reemplazo de abogado, auditor, DPO o autoridad;
 - éxito comercial basándose en tenants sintéticos;
 - ausencia de defectos fuera del recorrido probado.
 
 La plataforma guía, organiza y demuestra. La decisión sensible permanece en manos de una persona responsable.
-
----
-
-## Prioridad vigente
-
-La prioridad no se redefine en este README. Siempre se toma desde la sección **“Próximos bloques de 3”** y la **“Decisión vigente”** de [`ROADMAP.md`](./ROADMAP.md).
-
-En el cierre actual, la ruta de valor se concentra en:
-
-- ampliar el inventario con actividades reales;
-- resolver gates de seguridad pendientes;
-- poblar aprendizaje organizacional aprobado;
-- ejecutar un piloto externo supervisado;
-- medir tiempo, retrabajo, confianza y costo real.
-
-No se agregan módulos nuevos si compiten con esos gates.
 
 ---
 
