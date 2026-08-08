@@ -5,7 +5,7 @@ export const PRIVACY_NOTICE = {
   publicUrl: 'https://www.kumplio.app/privacy',
   title: 'Política de Privacidad de Kumplio',
   controllerLabel: 'Kumplio',
-  contact: 'privacidad@kumplio.app',
+  contact: 'info@kumplio.app',
   country: 'Chile',
   scopes: [
     'Navegación y seguridad del sitio',
