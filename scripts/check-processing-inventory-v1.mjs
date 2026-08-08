@@ -1,5 +1,8 @@
 import fs from 'node:fs'
 
+const coreSeedPath = 'supabase/migrations/20260808023000_seed_n3uralia_core_processing_activities_v1.sql'
+const coreVerificationPath = 'scripts/60-verify-n3uralia-core-processing-activities.sql'
+
 const required = [
   ['app/digital-twin/page.tsx', [
     'ProcessingInventoryWorkspace',
@@ -41,6 +44,27 @@ const required = [
     'processingReviews',
     'tratamientos revisados',
   ]],
+  ['app/(auth)/sign-up/page.tsx', [
+    'supabase.auth.signUp',
+    'isStrongPassword',
+    'terms_version',
+    'privacy_version',
+    'legal_accepted_at',
+  ]],
+  ['lib/agents/openai-runtime.ts', [
+    'openai.responses.create',
+    "type: 'json_schema'",
+    'safety_identifier: safetyIdentifier',
+    'store: false',
+    'parseAgentOutput',
+  ]],
+  ['lib/agents/workflow-stage-executor.ts', [
+    ".from('agent_runs').insert",
+    'context_text: workflowContext',
+    'output_payload: result.output',
+    ".from('agent_artifacts').insert",
+    "status: 'pending_review'",
+  ]],
   ['supabase/migrations/20260807204500_processing_activity_inventory_v1.sql', [
     'processing_activity_reviews',
     'processing_activity_evidence',
@@ -66,10 +90,42 @@ const required = [
     'Skipping supervised processing seed',
     'second call was not idempotent',
   ]],
+  [coreSeedPath, [
+    "lower(btrim(organization.name)) = 'n3uralia'",
+    "md5(v_organization_id::text || ':account-auth-access-v1')::uuid",
+    "md5(v_organization_id::text || ':guided-cases-ai-specialists-v1')::uuid",
+    'Gestión de cuentas, autenticación y acceso al workspace',
+    'Gestión de expedientes y análisis asistido por especialistas IA',
+    'auth.users/auth.identities/auth.sessions/auth.refresh_tokens',
+    'Supabase security advisor snapshot 2026-08-07',
+    'Verificar y habilitar Leaked Password Protection',
+    'lib/agents/openai-runtime.ts',
+    'lib/agents/workflow-stage-executor.ts',
+    'OpenAI Responses API',
+    'v_approved_run_count < 1',
+    'store=false está configurado pero no acredita eliminación integral.',
+    'No se ha validado mediante piloto humano',
+    'Account processing activity second call was not idempotent',
+    'AI processing activity second call was not idempotent',
+    'N3uralia must expose exactly three supervised real processing activities after the seed.',
+  ]],
   ['scripts/58-verify-processing-inventory.sql', [
     'begin;',
     'create_processing_activity_inventory_v1',
     'Second verification call was not idempotent',
+    'rollback;',
+  ]],
+  [coreVerificationPath, [
+    'set transaction read only;',
+    'Expected exactly three supervised N3uralia processing activities',
+    ':account-auth-access-v1',
+    ':guided-cases-ai-specialists-v1',
+    'Account activity review does not preserve its partial scope and security unknowns.',
+    'AI activity review does not preserve its partial scope and privacy unknowns.',
+    'one tenant-scoped Supabase asset/vendor chain',
+    'one tenant-scoped OpenAI asset/vendor chain',
+    'AI evidence has no approved run.',
+    "'status', 'passed'",
     'rollback;',
   ]],
 ]
@@ -96,15 +152,63 @@ if (page.includes(".eq('user_id', user.id).limit(1)")) {
   throw new Error('Digital twin must use the explicit active workspace')
 }
 
-const seed = fs.readFileSync('supabase/migrations/20260807213000_seed_n3uralia_commercial_processing_activity.sql', 'utf8')
-for (const forbiddenId of [
-  'ab928c42-b8f0-44f8-bcf0-d8267398f9b1',
-  '05a0536f-2f8b-438f-b945-e685f40af447',
-  'f82bba3d-988b-48d4-9893-097f176ae122',
-  '91ae9174-be4c-4ddd-8980-4a671571afdc',
-  '81c256bd-0a5e-4663-a96a-67bf7de2008a',
+const supervisedSeedPaths = [
+  'supabase/migrations/20260807213000_seed_n3uralia_commercial_processing_activity.sql',
+  coreSeedPath,
+]
+const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
+for (const seedPath of supervisedSeedPaths) {
+  const seed = fs.readFileSync(seedPath, 'utf8')
+  const literalIds = [...new Set(seed.match(uuidPattern) || [])]
+  if (literalIds.length) {
+    throw new Error(`${seedPath} must discover production IDs dynamically: ${literalIds.join(', ')}`)
+  }
+}
+
+const coreSeed = fs.readFileSync(coreSeedPath, 'utf8')
+if ((coreSeed.match(/create_processing_activity_inventory_v1/g) || []).length !== 4) {
+  throw new Error('Core N3uralia seed must call the atomic RPC exactly twice per activity')
+}
+if ((coreSeed.match(/'decision', 'approved'/g) || []).length !== 2) {
+  throw new Error('Both new activity payloads must preserve an explicit approved inventory review')
+}
+if ((coreSeed.match(/'completeness', 'partial'/g) || []).length !== 2) {
+  throw new Error('Both new activity payloads must remain partial')
+}
+if ((coreSeed.match(/second call was not idempotent/g) || []).length !== 2) {
+  throw new Error('Both new activities must prove RPC idempotency')
+}
+for (const forbidden of [
+  /'completeness',\s*'complete'/i,
+  /'basisStatus',\s*'validated'/i,
+  /cumplimiento\s+integral/i,
+  /sin\s+datos\s+sensibles/i,
 ]) {
-  if (seed.includes(forbiddenId)) throw new Error(`Supervised seed must discover IDs dynamically: ${forbiddenId}`)
+  if (forbidden.test(coreSeed)) throw new Error(`Core N3uralia seed overstates its evidence: ${forbidden}`)
+}
+
+const verification = fs.readFileSync(coreVerificationPath, 'utf8')
+if (!/rollback;\s*$/i.test(verification.trim())) {
+  throw new Error('Core N3uralia verification must end in ROLLBACK')
+}
+if (/\b(insert|update|delete|merge|truncate|alter|drop|create)\b/i.test(stripSqlComments(verification))) {
+  throw new Error('Core N3uralia verification must remain read-only')
+}
+if (verification.includes('create_processing_activity_inventory_v1')) {
+  throw new Error('Read-only verification must not call the inventory mutation RPC')
+}
+const verificationLiteralIds = [...new Set(verification.match(uuidPattern) || [])]
+if (verificationLiteralIds.length) {
+  throw new Error(`Core verification must discover IDs dynamically: ${verificationLiteralIds.join(', ')}`)
+}
+for (const missingBridgeColumn of [
+  'organization_process_datasets link\n  where link.organization_id',
+  'organization_process_assets link\n  where link.organization_id',
+  'organization_vendor_assets vendor_asset\n  where vendor_asset.organization_id',
+]) {
+  if (verification.includes(missingBridgeColumn)) {
+    throw new Error(`Verification references a tenant column that does not exist on a bridge table: ${missingBridgeColumn}`)
+  }
 }
 
 const confidence = fs.readFileSync('lib/compliance/confidence.ts', 'utf8')
@@ -113,3 +217,9 @@ if (!confidence.includes("maximum: 65, reason: 'el inventario de tratamientos co
 }
 
 console.log('Processing inventory v1 guardrail: PASS')
+
+function stripSqlComments(sql) {
+  return sql
+    .replace(/--.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+}
