@@ -30,6 +30,8 @@ No demuestra todavía:
 - que exista evidencia aceptada de purga, respaldo o propagación a proveedores;
 - cumplimiento integral de la Ley N.º 21.719.
 
+**Trabajo creado no equivale a cumplimiento demostrado.**
+
 ## Migraciones productivas
 
 | Versión | Migración |
