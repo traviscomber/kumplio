@@ -48,6 +48,7 @@
     "check:processing-lifecycle": "node scripts/check-processing-lifecycle-review-v1.mjs",
     "check:processing-privacy-remediation": "node scripts/check-processing-privacy-remediation-v1.mjs",
     "check:processing-notice-mapping": "node scripts/check-processing-notice-mapping-v1.mjs",
+    "check:processing-controlled-deletion": "node scripts/check-processing-controlled-deletion-drill-v1.mjs",
     "check:tenant-assurance": "node scripts/check-tenant-assurance-v1.mjs",
     "check:ui-golden-path": "node scripts/check-ui-golden-path-v1.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
