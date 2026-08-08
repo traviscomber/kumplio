@@ -36,6 +36,7 @@ declare
   v_notice_title text;
   v_deletion_title text;
   v_remediation_title text;
+  v_notice_link_count bigint := 0;
   v_event_created boolean := false;
   v_notice_created boolean := false;
   v_notice_link_created boolean := false;
@@ -85,8 +86,8 @@ begin
   order by review.reviewed_at desc, review.created_at desc
   limit 1;
 
-  if v_project_id is null or v_case_id is null or v_control_id is null then
-    raise exception using errcode = '23514', message = 'Reviewed inventory, case and control are required';
+  if v_project_id is null then
+    raise exception using errcode = '23514', message = 'A reviewed inventory record and project are required';
   end if;
 
   select review.id
@@ -141,6 +142,13 @@ begin
     )
   );
 
+  perform pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(
+      p_organization_id::text || ':public-privacy-notice:' || v_project_id::text || ':' || v_notice_version,
+      21719
+    )
+  );
+
   v_notice_hash := pg_catalog.encode(extensions.digest(p_notice_snapshot::text, 'sha256'), 'hex');
 
   select evidence.id, evidence.integrity_hash
@@ -173,25 +181,27 @@ begin
       null
     ) into v_notice_evidence_id;
 
-    update public.evidence
-    set validation_status = 'accepted',
-        integrity_status = 'verified',
-        metadata = coalesce(metadata, '{}'::jsonb) || jsonb_build_object(
-          'scope', 'public_privacy_notice',
-          'privacyNoticeVersion', v_notice_version,
-          'privacyNoticeSnapshot', p_notice_snapshot,
-          'snapshotHash', v_notice_hash,
-          'activitySpecificMapping', false,
-          'deletionEvidence', false,
-          'limitationsPreserved', true
-        ),
-        updated_at = now()
-    where id = v_notice_evidence_id;
-
     v_notice_created := true;
   elsif v_existing_notice_hash is distinct from v_notice_hash then
     raise exception using errcode = '23514', message = 'Privacy notice version already exists with a different snapshot';
   end if;
+
+  update public.evidence
+  set validation_status = 'accepted',
+      integrity_status = 'verified',
+      integrity_hash = v_notice_hash,
+      metadata = coalesce(metadata, '{}'::jsonb) || jsonb_build_object(
+        'scope', 'public_privacy_notice',
+        'privacyNoticeVersion', v_notice_version,
+        'privacyNoticeSnapshot', p_notice_snapshot,
+        'snapshotHash', v_notice_hash,
+        'activitySpecificMapping', false,
+        'deletionEvidence', false,
+        'limitationsPreserved', true
+      ),
+      updated_at = now()
+  where id = v_notice_evidence_id
+    and organization_id = p_organization_id;
 
   insert into public.processing_activity_evidence (
     organization_id,
@@ -210,11 +220,12 @@ begin
   )
   on conflict do nothing;
 
-  get diagnostics v_notice_link_created = row_count;
+  get diagnostics v_notice_link_count = row_count;
+  v_notice_link_created := v_notice_link_count > 0;
 
-  v_remediation_title := left('Cerrar aviso y eliminación — ' || v_process.name, 220);
-  v_notice_title := left('Aviso aplicable y mapeado — ' || v_process.name, 180);
-  v_deletion_title := left('Evidencia de eliminación — ' || v_process.name, 180);
+  v_remediation_title := left('Cerrar aviso y eliminación — ' || v_process.name, 180);
+  v_notice_title := left('Aviso aplicable y mapeado — ' || v_process.name || ' (' || v_process.code || ')', 180);
+  v_deletion_title := left('Evidencia de eliminación — ' || v_process.name || ' (' || v_process.code || ')', 180);
 
   select mission.id
   into v_mission_id
@@ -260,8 +271,8 @@ begin
   from public.evidence_requests request
   where request.organization_id = p_organization_id
     and request.project_id = v_project_id
-    and request.case_id = v_case_id
-    and request.control_id = v_control_id
+    and request.case_id is not distinct from v_case_id
+    and request.control_id is not distinct from v_control_id
     and request.title = v_notice_title
   order by request.created_at
   limit 1
@@ -288,8 +299,8 @@ begin
   from public.evidence_requests request
   where request.organization_id = p_organization_id
     and request.project_id = v_project_id
-    and request.case_id = v_case_id
-    and request.control_id = v_control_id
+    and request.case_id is not distinct from v_case_id
+    and request.control_id is not distinct from v_control_id
     and request.title = v_deletion_title
   order by request.created_at
   limit 1
@@ -345,7 +356,7 @@ begin
   where process.id = p_process_id
     and process.organization_id = p_organization_id;
 
-  if not exists (
+  if v_case_id is not null and not exists (
     select 1
     from public.compliance_case_events event
     where event.organization_id = p_organization_id
