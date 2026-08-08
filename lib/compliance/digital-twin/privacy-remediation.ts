@@ -50,6 +50,11 @@ export type ProcessingPrivacyRemediation = {
     ownerLabel: string | null
     submittedEvidenceId: string | null
   } | null
+  controlledDeletion: {
+    status: string
+    drillId: string | null
+    evidenceId: string | null
+  }
   deletionEvidenceStatus: string
 }
 
@@ -61,6 +66,7 @@ export type ProcessingPrivacyRemediationSummary = {
   noticeRequestsAccepted: number
   deletionRequestsOpen: number
   deletionRequestsAccepted: number
+  controlledDeletionDrillsPassed: number
 }
 
 export async function getProcessingPrivacyRemediation(
@@ -189,6 +195,11 @@ export async function getProcessingPrivacyRemediation(
       } : null,
       noticeRequest: requestView(noticeRequest, profileLabels),
       deletionRequest: requestView(deletionRequest, profileLabels),
+      controlledDeletion: {
+        status: String(attributes.controlledDeletionDrillStatus || 'not_run'),
+        drillId: text(attributes.controlledDeletionDrillId),
+        evidenceId: text(attributes.controlledDeletionEvidenceId),
+      },
       deletionEvidenceStatus: deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id
         ? 'accepted'
         : String(attributes.deletionEvidenceStatus || 'pending_evidence'),
@@ -215,6 +226,9 @@ export async function getProcessingPrivacyRemediation(
       deletionRequestsOpen: actions.filter((item) => isOpenWork(item.deletionRequest?.status)).length,
       deletionRequestsAccepted: actions.filter((item) => (
         item.deletionRequest?.status === 'accepted' && item.deletionRequest.submittedEvidenceId
+      )).length,
+      controlledDeletionDrillsPassed: actions.filter((item) => (
+        item.controlledDeletion.status === 'passed_controlled_test'
       )).length,
     },
   }
