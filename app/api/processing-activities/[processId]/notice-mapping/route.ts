@@ -112,7 +112,7 @@ export async function POST(
     const conflict = error?.code === '23514'
     return noStore({
       error: conflict
-        ? error.message || 'El mapeo entra en conflicto con el estado actual de la actividad.'
+        ? 'El mapeo entra en conflicto con el estado actual de la actividad. Actualiza los datos y vuelve a revisarlo.'
         : 'No fue posible aceptar el mapeo del aviso.',
       code: conflict ? 'notice_mapping_conflict' : 'notice_mapping_failed',
     }, conflict ? 409 : 500)
