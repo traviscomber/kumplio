@@ -30,6 +30,7 @@ const checks = [
   ['check:case-operational-plan'],
   ['check:baseline-assurance'],
   ['check:processing-inventory'],
+  ['check:processing-lifecycle'],
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
   ['check:e2e-data-lifecycle'],

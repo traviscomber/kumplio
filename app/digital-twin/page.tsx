@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { ProcessingInventoryWorkspace } from '@/components/digital-twin/processing-inventory-workspace'
+import { ProcessingLifecycleReviewWorkspace } from '@/components/digital-twin/processing-lifecycle-review-workspace'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { listTeamMembers } from '@/lib/compliance/accountability/team'
@@ -79,6 +80,10 @@ export default async function DigitalTwinPage() {
           controls={controls}
           currentUserId={user.id}
           initialRequestKey={randomUUID()}
+          canManage={access.canAssignWork}
+        />
+        <ProcessingLifecycleReviewWorkspace
+          activities={inventory.activities}
           canManage={access.canAssignWork}
         />
       </main>
