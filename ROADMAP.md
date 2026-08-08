@@ -133,7 +133,7 @@ PRs de referencia del cierre:
 - **#217** — inventario mínimo real de tratamientos;
 - **#219** — segundo tenant, aislamiento y repetibilidad;
 - **#220** — corrección de joins del refresh de tenant assurance;
-- **#223–#225** — selectores accesibles y revisión humana canónica;
+- **#223–#225** — selectores accesibles y revisión canónica;
 - **#226** — navegación determinista después del onboarding;
 - **#227** — perfiles de equipo sin embed PostgREST inexistente;
 - **#228** — código de salida explícito de Playwright;
@@ -156,7 +156,7 @@ PRs de referencia del cierre:
 |---|---|
 | Desarrollo técnico | sólido |
 | Demo comercial acompañada | apta |
-| Golden path productivo por UI | validado 3/3 |
+| Golden path productivo por UI | validado 3/3 con actor E2E automatizado |
 | Assurance multiempresa interno | validado |
 | Piloto supervisado | apto para iniciar |
 | Beta privada autoservicio | cerca; faltan gates P0 externos y de seguridad |
@@ -229,7 +229,7 @@ IDs principales:
 - sistema/repositorio: `aabbcc76-f48c-4aad-b251-55aa2cc9185b`;
 - tercero: `1f5fa52c-7b34-47f4-9e49-bd8007dad191`;
 - evidencia: `ab080fbd-c189-4059-b5c4-752e65daaac5`;
-- revisión humana: `3cc95dac-0026-42de-bcac-c5ac26ae19d6`.
+- revisión: `3cc95dac-0026-42de-bcac-c5ac26ae19d6`.
 
 Hash del snapshot:
 
@@ -286,7 +286,7 @@ Cuenta E2E independiente
 → inventario sintético
 → evidencia y revisión
 → cinco jobs durables
-→ cinco revisiones humanas
+→ cinco aprobaciones bajo el contrato de revisión
 → tenant assurance passed
 ```
 
@@ -315,7 +315,7 @@ Resultado dinámico del segundo tenant:
 | Dead-letter | 0 |
 | Runs aprobados | 5/5 |
 | Artefactos aprobados | 5/5 |
-| Revisiones humanas | 5/5 |
+| Revisiones registradas | 5/5 |
 | Input tokens | 50.592 |
 | Output tokens | 22.499 |
 | Total tokens | 73.091 |
@@ -323,6 +323,17 @@ Resultado dinámico del segundo tenant:
 | Assurance final | `passed` |
 
 La etapa final recomendó **`request_changes`** y mantuvo reservas abiertas. Se aprobó la calidad del artefacto, no el cierre del caso ni una conclusión de cumplimiento.
+
+El assurance fundacional detectó que `refresh_tenant_assurance_run_v1` intentaba leer `workflow_id` directamente desde `agent_runs` y `agent_artifacts`, columnas que no existen. La PR #220 corrigió el recorrido canónico:
+
+```text
+agent_workflows
+→ agent_workflow_stages
+→ agent_runs
+→ agent_artifacts / agent_reviews
+```
+
+El Release Gate impide reintroducir esos joins inválidos. La verificación reversible `scripts/59-verify-tenant-assurance.sql` pasó dentro de `BEGIN ... ROLLBACK` sin alterar producción.
 
 ### Hito D — UI Golden Path productivo y repetible — `VALIDATED x3`
 
@@ -342,15 +353,17 @@ login
 → caso inicial
 → expediente guiado
 → cinco especialistas
-→ cinco aprobaciones humanas
+→ cinco aprobaciones explícitas bajo el contrato de revisión
 → plan operativo
 → misión y solicitud
 → baseline
-→ cierre humano
+→ aceptación explícita de la línea base
 → actividad de tratamiento
 → sistema, dataset, tercero y evidencia
 → revisión parcial con desconocidos abiertos
 ```
+
+El actor de las tres ejecuciones fue Playwright con una cuenta E2E. Esto valida el contrato técnico de revisión y aceptación; no demuestra que una persona real haya completado el recorrido.
 
 Resultado agregado:
 
@@ -395,10 +408,10 @@ El documento de assurance conserva jobs, artefactos, digests, métricas, fronter
 
 - expediente canónico;
 - inicio idempotente;
-- especialistas y revisión humana;
+- especialistas y contrato de revisión;
 - plan operativo;
 - baseline, evidencia y misión;
-- ejecución productiva por UI en tres tenants limpios consecutivos.
+- ejecución productiva por UI en tres tenants limpios consecutivos con actor E2E.
 
 Pendiente fuera del alcance técnico: observación con una organización externa real.
 
@@ -410,7 +423,7 @@ Pendiente fuera del alcance técnico: observación con una organización externa
 - contexto de comité;
 - contradicciones y reservas;
 - supervisor determinístico;
-- aprobación humana con justificación;
+- aprobación con justificación y aceptación explícita;
 - retry sin sobrescribir versiones.
 
 ### D. Ejecución durable — `VALIDATED x3`
@@ -432,7 +445,7 @@ Pendiente fuera del alcance técnico: observación con una organización externa
 - diseño y operación separados;
 - baseline assurance idempotente;
 - operación parcial visible;
-- cierre humano explícito.
+- cierre con aceptación explícita.
 
 ### F. Inventario de tratamientos — `VALIDATED INICIAL`
 
@@ -441,7 +454,7 @@ Pendiente fuera del alcance técnico: observación con una organización externa
 - owner, sistema, dataset y tercero;
 - transferencia y retención;
 - fuente, snapshot y hash;
-- revisión humana;
+- revisión con justificación;
 - desconocidos explícitos;
 - dimensión de confianza y tope por parcialidad;
 - comprobación durable de tarjeta, evidencia e integridad en producción.
@@ -513,7 +526,7 @@ Deuda externa conocida: **Supabase Auth Leaked Password Protection continúa des
 | Bloque | Resultado | Estado |
 |---:|---|---|
 | 1 | Auth, workspace activo y tenant | `VALIDATED INICIAL / BLOCKED` por leaked passwords |
-| 2 | Golden path Ley N.º 21.719 | `VALIDATED x3` |
+| 2 | Golden path Ley N.º 21.719 | `VALIDATED x3` técnico con actor E2E |
 | 3 | UX operacional | `DEPLOYED` |
 | 4 | Ejecución durable | `VALIDATED x3` |
 | 5 | Evidencia y controles | `VALIDATED x3` |
@@ -549,7 +562,7 @@ Completado:
 - aislamiento positivo y negativo;
 - selector de workspace protegido;
 - pruebas de tablas y RPC;
-- tres tenants limpios creados y operados por UI productiva.
+- tres tenants limpios creados y operados por UI productiva mediante actor E2E.
 
 Falta:
 
@@ -583,6 +596,8 @@ Completado:
 - cero retry, recovery y dead-letter;
 - cero intervención SQL para crear o avanzar registros de negocio;
 - evidencia visual y digests por intento.
+
+El gate fue ejecutado por Playwright. Valida repetibilidad técnica y el contrato de aceptación; no acredita todavía operación humana real.
 
 Pendiente fuera de este gate:
 
@@ -671,7 +686,7 @@ La tercera repetición técnica ya no forma parte de este bloque: quedó cerrada
 |---|---:|---:|
 | Bugs críticos abiertos | 0 | 0 conocidos en el recorrido cerrado |
 | Release Gate en cambios críticos | 100% | 100% |
-| Golden paths productivos en tenants independientes | ≥ 3 | 3/3 |
+| Golden paths productivos en tenants independientes | ≥ 3 | 3/3 técnicos con actor E2E |
 | Aserciones persistidas del gate UI | 100% | 51/51 |
 | Duplicados o huérfanos por retry | 0 | 0 en los tres paths oficiales |
 | Retry / recovery / dead-letter | 0 | 0 / 0 / 0 |
@@ -679,7 +694,8 @@ La tercera repetición técnica ya no forma parte de este bloque: quedó cerrada
 | Actividades reales revisadas | ≥ 3 | 1 real validada; registros E2E excluidos |
 | Controles con owner | 100% del alcance piloto | 100% del alcance actual |
 | Evidencia demostrada con procedencia | 100% | 100% del alcance declarado |
-| Decisiones sensibles con revisión humana | 100% | 100% del assurance |
+| Contrato de revisión explícita en assurance | 100% | 100% ejercido por actor E2E |
+| Recorridos completos por persona externa | ≥ 1 | 0 |
 | Recomendaciones con explicación | 100% | 100% del assurance |
 | Bases/retención pendientes | visibles y accionables | visibles |
 | Tokens de las tres ejecuciones UI | medir | 185.091 totales; 61.697 promedio |
@@ -739,9 +755,9 @@ El bloque 15 queda cerrado como **`DONE` dentro del assurance técnico interno**
 Kumplio ya demostró internamente:
 
 - creación aislada de tenants desde producción;
-- tres recorridos completos por interfaz;
+- tres recorridos completos por interfaz con actor E2E;
 - ejecución durable de cinco especialistas por recorrido;
-- revisión humana explícita en cada etapa;
+- contrato de revisión y aceptación explícita ejercido en cada etapa;
 - plan operativo, misión, evidencia y baseline;
 - inventario de tratamiento con hash, sistema, dataset y tercero;
 - 51/51 aserciones persistidas;
@@ -749,7 +765,7 @@ Kumplio ya demostró internamente:
 - cero retry, recovery y dead-letter;
 - una conclusión conservadora que mantiene límites y desconocidos abiertos.
 
-Esto valida la arquitectura y la repetibilidad técnica. No sustituye un piloto externo, no demuestra beta autoservicio y no acredita cumplimiento integral.
+Esto valida la arquitectura y la repetibilidad técnica. No sustituye un piloto externo, no demuestra beta autoservicio, no acredita experiencia de usuario humana y no acredita cumplimiento integral.
 
 La prioridad inmediata es:
 
