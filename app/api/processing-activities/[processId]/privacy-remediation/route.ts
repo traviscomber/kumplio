@@ -1,4 +1,3 @@
-import { addDays } from 'date-fns'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
@@ -72,9 +71,9 @@ export async function POST(
   }
 
   const now = new Date()
-  const noticeDueAt = addDays(now, 14).toISOString()
-  const deletionDueAt = addDays(now, 30).toISOString()
-  const missionDueAt = addDays(now, 35).toISOString()
+  const noticeDueAt = addUtcDays(now, 14).toISOString()
+  const deletionDueAt = addUtcDays(now, 30).toISOString()
+  const missionDueAt = addUtcDays(now, 35).toISOString()
 
   const { data, error } = await admin.rpc('prepare_processing_activity_privacy_remediation_v1', {
     p_actor_id: user.id,
@@ -105,6 +104,12 @@ export async function POST(
       ? 'El plan ya existía y se recuperó sin duplicarlo.'
       : 'Aviso y eliminación quedaron convertidos en misión y solicitudes de evidencia.',
   }, result.resumed ? 200 : 201)
+}
+
+function addUtcDays(value: Date, days: number) {
+  const result = new Date(value)
+  result.setUTCDate(result.getUTCDate() + days)
+  return result
 }
 
 function noStore(body: Record<string, unknown>, status: number) {
