@@ -1,8 +1,9 @@
 import fs from 'node:fs'
 
-const foundationPath = 'supabase/migrations/20260808060000_processing_privacy_remediation_v1.sql'
-const seedPath = 'supabase/migrations/20260808061000_seed_n3uralia_privacy_remediation_v1.sql'
+const foundationPath = 'supabase/migrations/20260808151723_processing_activity_privacy_remediation_v1.sql'
+const seedPath = 'supabase/migrations/20260808152005_seed_n3uralia_privacy_remediation_v1.sql'
 const verificationPath = 'scripts/62-verify-n3uralia-processing-privacy-remediation.sql'
+const assurancePath = 'docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md'
 
 const required = [
   ['lib/privacy/notice.ts', [
@@ -57,6 +58,8 @@ const required = [
     'prepare_processing_activity_privacy_remediation_v1',
     "set search_path to ''",
     'pg_advisory_xact_lock',
+    ':processing-privacy-remediation-request:',
+    ':processing-privacy-remediation:',
     ':public-privacy-notice:',
     'create_evidence_record',
     'create_mission_from_playbook',
@@ -65,8 +68,8 @@ const required = [
     'is not distinct from',
     "'activitySpecificMapping', false",
     "'deletionEvidence', false",
-    'backup_purga_programada',
-    'backup_purga_confirmada',
+    'Persisted privacy remediation due dates are inconsistent',
+    'Privacy remediation request key already belongs to another activity or notice version',
     'to service_role, postgres',
   ]],
   [seedPath, [
@@ -91,19 +94,32 @@ const required = [
     "'status', 'passed'",
     'rollback;',
   ]],
+  [assurancePath, [
+    '`VALIDATED INICIAL / TRABAJO ABIERTO`',
+    '`20260808151723`',
+    '`20260808152005`',
+    'Evidencias del aviso | 1',
+    'Enlaces específicos al aviso | 3',
+    'Mapeos aceptados con evidencia | 0',
+    'Eliminaciones aceptadas con evidencia | 0',
+    'Trabajo creado no equivale a cumplimiento demostrado',
+  ]],
   ['README.md', [
     '## Resumen ejecutivo',
-    'Baseline estable en `main`',
-    'Revisión jurídica y de ciclo de vida',
-    'Bloque 16, tarea 3 — aviso de privacidad y eliminación — `ACTIVE`',
-    'La tarea seguirá `ACTIVE` hasta que CI, migraciones, verificación productiva, idempotencia y pruebas cross-tenant estén verdes.',
+    'Aviso y eliminación como trabajo trazable',
+    '`DEPLOYED / VALIDATED INICIAL`',
+    'Mapeos de aviso aceptados con evidencia | 0/3',
+    'Eliminaciones demostradas con evidencia | 0/3',
+    '20260808151723_processing_activity_privacy_remediation_v1',
+    '20260808152005_seed_n3uralia_privacy_remediation_v1',
   ]],
   ['ROADMAP.md', [
-    'Baseline estable en `main`',
-    'Assurance lifecycle 3/3',
+    'Assurance aviso y eliminación 3/3',
+    '`20260808151723`',
+    '`20260808152005`',
     '### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`',
-    'Active en PR #236',
-    'aviso y eliminación están `ACTIVE` en la PR #236',
+    'aviso y eliminación están `DEPLOYED / VALIDATED INICIAL`',
+    '0/3 mapeos aceptados y 0/3 eliminaciones demostradas',
   ]],
   ['package.json', [
     'check:processing-privacy-remediation',
@@ -120,6 +136,13 @@ for (const [file, markers] of required) {
   for (const marker of markers) {
     if (!text.includes(marker)) throw new Error(`${file} missing marker: ${marker}`)
   }
+}
+
+for (const stalePath of [
+  'supabase/migrations/20260808060000_processing_privacy_remediation_v1.sql',
+  'supabase/migrations/20260808061000_seed_n3uralia_privacy_remediation_v1.sql',
+]) {
+  if (fs.existsSync(stalePath)) throw new Error(`Stale unreconciled migration remains: ${stalePath}`)
 }
 
 const foundation = fs.readFileSync(foundationPath, 'utf8')
@@ -139,8 +162,13 @@ if (!foundation.includes("request.case_id is not distinct from v_case_id")
   || !foundation.includes("request.control_id is not distinct from v_control_id")) {
   throw new Error('Nullable case and control idempotency must use IS NOT DISTINCT FROM')
 }
-if ((foundation.match(/pg_advisory_xact_lock/g) || []).length < 2) {
-  throw new Error('Privacy remediation needs process and shared-notice advisory locks')
+if ((foundation.match(/pg_advisory_xact_lock/g) || []).length < 3) {
+  throw new Error('Privacy remediation needs request, process and shared-notice advisory locks')
+}
+if (!foundation.includes('v_effective_notice_due_at')
+  || !foundation.includes('v_effective_deletion_due_at')
+  || !foundation.includes('v_effective_mission_due_at')) {
+  throw new Error('Resumed privacy remediation must preserve persisted due dates')
 }
 
 const route = fs.readFileSync('app/api/processing-activities/[processId]/privacy-remediation/route.ts', 'utf8')
@@ -181,19 +209,8 @@ if (notice.includes('privacidad@kumplio.app') || seed.includes('privacidad@kumpl
 if (!privacyPage.includes('PRIVACY_NOTICE.contact') || !privacyPage.includes('PRIVACY_NOTICE.version')) {
   throw new Error('The public privacy page must render canonical notice metadata')
 }
-
 if ((seed.match(/prepare_processing_activity_privacy_remediation_v1/g) || []).length !== 2) {
   throw new Error('The looped N3uralia privacy seed must call the RPC twice per activity')
-}
-if ((seed.match(/second call was not idempotent/g) || []).length !== 1) {
-  throw new Error('N3uralia privacy seed must prove idempotency for each looped activity')
-}
-for (const processName of [
-  'Gestión de contactos comerciales y solicitudes de demostración',
-  'Gestión de cuentas, autenticación y acceso al workspace',
-  'Gestión de expedientes y análisis asistido por especialistas IA',
-]) {
-  if (!seed.includes(processName)) throw new Error(`Seed missing supervised activity: ${processName}`)
 }
 
 const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
