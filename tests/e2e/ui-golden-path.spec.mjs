@@ -115,8 +115,18 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.getByLabel('Entiendo que la base registrada es una propuesta pendiente de validación jurídica.').check()
     await page.getByRole('button', { name: 'Registrar y revisar', exact: true }).click()
 
-    await expect(page.getByText('Actividad registrada y revisada.')).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByRole('heading', { name: activityName })).toBeVisible()
+    const activityHeading = page.getByRole('heading', { name: activityName, exact: true })
+    await expect(activityHeading).toBeVisible({ timeout: 90_000 })
+
+    const activity = page.locator('article').filter({ has: activityHeading })
+    await expect(activity).toBeVisible()
+    await expect(activity.getByText('Parcial', { exact: true })).toBeVisible()
+    await expect(activity.getByText('Portal Kumplio UI E2E', { exact: true })).toBeVisible()
+    await expect(activity.getByText('Proveedor sintético UI E2E', { exact: true })).toBeVisible()
+    await expect(activity.getByText(/accepted · verified/i)).toBeVisible()
+    await expect(activity.getByText(/SHA-256 [a-f0-9]{64}/i)).toBeVisible()
+    await expect(activity.getByRole('listitem').filter({ hasText: 'Base jurídica pendiente de validación' })).toBeVisible()
+    await expect(activity.getByRole('listitem').filter({ hasText: 'Retención pendiente de aprobación' })).toBeVisible()
   })
 
   await page.screenshot({ path: 'test-results/ui-golden-path-success.png', fullPage: true })

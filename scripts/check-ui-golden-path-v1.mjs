@@ -72,6 +72,15 @@ const required = [
     "name: 'Aceptar línea base y cerrar misión', exact: true",
     "page.goto('/digital-twin')",
     "name: 'Registrar y revisar', exact: true",
+    "const activityHeading = page.getByRole('heading', { name: activityName, exact: true })",
+    "const activity = page.locator('article').filter({ has: activityHeading })",
+    "activity.getByText('Parcial', { exact: true })",
+    "activity.getByText('Portal Kumplio UI E2E', { exact: true })",
+    "activity.getByText('Proveedor sintético UI E2E', { exact: true })",
+    'activity.getByText(/accepted · verified/i)',
+    'activity.getByText(/SHA-256 [a-f0-9]{64}/i)',
+    "hasText: 'Base jurídica pendiente de validación'",
+    "hasText: 'Retención pendiente de aprobación'",
   ]],
 ]
 
@@ -91,6 +100,11 @@ if (onboarding.includes('router.refresh()')) {
 const team = fs.readFileSync('lib/compliance/accountability/team.ts', 'utf8')
 if (/organization_members[\s\S]{0,240}profiles\s*\(/.test(team) || team.includes("profiles(first_name,last_name,email)")) {
   throw new Error('Team profiles must be loaded separately because organization_members has no direct FK to profiles')
+}
+
+const uiTest = fs.readFileSync('tests/e2e/ui-golden-path.spec.mjs', 'utf8')
+if (uiTest.includes("getByText('Actividad registrada y revisada.')")) {
+  throw new Error('The processing activity must be asserted from durable rendered state, not an ephemeral success message')
 }
 
 const route = fs.readFileSync('app/api/internal/ui-golden-path/route.ts', 'utf8')
