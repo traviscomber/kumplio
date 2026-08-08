@@ -82,6 +82,10 @@ begin
     raise exception 'Expected exactly 3 pre-mission E2E projects';
   end if;
 
+  if (select official_orgs from baseline_guard) <> 3 then
+    raise exception 'Expected all three official 3x organizations to exist';
+  end if;
+
   if (
     select count(*)
     from auth.users u
@@ -212,6 +216,87 @@ begin
   ) then
     raise exception 'Target profile points to an organization outside the allowlist';
   end if;
+end $$;
+
+-- Inspect every public FK to auth.users, including SET NULL and CASCADE. A
+-- target identity may be referenced only by its reviewed tenant/project,
+-- by its own profile, or by telemetry explicitly deleted below. This prevents
+-- global records from being silently anonymized when auth.users is removed.
+do $$
+declare
+  r record;
+  v_has_org boolean;
+  v_has_project boolean;
+  v_outside_scope bigint;
+begin
+  for r in
+    select distinct
+      ns.nspname as table_schema,
+      cls.relname as table_name,
+      att.attname as column_name
+    from pg_constraint con
+    join pg_class cls on cls.oid = con.conrelid
+    join pg_namespace ns on ns.oid = cls.relnamespace
+    join pg_class fcls on fcls.oid = con.confrelid
+    join pg_namespace fns on fns.oid = fcls.relnamespace
+    join lateral unnest(con.conkey) with ordinality ck(attnum, ord) on true
+    join lateral unnest(con.confkey) with ordinality fk(attnum, ord) on fk.ord = ck.ord
+    join pg_attribute att on att.attrelid = con.conrelid and att.attnum = ck.attnum
+    where con.contype = 'f'
+      and ns.nspname = 'public'
+      and fns.nspname = 'auth'
+      and fcls.relname = 'users'
+  loop
+    select exists(
+      select 1
+      from information_schema.columns c
+      where c.table_schema = r.table_schema
+        and c.table_name = r.table_name
+        and c.column_name = 'organization_id'
+    ) into v_has_org;
+
+    select exists(
+      select 1
+      from information_schema.columns c
+      where c.table_schema = r.table_schema
+        and c.table_name = r.table_name
+        and c.column_name = 'project_id'
+    ) into v_has_project;
+
+    if r.table_name = 'profiles' and r.column_name = 'id' then
+      v_outside_scope := 0;
+    elsif (r.table_name = 'ai_platform_runs' and r.column_name = 'actor_user_id')
+       or (r.table_name = 'scraper_runs' and r.column_name = 'requested_by') then
+      -- These telemetry rows are explicitly removed before tenant deletion.
+      v_outside_scope := 0;
+    elsif v_has_org then
+      execute format(
+        'select count(*) from %I.%I where %I in (select user_id from pg_temp.target_users) and (organization_id is null or organization_id not in (select organization_id from pg_temp.target_orgs))',
+        r.table_schema,
+        r.table_name,
+        r.column_name
+      ) into v_outside_scope;
+    elsif v_has_project then
+      execute format(
+        'select count(*) from %I.%I where %I in (select user_id from pg_temp.target_users) and (project_id is null or project_id not in (select project_id from pg_temp.target_projects))',
+        r.table_schema,
+        r.table_name,
+        r.column_name
+      ) into v_outside_scope;
+    else
+      execute format(
+        'select count(*) from %I.%I where %I in (select user_id from pg_temp.target_users)',
+        r.table_schema,
+        r.table_name,
+        r.column_name
+      ) into v_outside_scope;
+    end if;
+
+    if v_outside_scope <> 0 then
+      raise exception 'Public user reference escaped the reviewed tenant scope in %.% column %: % rows',
+        r.table_schema, r.table_name, r.column_name, v_outside_scope;
+    end if;
+  end loop;
 end $$;
 
 -- These FKs use SET NULL toward organizations/users. Delete the E2E telemetry
