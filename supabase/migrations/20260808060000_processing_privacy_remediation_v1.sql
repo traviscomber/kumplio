@@ -34,9 +34,15 @@ declare
   v_existing_mission_process_id text;
   v_existing_mission_notice_version text;
   v_existing_mission_request_key text;
+  v_existing_mission_due_at timestamptz;
   v_effective_request_key text := p_request_key::text;
+  v_effective_notice_due_at timestamptz := p_notice_due_at;
+  v_effective_deletion_due_at timestamptz := p_deletion_due_at;
+  v_effective_mission_due_at timestamptz := p_mission_due_at;
   v_notice_request_id uuid;
+  v_existing_notice_request_due_at timestamptz;
   v_deletion_request_id uuid;
+  v_existing_deletion_request_due_at timestamptz;
   v_notice_title text;
   v_deletion_title text;
   v_remediation_title text;
@@ -242,12 +248,14 @@ begin
     mission.id,
     mission.metadata ->> 'processingActivityId',
     mission.metadata ->> 'privacyNoticeVersion',
-    mission.metadata ->> 'processingPrivacyRemediationKey'
+    mission.metadata ->> 'processingPrivacyRemediationKey',
+    mission.due_at
   into
     v_mission_id,
     v_existing_mission_process_id,
     v_existing_mission_notice_version,
-    v_existing_mission_request_key
+    v_existing_mission_request_key,
+    v_existing_mission_due_at
   from public.missions mission
   where mission.organization_id = p_organization_id
     and mission.metadata ->> 'source' = 'processing_privacy_and_deletion_remediation'
@@ -299,13 +307,15 @@ begin
     ) into v_mission_id;
 
     v_existing_mission_request_key := p_request_key::text;
+    v_existing_mission_due_at := p_mission_due_at;
     v_mission_created := true;
   end if;
 
   v_effective_request_key := coalesce(v_existing_mission_request_key, p_request_key::text);
+  v_effective_mission_due_at := coalesce(v_existing_mission_due_at, p_mission_due_at);
 
-  select request.id
-  into v_notice_request_id
+  select request.id, request.due_at
+  into v_notice_request_id, v_existing_notice_request_due_at
   from public.evidence_requests request
   where request.organization_id = p_organization_id
     and request.project_id = v_project_id
@@ -329,11 +339,14 @@ begin
       p_notice_due_at
     ) into v_notice_request_id;
 
+    v_existing_notice_request_due_at := p_notice_due_at;
     v_notice_request_created := true;
   end if;
 
-  select request.id
-  into v_deletion_request_id
+  v_effective_notice_due_at := coalesce(v_existing_notice_request_due_at, p_notice_due_at);
+
+  select request.id, request.due_at
+  into v_deletion_request_id, v_existing_deletion_request_due_at
   from public.evidence_requests request
   where request.organization_id = p_organization_id
     and request.project_id = v_project_id
@@ -357,7 +370,15 @@ begin
       p_deletion_due_at
     ) into v_deletion_request_id;
 
+    v_existing_deletion_request_due_at := p_deletion_due_at;
     v_deletion_request_created := true;
+  end if;
+
+  v_effective_deletion_due_at := coalesce(v_existing_deletion_request_due_at, p_deletion_due_at);
+
+  if v_effective_notice_due_at >= v_effective_deletion_due_at
+     or v_effective_deletion_due_at > v_effective_mission_due_at then
+    raise exception using errcode = '23514', message = 'Persisted privacy remediation due dates are inconsistent';
   end if;
 
   update public.missions mission
@@ -388,7 +409,7 @@ begin
         'privacyNoticeRequestId', v_notice_request_id,
         'deletionEvidenceRequestId', v_deletion_request_id,
         'deletionEvidenceStatus', 'pending_evidence',
-        'privacyRemediationDueAt', p_mission_due_at
+        'privacyRemediationDueAt', v_effective_mission_due_at
       ),
       updated_at = now()
   where process.id = p_process_id
@@ -425,9 +446,9 @@ begin
         'mission_id', v_mission_id,
         'notice_request_id', v_notice_request_id,
         'deletion_request_id', v_deletion_request_id,
-        'notice_due_at', p_notice_due_at,
-        'deletion_due_at', p_deletion_due_at,
-        'mission_due_at', p_mission_due_at
+        'notice_due_at', v_effective_notice_due_at,
+        'deletion_due_at', v_effective_deletion_due_at,
+        'mission_due_at', v_effective_mission_due_at
       )
     );
 
@@ -443,9 +464,9 @@ begin
     'missionId', v_mission_id,
     'privacyNoticeRequestId', v_notice_request_id,
     'deletionEvidenceRequestId', v_deletion_request_id,
-    'noticeDueAt', p_notice_due_at,
-    'deletionDueAt', p_deletion_due_at,
-    'missionDueAt', p_mission_due_at,
+    'noticeDueAt', v_effective_notice_due_at,
+    'deletionDueAt', v_effective_deletion_due_at,
+    'missionDueAt', v_effective_mission_due_at,
     'created', jsonb_build_object(
       'privacyNoticeEvidence', v_notice_created,
       'privacyNoticeLink', v_notice_link_created,
