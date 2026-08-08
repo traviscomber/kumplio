@@ -32,6 +32,7 @@ const checks = [
   ['check:processing-inventory'],
   ['check:processing-lifecycle'],
   ['check:processing-privacy-remediation'],
+  ['check:processing-notice-mapping'],
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
   ['check:e2e-data-lifecycle'],
