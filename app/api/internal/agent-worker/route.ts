@@ -23,6 +23,11 @@ type ClaimedJob = {
   retry_instructions: string | null
 }
 
+type ProviderTrace = {
+  requestId: string | null
+  organization: string | null
+}
+
 export async function POST(req: NextRequest) {
   const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim() || ''
   if (!token) return NextResponse.json({ error: 'Worker authorization required' }, { status: 401 })
@@ -85,12 +90,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Stage completed but queue acknowledgement failed', code: 'job_ack_failed' }, { status: 500 })
     }
 
+    const providerTrace = readProviderTrace(result.result)
     return NextResponse.json({
       processed: true,
       jobId: job.job_id,
       workflowId: job.workflow_id,
       stageIndex: result.stageIndex,
       status: result.status,
+      providerTrace,
     })
   } catch (error) {
     const failure = classifyWorkflowExecutionFailure(error)
@@ -126,5 +133,16 @@ export async function POST(req: NextRequest) {
     }, { status: retryable ? 503 : 422 })
   } finally {
     clearInterval(heartbeat)
+  }
+}
+
+function readProviderTrace(value: unknown): ProviderTrace | null {
+  if (!value || typeof value !== 'object' || !('providerTrace' in value)) return null
+  const trace = (value as { providerTrace?: unknown }).providerTrace
+  if (!trace || typeof trace !== 'object') return null
+  const record = trace as Record<string, unknown>
+  return {
+    requestId: typeof record.requestId === 'string' ? record.requestId : null,
+    organization: typeof record.organization === 'string' ? record.organization : null,
   }
 }
