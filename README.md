@@ -19,7 +19,9 @@
   ·
   <a href="./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md">Lifecycle 3/3</a>
   ·
-  <a href="./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md">Aviso y eliminación 3/3</a>
+  <a href="./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md">Aviso y acciones 3/3</a>
+  ·
+  <a href="./docs/assurance/n3uralia-processing-notice-mapping-3x-2026-08-08.md">Mapeo 3/3</a>
 </p>
 
 ---
@@ -55,17 +57,32 @@ La promesa central es:
 | Inventario real de N3uralia | 3 actividades revisadas |
 | Revisión jurídica y lifecycle | 3/3 con `changes_requested` |
 | Aviso y eliminación como trabajo trazable | `DEPLOYED / VALIDATED INICIAL` |
-| Mapeos de aviso aceptados con evidencia | 0/3 |
+| Mapeos de aviso aceptados con evidencia | 3/3 |
 | Eliminaciones demostradas con evidencia | 0/3 |
 | Piloto externo con personas | pendiente |
 | Beta privada autoservicio | no habilitar todavía |
 | Registro público autoservicio | no habilitado |
 
-`VALIDATED` internamente no significa certificación, cumplimiento integral ni piloto externo.
+`VALIDATED` internamente no significa certificación, cumplimiento integral ni piloto externo. **Mapeo aceptado no equivale a aviso suficiente.**
 
 ---
 
-## Qué existe y está probado
+## Qué hace único a Kumplio
+
+La mayoría de las herramientas separan documentos, tareas, auditorías e IA. Kumplio los conecta dentro de una misma cadena de decisión:
+
+1. **Centraliza primero.** La información sensible vive en un expediente controlado y no en correos, carpetas y conversaciones dispersas.
+2. **Separa hechos de conclusiones.** Fuentes, inferencias, reservas, unknowns y decisiones humanas no se mezclan.
+3. **Convierte análisis en operación.** Cada gap puede terminar en misión, owner, vencimiento y solicitud de evidencia.
+4. **Exige evidencia defendible.** Un documento no acredita por sí solo un control, un aviso ni una eliminación.
+5. **Mantiene supervisión humana.** Los especialistas proponen; una persona aprueba, rechaza o solicita cambios.
+6. **Versiona antes de sobrescribir.** Cada revisión conserva procedencia, hash, vigencia y supersesión.
+7. **Explica la confianza.** Los scores declaran alcance, límites y topes por información parcial.
+8. **Aprende sin inventar.** Solo el conocimiento aprobado puede convertirse en precedente reutilizable.
+
+---
+
+## Capacidades actuales
 
 ### 1. Workspace seguro y multiempresa — `VALIDATED INTERNO`
 
@@ -74,11 +91,11 @@ La promesa central es:
 - workspace activo explícito;
 - organizaciones, miembros, roles, invitaciones y revocación;
 - operaciones tenant-scoped;
-- aislamiento positivo y negativo mediante RLS, RPC y pruebas de frontera;
+- aislamiento positivo y negativo mediante RLS y RPC;
 - mutaciones privilegiadas limitadas al servidor;
 - auditoría de cambios sensibles.
 
-La deuda externa conocida más importante sigue siendo **Supabase Auth Leaked Password Protection desactivada**.
+La deuda externa más importante sigue siendo **Supabase Auth Leaked Password Protection desactivada**.
 
 ### 2. Expedientes de cumplimiento — `VALIDATED x3`
 
@@ -86,7 +103,7 @@ La deuda externa conocida más importante sigue siendo **Supabase Auth Leaked Pa
 - timeline de eventos;
 - documentos, fuentes, controles y evidencia;
 - relaciones navegables;
-- flujo guiado desde el problema hasta el cierre operacional;
+- recorrido guiado desde el problema hasta el trabajo operacional;
 - cierre conservador cuando faltan antecedentes.
 
 ### 3. Consejo de Especialistas — `VALIDATED x3`
@@ -101,7 +118,7 @@ La deuda externa conocida más importante sigue siendo **Supabase Auth Leaked Pa
 | **Andrés** | desempeño, recurrencias y aprendizaje |
 | **Julieta** | revisión jurídica, calidad, consistencia y comunicación |
 
-Los especialistas usan salidas estructuradas, herramientas autorizadas y fronteras `DECIDE / NO DECIDE`. Una persona aprueba o solicita cambios; generar una salida no equivale a aprobarla.
+Los especialistas usan salidas estructuradas, herramientas autorizadas y fronteras `DECIDE / NO DECIDE`. Generar una salida no equivale a aprobarla.
 
 ### 4. Ejecución durable — `VALIDATED x3`
 
@@ -142,26 +159,13 @@ N3uralia tiene tres actividades reales observadas:
 2. **Gestión de cuentas, autenticación y acceso al workspace**.
 3. **Gestión de expedientes y análisis asistido por especialistas IA**.
 
-Cada actividad contiene:
+Cada actividad contiene propósito, base propuesta, owner, titulares, categorías, dataset, sistema, tercero, fuente, revisión humana, evidencia `accepted · verified`, snapshot SHA-256 y unknowns visibles.
 
-- propósito y base expresamente propuesta;
-- owner;
-- titulares y categorías de datos;
-- dataset;
-- sistema o repositorio;
-- proveedor o tercero;
-- transferencia y retención declaradas;
-- fuente verificable;
-- revisión humana `approved / partial`;
-- evidencia `accepted · verified`;
-- snapshot SHA-256;
-- unknowns visibles.
-
-La cantidad mínima ya está cubierta. La resolución jurídica y operacional continúa abierta.
+La cantidad mínima está cubierta. Eso no convierte tres actividades en un inventario organizacional completo.
 
 ### 8. Revisión jurídica y de ciclo de vida — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
 
-Kumplio separa cinco decisiones que antes podían confundirse dentro del inventario:
+Kumplio separa cinco decisiones:
 
 ```text
 base jurídica
@@ -171,57 +175,62 @@ subencargados
 transferencias internacionales
 ```
 
-Resultado productivo de las tres actividades:
+Resultado de las tres actividades:
 
 | Actividad | Decisión | Base | Retención | Destinatarios | Subencargados | Transferencias | Unknowns |
 |---|---|---|---|---|---|---|---:|
-| Contactos comerciales y demos | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
-| Cuentas, autenticación y workspace | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
-| Expedientes y especialistas IA | `changes_requested` | `pending_evidence` | `needs_changes` | `pending_evidence` | `pending_evidence` | `pending_evidence` | 8 |
+| Contactos comerciales y demos | `changes_requested` | pendiente | requiere cambios | pendiente | pendiente | pendiente | 8 |
+| Cuentas, autenticación y workspace | `changes_requested` | pendiente | requiere cambios | pendiente | pendiente | pendiente | 8 |
+| Expedientes y especialistas IA | `changes_requested` | pendiente | requiere cambios | pendiente | pendiente | pendiente | 8 |
 
-Cada revisión tiene versión, fuentes, evidencia, hash, unknowns y supersesión. Ninguna dimensión pendiente puede presentarse como aprobada.
+Cada revisión conserva versión, evidencia, hash, fuentes, unknowns y supersesión. Ninguna dimensión pendiente puede presentarse como aprobada.
 
-### 9. Aviso y eliminación — `DEPLOYED / VALIDATED INICIAL`
+### 9. Aviso, mapeo y eliminación — `DEPLOYED / VALIDATED INICIAL`
 
-El aviso público versión `2026-08-03` quedó capturado como evidencia general con integridad verificada. Kumplio no lo presenta como prueba específica de cada actividad.
-
-Resultado productivo:
-
-| Objeto | Resultado |
-|---|---:|
-| Evidencia versionada del aviso | 1 |
-| Enlaces específicos a actividades | 3 |
-| Misiones con owner y fecha | 3 |
-| Solicitudes de mapeo | 3 |
-| Solicitudes de eliminación | 3 |
-| Eventos de expediente | 3 |
-| Mapeos aceptados con evidencia | 0 |
-| Eliminaciones aceptadas con evidencia | 0 |
-
-Cada actividad quedó con:
-
-```text
-aviso público vinculado
-→ mapeo específico requerido
-→ misión de cierre
-→ solicitud de evidencia de eliminación
-→ owner y vencimientos persistidos
-```
-
-Los estados actuales son:
-
-- mapeo del aviso: `needs_changes` en 3/3;
-- eliminación: `pending_evidence` en 3/3;
-- misiones: `ready` en 3/3.
-
-Una eliminación solo cuenta como demostrada cuando la solicitud está `accepted` y tiene `submitted_evidence_id`. La prueba debe incluir timestamp, proveedor, activo o dataset, alcance, responsable, resultado, `backup_purga_programada` y `backup_purga_confirmada`.
-
-Migraciones productivas:
+La infraestructura operativa utiliza:
 
 ```text
 20260808151723_processing_activity_privacy_remediation_v1
 20260808152005_seed_n3uralia_privacy_remediation_v1
+20260808174718_processing_notice_mapping_review_v1
+20260808175012_seed_n3uralia_notice_mapping_reviews_v1
 ```
+
+#### Aviso y eliminación como trabajo trazable
+
+- un aviso público versionado y verificado;
+- un enlace del aviso por actividad;
+- una misión con owner por actividad;
+- una solicitud de mapeo por actividad;
+- una solicitud de eliminación o anonimización por actividad;
+- fechas persistidas y eventos auditables.
+
+#### Mapeos aceptados con brechas
+
+Las tres solicitudes de mapeo están `accepted` y tienen evidencia `accepted · verified`. El estado canónico es `accepted_with_gaps`.
+
+| Resultado | Estado |
+|---|---:|
+| Mapeos aceptados | 3/3 |
+| Evidencias de mapeo con SHA-256 | 3/3 |
+| Unknowns conservados | 12 |
+| Lifecycle todavía `changes_requested` | 3/3 |
+| Eliminaciones demostradas | 0/3 |
+
+El control conserva suficiencia `partial`; aceptar la matriz no valida base jurídica, retención, destinatarios, subencargados, transferencias ni eliminación.
+
+Cada solicitud de eliminación exige:
+
+- timestamp;
+- proveedor;
+- activo o dataset;
+- alcance;
+- responsable persona o sistema;
+- resultado;
+- `backup_purga_programada`;
+- `backup_purga_confirmada`.
+
+Una eliminación solo cuenta cuando la solicitud está `accepted` y tiene evidencia adjunta.
 
 ### 10. Escritorio, Insights, grafo e impacto — `DEPLOYED / VALIDATED INICIAL`
 
@@ -231,7 +240,7 @@ Migraciones productivas:
 - confianza por dimensiones;
 - grafo de casos, controles, evidencia, activos y decisiones;
 - análisis de impacto;
-- reutilización de controles y evidencia.
+- reutilización defendible de controles y evidencia.
 
 ### 11. Motor regulatorio Chile — `DEPLOYED`
 
@@ -246,7 +255,7 @@ Migraciones productivas:
 
 ### 12. Memoria organizacional — `DEPLOYED / SIN APRENDIZAJES REALES`
 
-La infraestructura de nodos, relaciones, versiones, vigencia y supersesión existe. Todavía falta capturar, aprobar y reutilizar el primer aprendizaje real antes de considerarla una ventaja medida.
+La infraestructura de nodos, relaciones, versiones, vigencia y supersesión existe. Falta capturar, aprobar y reutilizar el primer aprendizaje real antes de considerarla una ventaja medida.
 
 ### 13. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
 
@@ -258,8 +267,7 @@ La infraestructura de nodos, relaciones, versiones, vigencia y supersesión exis
 - UI Golden Path productivo;
 - aserciones server-side independientes;
 - assurance multiempresa;
-- verificaciones read-only de inventario, lifecycle y privacidad;
-- procedimiento documentado para datos E2E.
+- procedimientos documentados para datos E2E.
 
 ---
 
@@ -277,31 +285,32 @@ La infraestructura de nodos, relaciones, versiones, vigencia y supersesión exis
 | Retry / recovery / dead-letter | 0 / 0 / 0 |
 | Tokens observados | 185.091 |
 
-El recorrido incluyó login, onboarding, expediente, cinco especialistas, cinco revisiones explícitas, plan, misión, evidencia, baseline e inventario de tratamiento.
-
 ### Assurance disponibles
 
 - [`UI Golden Path productivo 3/3`](./docs/assurance/ui-golden-path-production-3x-2026-08-07.md)
 - [`Inventario real de N3uralia 3/3`](./docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md)
 - [`Revisión lifecycle de N3uralia 3/3`](./docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md)
-- [`Aviso y eliminación de N3uralia 3/3`](./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md)
+- [`Aviso y eliminación convertidos en trabajo 3/3`](./docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md)
+- [`Mapeo del aviso aceptado con brechas 3/3`](./docs/assurance/n3uralia-processing-notice-mapping-3x-2026-08-08.md)
 - [`Ciclo de vida de datos E2E`](./docs/operations/ui-golden-path-data-lifecycle.md)
 
-> Esta evidencia demuestra arquitectura, persistencia, seguridad e idempotencia dentro del alcance probado. No sustituye revisión legal, auditoría, certificación ni observación de una organización externa.
+> La evidencia demuestra arquitectura, persistencia, seguridad e idempotencia dentro del alcance probado. No sustituye revisión legal, auditoría, certificación ni observación de una organización externa.
 
 ---
 
-## Trabajo abierto ahora
+## En desarrollo ahora
 
-El sistema ya convirtió los gaps del Bloque 16 en trabajo operacional. El resultado de cumplimiento sigue abierto:
+### Bloque 16 — siguiente cierre de evidencia — `ACTIVE`
 
-1. responder y aprobar las tres solicitudes de mapeo del aviso;
-2. ejecutar y acreditar las tres pruebas de eliminación o anonimización;
-3. resolver base, retención, destinatarios, subencargados y transferencias con evidencia;
-4. activar Supabase Auth Leaked Password Protection;
-5. observar una organización externa supervisada.
+La continuidad autorizada es:
 
-No se iniciará el Bloque 17 como prioridad principal mientras el cierre real del Bloque 16 continúe sin evidencia aceptada.
+1. ejecutar una prueba controlada de eliminación o anonimización por actividad;
+2. adjuntar evidencia auditable a las tres solicitudes abiertas;
+3. revisar y aceptar solo las pruebas que cumplan el contrato;
+4. mantener `0/3` cuando la evidencia no exista o sea insuficiente;
+5. después, resolver las dimensiones lifecycle con fuentes aprobadas.
+
+No corresponde abrir otro módulo ni avanzar al Bloque 17 mientras estas evidencias sigan pendientes.
 
 ---
 
@@ -312,14 +321,14 @@ No se iniciará el Bloque 17 como prioridad principal mientras el cierre real de
 | Leaked Password Protection | `BLOCKED` por configuración externa |
 | Tres actividades reales | `VALIDATED` |
 | Lifecycle de cinco dimensiones | `VALIDATED INICIAL / CAMBIOS REQUERIDOS` |
-| Aviso convertido en trabajo | `DEPLOYED / VALIDATED INICIAL` |
-| Eliminación demostrada | 0/3 |
+| Mapeo del aviso | `VALIDATED INICIAL 3/3 CON BRECHAS` |
+| Eliminación demostrada | `0/3` |
 | Multiempresa interno | `VALIDATED` |
 | Golden Path repetible | `VALIDATED x3` |
 | Organización externa observada | pendiente |
 | Tiempo humano, retrabajo y costo real | pendiente |
 
-No se habilitará beta autoservicio mientras permanezcan abiertos los gates críticos de seguridad, evidencia y validación externa.
+No se habilitará beta autoservicio mientras permanezcan abiertos los gates críticos de seguridad, evidencia lifecycle, eliminación y validación externa.
 
 ---
 
@@ -361,7 +370,7 @@ app/                         rutas públicas, autenticadas y API
 components/                  experiencia y componentes reutilizables
 lib/agents/                  catálogo, prompts, schemas y runtime
 lib/compliance/              expedientes, controles, evidencia y confianza
-lib/privacy/                 contrato versionado del aviso público
+lib/privacy/                 aviso y contratos de mapeo
 lib/supabase/                clientes de navegador, servidor y administración
 supabase/migrations/         esquema y cambios reproducibles
 scripts/                     guardrails, verificaciones y smoke tests
@@ -369,7 +378,7 @@ tests/e2e/                   Golden Path productivo
 .github/workflows/           CI, release y assurance
 ROADMAP.md                   fuente canónica de prioridad y estado
 docs/assurance/              evidencia técnica de recorridos validados
-docs/governance/             contrato de ejecución y cambio de prioridades
+docs/governance/             contrato de ejecución y prioridades
 docs/operations/             procedimientos operacionales y de datos
 ```
 
@@ -383,16 +392,14 @@ Un cambio está autorizado cuando cumple al menos una condición:
 
 1. pertenece al único bloque marcado `NEXT`;
 2. cierra un gate `P0` o una tarea `ACTIVE`;
-3. corrige un bug, una regresión, un riesgo de seguridad o integridad;
+3. corrige un bug, regresión o riesgo de seguridad e integridad;
 4. responde a una decisión explícita del owner que actualiza el roadmap en la misma PR.
 
-No se inicia trabajo `PLANNED` o `DEFERRED` solo porque parezca atractivo. El contrato completo está en [`docs/governance/canonical-roadmap-contract.md`](./docs/governance/canonical-roadmap-contract.md) y se verifica mediante:
+No se inicia trabajo `PLANNED` o `DEFERRED` solo porque parezca atractivo. El contrato está en [`docs/governance/canonical-roadmap-contract.md`](./docs/governance/canonical-roadmap-contract.md) y se verifica mediante:
 
 ```bash
 npm run check:canonical-roadmap
 ```
-
-Cuando una PR cambia alcance, prioridad o estado, debe actualizar `ROADMAP.md` dentro de la misma PR.
 
 ---
 
@@ -401,7 +408,7 @@ Cuando una PR cambia alcance, prioridad o estado, debe actualizar `ROADMAP.md` d
 ### Requisitos
 
 - Node.js compatible con Next.js 16;
-- npm y el lockfile comprometido;
+- npm y lockfile comprometido;
 - proyecto Supabase;
 - credenciales de OpenAI para ejecutar especialistas;
 - secretos gestionados exclusivamente en servidor.
@@ -431,18 +438,15 @@ npm ci
 npm run dev
 ```
 
-Abrir `http://localhost:3000`.
-
 ### Validación antes de publicar
 
 ```bash
 npm run typecheck
 npm run check:canonical-roadmap
+npm run check:processing-notice-mapping
 npm run release:check
 npm run smoke
 ```
-
-`release:check` ejecuta contratos de seguridad, producto, orquestación, evidencia, inventario, lifecycle, privacidad, tenant assurance y build de producción.
 
 ---
 
@@ -467,7 +471,8 @@ Kumplio no debe afirmar:
 - aplicabilidad jurídica sin fuente y validación;
 - operación efectiva por un documento aislado;
 - inventario completo mientras existan unknowns relevantes;
-- eliminación demostrada sin una prueba auditable aceptada;
+- aviso suficiente porque un mapeo fue aceptado;
+- eliminación demostrada sin una prueba auditable;
 - auditoría aprobada por una salida generada;
 - reemplazo de abogado, auditor, DPO o autoridad;
 - éxito comercial basándose en tenants sintéticos;

@@ -6,9 +6,9 @@ import {
   AlertTriangle,
   CalendarClock,
   CheckCircle2,
+  ClipboardCheck,
   ExternalLink,
   FileCheck2,
-  FileClock,
   Loader2,
   ShieldCheck,
   Trash2,
@@ -19,6 +19,7 @@ import type {
   ProcessingPrivacyRemediation,
   ProcessingPrivacyRemediationSummary,
 } from '@/lib/compliance/digital-twin/privacy-remediation'
+import type { NoticeMappingCoverage } from '@/lib/privacy/processing-notice-mapping'
 import { PRIVACY_NOTICE } from '@/lib/privacy/notice'
 
 type Props = {
@@ -36,10 +37,19 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+  const [mappingId, setMappingId] = useState<string | null>(null)
+  const [mappingReviewed, setMappingReviewed] = useState(false)
+  const [limitationsConfirmed, setLimitationsConfirmed] = useState(false)
+  const [mappingRequestKey, setMappingRequestKey] = useState(() => crypto.randomUUID())
+  const [mappingLoading, setMappingLoading] = useState(false)
+  const [mappingFeedback, setMappingFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const selected = actions.find((item) => item.processId === selectedId) || null
+  const mappingSelected = actions.find((item) => item.processId === mappingId) || null
 
   function open(action: ProcessingPrivacyRemediation) {
     setSelectedId(action.processId)
+    setMappingId(null)
     setRequestKey(crypto.randomUUID())
     setScopeConfirmed(false)
     setOwnerAndDatesConfirmed(false)
@@ -49,6 +59,20 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
   function close() {
     setSelectedId(null)
     setFeedback(null)
+  }
+
+  function openMapping(action: ProcessingPrivacyRemediation) {
+    setMappingId(action.processId)
+    setSelectedId(null)
+    setMappingRequestKey(crypto.randomUUID())
+    setMappingReviewed(false)
+    setLimitationsConfirmed(false)
+    setMappingFeedback(null)
+  }
+
+  function closeMapping() {
+    setMappingId(null)
+    setMappingFeedback(null)
   }
 
   async function createPlan() {
@@ -73,6 +97,32 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
     }
   }
 
+  async function acceptMapping() {
+    if (!mappingSelected) return
+    setMappingLoading(true)
+    setMappingFeedback(null)
+    try {
+      const response = await fetch(`/api/processing-activities/${mappingSelected.processId}/notice-mapping`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestKey: mappingRequestKey,
+          mappingReviewed,
+          limitationsConfirmed,
+        }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'No fue posible aceptar el mapeo.')
+      setMappingFeedback({ type: 'success', message: result.message || 'Mapeo aceptado.' })
+      setMappingRequestKey(crypto.randomUUID())
+      router.refresh()
+    } catch (error) {
+      setMappingFeedback({ type: 'error', message: error instanceof Error ? error.message : 'No fue posible aceptar el mapeo.' })
+    } finally {
+      setMappingLoading(false)
+    }
+  }
+
   return (
     <section className="mt-10 space-y-6 rounded-3xl border bg-card p-5 sm:p-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -83,7 +133,7 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
           </div>
           <h2 className="mt-2 text-2xl font-black sm:text-3xl">La política pública no reemplaza la prueba.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            Kumplio vincula la versión vigente del aviso y, cuando todavía no acredita el alcance o la eliminación, crea trabajo real con responsable, vencimiento y solicitudes de evidencia.
+            Kumplio vincula la versión vigente, revisa cómo aplica a cada actividad y conserva las brechas que todavía necesitan contratos, decisiones o evidencia operacional.
           </p>
           <a href={PRIVACY_NOTICE.route} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
             Ver aviso público v{PRIVACY_NOTICE.version}
@@ -93,20 +143,22 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
         <div className="grid grid-cols-2 gap-2 text-center text-xs sm:grid-cols-4">
           <Metric label="Avisos vinculados" value={`${summary.noticesLinked}/${summary.activities}`} />
           <Metric label="Planes listos" value={`${summary.plansReady}/${summary.activities}`} />
-          <Metric label="Avisos pendientes" value={summary.noticeRequestsOpen} />
+          <Metric label="Mapeos aceptados" value={`${summary.noticeRequestsAccepted}/${summary.activities}`} />
           <Metric label="Eliminaciones probadas" value={`${summary.deletionRequestsAccepted}/${summary.activities}`} />
         </div>
       </div>
 
       <div className="space-y-4">
         {actions.map((action) => {
+          const mappingAccepted = action.noticeRequest?.status === 'accepted'
+            && Boolean(action.noticeRequest.submittedEvidenceId)
           const deletionAccepted = action.deletionRequest?.status === 'accepted'
             && Boolean(action.deletionRequest.submittedEvidenceId)
 
           return (
             <article key={action.processId} className="rounded-2xl border bg-background/40 p-4 sm:p-5">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-black">{action.processName}</h3>
                     <StateBadge ready={Boolean(action.mission)} />
@@ -122,11 +174,15 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
                       success={Boolean(action.notice.evidenceId)}
                     />
                     <EvidenceCard
-                      icon={<FileClock className="h-4 w-4" />}
+                      icon={<ClipboardCheck className="h-4 w-4" />}
                       title="Mapeo aplicable"
-                      status={requestStatus(action.noticeRequest?.status)}
-                      due={formatDue(action.noticeRequest?.dueAt)}
-                      success={action.noticeRequest?.status === 'accepted' && Boolean(action.noticeRequest.submittedEvidenceId)}
+                      status={mappingAccepted
+                        ? `Aceptado con ${action.mapping.unknowns.length} brechas`
+                        : requestStatus(action.noticeRequest?.status)}
+                      due={action.mapping.snapshotHash
+                        ? `SHA-256 ${shortHash(action.mapping.snapshotHash)}`
+                        : formatDue(action.noticeRequest?.dueAt)}
+                      success={mappingAccepted}
                     />
                     <EvidenceCard
                       icon={<Trash2 className="h-4 w-4" />}
@@ -147,17 +203,104 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
                   )}
                 </div>
 
-                {canManage && !action.mission && (
-                  <Button type="button" variant="outline" onClick={() => open(action)} className="gap-2">
-                    <ShieldCheck className="h-4 w-4" />
-                    Crear plan de cierre
-                  </Button>
-                )}
+                <div className="flex shrink-0 flex-col gap-2 sm:flex-row xl:flex-col">
+                  {canManage && !action.mission && (
+                    <Button type="button" variant="outline" onClick={() => open(action)} className="gap-2">
+                      <ShieldCheck className="h-4 w-4" />
+                      Crear plan de cierre
+                    </Button>
+                  )}
+                  {canManage && action.mission && action.noticeRequest && !mappingAccepted && action.mappingSuggestion.ready && (
+                    <Button type="button" variant="outline" onClick={() => openMapping(action)} className="gap-2">
+                      <ClipboardCheck className="h-4 w-4" />
+                      Revisar mapeo
+                    </Button>
+                  )}
+                </div>
               </div>
             </article>
           )
         })}
       </div>
+
+      {mappingSelected && (
+        <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-background p-5 sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Revisión humana del mapeo</p>
+              <h3 className="mt-1 text-xl font-black">{mappingSelected.processName}</h3>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                El mapeo compara la actividad y su revisión lifecycle con el aviso público v{mappingSelected.mappingSuggestion.noticeVersion}. Puede aceptarse aunque conserve brechas, porque lo aceptado es la matriz y no una conclusión de cumplimiento.
+              </p>
+            </div>
+            <Button type="button" variant="ghost" size="icon" onClick={closeMapping} aria-label="Cerrar revisión del mapeo">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {mappingFeedback && (
+            <Feedback feedback={mappingFeedback} />
+          )}
+
+          <div className="rounded-xl border bg-muted/20 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Scope principal</p>
+            <p className="mt-2 font-black">{mappingSelected.mappingSuggestion.primaryScope || 'Sin correspondencia defendible'}</p>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-3">
+            {mappingSelected.mappingSuggestion.mappedScopes.map((scope) => (
+              <MappingScope key={scope.scope} scope={scope.scope} status={scope.status} note={scope.note} />
+            ))}
+          </div>
+
+          <div>
+            <p className="text-sm font-black">Cobertura por dimensión</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {Object.entries(mappingSelected.mappingSuggestion.dimensions).map(([key, dimension]) => (
+                <DimensionCard key={key} label={dimensionLabel(key)} status={dimension.status} note={dimension.note} />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <div className="flex items-center gap-2 font-bold text-amber-800 dark:text-amber-200">
+              <AlertTriangle className="h-4 w-4" />
+              Brechas que permanecen abiertas
+            </div>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-amber-950/80 dark:text-amber-100/80">
+              {mappingSelected.mappingSuggestion.unknowns.map((unknown) => <li key={unknown}>• {unknown}</li>)}
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <Confirmation
+              checked={mappingReviewed}
+              onChange={setMappingReviewed}
+              label="Revisé el scope principal, las dimensiones y las fuentes observadas para esta actividad."
+            />
+            <Confirmation
+              checked={limitationsConfirmed}
+              onChange={setLimitationsConfirmed}
+              label={mappingSelected.mappingSuggestion.limitation}
+            />
+          </div>
+
+          <div className="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-3xl text-xs leading-5 text-muted-foreground">
+              La evidencia quedará `accepted · verified`, pero su suficiencia para el control será `partial` mientras existan brechas. Base jurídica, retención, destinatarios, subencargados, transferencias y eliminación siguen requiriendo evidencia separada.
+            </p>
+            <Button
+              type="button"
+              onClick={acceptMapping}
+              disabled={mappingLoading || !mappingReviewed || !limitationsConfirmed}
+              className="gap-2"
+            >
+              {mappingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardCheck className="h-4 w-4" />}
+              Aceptar mapeo con brechas
+            </Button>
+          </div>
+        </div>
+      )}
 
       {selected && (
         <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-background p-5 sm:p-6">
@@ -174,11 +317,7 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
             </Button>
           </div>
 
-          {feedback && (
-            <div className={`rounded-xl border p-3 text-sm ${feedback.type === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'}`}>
-              {feedback.message}
-            </div>
-          )}
+          {feedback && <Feedback feedback={feedback} />}
 
           <div className="grid gap-3 md:grid-cols-3">
             <PlanStep title="14 días" description="Matriz de cobertura o aviso corregido." />
@@ -226,6 +365,52 @@ function EvidenceCard({ icon, title, status, due, success }: { icon: React.React
   )
 }
 
+function MappingScope({ scope, status, note }: { scope: string; status: NoticeMappingCoverage; note: string }) {
+  return (
+    <div className="rounded-xl border bg-background p-4">
+      <CoverageBadge status={status} />
+      <p className="mt-3 font-black">{scope}</p>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">{note}</p>
+    </div>
+  )
+}
+
+function DimensionCard({ label, status, note }: { label: string; status: NoticeMappingCoverage; note: string }) {
+  return (
+    <div className="rounded-xl border bg-background p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-bold">{label}</p>
+        <CoverageBadge status={status} />
+      </div>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">{note}</p>
+    </div>
+  )
+}
+
+function CoverageBadge({ status }: { status: NoticeMappingCoverage }) {
+  const label = status === 'covered'
+    ? 'Cubierto'
+    : status === 'partial'
+      ? 'Parcial'
+      : status === 'not_applicable'
+        ? 'No aplica'
+        : 'No cubierto'
+  const className = status === 'covered'
+    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+    : status === 'partial'
+      ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+      : 'border-border bg-muted/40 text-muted-foreground'
+  return <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${className}`}>{label}</span>
+}
+
+function Feedback({ feedback }: { feedback: { type: 'success' | 'error'; message: string } }) {
+  return (
+    <div className={`rounded-xl border p-3 text-sm ${feedback.type === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'}`}>
+      {feedback.message}
+    </div>
+  )
+}
+
 function PlanStep({ title, description }: { title: string; description: string }) {
   return <div className="rounded-xl border bg-muted/20 p-3"><p className="font-black">{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p></div>
 }
@@ -252,6 +437,18 @@ function missionStatus(status: string) {
   if (status === 'cancelled') return 'cancelada'
   if (status === 'draft') return 'borrador'
   return 'lista para iniciar'
+}
+
+function dimensionLabel(key: string) {
+  return ({
+    purpose: 'Finalidad',
+    dataSubjects: 'Titulares',
+    dataCategories: 'Categorías',
+    recipients: 'Destinatarios',
+    rights: 'Derechos',
+    transfers: 'Transferencias',
+    retention: 'Retención',
+  } as Record<string, string>)[key] || key
 }
 
 function formatDue(value: string | null | undefined) {

@@ -1,4 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import {
+  buildProcessingNoticeMappingSuggestion,
+  type ProcessingNoticeMappingSuggestion,
+} from '@/lib/privacy/processing-notice-mapping'
 
 export type ProcessingPrivacyRemediation = {
   processId: string
@@ -14,6 +18,14 @@ export type ProcessingPrivacyRemediation = {
     integrityHash: string | null
     mappingStatus: string
   }
+  mapping: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    unknowns: string[]
+    mappedAt: string | null
+  }
+  mappingSuggestion: ProcessingNoticeMappingSuggestion
   mission: {
     id: string
     title: string
@@ -46,6 +58,7 @@ export type ProcessingPrivacyRemediationSummary = {
   noticesLinked: number
   plansReady: number
   noticeRequestsOpen: number
+  noticeRequestsAccepted: number
   deletionRequestsOpen: number
   deletionRequestsAccepted: number
 }
@@ -59,7 +72,7 @@ export async function getProcessingPrivacyRemediation(
   const db = admin as any
 
   const { data: processRows, error: processError } = await db.from('organization_processes')
-    .select('id,name,owner_user_id,attributes')
+    .select('id,name,code,owner_user_id,attributes')
     .eq('organization_id', organizationId)
     .eq('process_type', 'processing_activity')
     .neq('lifecycle_status', 'retired')
@@ -134,6 +147,16 @@ export async function getProcessingPrivacyRemediation(
       ? requestsById.get(String(attributes.deletionEvidenceRequestId))
       : undefined
 
+    const mappingSuggestion = buildProcessingNoticeMappingSuggestion({
+      processName: String(process.name || 'Actividad de tratamiento'),
+      processCode: text(process.code),
+      purpose: text(attributes.purpose),
+      source: attributes.source,
+      lifecycleUnknowns: attributes.lifecycleUnknowns,
+      lifecycleReviewId: text(attributes.latestLifecycleReviewId),
+      lifecycleSnapshotHash: text(attributes.latestSnapshotHash),
+    })
+
     return {
       processId: String(process.id),
       processName: String(process.name || 'Actividad de tratamiento'),
@@ -148,6 +171,14 @@ export async function getProcessingPrivacyRemediation(
         integrityHash: noticeEvidence ? text(noticeEvidence.integrity_hash) : null,
         mappingStatus: String(attributes.privacyNoticeMappingStatus || 'not_linked'),
       },
+      mapping: {
+        status: String(attributes.privacyNoticeMappingStatus || 'not_linked'),
+        evidenceId: text(attributes.privacyNoticeMappingEvidenceId),
+        snapshotHash: text(attributes.privacyNoticeMappingSnapshotHash),
+        unknowns: textArray(attributes.privacyNoticeMappingUnknowns),
+        mappedAt: text(attributes.privacyNoticeMappedAt),
+      },
+      mappingSuggestion,
       mission: mission ? {
         id: String(mission.id),
         title: String(mission.title || 'Cerrar aviso y eliminación'),
@@ -178,6 +209,9 @@ export async function getProcessingPrivacyRemediation(
       noticesLinked: actions.filter((item) => item.notice.evidenceId).length,
       plansReady: actions.filter((item) => item.mission).length,
       noticeRequestsOpen: actions.filter((item) => isOpenWork(item.noticeRequest?.status)).length,
+      noticeRequestsAccepted: actions.filter((item) => (
+        item.noticeRequest?.status === 'accepted' && item.noticeRequest.submittedEvidenceId
+      )).length,
       deletionRequestsOpen: actions.filter((item) => isOpenWork(item.deletionRequest?.status)).length,
       deletionRequestsAccepted: actions.filter((item) => (
         item.deletionRequest?.status === 'accepted' && item.deletionRequest.submittedEvidenceId
@@ -217,6 +251,12 @@ function indexBy(rows: Array<Record<string, unknown>>) {
 
 function asObject(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
+function textArray(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim())).map((item) => item.trim())
+    : []
 }
 
 function text(value: unknown) {
