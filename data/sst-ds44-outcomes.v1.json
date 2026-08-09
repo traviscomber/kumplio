@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "jurisdiction": "CL",
+  "domain": "occupational_safety_health",
+  "sourcePolicy": {
+    "legalAuthority": ["DT", "LeyChile/BCN", "Diario Oficial"],
+    "supervisoryAuthority": ["DT", "SUSESO", "SEREMI de Salud"],
+    "technicalGuidance": ["DT", "SUSESO", "organismos administradores Ley 16.744"],
+    "rule": "A technical guide or template is never promoted to a legal obligation without a legal or supervisory source supporting that effect."
+  },
+  "statusModel": ["candidate", "grounded", "context_validated", "human_reviewed", "approved", "implemented", "evidenced", "current"],
+  "outcomes": [
+    {
+      "key": "hazard_risk_matrix",
+      "instrument": "Matriz de Identificación de Peligros y Evaluación de Riesgos",
+      "evidenceCandidates": ["risk_matrix", "process_inventory", "job_task_inventory", "risk_controls"],
+      "artifactCandidates": ["MIPER", "risk_register", "control_plan"],
+      "agentOutcomes": ["gap_analysis", "risk_prioritization", "control_design"]
+    },
+    {
+      "key": "preventive_work_program",
+      "instrument": "Programa de Trabajo en Prevención de Riesgos Laborales",
+      "evidenceCandidates": ["annual_program", "owners", "deadlines", "completion_records"],
+      "artifactCandidates": ["preventive_work_program", "action_plan", "follow_up_board"],
+      "agentOutcomes": ["action_plan", "ownership", "follow_up"]
+    },
+    {
+      "key": "sst_information_training",
+      "instrument": "Información y formación en seguridad y salud en el trabajo",
+      "evidenceCandidates": ["training_plan", "attendance_records", "worker_information", "competence_records"],
+      "artifactCandidates": ["training_matrix", "training_plan", "worker_briefing"],
+      "agentOutcomes": ["training_gap", "evidence_pack", "renewal_schedule"]
+    },
+    {
+      "key": "worker_participation",
+      "instrument": "Consulta y participación de las personas trabajadoras en la gestión preventiva",
+      "evidenceCandidates": ["consultation_records", "meeting_minutes", "worker_feedback"],
+      "artifactCandidates": ["consultation_protocol", "minutes_template", "participation_register"],
+      "agentOutcomes": ["participation_gap", "evidence_pack"]
+    },
+    {
+      "key": "emergency_risk_management",
+      "instrument": "Plan de Gestión para la reducción de Riesgos de emergencias, catástrofes o desastres",
+      "evidenceCandidates": ["emergency_plan", "drill_records", "roles", "site_specific_scenarios"],
+      "artifactCandidates": ["emergency_management_plan", "drill_plan", "response_checklist"],
+      "agentOutcomes": ["emergency_readiness", "drill_follow_up"]
+    },
+    {
+      "key": "sst_management_system",
+      "instrument": "Sistema de Gestión de Seguridad y Salud en el Trabajo",
+      "evidenceCandidates": ["policy", "objectives", "risk_process", "monitoring", "audit", "improvement_actions"],
+      "artifactCandidates": ["sst_management_manual", "control_matrix", "audit_plan"],
+      "agentOutcomes": ["system_gap_analysis", "audit_readiness", "continuous_improvement"]
+    },
+    {
+      "key": "joint_committee",
+      "instrument": "Comités Paritarios de Higiene y Seguridad",
+      "evidenceCandidates": ["constitution_record", "member_registry", "minutes", "actions"],
+      "artifactCandidates": ["committee_register", "meeting_minutes", "action_tracker"],
+      "agentOutcomes": ["governance_gap", "follow_up"]
+    },
+    {
+      "key": "risk_prevention_department",
+      "instrument": "Departamentos de Prevención de Riesgos",
+      "evidenceCandidates": ["organizational_role", "responsibilities", "expert_credentials", "work_program"],
+      "artifactCandidates": ["role_charter", "responsibility_matrix", "work_program"],
+      "agentOutcomes": ["governance_gap", "responsibility_assignment"]
+    },
+    {
+      "key": "internal_regulations",
+      "instrument": "Reglamentos Internos",
+      "evidenceCandidates": ["current_regulation", "communication_record", "version_history"],
+      "artifactCandidates": ["regulation_gap_report", "amendment_draft", "change_log"],
+      "agentOutcomes": ["document_gap", "version_control", "implementation_plan"]
+    },
+    {
+      "key": "risk_maps",
+      "instrument": "Mapas de Riesgos",
+      "evidenceCandidates": ["site_map", "hazard_locations", "worker_communication"],
+      "artifactCandidates": ["risk_map", "site_risk_register"],
+      "agentOutcomes": ["site_risk_visualization", "communication_gap"]
+    },
+    {
+      "key": "small_employer_prevention",
+      "instrument": "Instrumentos de Gestión Preventiva para entidades empleadoras de menor tamaño",
+      "evidenceCandidates": ["applicability_assessment", "simplified_prevention_records", "assistance_records"],
+      "artifactCandidates": ["small_employer_prevention_pack", "assistance_request_pack"],
+      "agentOutcomes": ["applicability", "minimum_evidence_pack", "technical_assistance"]
+    }
+  ]
+}
