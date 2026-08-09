@@ -55,9 +55,20 @@ await expectIncludes('app/layout.tsx', [
 ])
 
 await expectIncludes('lib/public-site.ts', [
+  'PUBLIC_POSITIONING',
+  'protección de datos y privacidad para Chile',
+  'Ley 21.719',
   'N3URALIA_FACTORY_DESCRIPTION',
   'factoría chilena de inteligencia artificial aplicada y software',
   'Kumplio es un producto desarrollado por n3uralia',
+])
+
+await expectIncludes('app/software-cumplimiento-chile/page.tsx', [
+  'Software de protección de datos y Ley 21.719 en Chile',
+  'Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.',
+  '¿Qué debe resolver una plataforma de protección de datos?',
+  'Construido para la realidad de protección de datos en Chile.',
+  'cumplimiento normativo',
 ])
 
 await expectIncludes('app/robots.ts', [
@@ -87,6 +98,9 @@ await expectIncludes('app/como-pensamos/page.tsx', [
 await expectIncludes('app/llms.txt/route.ts', [
   'Developer and product factory',
   'Primary market: Chile',
+  'Primary positioning:',
+  'Primary scope: data protection, privacy and Law 21.719 in Chile.',
+  'Secondary category: compliance management.',
   'Last reviewed: 2026-08-09',
   'N3URALIA_FACTORY_DESCRIPTION',
 ])
@@ -94,13 +108,18 @@ await expectIncludes('app/llms.txt/route.ts', [
 await expectIncludes('app/llms-full.txt/route.ts', [
   'Last reviewed: 2026-08-09',
   'Developer and product factory',
+  'personal data protection, privacy and guided preparation for Chilean Law 21.719',
+  'current public product positioning is data protection and privacy in Chile',
   'Geographic relevance',
   'N3URALIA_FACTORY_DESCRIPTION',
 ])
 
 await expectIncludes('app/kumplio.json/route.ts', [
-  "schema_version: '1.1'",
+  "schema_version: '1.2'",
   "last_reviewed: '2026-08-09'",
+  "primary_category: 'Data protection and privacy software'",
+  "secondary_category: 'Compliance management software'",
+  'primary_positioning: PUBLIC_POSITIONING',
   "role: 'developer_and_product_factory'",
   'geographic_relevance',
 ])
