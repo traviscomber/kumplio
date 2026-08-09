@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/demo`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.72 },
     { url: `${SITE_URL}/faq`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.78 },
     { url: `${SITE_URL}/about`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${SITE_URL}/como-pensamos`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${SITE_URL}/powered-by-n3uralia`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.68 },
     { url: `${SITE_URL}/contact`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.62 },
     { url: `${SITE_URL}/security`, lastModified: legalUpdatedAt, changeFrequency: 'monthly', priority: 0.55 },
