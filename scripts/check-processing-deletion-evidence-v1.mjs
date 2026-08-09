@@ -2,9 +2,13 @@ import fs from 'node:fs'
 
 const files = {
   migration: 'supabase/migrations/20260808235300_processing_deletion_evidence_review_v1.sql',
+  providerMigration: 'supabase/migrations/20260809024500_processing_provider_retention_assurance_v1.sql',
   route: 'app/api/processing-activities/[processId]/deletion-evidence/route.ts',
   twin: 'lib/compliance/digital-twin/privacy-remediation.ts',
   productionGate: 'scripts/64-verify-n3uralia-deletion-evidence-3x.sql',
+  primaryGate: 'scripts/66-verify-n3uralia-primary-deletion-3x.sql',
+  providerGate: 'scripts/67-verify-n3uralia-provider-retention-assurance-3x.sql',
+  providerAssurance: 'docs/assurance/n3uralia-provider-retention-assurance-3x-2026-08-08.md',
 }
 
 const source = Object.fromEntries(
@@ -38,6 +42,16 @@ const checks = [
   ['production gate is read only', source.productionGate.includes('begin transaction read only;')],
   ['production gate requires 3/3', source.productionGate.includes('v_demonstrated_count <> 3')],
   ['production gate rejects future executions', source.productionGate.includes('v_future_execution_count <> 0')],
+  ['primary gate preserves synthetic-only proof', source.primaryGate.includes("productionSubjectDataTouched") && source.primaryGate.includes("remainingMatches")],
+  ['provider assurance RPC exists', source.providerMigration.includes('record_processing_provider_retention_assurance_v1')],
+  ['provider assurance blocks browser roles', source.providerMigration.includes('from public,anon,authenticated')],
+  ['provider assurance requires tenant verification for backup claim', source.providerMigration.includes("v_backup_status='demonstrated' and v_tenant_config_status <> 'verified'")],
+  ['provider assurance requires tenant verification for external claim', source.providerMigration.includes("v_external_status='demonstrated' and v_tenant_config_status <> 'verified'")],
+  ['provider gate is read only', source.providerGate.includes('begin transaction read only;')],
+  ['provider gate requires assurance 3/3', source.providerGate.includes('v_assurance_count <> 3')],
+  ['provider gate preserves tenant gap 0/3', source.providerGate.includes('v_tenant_verified_count <> 0')],
+  ['provider gate keeps final deletion closed', source.providerGate.includes('v_final_demonstrated_count <> 0')],
+  ['assurance doc separates policy from purge', source.providerAssurance.includes('no es evidencia de que un objeto específico haya sido purgado')],
 ]
 
 const failed = checks.filter(([, ok]) => !ok)
