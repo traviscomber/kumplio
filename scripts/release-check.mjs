@@ -6,6 +6,8 @@ const checks = [
   ['check:discovery'],
   ['check:boundaries'],
   ['check:auth'],
+  ['check:chile-sources'],
+  ['check:mercado-publico'],
   ['check:leychile'],
   ['check:claims'],
   ['check:compliance-core'],

@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "country": "CL",
+  "generatedFor": "Kumplio Government Intelligence Layer",
+  "principles": [
+    "Prefer official structured APIs and open-data exports over HTML scraping.",
+    "Capture source URL, retrieval time, content hash and parser version for every artifact.",
+    "Keep raw provider payloads separate from normalized facts.",
+    "Never infer legal effect from a page title alone; preserve source context and review state.",
+    "Use public information only and respect source-specific rate limits and access controls."
+  ],
+  "sources": [
+    {
+      "key": "diario-oficial",
+      "authority": "Diario Oficial de la República de Chile",
+      "domain": "diariooficial.interior.gob.cl",
+      "category": "law_change",
+      "ingestion": "html_pdf",
+      "status": "active",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["new_law", "new_decree", "new_resolution", "publication_change"],
+      "consumerOutcomes": ["regulatory_change", "impact_analysis", "evidence_update"]
+    },
+    {
+      "key": "leychile",
+      "authority": "Biblioteca del Congreso Nacional de Chile",
+      "domain": "bcn.cl",
+      "category": "law_corpus",
+      "ingestion": "html",
+      "status": "active",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["consolidated_text", "legal_version", "amendment_relation"],
+      "consumerOutcomes": ["legal_grounding", "knowledge_graph", "citation"]
+    },
+    {
+      "key": "direccion-trabajo-doctrina",
+      "authority": "Dirección del Trabajo",
+      "domain": "dt.gob.cl",
+      "category": "labor_doctrine",
+      "ingestion": "html_pdf",
+      "status": "active",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["dictamen", "ordinario", "doctrine_change", "legal_reference"],
+      "consumerOutcomes": ["labor_compliance", "impact_analysis", "control_update"]
+    },
+    {
+      "key": "direccion-trabajo-ds44",
+      "authority": "Dirección del Trabajo",
+      "domain": "dt.gob.cl",
+      "category": "occupational_safety",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 1,
+      "cadence": "weekly",
+      "signals": ["inspection_form", "infraction_typifier", "guidance", "control_requirement"],
+      "consumerOutcomes": ["ds44_gap_analysis", "inspection_readiness", "document_factory"]
+    },
+    {
+      "key": "suseso-sst",
+      "authority": "Superintendencia de Seguridad Social",
+      "domain": "suseso.cl",
+      "category": "occupational_safety",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["circular", "compendium_update", "interpretation", "supervision_criterion"],
+      "consumerOutcomes": ["ds44_gap_analysis", "mutuality_controls", "legal_grounding"]
+    },
+    {
+      "key": "sma-snifa",
+      "authority": "Superintendencia del Medio Ambiente",
+      "domain": "snifa.sma.gob.cl",
+      "category": "environmental_enforcement",
+      "ingestion": "open_data_html",
+      "status": "active",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["inspection", "sanctioning_procedure", "firm_sanction", "compliance_program", "regulated_unit"],
+      "consumerOutcomes": ["counterparty_risk", "environmental_compliance", "enforcement_benchmark"]
+    },
+    {
+      "key": "mercado-publico",
+      "authority": "Dirección ChileCompra",
+      "domain": "api.mercadopublico.cl",
+      "category": "public_procurement",
+      "ingestion": "api",
+      "status": "implementation",
+      "priority": 1,
+      "cadence": "daily",
+      "signals": ["tender", "purchase_order", "buyer", "supplier", "award_context"],
+      "consumerOutcomes": ["supplier_due_diligence", "public_sector_exposure", "commercial_intelligence"]
+    },
+    {
+      "key": "contraloria-dictamenes",
+      "authority": "Contraloría General de la República",
+      "domain": "contraloria.cl",
+      "category": "administrative_doctrine",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 2,
+      "cadence": "daily",
+      "signals": ["dictamen", "administrative_criterion", "doctrine_relation"],
+      "consumerOutcomes": ["public_law_compliance", "legal_grounding", "public_procurement"]
+    },
+    {
+      "key": "cmf-sanctions",
+      "authority": "Comisión para el Mercado Financiero",
+      "domain": "cmfchile.cl",
+      "category": "financial_enforcement",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 2,
+      "cadence": "daily",
+      "signals": ["sanction", "resolution", "regulated_entity", "enforcement_action"],
+      "consumerOutcomes": ["counterparty_risk", "financial_compliance", "board_brief"]
+    },
+    {
+      "key": "fne-competition",
+      "authority": "Fiscalía Nacional Económica",
+      "domain": "fne.gob.cl",
+      "category": "competition",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 2,
+      "cadence": "daily",
+      "signals": ["investigation", "guideline", "market_study", "court_action"],
+      "consumerOutcomes": ["competition_compliance", "counterparty_risk", "legal_change"]
+    },
+    {
+      "key": "tdlc-decisions",
+      "authority": "Tribunal de Defensa de la Libre Competencia",
+      "domain": "tdlc.cl",
+      "category": "competition",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 2,
+      "cadence": "daily",
+      "signals": ["judgment", "resolution", "consultation", "competition_measure"],
+      "consumerOutcomes": ["competition_compliance", "case_law", "legal_grounding"]
+    },
+    {
+      "key": "sernac-enforcement",
+      "authority": "Servicio Nacional del Consumidor",
+      "domain": "sernac.cl",
+      "category": "consumer_protection",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 2,
+      "cadence": "daily",
+      "signals": ["collective_action", "alert", "interpretive_guidance", "supplier_action"],
+      "consumerOutcomes": ["consumer_compliance", "counterparty_risk", "policy_update"]
+    },
+    {
+      "key": "minsal-regulation",
+      "authority": "Ministerio de Salud",
+      "domain": "minsal.cl",
+      "category": "health_regulation",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 3,
+      "cadence": "daily",
+      "signals": ["sanitary_rule", "technical_standard", "health_alert", "protocol"],
+      "consumerOutcomes": ["health_compliance", "occupational_safety", "policy_update"]
+    },
+    {
+      "key": "isp-alerts",
+      "authority": "Instituto de Salud Pública de Chile",
+      "domain": "ispch.cl",
+      "category": "health_regulation",
+      "ingestion": "html_pdf",
+      "status": "planned",
+      "priority": 3,
+      "cadence": "daily",
+      "signals": ["alert", "resolution", "technical_guidance"],
+      "consumerOutcomes": ["health_compliance", "product_risk", "policy_update"]
+    }
+  ]
+}
