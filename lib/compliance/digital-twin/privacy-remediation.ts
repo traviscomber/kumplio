@@ -25,6 +25,37 @@ export type ProcessingPrivacyRemediation = {
     unknowns: string[]
     mappedAt: string | null
   }
+  controlledDeletion: {
+    status: string
+    reviewStatus: string
+    drillId: string | null
+    evidenceId: string | null
+    reviewedAt: string | null
+  }
+  primaryDeletion: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    executedAt: string | null
+    target: string | null
+  }
+  providerAssurance: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    backupPurgeStatus: string
+    externalPropagationStatus: string
+    tenantConfigurationStatus: string
+  }
+  deletion: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    method: string | null
+    executedAt: string | null
+    validationStatus: string | null
+    integrityStatus: string | null
+  }
   mappingSuggestion: ProcessingNoticeMappingSuggestion
   mission: {
     id: string
@@ -61,6 +92,11 @@ export type ProcessingPrivacyRemediationSummary = {
   noticeRequestsAccepted: number
   deletionRequestsOpen: number
   deletionRequestsAccepted: number
+  controlledMechanismsValidated: number
+  primaryDeletionsDemonstrated: number
+  providerAssuranceReviewed: number
+  providerTenantConfigurationsVerified: number
+  deletionsDemonstrated: number
 }
 
 export async function getProcessingPrivacyRemediation(
@@ -83,7 +119,16 @@ export async function getProcessingPrivacyRemediation(
   const processes = (processRows || []) as Array<Record<string, unknown>>
 
   const missionIds = unique(processes.map((row) => asObject(row.attributes).privacyRemediationMissionId))
-  const evidenceIds = unique(processes.map((row) => asObject(row.attributes).privacyNoticeEvidenceId))
+  const evidenceIds = unique(processes.flatMap((row) => {
+    const attributes = asObject(row.attributes)
+    return [
+      attributes.privacyNoticeEvidenceId,
+      attributes.controlledDeletionEvidenceId,
+      attributes.primaryDeletionOperationalEvidenceId,
+      attributes.providerRetentionAssuranceEvidenceId,
+      attributes.deletionEvidenceId,
+    ]
+  }))
   const requestIds = unique(processes.flatMap((row) => {
     const attributes = asObject(row.attributes)
     return [attributes.privacyNoticeRequestId, attributes.deletionEvidenceRequestId]
@@ -140,6 +185,18 @@ export async function getProcessingPrivacyRemediation(
     const noticeEvidence = attributes.privacyNoticeEvidenceId
       ? evidenceById.get(String(attributes.privacyNoticeEvidenceId))
       : undefined
+    const controlledEvidence = attributes.controlledDeletionEvidenceId
+      ? evidenceById.get(String(attributes.controlledDeletionEvidenceId))
+      : undefined
+    const primaryEvidence = attributes.primaryDeletionOperationalEvidenceId
+      ? evidenceById.get(String(attributes.primaryDeletionOperationalEvidenceId))
+      : undefined
+    const providerEvidence = attributes.providerRetentionAssuranceEvidenceId
+      ? evidenceById.get(String(attributes.providerRetentionAssuranceEvidenceId))
+      : undefined
+    const deletionEvidence = attributes.deletionEvidenceId
+      ? evidenceById.get(String(attributes.deletionEvidenceId))
+      : undefined
     const noticeRequest = attributes.privacyNoticeRequestId
       ? requestsById.get(String(attributes.privacyNoticeRequestId))
       : undefined
@@ -156,6 +213,9 @@ export async function getProcessingPrivacyRemediation(
       lifecycleReviewId: text(attributes.latestLifecycleReviewId),
       lifecycleSnapshotHash: text(attributes.latestSnapshotHash),
     })
+
+    const deletionStatus = String(attributes.deletionEvidenceStatus || 'pending_evidence')
+    const controlledReviewStatus = String(attributes.controlledDeletionReviewStatus || 'not_reviewed')
 
     return {
       processId: String(process.id),
@@ -178,6 +238,37 @@ export async function getProcessingPrivacyRemediation(
         unknowns: textArray(attributes.privacyNoticeMappingUnknowns),
         mappedAt: text(attributes.privacyNoticeMappedAt),
       },
+      controlledDeletion: {
+        status: String(attributes.controlledDeletionDrillStatus || 'not_run'),
+        reviewStatus: controlledReviewStatus,
+        drillId: text(attributes.controlledDeletionDrillId),
+        evidenceId: controlledEvidence ? String(controlledEvidence.id) : text(attributes.controlledDeletionEvidenceId),
+        reviewedAt: text(attributes.controlledDeletionReviewedAt),
+      },
+      primaryDeletion: {
+        status: String(attributes.primaryDeletionOperationalStatus || 'not_run'),
+        evidenceId: primaryEvidence ? String(primaryEvidence.id) : text(attributes.primaryDeletionOperationalEvidenceId),
+        snapshotHash: text(attributes.primaryDeletionOperationalSnapshotHash),
+        executedAt: text(attributes.primaryDeletionOperationalExecutedAt),
+        target: text(attributes.primaryDeletionOperationalTarget),
+      },
+      providerAssurance: {
+        status: String(attributes.providerRetentionAssuranceStatus || 'not_reviewed'),
+        evidenceId: providerEvidence ? String(providerEvidence.id) : text(attributes.providerRetentionAssuranceEvidenceId),
+        snapshotHash: text(attributes.providerRetentionAssuranceSnapshotHash),
+        backupPurgeStatus: String(attributes.backupPurgeStatus || 'not_demonstrated'),
+        externalPropagationStatus: String(attributes.externalPropagationStatus || 'not_demonstrated'),
+        tenantConfigurationStatus: String(attributes.providerTenantConfigurationStatus || 'unverified'),
+      },
+      deletion: {
+        status: deletionStatus,
+        evidenceId: deletionEvidence ? String(deletionEvidence.id) : text(attributes.deletionEvidenceId),
+        snapshotHash: text(attributes.deletionEvidenceSnapshotHash),
+        method: text(attributes.deletionEvidenceMethod),
+        executedAt: text(attributes.deletionExecutedAt),
+        validationStatus: deletionEvidence ? text(deletionEvidence.validation_status) : null,
+        integrityStatus: deletionEvidence ? text(deletionEvidence.integrity_status) : null,
+      },
       mappingSuggestion,
       mission: mission ? {
         id: String(mission.id),
@@ -189,9 +280,7 @@ export async function getProcessingPrivacyRemediation(
       } : null,
       noticeRequest: requestView(noticeRequest, profileLabels),
       deletionRequest: requestView(deletionRequest, profileLabels),
-      deletionEvidenceStatus: deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id
-        ? 'accepted'
-        : String(attributes.deletionEvidenceStatus || 'pending_evidence'),
+      deletionEvidenceStatus: deletionStatus,
     }
   })
 
@@ -201,6 +290,42 @@ export async function getProcessingPrivacyRemediation(
     'under_review',
     'changes_requested',
   ].includes(status || '')
+
+  const isControlledMechanismValidated = (item: ProcessingPrivacyRemediation) => (
+    item.controlledDeletion.status === 'passed_controlled_test'
+    && item.controlledDeletion.reviewStatus === 'validated_controlled'
+    && Boolean(item.controlledDeletion.drillId)
+    && Boolean(item.controlledDeletion.evidenceId)
+  )
+
+  const isPrimaryDeletionDemonstrated = (item: ProcessingPrivacyRemediation) => (
+    item.primaryDeletion.status === 'demonstrated_controlled_primary'
+    && Boolean(item.primaryDeletion.evidenceId)
+    && Boolean(item.primaryDeletion.snapshotHash?.match(/^[0-9a-f]{64}$/))
+  )
+
+  const isProviderAssuranceReviewed = (item: ProcessingPrivacyRemediation) => (
+    ['partial_policy_verified', 'tenant_configuration_verified'].includes(item.providerAssurance.status)
+    && Boolean(item.providerAssurance.evidenceId)
+    && Boolean(item.providerAssurance.snapshotHash?.match(/^[0-9a-f]{64}$/))
+  )
+
+  const isProviderTenantVerified = (item: ProcessingPrivacyRemediation) => (
+    isProviderAssuranceReviewed(item)
+    && item.providerAssurance.tenantConfigurationStatus === 'verified'
+  )
+
+  const isDeletionDemonstrated = (item: ProcessingPrivacyRemediation) => (
+    item.deletion.status === 'demonstrated'
+    && Boolean(item.deletion.evidenceId)
+    && Boolean(item.deletion.snapshotHash?.match(/^[0-9a-f]{64}$/))
+    && ['deletion', 'anonymization'].includes(item.deletion.method || '')
+    && Boolean(item.deletion.executedAt)
+    && item.deletion.validationStatus === 'accepted'
+    && item.deletion.integrityStatus === 'verified'
+    && item.deletionRequest?.status === 'accepted'
+    && item.deletionRequest.submittedEvidenceId === item.deletion.evidenceId
+  )
 
   return {
     actions,
@@ -216,6 +341,11 @@ export async function getProcessingPrivacyRemediation(
       deletionRequestsAccepted: actions.filter((item) => (
         item.deletionRequest?.status === 'accepted' && item.deletionRequest.submittedEvidenceId
       )).length,
+      controlledMechanismsValidated: actions.filter(isControlledMechanismValidated).length,
+      primaryDeletionsDemonstrated: actions.filter(isPrimaryDeletionDemonstrated).length,
+      providerAssuranceReviewed: actions.filter(isProviderAssuranceReviewed).length,
+      providerTenantConfigurationsVerified: actions.filter(isProviderTenantVerified).length,
+      deletionsDemonstrated: actions.filter(isDeletionDemonstrated).length,
     },
   }
 }

@@ -36,17 +36,22 @@ const required = [
     'deletionEvidenceRequestId',
     'submitted_evidence_id',
     'review_comment',
-    "deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id",
+    "item.deletionRequest?.status === 'accepted'",
+    'item.deletionRequest.submittedEvidenceId === item.deletion.evidenceId',
   ]],
   ['components/digital-twin/processing-privacy-remediation-workspace.tsx', [
-    'La política pública no reemplaza la prueba.',
-    'Crear plan de cierre',
-    'Mapeo aplicable',
-    'Eliminación demostrada',
+    'Cada capa necesita su propia evidencia.',
+    'Mapeo y mecanismo',
+    'Eliminación primaria demostrada',
+    'Assurance proveedor',
+    'Tenant proveedor',
+    'Bloqueo externo identificado',
+    'Registrar prueba final',
     'backup_purga_programada',
     'backup_purga_confirmada',
-    "status === 'under_review'",
-    "status === 'changes_requested'",
+    'action.deletionRequest && tenantVerified && !deletionDemonstrated',
+    'store:false',
+    'ZDR/MAM',
   ]],
   ['app/digital-twin/page.tsx', [
     'ProcessingPrivacyRemediationWorkspace',
@@ -181,7 +186,8 @@ if (!route.includes(".eq('organization_id', access.organizationId)")) {
 const loader = fs.readFileSync('lib/compliance/digital-twin/privacy-remediation.ts', 'utf8')
 if (loader.includes('review_note')) throw new Error('Evidence requests use review_comment, not review_note')
 if (loader.includes("['42P01', '42703'")) throw new Error('Privacy loader must not hide undefined-column errors')
-if (!loader.includes("deletionRequest?.status === 'accepted' && deletionRequest.submitted_evidence_id")) {
+if (!loader.includes("item.deletionRequest?.status === 'accepted'")
+  || !loader.includes('item.deletionRequest.submittedEvidenceId === item.deletion.evidenceId')) {
   throw new Error('Accepted deletion must require submitted evidence')
 }
 
