@@ -56,7 +56,9 @@ assert.equal(discoveries.find((item) => item.circularNumber === '3854')?.ds44Hin
 assert.ok(discoveries.every((item) => item.detailUrl.startsWith('https://www.suseso.cl/')))
 
 const circular3855 = parseSusesoCircularPage(`
-<html><body><h1>Circular 3855</h1>
+<html><body>
+<nav>Materias específicas Empresas con administración delegada de la Ley N° 16.744</nav>
+<h1>Circular 3855</h1>
 <p>Fecha: 27 de enero de 2025</p>
 <p>Materia: Imparte instrucciones sobre las capacitaciones y el registro de la información de la gestión de riesgos y de los incidentes peligrosos.</p>
 <p>Tema: LEY N°16.744</p>
@@ -71,7 +73,8 @@ assert.equal(circular3855.circularNumber, '3855')
 assert.equal(circular3855.publicationDate, '2025-01-27')
 assert.equal(circular3855.ds44Related, true)
 assert.equal(circular3855.sstRelevant, true)
-assert.match(circular3855.subject, /capacitaciones/i)
+assert.equal(circular3855.subject, 'Imparte instrucciones sobre las capacitaciones y el registro de la información de la gestión de riesgos y de los incidentes peligrosos.')
+assert.equal(circular3855.topic, 'LEY N°16.744')
 
 const signals = deriveSstOutcomeSignals({ dt, suseso: [circular3855] })
 assert.equal(signals.inspectionReadiness, true)
