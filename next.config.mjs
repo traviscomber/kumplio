@@ -14,6 +14,25 @@ const nextConfig = {
     'localhost:3000',
     '127.0.0.1:3000',
   ],
+  async redirects() {
+    return [
+      {
+        source: '/sales-kit',
+        destination: '/software-cumplimiento-chile',
+        permanent: true,
+      },
+      {
+        source: '/demo/transporte',
+        destination: '/use-cases',
+        permanent: true,
+      },
+      {
+        source: '/demo/mineria',
+        destination: '/use-cases',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     const privateRoutes = [
       '/accountability/:path*',
@@ -46,7 +65,6 @@ const nextConfig = {
       '/situations/:path*',
       '/team/:path*',
       '/api/agents/:path*',
-      '/sales-kit/:path*',
     ]
 
     return [
