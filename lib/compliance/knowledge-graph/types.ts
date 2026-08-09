@@ -7,6 +7,8 @@ export type KnowledgeNodeType =
   | 'document'
   | 'member'
   | 'project'
+  | 'regulatory_source'
+  | 'regulatory_document'
 
 export type KnowledgeEdgeType =
   | 'requires'
@@ -16,6 +18,8 @@ export type KnowledgeEdgeType =
   | 'related_to'
   | 'evidences'
   | 'created_for'
+  | 'published_by'
+  | 'derived_from'
 
 export type KnowledgeNode = {
   id: string

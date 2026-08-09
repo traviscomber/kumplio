@@ -10,6 +10,8 @@ type CaseRow = { id: string; project_id: string; title: string; status: string; 
 type MissionRow = { id: string; case_id: string | null; title: string; status: string; owner_id: string | null }
 type DocumentRow = { id: string; project_id: string; name: string; status: string | null }
 type ProfileRow = { id: string; first_name: string | null; last_name: string | null; email: string }
+type RegulatorySourceRow = { id: string; authority_name: string; source_name: string; canonical_url: string; authority_level: string; health_status: string }
+type RegulatoryDocumentRow = { id: string; source_id: string; title: string; document_type: string; canonical_url: string; status: string; publication_date: string | null }
 
 export type KnowledgeGraphInput = {
   projects: ProjectRow[]
@@ -22,6 +24,8 @@ export type KnowledgeGraphInput = {
   missions: MissionRow[]
   documents: DocumentRow[]
   profiles: ProfileRow[]
+  regulatorySources?: RegulatorySourceRow[]
+  regulatoryDocuments?: RegulatoryDocumentRow[]
 }
 
 export function buildKnowledgeGraph(input: KnowledgeGraphInput): KnowledgeGraph {
@@ -102,6 +106,32 @@ export function buildKnowledgeGraph(input: KnowledgeGraphInput): KnowledgeGraph 
   for (const profile of input.profiles) {
     const label = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || profile.email
     addNode({ id: profile.id, type: 'member', label, href: '/team' })
+  }
+
+  for (const source of input.regulatorySources || []) {
+    addNode({
+      id: source.id,
+      type: 'regulatory_source',
+      label: `${source.authority_name} · ${source.source_name}`,
+      href: '/regulatory',
+      meta: { authorityLevel: source.authority_level, health: source.health_status, canonicalUrl: source.canonical_url },
+    })
+  }
+
+  for (const document of input.regulatoryDocuments || []) {
+    addNode({
+      id: document.id,
+      type: 'regulatory_document',
+      label: document.title,
+      href: '/regulatory',
+      meta: { documentType: document.document_type, status: document.status, publicationDate: document.publication_date, canonicalUrl: document.canonical_url },
+    })
+    addEdge({
+      from: nodeKey('regulatory_document', document.id),
+      to: nodeKey('regulatory_source', document.source_id),
+      type: 'published_by',
+      label: 'publicado por',
+    })
   }
 
   return { nodes: [...nodes.values()], edges: [...edges.values()] }
