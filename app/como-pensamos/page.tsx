@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Eye, ShieldCheck, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,10 +25,17 @@ const principles = [
   },
 ]
 
-export const metadata = {
-  title: 'Cómo pensamos | Kumplio',
+export const metadata: Metadata = {
+  title: 'Cómo trabaja Kumplio | IA, evidencia y revisión humana en Chile',
   description:
-    'La filosofía de producto de Kumplio: reducir la complejidad del cumplimiento sin reducir el rigor.',
+    'Metodología de Kumplio para reducir la complejidad del cumplimiento en Chile sin reducir el rigor: fuentes trazables, evidencia, automatización gobernada y revisión humana.',
+  alternates: { canonical: '/como-pensamos' },
+  openGraph: {
+    type: 'article',
+    url: '/como-pensamos',
+    title: 'Cómo trabaja Kumplio | IA, evidencia y revisión humana en Chile',
+    description: 'Principios de producto: claridad, trazabilidad, prevención y automatización con control humano.',
+  },
 }
 
 export default function ComoPensamosPage() {

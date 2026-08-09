@@ -2,6 +2,7 @@ import { chileComplianceGuides, officialLey21719Reference } from '@/lib/chile-co
 import {
   CORE_CAPABILITIES,
   N3URALIA_CANONICAL_URL,
+  N3URALIA_FACTORY_DESCRIPTION,
   N3URALIA_NAME,
   PUBLIC_CONTACT,
   PUBLIC_DESCRIPTION,
@@ -15,18 +16,27 @@ export const dynamic = 'force-static'
 
 export function GET() {
   const payload = {
-    schema_version: '1.0',
-    last_reviewed: '2026-08-03',
+    schema_version: '1.1',
+    last_reviewed: '2026-08-09',
     product: {
       name: SITE_NAME,
       url: SITE_URL,
       locale: SITE_LOCALE,
       country: 'Chile',
-      category: 'Compliance management and regulatory intelligence software',
+      market: 'Chile',
+      category: 'Privacy, compliance management and regulatory intelligence software',
       description: PUBLIC_DESCRIPTION,
       developed_by: {
         name: N3URALIA_NAME,
         url: N3URALIA_CANONICAL_URL,
+        role: 'developer_and_product_factory',
+        description: N3URALIA_FACTORY_DESCRIPTION,
+      },
+      geographic_relevance: {
+        country: 'Chile',
+        public_contact_location: PUBLIC_CONTACT.location,
+        language: SITE_LOCALE,
+        currency: 'CLP',
       },
       capabilities: CORE_CAPABILITIES,
       limitations: PUBLIC_LIMITATIONS,
@@ -54,16 +64,20 @@ export function GET() {
       })),
     },
     public_pages: {
+      home: SITE_URL,
       product: `${SITE_URL}/software-cumplimiento-chile`,
       law_solution: `${SITE_URL}/features/ley-21719`,
       law_guides: `${SITE_URL}/resources/ley-21719`,
+      compliance_resources: `${SITE_URL}/resources/cumplimiento-normativo`,
       use_cases: `${SITE_URL}/use-cases`,
       demo: `${SITE_URL}/demo`,
       pricing: `${SITE_URL}/pricing`,
       enterprise: `${SITE_URL}/enterprise`,
       faq: `${SITE_URL}/faq`,
+      about: `${SITE_URL}/about`,
       security: `${SITE_URL}/security`,
       relationship: `${SITE_URL}/powered-by-n3uralia`,
+      developer: N3URALIA_CANONICAL_URL,
     },
     contact: PUBLIC_CONTACT,
   }

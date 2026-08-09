@@ -18,8 +18,11 @@ export const OFFICIAL_LEY_21719_URL =
 export const PUBLIC_DESCRIPTION =
   'Kumplio ayuda a organizaciones en Chile a proteger datos y resolver obligaciones de privacidad: centraliza información sensible en expedientes trazables, coordina especialistas digitales y convierte brechas y riesgos en acciones, evidencia y decisiones revisables.'
 
+export const N3URALIA_FACTORY_DESCRIPTION =
+  'n3uralia es la factoría chilena de inteligencia artificial aplicada y software que desarrolla Kumplio y otras soluciones para operaciones reales.'
+
 export const POWERED_BY_DESCRIPTION =
-  'Kumplio es un producto desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.'
+  `Kumplio es un producto desarrollado por n3uralia. ${N3URALIA_FACTORY_DESCRIPTION}`
 
 export const PUBLIC_CONTACT = {
   email: 'info@kumplio.app',

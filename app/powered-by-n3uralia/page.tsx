@@ -6,20 +6,21 @@ import { Footer } from '@/components/footer'
 import {
   N3URALIA_CANONICAL_URL,
   N3URALIA_CONTACT_REFERRAL_URL,
+  N3URALIA_FACTORY_DESCRIPTION,
   N3URALIA_SOLUTIONS_REFERRAL_URL,
   SITE_URL,
 } from '@/lib/public-site'
 
 export const metadata: Metadata = {
-  title: 'Kumplio y n3uralia',
+  title: 'Kumplio y n3uralia | Producto y factoría de IA en Chile',
   description:
-    'Kumplio es un producto de cumplimiento normativo desarrollado por n3uralia, empresa chilena de IA aplicada, automatización y software para operaciones reales.',
+    'Kumplio es un producto de cumplimiento y privacidad desarrollado por n3uralia, factoría chilena de inteligencia artificial aplicada y software para operaciones reales.',
   alternates: { canonical: '/powered-by-n3uralia' },
   openGraph: {
     type: 'website',
     url: '/powered-by-n3uralia',
-    title: 'Kumplio y n3uralia',
-    description: 'La relación entre el producto Kumplio y la empresa de ingeniería que lo desarrolla.',
+    title: 'Kumplio y n3uralia | Producto y factoría de IA en Chile',
+    description: 'La relación entre Kumplio y n3uralia, la factoría chilena de IA aplicada y software que desarrolla el producto.',
   },
 }
 
@@ -55,6 +56,7 @@ export default function PoweredByN3uraliaPage() {
         '@id': `${SITE_URL}/powered-by-n3uralia#page`,
         url: `${SITE_URL}/powered-by-n3uralia`,
         name: 'Kumplio y n3uralia',
+        description: 'Relación entre el producto Kumplio y n3uralia, su desarrollador y factoría de producto.',
         inLanguage: 'es-CL',
         about: [
           { '@id': `${SITE_URL}/#software` },
@@ -65,7 +67,13 @@ export default function PoweredByN3uraliaPage() {
         '@type': 'Organization',
         '@id': `${N3URALIA_CANONICAL_URL}/#organization`,
         name: 'n3uralia',
+        alternateName: 'N3uralia',
         url: N3URALIA_CANONICAL_URL,
+        description: N3URALIA_FACTORY_DESCRIPTION,
+        areaServed: [
+          { '@type': 'Country', name: 'Chile' },
+          { '@type': 'Place', name: 'Latinoamérica' },
+        ],
         makesOffer: {
           '@type': 'Offer',
           itemOffered: { '@id': `${SITE_URL}/#software` },
@@ -91,7 +99,7 @@ export default function PoweredByN3uraliaPage() {
               Kumplio es desarrollado por n3uralia.
             </h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
-              Kumplio es la aplicación especializada en cumplimiento normativo e inteligencia regulatoria. N3uralia es la empresa chilena que diseña, construye y evoluciona su arquitectura de software, automatización e inteligencia artificial.
+              Kumplio es la aplicación especializada en cumplimiento, privacidad e inteligencia regulatoria. n3uralia es la factoría chilena de IA aplicada y software que diseña, construye y evoluciona su arquitectura, automatización y capacidades de inteligencia artificial.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" variant="outline" asChild>
@@ -108,9 +116,9 @@ export default function PoweredByN3uraliaPage() {
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Responsabilidades</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Producto especializado, ingeniería compartida.</h2>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Producto especializado, factoría compartida.</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Kumplio mantiene su propia propuesta de valor, experiencia y operación. N3uralia aporta la capacidad de ingeniería necesaria para desarrollar el producto y para construir soluciones más amplias cuando una organización necesita integraciones o procesos fuera del alcance estándar.
+                Kumplio mantiene su propia propuesta de valor, experiencia y operación. n3uralia aporta la ingeniería y capacidad de producto necesarias para desarrollar Kumplio y para construir soluciones más amplias cuando una organización necesita integraciones o procesos fuera del alcance estándar.
               </p>
             </div>
 
@@ -130,7 +138,7 @@ export default function PoweredByN3uraliaPage() {
           <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-2">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Kumplio</p>
-              <h2 className="mt-4 text-3xl font-extrabold">Para operar cumplimiento normativo con una plataforma especializada.</h2>
+              <h2 className="mt-4 text-3xl font-extrabold">Para operar cumplimiento y privacidad con una plataforma especializada.</h2>
               <ul className="mt-7 space-y-4 text-muted-foreground">
                 {[
                   'Preparación y operación de la Ley 21.719.',
@@ -144,7 +152,7 @@ export default function PoweredByN3uraliaPage() {
 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">n3uralia</p>
-              <h2 className="mt-4 text-3xl font-extrabold">Para construir sistemas, integraciones o automatizaciones fuera del producto estándar.</h2>
+              <h2 className="mt-4 text-3xl font-extrabold">Factoría de IA aplicada y software para construir sistemas fuera del producto estándar.</h2>
               <ul className="mt-7 space-y-4 text-muted-foreground">
                 {[
                   'Aplicaciones fullstack para procesos propios.',
