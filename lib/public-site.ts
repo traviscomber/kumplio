@@ -16,10 +16,30 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio ayuda a organizaciones en Chile a proteger datos y resolver obligaciones de privacidad, con foco en la Ley 21.719: centraliza información sensible, ordena tratamientos y proveedores, identifica brechas y convierte cada situación en una ruta clara de acciones, responsables, evidencia y revisión humana.'
+  'Kumplio ayuda a organizaciones en Chile a transformar situaciones de cumplimiento en resultados verificables: reúne contexto y fuentes, coordina especialistas digitales, prioriza riesgos, convierte brechas en acciones y responsables, solicita evidencia y conserva revisión humana hasta el cierre. Protección de datos y Ley 21.719 son un foco prioritario, no el único alcance del producto.'
 
 export const PUBLIC_POSITIONING =
-  'Plataforma de protección de datos y privacidad para Chile, con foco inicial en la Ley 21.719 y resolución guiada de situaciones reales.'
+  'Sistema operativo de cumplimiento para Chile orientado a outcomes: entender qué ocurre, decidir qué importa, ejecutar qué sigue y demostrar qué se resolvió.'
+
+export const CUSTOMER_OUTCOMES = [
+  'Entender qué obligación, riesgo o cambio realmente aplica al caso',
+  'Priorizar lo urgente y separar hechos, supuestos e incertidumbre',
+  'Convertir brechas en un plan ejecutable con responsables, dependencias y criterios de cierre',
+  'Saber qué evidencia falta y qué controla o demuestra cada resultado',
+  'Preparar auditorías y revisiones sin reconstruir el contexto desde cero',
+  'Evaluar proveedores, contratos, políticas y cambios normativos con trazabilidad',
+  'Conservar decisiones, revisiones y aprendizaje para resolver mejor el siguiente caso',
+] as const
+
+export const SPECIALIST_OUTCOMES = [
+  'Isidora convierte normas, contratos, políticas y registros en obligaciones y evidencia trazables',
+  'Rodrigo transforma hallazgos y contexto en riesgo, urgencia y prioridades justificadas',
+  'Javier convierte objetivos, brechas y riesgos en planes ejecutables y criterios de cierre',
+  'Beatriz detecta cambios oficiales, vigencia e impacto sobre obligaciones y procesos',
+  'Verónica evalúa controles, suficiencia de evidencia, hallazgos y readiness de cierre',
+  'Andrés detecta recurrencias, precedentes, desempeño y oportunidades de mejora',
+  'Julieta revisa calidad jurídica, sustento, reservas y la próxima decisión para revisión humana',
+] as const
 
 export const N3URALIA_FACTORY_DESCRIPTION =
   'n3uralia es la factoría chilena de inteligencia artificial aplicada y software que desarrolla Kumplio y otras soluciones para operaciones reales.'
@@ -35,15 +55,16 @@ export const PUBLIC_CONTACT = {
 }
 
 export const CORE_CAPABILITIES = [
-  'Centralizar información sensible, documentos, tratamientos, proveedores, controles, evidencias y decisiones dentro de expedientes trazables',
-  'Ayudar a entender qué datos personales existen, dónde están, cómo se usan, quién interviene y qué falta revisar',
-  'Preparar a organizaciones para la Ley 21.719 mediante trabajo guiado, prioridades y evidencia verificable',
-  'Convertir brechas de privacidad y protección de datos en acciones, responsables sugeridos, dependencias y criterios de cierre',
-  'Coordinar especialistas digitales con funciones y entregables definidos según el objetivo y el contexto autorizado',
-  'Relacionar conclusiones con fuentes, documentos, evidencia y revisiones humanas antes de avanzar',
-  'Conservar aislamiento por organización, acceso controlado, historial y trazabilidad durante la gestión del caso',
+  'Centralizar situaciones, fuentes, documentos, obligaciones, proveedores, controles, evidencias y decisiones dentro de expedientes trazables',
+  'Coordinar especialistas digitales con funciones, inputs, entregables y fronteras de decisión explícitas',
+  'Separar hechos, inferencias, supuestos, unknowns y decisiones humanas antes de avanzar',
+  'Priorizar riesgos, urgencias y brechas con contexto y nivel de confianza',
+  'Convertir análisis en misiones, responsables sugeridos, dependencias, fechas y criterios de cierre',
+  'Relacionar cada conclusión con fuentes, evidencia y revisiones humanas verificables',
+  'Detectar cambios regulatorios y conectar su impacto con obligaciones, controles y trabajo pendiente',
+  'Conservar aislamiento por organización, historial, versiones, precedentes y aprendizaje aprobado',
   'Acompañar cada situación desde la comprensión inicial hasta una decisión y cierre verificables',
-]
+] as const
 
 export const PUBLIC_LIMITATIONS = [
   'Kumplio no declara automáticamente que una persona u organización cumple una norma.',
