@@ -90,11 +90,10 @@ const required = [
     'Mapeo aceptado no equivale a aviso suficiente',
   ]],
   ['README.md', [
-    'Mapeos de aviso aceptados con evidencia | 3/3',
-    'Mapeos aceptados con brechas',
-    '`accepted_with_gaps`',
-    'control conserva suficiencia `partial`',
-    'Eliminaciones demostradas con evidencia | 0/3',
+    '3/3 mapeos aceptados con brechas',
+    'mapeo del aviso                    3/3',
+    'configuración tenant               0/3',
+    'eliminación operacional final      0/3',
     './docs/assurance/n3uralia-processing-notice-mapping-3x-2026-08-08.md',
   ]],
   ['ROADMAP.md', [
