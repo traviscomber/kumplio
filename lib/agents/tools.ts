@@ -181,7 +181,37 @@ export async function retrieveAgentContext(
   const toolCallIds: string[] = []
   const warnings: string[] = []
 
+  let sstGrounding: Awaited<ReturnType<typeof retrieveSstRegulatoryGrounding>> | null = null
+  try {
+    sstGrounding = await retrieveSstRegulatoryGrounding(supabase, scope)
+    if (sstGrounding.context) sections.push(sstGrounding.context)
+    sourceRefs.push(...sstGrounding.sourceRefs)
+    if (sstGrounding.toolCallId) toolCallIds.push(sstGrounding.toolCallId)
+    if (sstGrounding.warning) warnings.push(sstGrounding.warning)
+  } catch {
+    warnings.push('sst_regulatory_grounding: unavailable')
+  }
+
+  const hasSstGrounding = Boolean(sstGrounding?.context && sstGrounding.sourceRefs.length)
+
   for (const tool of TOOL_REGISTRY[scope.agentId]) {
+    if (hasSstGrounding && scope.agentId === 'isidora' && tool.name === 'read_obligations') {
+      const callId = await createAuditCall(supabase, scope, tool)
+      if (callId) toolCallIds.push(callId)
+      await finishAuditCall(supabase, callId, {
+        status: 'skipped',
+        result_count: 0,
+        result_summary: {
+          reason: 'sst_case_domain_isolation',
+          groundingTool: 'read_sst_regulatory_grounding',
+          parserVersion: 'sst-ds44-suseso-v4',
+        },
+        source_refs: [],
+      })
+      warnings.push('read_obligations: skipped because SST official grounding is active for Isidora')
+      continue
+    }
+
     const result = await queryTool(supabase, scope, tool)
     if (result.callId) toolCallIds.push(result.callId)
     if (result.warning) warnings.push(result.warning)
@@ -221,16 +251,6 @@ export async function retrieveAgentContext(
     }
   } catch {
     warnings.push('organizational_memory: unavailable')
-  }
-
-  try {
-    const grounding = await retrieveSstRegulatoryGrounding(supabase, scope)
-    if (grounding.context) sections.push(grounding.context)
-    sourceRefs.push(...grounding.sourceRefs)
-    if (grounding.toolCallId) toolCallIds.push(grounding.toolCallId)
-    if (grounding.warning) warnings.push(grounding.warning)
-  } catch {
-    warnings.push('sst_regulatory_grounding: unavailable')
   }
 
   if (scope.caseId) {
