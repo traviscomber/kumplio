@@ -3,13 +3,16 @@ import fs from 'node:fs'
 const files = {
   migration: 'supabase/migrations/20260808235300_processing_deletion_evidence_review_v1.sql',
   providerMigration: 'supabase/migrations/20260809024500_processing_provider_retention_assurance_v1.sql',
+  providerRequestMigration: 'supabase/migrations/20260809030500_processing_provider_configuration_requests_v1.sql',
   route: 'app/api/processing-activities/[processId]/deletion-evidence/route.ts',
   twin: 'lib/compliance/digital-twin/privacy-remediation.ts',
   workspace: 'components/digital-twin/processing-privacy-remediation-workspace.tsx',
   productionGate: 'scripts/64-verify-n3uralia-deletion-evidence-3x.sql',
   primaryGate: 'scripts/66-verify-n3uralia-primary-deletion-3x.sql',
   providerGate: 'scripts/67-verify-n3uralia-provider-retention-assurance-3x.sql',
+  providerRequestGate: 'scripts/68-verify-n3uralia-provider-configuration-requests-3x.sql',
   providerAssurance: 'docs/assurance/n3uralia-provider-retention-assurance-3x-2026-08-08.md',
+  providerRequests: 'docs/assurance/n3uralia-provider-configuration-requests-3x-2026-08-08.md',
 }
 
 const source = Object.fromEntries(
@@ -60,6 +63,15 @@ const checks = [
   ['provider gate preserves tenant gap 0/3', source.providerGate.includes('v_tenant_verified_count <> 0')],
   ['provider gate keeps final deletion closed', source.providerGate.includes('v_final_demonstrated_count <> 0')],
   ['assurance doc separates policy from purge', source.providerAssurance.includes('no es evidencia de que un objeto específico haya sido purgado')],
+  ['provider configuration request RPC exists', source.providerRequestMigration.includes('prepare_processing_provider_configuration_request_v1')],
+  ['provider configuration request blocks browser roles', source.providerRequestMigration.includes('from public,anon,authenticated')],
+  ['provider configuration request requires reviewed assurance', source.providerRequestMigration.includes("providerRetentionAssuranceStatus") && source.providerRequestMigration.includes('partial_policy_verified')],
+  ['provider configuration request assigns process owner', source.providerRequestMigration.includes('v_process.owner_user_id')],
+  ['provider configuration request has due date', source.providerRequestMigration.includes("now() + interval '14 days'")],
+  ['provider configuration request distinguishes Supabase and OpenAI evidence', source.providerRequestMigration.includes('backups/PITR') && source.providerRequestMigration.includes('Modified Abuse Monitoring') && source.providerRequestMigration.includes('Zero Data Retention')],
+  ['provider configuration request gate is read only', source.providerRequestGate.includes('begin transaction read only;')],
+  ['provider configuration request gate requires 3/3', source.providerRequestGate.includes('v_total <> 3') && source.providerRequestGate.includes('v_open <> 3')],
+  ['provider configuration request assurance preserves tenant gap', source.providerRequests.includes('providerTenantConfigurationStatus = unverified') && source.providerRequests.includes('deletionEvidenceStatus')],
 ]
 
 const failed = checks.filter(([, ok]) => !ok)
