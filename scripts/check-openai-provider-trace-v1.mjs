@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 
 const runtime = fs.readFileSync('lib/agents/openai-runtime.ts', 'utf8')
+const executor = fs.readFileSync('lib/agents/workflow-stage-executor.ts', 'utf8')
 const worker = fs.readFileSync('app/api/internal/agent-worker/route.ts', 'utf8')
 const migration = fs.readFileSync('supabase/migrations/20260809141500_agent_run_provider_trace_v1.sql', 'utf8')
 
@@ -10,6 +11,9 @@ const checks = [
   ['runtime captures organization', runtime.includes("headers.get('openai-organization')") && runtime.includes('providerOrganization')],
   ['runtime preserves store false', runtime.includes('store: false')],
   ['runtime does not enable debug body logging', !runtime.includes("logLevel: 'debug'") && !runtime.includes('OPENAI_LOG')],
+  ['workflow executor persists request trace', executor.includes('provider_request_id: result.providerTrace.requestId')],
+  ['workflow executor persists organization trace', executor.includes('provider_organization: result.providerTrace.organization')],
+  ['workflow executor does not persist provider response bodies or full headers', !executor.includes('providerTrace.headers') && !executor.includes('providerTrace.body')],
   ['worker keeps token authentication', worker.includes("replace(/^Bearer\\s+/i, '').trim()") && worker.includes("rpc('validate_agent_worker_token'")],
   ['worker returns bounded provider trace', worker.includes('providerTrace,') && worker.includes('readProviderTrace(result.result)')],
   ['worker trace contains only request and organization fields', worker.includes('requestId: typeof record.requestId') && worker.includes('organization: typeof record.organization') && !worker.includes('providerTrace: result.result')],
