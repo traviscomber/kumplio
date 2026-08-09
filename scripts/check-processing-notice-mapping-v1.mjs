@@ -33,10 +33,11 @@ const required = [
   ['components/digital-twin/processing-privacy-remediation-workspace.tsx', [
     'Revisión humana del mapeo',
     'Aceptar mapeo con brechas',
-    'Mapeos aceptados',
-    'La evidencia quedará `accepted · verified`',
-    'suficiencia para el control será `partial`',
-    'Base jurídica, retención, destinatarios, subencargados, transferencias y eliminación siguen requiriendo evidencia separada.',
+    'Metric label="Mapeos"',
+    'Brechas preservadas',
+    'selected.mappingSuggestion.unknowns',
+    'Cada capa necesita su propia evidencia.',
+    'Una política pública o una fila eliminada no cierran por sí solas las capas de backup o proveedor.',
   ]],
   [foundationPath, [
     'accept_processing_notice_mapping_v1',
