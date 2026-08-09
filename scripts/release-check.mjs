@@ -12,6 +12,7 @@ const checks = [
   ['check:sst-agent-grounding'],
   ['check:isidora-case-relevance'],
   ['check:sst-input-domain-isolation'],
+  ['check:isidora-applicability'],
   ['check:leychile'],
   ['check:claims'],
   ['check:compliance-core'],
