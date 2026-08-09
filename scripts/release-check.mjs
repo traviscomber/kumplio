@@ -9,6 +9,7 @@ const checks = [
   ['check:chile-sources'],
   ['check:mercado-publico'],
   ['check:sst-ds44'],
+  ['check:sst-agent-grounding'],
   ['check:leychile'],
   ['check:claims'],
   ['check:compliance-core'],
