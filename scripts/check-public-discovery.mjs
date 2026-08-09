@@ -11,6 +11,7 @@ const requiredFiles = [
   'app/resources/ley-21719/page.tsx',
   'app/resources/ley-21719/[slug]/page.tsx',
   'app/faq/page.tsx',
+  'app/como-pensamos/page.tsx',
   'app/powered-by-n3uralia/page.tsx',
   'app/llms.txt/route.ts',
   'app/llms-full.txt/route.ts',
@@ -71,9 +72,16 @@ await expectIncludes('app/sitemap.ts', [
   '/software-cumplimiento-chile',
   '/resources/ley-21719',
   '/resources/cumplimiento-normativo',
+  '/como-pensamos',
   '/faq',
   '/powered-by-n3uralia',
   "2026-08-09T11:15:00-04:00",
+])
+
+await expectIncludes('app/como-pensamos/page.tsx', [
+  "canonical: '/como-pensamos'",
+  'IA, evidencia y revisión humana en Chile',
+  "url: '/como-pensamos'",
 ])
 
 await expectIncludes('app/llms.txt/route.ts', [
