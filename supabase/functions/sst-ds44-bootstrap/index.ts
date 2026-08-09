@@ -8,7 +8,7 @@ import {
   sha256,
 } from "./core.mjs";
 
-const CONNECTOR_VERSION = "sst-ds44-suseso-v3";
+const CONNECTOR_VERSION = "sst-ds44-suseso-v4";
 const USER_AGENT = "KUMPLIO-Government-Intelligence/1.0 (+https://kumplio.app/regulatory)";
 const DT_DS44_URL = "https://www.dt.gob.cl/portal/1626/w3-article-127643.html";
 const SUSESO_INDEX_URL = "https://www.suseso.cl/612/w3-propertyvalue-69181.html";
