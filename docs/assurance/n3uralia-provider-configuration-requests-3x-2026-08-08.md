@@ -25,6 +25,32 @@ Se prepararon tres solicitudes de evidencia reales, una por actividad:
    - Request: `b97fb811-55d5-416e-becc-b54d0d9753a0`.
    - Evidencia requerida: modo efectivo de Data Retention del tenant/proyecto (estándar, MAM o ZDR), alcance aplicable al proyecto/API, fecha y fuente administrable o contractual.
 
+Las tres solicitudes vencen el **22 de agosto de 2026 a las 22:56 hora de Chile** y están asignadas al owner de las actividades.
+
+## Criterio de aceptación
+
+### Supabase
+
+La evidencia sólo puede aceptarse como tenant-specific si identifica inequívocamente el proyecto usado por Kumplio y permite determinar:
+
+- si existen backups diarios y/o PITR;
+- la ventana efectiva de recuperación o retención;
+- qué capacidad corresponde al plan/configuración actual;
+- la fecha de la captura;
+- una fuente administrable o contractual.
+
+Una página pública genérica de Supabase no basta.
+
+### OpenAI
+
+La evidencia sólo puede aceptarse como tenant-specific si identifica la organización/proyecto utilizado por Kumplio y muestra el modo efectivo de retención aplicable al tráfico de API:
+
+- estándar;
+- Modified Abuse Monitoring (MAM); o
+- Zero Data Retention (ZDR).
+
+`store:false` sigue siendo un hecho local válido, pero no sustituye la acreditación de MAM/ZDR.
+
 ## Verificación
 
 Consulta productiva:
