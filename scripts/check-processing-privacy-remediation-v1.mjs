@@ -108,12 +108,11 @@ const required = [
     'Trabajo creado no equivale a cumplimiento demostrado',
   ]],
   ['README.md', [
-    'Aviso y eliminación como trabajo trazable',
-    '`DEPLOYED / VALIDATED INICIAL`',
-    'Mapeos de aviso aceptados con evidencia | 3/3',
-    'Eliminaciones demostradas con evidencia | 0/3',
-    '20260808151723_processing_activity_privacy_remediation_v1',
-    '20260808152005_seed_n3uralia_privacy_remediation_v1',
+    '## Bloque 16 — evidencia real y privacidad',
+    '3/3 mapeos aceptados con brechas',
+    'eliminación operacional final      0/3',
+    './docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md',
+    'configuración tenant               0/3',
   ]],
   ['ROADMAP.md', [
     'Assurance aviso y eliminación 3/3',
