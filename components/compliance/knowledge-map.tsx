@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { ArrowRight, BookOpenCheck, FileCheck2, FolderKanban, Network, ShieldCheck, UserRound, Workflow } from 'lucide-react'
+import { ArrowRight, BookOpenCheck, FileCheck2, FolderKanban, Landmark, Network, Scale, ShieldCheck, UserRound, Workflow } from 'lucide-react'
 import type { KnowledgeGraph, KnowledgeNode, KnowledgeNodeType } from '@/lib/compliance/knowledge-graph/types'
 
 const labels: Record<KnowledgeNodeType, string> = {
@@ -14,6 +14,8 @@ const labels: Record<KnowledgeNodeType, string> = {
   document: 'Documentos',
   member: 'Responsables',
   project: 'Ámbitos',
+  regulatory_source: 'Fuentes oficiales',
+  regulatory_document: 'Documentos regulatorios',
 }
 
 const icons: Record<KnowledgeNodeType, typeof Network> = {
@@ -25,6 +27,8 @@ const icons: Record<KnowledgeNodeType, typeof Network> = {
   document: FileCheck2,
   member: UserRound,
   project: Network,
+  regulatory_source: Landmark,
+  regulatory_document: Scale,
 }
 
 const nodeKey = (node: KnowledgeNode) => `${node.type}:${node.id}`
