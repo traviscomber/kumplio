@@ -62,6 +62,10 @@ export type RunAgentResult = {
   promptVersion: string
   schemaVersion: string
   qualityGate: QualityGateReport
+  providerTrace: {
+    requestId: string | null
+    organization: string | null
+  }
 }
 
 function normalizeUsage(usage: unknown): NormalizedUsage {
@@ -125,6 +129,8 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
 
   const models = [MODEL_PRIMARY, MODEL_FALLBACK].filter((model, index, values) => values.indexOf(model) === index)
   let response: Awaited<ReturnType<typeof openai.responses.create>> | null = null
+  let providerRequestId: string | null = null
+  let providerOrganization: string | null = null
   let lastFailure: AgentRuntimeError | null = null
 
   for (const model of models) {
@@ -143,14 +149,19 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
         params.reasoning = { effort: REASONING_EFFORT[input.agentId] }
       }
 
-      response = await openai.responses.create(
+      const providerResponse = await openai.responses.create(
         params as any,
         {
           timeout,
           maxRetries: 0,
           signal: AbortSignal.timeout(timeout),
         },
-      )
+      ).withResponse()
+
+      response = providerResponse.data
+      providerRequestId = providerResponse.request_id || response._request_id || providerResponse.response.headers.get('x-request-id')
+      providerOrganization = providerResponse.response.headers.get('openai-organization')
+      console.info('[agents/runtime/provider-trace]', providerRequestId || 'no-request-id', providerOrganization || 'no-organization')
       break
     } catch (error) {
       lastFailure = classifyProviderError(error, model)
@@ -197,5 +208,9 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     promptVersion,
     schemaVersion: outputSchema.version,
     qualityGate,
+    providerTrace: {
+      requestId: providerRequestId,
+      organization: providerOrganization,
+    },
   }
 }
