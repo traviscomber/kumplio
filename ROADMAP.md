@@ -5,7 +5,7 @@
 > Revisión: 9 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible obligatorio: español  
-> Última migración aplicada: `20260809030500_processing_provider_configuration_requests_v1`  
+> Última migración aplicada: `20260809141500_agent_run_provider_trace_v1`  
 > Assurance UI 3/3: `docs/assurance/ui-golden-path-production-3x-2026-08-07.md`  
 > Assurance inventario 3/3: `docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md`  
 > Assurance lifecycle 3/3: `docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md`  
@@ -82,6 +82,7 @@ Una persona describe una situación
 - eliminación final demostrada por una prueba primaria sintética;
 - purga de backups por conocer la política pública de un proveedor;
 - ZDR/MAM porque una llamada use `store:false`;
+- tenant OpenAI verificado sólo por capturar un response header;
 - piloto externo a partir de un tenant sintético.
 
 ### Principios no negociables
@@ -102,7 +103,7 @@ Una persona describe una situación
 
 ### Release funcional vigente
 
-Las PR #238 y #241 están fusionadas a `main` con Release Gate, Application validation, Release qualification, lockfile y ambos proyectos Vercel en `success`.
+Las PR #238, #241, #244, #245 y #246 están fusionadas a `main`. Los cambios críticos pasaron Release Gate, Application validation, Release qualification, typecheck, build, smoke y los proyectos Vercel aplicables en `success`.
 
 Bloque 16 comprobado:
 
@@ -115,10 +116,15 @@ Bloque 16 comprobado:
 | Eliminación primaria operativa | 3/3 |
 | Assurance de proveedor | 3/3 |
 | Solicitudes tenant-specific | 3/3 |
+| Supabase plan | Pro verificado |
+| OpenAI provider runtime trace | capturado en ejecución real |
+| OpenAI provider identity `/v1/me` | implementado/desplegado; ejecución pendiente |
 | Configuración tenant proveedor | 0/3 |
 | Eliminación operacional final | 0/3 |
 
 **3/3 mapeos aceptados con brechas** sigue siendo un resultado válido. **0/3 eliminaciones demostradas** se refiere exclusivamente a eliminación operacional final, no al subgate de eliminación primaria, que ya está 3/3.
+
+La ejecución real de provider trace acreditó una llamada exitosa a `gpt-5.6-sol`, un `x-request-id` real y un valor `openai-organization` devuelto por OpenAI. Ese header demuestra trazabilidad de la request, pero no equivale todavía a Data Retention tenant-specific verificada ni a ZDR/MAM.
 
 ### Migraciones aplicadas más recientes
 
@@ -134,6 +140,7 @@ Bloque 16 comprobado:
 | `20260809014500` | `processing_primary_deletion_exercises_remaining_v1` |
 | `20260809024500` | `processing_provider_retention_assurance_v1` |
 | `20260809030500` | `processing_provider_configuration_requests_v1` |
+| `20260809141500` | `agent_run_provider_trace_v1` |
 
 ### Preparación actual
 
@@ -146,6 +153,8 @@ Bloque 16 comprobado:
 | Inventario real de N3uralia | 3 actividades revisadas |
 | Eliminación primaria | 3/3 `demonstrated_controlled_primary` |
 | Assurance proveedor | 3/3 `partial_policy_verified` |
+| Supabase plan | Pro verificado; PITR pendiente |
+| OpenAI runtime tenant trace | request real capturada; `/v1/me` pendiente de ejecutar |
 | Tenant proveedor | 0/3 `verified` |
 | Eliminación final | 0/3 `demonstrated` |
 | Piloto supervisado externo | pendiente |
@@ -201,8 +210,12 @@ Esto no demuestra purga física de backups ni propagación a procesadores extern
 
 ### Hito I — Assurance de proveedor — `VALIDATED PARCIAL 3/3`
 
-- Supabase: política oficial de backups revisada;
+- Supabase: política oficial de backups revisada y plan Pro del tenant confirmado;
 - OpenAI: `store:false` verificado en runtime y política oficial de Data Controls revisada;
+- provider trace OpenAI real: `x-request-id` + `openai-organization` capturados mediante el worker normal;
+- assurance de identidad OpenAI mediante `/v1/me`: implementado y desplegado, ejecución productiva pendiente;
+- PITR Supabase: no verificado;
+- Data Retention OpenAI (`None`, MAM o ZDR): no verificada;
 - tenant-specific: 0/3.
 
 ---
@@ -235,7 +248,7 @@ Procedencia, vigencia, SHA-256, suficiencia, diseño y operación separados.
 
 ### G. Inventario, lifecycle y aviso — `VALIDATED INICIAL / ACTIVE`
 
-Tres actividades; mapeo 3/3; eliminación primaria 3/3; assurance proveedor 3/3; tenant 0/3; final 0/3.
+Tres actividades; mapeo 3/3; eliminación primaria 3/3; assurance proveedor 3/3; provider trace OpenAI capturado; tenant 0/3; final 0/3.
 
 ### H. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
 
@@ -280,9 +293,9 @@ Falta organización externa y observación humana.
 
 ### 3. Inventario y lifecycle — `3/3 REAL / ACTIVE`
 
-Completado: tres actividades, lifecycle versionado, mapeo 3/3, eliminación primaria 3/3 y assurance proveedor 3/3.
+Completado: tres actividades, lifecycle versionado, mapeo 3/3, eliminación primaria 3/3, assurance proveedor 3/3 y trazabilidad runtime OpenAI verificada en una request real.
 
-Falta: tenant-specific 0/3, eliminación operacional final 0/3 y resolución de dimensiones lifecycle.
+Falta: PITR Supabase, identidad/configuración OpenAI tenant-specific, tenant-specific 0/3, eliminación operacional final 0/3 y resolución de dimensiones lifecycle.
 
 ### 4. Golden Path — `3/3 / VALIDATED`
 
@@ -295,10 +308,12 @@ Repetibilidad técnica cerrada. Falta tiempo humano, costo, retrabajo y experien
 - 3/3 eliminaciones primarias;
 - 3/3 assurance de proveedor;
 - 3/3 solicitudes tenant-specific;
+- provider trace OpenAI real capturado;
+- `/v1/me` assurance implementado, ejecución pendiente;
 - 0/3 configuraciones tenant verificadas;
 - **0/3 eliminaciones demostradas** como cierre operacional final.
 
-Aceptar una matriz, una prueba sintética o una política pública no completa lifecycle ni purga de backups/proveedores.
+Aceptar una matriz, una prueba sintética, un response header o una política pública no completa lifecycle ni purga de backups/proveedores.
 
 ### 6. Piloto externo — `PLANNED`
 
@@ -310,12 +325,13 @@ Aceptar una matriz, una prueba sintética o una política pública no completa l
 
 ### P1 — Cierre de evidencia real
 
-1. Verificar configuración tenant Supabase de backups/PITR.
-2. Verificar proyecto OpenAI usado por Kumplio y Data Retention efectiva (`None`, MAM o ZDR).
-3. Ejecutar y acreditar tres pruebas de eliminación o anonimización.
-4. Resolver lifecycle mediante evidencia independiente aprobada.
-5. Activar Leaked Password Protection.
-6. Preparar piloto externo supervisado.
+1. Ejecutar `provider_identity` (`/v1/me`) con la configuración productiva de Kumplio y reconciliar el `user-*`/organizaciones asociados sin exponer credenciales.
+2. Verificar configuración tenant Supabase de backups/PITR.
+3. Verificar Data Retention efectiva de OpenAI (`None`, MAM o ZDR) para la identidad/proyecto realmente usado por Kumplio.
+4. **Ejecutar y acreditar tres pruebas de eliminación o anonimización** sólo después de que la evidencia tenant-specific aplicable sea suficiente.
+5. Resolver lifecycle mediante evidencia independiente aprobada.
+6. Activar Leaked Password Protection.
+7. Preparar piloto externo supervisado.
 
 ### P2 — Valor acumulativo
 
@@ -333,21 +349,25 @@ Modo incidente, cadena de custodia, Data Room, holdings, multi-framework, SSO, A
 
 1. **Completado:** tres actividades reales registradas y revisadas.
 2. **Completado en su alcance de revisión:** lifecycle separado; resultado `changes_requested` en 3/3.
-3. **Completado en subgates técnicos:** 3/3 mapeos aceptados con brechas, 3/3 eliminación primaria, 3/3 assurance proveedor y 3/3 requests tenant-specific.
+3. **Completado en subgates técnicos:** 3/3 mapeos aceptados con brechas, 3/3 eliminación primaria, 3/3 assurance proveedor, 3/3 requests tenant-specific y provider trace OpenAI real capturado.
 
 Pendiente canónico:
 
+- ejecutar/reconciliar OpenAI `/v1/me` assurance;
+- confirmar PITR/backups efectivos de Supabase;
+- confirmar Data Retention OpenAI efectiva;
 - configuración tenant proveedor 0/3;
 - eliminación operacional final 0/3;
 - lifecycle sin resolver.
 
 Siguiente secuencia obligatoria:
 
-1. confirmar Supabase plan/configuración efectiva de backups/PITR para `qhhybqfuenxojboymrsd`;
-2. confirmar el proyecto OpenAI realmente usado por `OPENAI_API_KEY` y su Data Retention efectiva;
-3. **Ejecutar y acreditar tres pruebas de eliminación o anonimización.** Sólo la capa final puede promocionarse cuando la evidencia tenant-specific sea suficiente;
-4. adjuntar cada evidencia a su solicitud y someterla a revisión humana;
-5. aceptar sólo pruebas con timestamp, proveedor, dataset/activo, alcance, responsable, resultado y referencias de backup/propagación aplicables.
+1. ejecutar el assurance OpenAI `/v1/me` ya desplegado y reconciliar la identidad runtime;
+2. confirmar Supabase plan/configuración efectiva de backups/PITR para `qhhybqfuenxojboymrsd`;
+3. confirmar Data Retention OpenAI del tenant/proyecto realmente usado por `OPENAI_API_KEY`;
+4. **Ejecutar y acreditar tres pruebas de eliminación o anonimización.** Sólo la capa final puede promocionarse cuando la evidencia tenant-specific sea suficiente;
+5. adjuntar cada evidencia a su solicitud y someterla a revisión humana;
+6. aceptar sólo pruebas con timestamp, proveedor, dataset/activo, alcance, responsable, resultado y referencias de backup/propagación aplicables.
 
 **Salida:** tres actividades con mapeo aceptado y cierre final demostrado, o un estado abierto honesto con brecha, owner y vencimiento.
 
@@ -378,6 +398,9 @@ Siguiente secuencia obligatoria:
 | Mapeo del aviso aceptado | 100% | 3/3 con brechas |
 | Eliminación primaria | 100% | 3/3 controlado |
 | Assurance proveedor | 100% | 3/3 parcial |
+| OpenAI runtime trace | ≥ 1 request real | 1 request real capturada |
+| OpenAI provider identity | 1 ejecución `/v1/me` | implementado, pendiente de ejecutar |
+| Supabase PITR/config backup | 100% | pendiente |
 | Configuración tenant proveedor | 100% | 0/3 |
 | Base jurídicamente validada | 100% | 0/3 |
 | Retención aprobada | 100% | 0/3 |
@@ -406,6 +429,7 @@ Hasta cerrar P0:
 - no presentar mapeo aceptado como aviso suficiente;
 - no presentar eliminación primaria como purga final;
 - no presentar política de proveedor como configuración tenant verificada;
+- no presentar provider trace o `/v1/me` como prueba de ZDR/MAM;
 - no automatizar decisiones irreversibles sin aprobación;
 - no marcar `DONE` fuera del alcance probado;
 - no pasar al Bloque 17 mientras tenant-specific, eliminación final y lifecycle sigan abiertos.
@@ -425,11 +449,14 @@ Dentro del Bloque 16:
 5. eliminación primaria está demostrada de forma controlada 3/3;
 6. assurance de proveedor está revisado 3/3;
 7. solicitudes tenant-specific están abiertas 3/3;
-8. configuración tenant proveedor está verificada 0/3;
-9. eliminación operacional final demostrada está 0/3.
+8. Supabase plan Pro está verificado y PITR sigue pendiente;
+9. OpenAI provider trace de una ejecución real está capturado;
+10. OpenAI `/v1/me` assurance está implementado/desplegado, pero aún no ejecutado;
+11. configuración tenant proveedor está verificada 0/3;
+12. eliminación operacional final demostrada está 0/3.
 
 La única continuidad funcional autorizada es:
 
-> **Obtener y revisar evidencia tenant-specific de Supabase/OpenAI y, sólo cuando sea suficiente, ejecutar o aceptar la prueba operacional final de eliminación/anonimización sin sobreafirmar backups ni propagación externa.**
+> **Ejecutar/reconciliar la identidad runtime OpenAI, obtener la configuración tenant-specific efectiva de Supabase/OpenAI y, sólo cuando sea suficiente, ejecutar o aceptar la prueba operacional final de eliminación/anonimización sin sobreafirmar backups, retención ni propagación externa.**
 
 No se habilitará beta autoservicio hasta cerrar Leaked Password Protection, la evidencia tenant-specific/final, las dimensiones lifecycle críticas y observar al menos una organización externa supervisada.
