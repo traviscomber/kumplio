@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import {
   deriveSstOutcomeSignals,
   parseDtDs44LandingPage,
+  parseSusesoCircularIndexPage,
   parseSusesoCircularPage,
 } from '../supabase/functions/sst-ds44-bootstrap/core.mjs'
 
@@ -37,6 +38,23 @@ assert.ok(dt.resources.some((item) => item.resourceType === 'infraction_typifier
 assert.ok(dt.resources.some((item) => item.resourceType === 'risk_assessment_guidance'))
 assert.ok(dt.resources.every((item) => item.url.startsWith('https://www.dt.gob.cl/')))
 
+const indexHtml = `
+<html><body>
+<div><p>20/03/2026</p><a href="/612/w3-article-776436.html">Circular 3914</a><p>Coordinación y cooperación de la actividad preventiva entre entidades empleadoras que comparten un lugar de trabajo. D.S. N°44.</p></div>
+<div><p>07/02/2025</p><a href="/612/w3-article-745100.html">Circular 3858</a><p>Comités Paritarios de Higiene y Seguridad en el sector público.</p></div>
+<div><p>27/01/2025</p><a href="/612/w3-article-744080.html">Circular 3855</a><p>Capacitaciones, gestión de riesgos e incidentes peligrosos conforme al D.S. N°44.</p></div>
+<div><p>15/01/2025</p><a href="/612/w3-article-743800.html">Circular 3854</a><p>Registros vinculados a Ley Karin.</p></div>
+<div><p>10/01/2025</p><a href="/612/w3-article-743600.html">Circular 3850</a><p>Actividades de prevención de riesgos profesionales.</p></div>
+</body></html>`
+
+const discoveries = parseSusesoCircularIndexPage(indexHtml)
+assert.equal(discoveries.length, 5)
+assert.equal(discoveries[0].circularNumber, '3914')
+assert.equal(discoveries.find((item) => item.circularNumber === '3855')?.ds44Hint, true)
+assert.equal(discoveries.find((item) => item.circularNumber === '3850')?.sstRelevant, true)
+assert.equal(discoveries.find((item) => item.circularNumber === '3854')?.ds44Hint, false)
+assert.ok(discoveries.every((item) => item.detailUrl.startsWith('https://www.suseso.cl/')))
+
 const circular3855 = parseSusesoCircularPage(`
 <html><body><h1>Circular 3855</h1>
 <p>Fecha: 27 de enero de 2025</p>
@@ -52,14 +70,17 @@ const circular3855 = parseSusesoCircularPage(`
 assert.equal(circular3855.circularNumber, '3855')
 assert.equal(circular3855.publicationDate, '2025-01-27')
 assert.equal(circular3855.ds44Related, true)
+assert.equal(circular3855.sstRelevant, true)
 assert.match(circular3855.subject, /capacitaciones/i)
 
 const signals = deriveSstOutcomeSignals({ dt, suseso: [circular3855] })
 assert.equal(signals.inspectionReadiness, true)
 assert.equal(signals.riskManagementEvidence, true)
 assert.equal(signals.ds44OperationalGuidanceCount, 1)
+assert.equal(signals.sstSupervisoryGuidanceCount, 1)
 assert.ok(signals.candidateOutcomes.includes('inspection_gap_analysis'))
 assert.ok(signals.candidateOutcomes.includes('training_records_incident_controls'))
+assert.ok(signals.candidateOutcomes.includes('sst_supervisory_update'))
 
 const outcomeCatalog = JSON.parse(await readFile(new URL('../data/sst-ds44-outcomes.v1.json', import.meta.url), 'utf8'))
 assert.equal(outcomeCatalog.version, 1)
