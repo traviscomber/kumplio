@@ -15,56 +15,62 @@ import { Footer } from '@/components/footer'
 import { N3URALIA_CANONICAL_URL, SITE_URL } from '@/lib/public-site'
 
 export const metadata: Metadata = {
-  title: 'Software de cumplimiento normativo en Chile',
+  title: 'Software de protección de datos y Ley 21.719 en Chile',
   description:
-    'Kumplio es un software chileno de cumplimiento normativo e inteligencia regulatoria para gestionar obligaciones, controles, evidencia, misiones y revisión humana.',
+    'Kumplio es una plataforma chilena para proteger datos personales, prepararse para la Ley 21.719, ordenar tratamientos y proveedores, gestionar brechas y cerrar acciones con evidencia y revisión humana.',
   keywords: [
-    'software cumplimiento normativo Chile',
-    'plataforma compliance Chile',
-    'software gestión de cumplimiento',
+    'software protección de datos Chile',
     'software Ley 21.719',
-    'plataforma evidencia auditable',
-    'inteligencia regulatoria Chile',
+    'plataforma privacidad Chile',
+    'gestión datos personales Chile',
+    'cumplimiento Ley 21.719 empresas',
+    'software compliance Chile',
+    'evidencia privacidad Chile',
   ],
   alternates: { canonical: '/software-cumplimiento-chile' },
   openGraph: {
     type: 'website',
     url: '/software-cumplimiento-chile',
-    title: 'Software de cumplimiento normativo en Chile | Kumplio',
+    title: 'Software de protección de datos y Ley 21.719 en Chile | Kumplio',
     description:
-      'Del requisito a la evidencia: obligaciones, controles, misiones y decisiones revisables en una plataforma chilena.',
+      'Centraliza información sensible, entiende qué debes proteger y convierte brechas de privacidad en acciones, responsables y evidencia revisable.',
   },
 }
 
 const comparison = [
-  ['Normativa y fuentes identificables', false, false, true],
-  ['Obligaciones relacionadas con controles', false, false, true],
+  ['Mapa de datos, tratamientos y proveedores', false, false, true],
+  ['Brechas relacionadas con obligaciones y responsables', false, false, true],
   ['Evidencia con responsable, vigencia y revisión', false, true, true],
-  ['Misiones ejecutables con criterios de éxito', false, false, true],
+  ['Acciones ejecutables con criterios de cierre', false, false, true],
   ['Asistencia IA con contexto y revisión humana', false, false, true],
   ['Historial de decisiones y resultados', false, true, true],
 ]
 
 const faqs = [
   {
-    question: '¿Qué es un software de cumplimiento normativo?',
+    question: '¿Qué hace un software de protección de datos?',
     answer:
-      'Es una plataforma que ayuda a organizar requisitos, responsables, controles, evidencia, hallazgos y acciones. Su valor no está solamente en almacenar documentos, sino en demostrar cómo se gestiona y revisa el cumplimiento.',
+      'Ayuda a saber qué datos personales existen, para qué se usan, dónde están, quién interviene, qué terceros participan y qué brechas necesitan trabajo. Kumplio conecta ese contexto con acciones, responsables, evidencia y revisión humana.',
   },
   {
     question: '¿Kumplio declara automáticamente que una empresa cumple?',
     answer:
-      'No. Kumplio organiza fuentes, contexto, controles y evidencia; propone estructuras y próximos pasos; y conserva revisión humana para las decisiones relevantes.',
+      'No. Kumplio organiza fuentes, contexto, tratamientos, controles y evidencia; propone próximos pasos; y conserva revisión humana para las decisiones relevantes.',
   },
   {
-    question: '¿Sirve solamente para la Ley 21.719?',
+    question: '¿Kumplio está pensado para la Ley 21.719?',
     answer:
-      'No. La Ley 21.719 es la primera solución prioritaria en Chile, pero el modelo de obligaciones, controles, evidencia, riesgos y acciones puede extenderse a contratos, políticas y otros marcos.',
+      'Sí. La preparación para la Ley 21.719 es el foco inicial del producto en Chile: inventario de tratamientos, responsables, terceros, brechas, controles, evidencia y acciones de cierre.',
+  },
+  {
+    question: '¿También sirve para cumplimiento normativo?',
+    answer:
+      'Sí, como marco más amplio. El producto parte por protección de datos y privacidad en Chile, y su modelo de fuentes, obligaciones, controles, evidencia y acciones puede extenderse a otros marcos cuando corresponda.',
   },
   {
     question: '¿Quién desarrolla Kumplio?',
     answer:
-      'Kumplio es un producto desarrollado por n3uralia, empresa chilena de inteligencia artificial aplicada, automatización y software para operaciones reales.',
+      'Kumplio es un producto desarrollado por n3uralia, factoría chilena de inteligencia artificial aplicada y software para operaciones reales.',
   },
 ]
 
@@ -82,7 +88,7 @@ export default function SoftwareCumplimientoChilePage() {
         '@type': 'WebPage',
         '@id': `${SITE_URL}/software-cumplimiento-chile#page`,
         url: `${SITE_URL}/software-cumplimiento-chile`,
-        name: 'Software de cumplimiento normativo en Chile',
+        name: 'Software de protección de datos y Ley 21.719 en Chile',
         description: metadata.description,
         inLanguage: 'es-CL',
         about: { '@id': `${SITE_URL}/#software` },
@@ -95,7 +101,7 @@ export default function SoftwareCumplimientoChilePage() {
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'Software de cumplimiento normativo en Chile',
+            name: 'Software de protección de datos en Chile',
             item: `${SITE_URL}/software-cumplimiento-chile`,
           },
         ],
@@ -128,13 +134,13 @@ export default function SoftwareCumplimientoChilePage() {
         <section className="border-b border-border px-6 py-24 md:py-32">
           <div className="mx-auto max-w-6xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
-              <ShieldCheck className="h-4 w-4" /> Software para empresas chilenas
+              <ShieldCheck className="h-4 w-4" /> Protección de datos para organizaciones en Chile
             </div>
             <h1 className="mt-6 max-w-5xl text-balance text-5xl font-black leading-tight tracking-[-0.04em] md:text-7xl">
-              Cumplimiento normativo conectado con el trabajo real.
+              Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.
             </h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
-              Kumplio reúne normativa, documentos y contexto organizacional para convertir obligaciones en controles, misiones, evidencia y decisiones revisables. Está diseñado para Chile y comienza por la preparación para la Ley 21.719.
+              Kumplio centraliza información sensible, tratamientos, proveedores, controles y evidencia para ayudarte a entender qué debes proteger, qué brechas existen y qué acciones necesitas cerrar con responsables y revisión humana.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild><Link href="/sign-up">Crear mi organización <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
@@ -147,18 +153,18 @@ export default function SoftwareCumplimientoChilePage() {
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Respuesta directa</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">¿Qué debe hacer un software de compliance moderno?</h2>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">¿Qué debe resolver una plataforma de protección de datos?</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Debe permitir identificar la fuente de una obligación, determinar si aplica, asignar controles y responsables, solicitar evidencia, registrar hallazgos, coordinar correcciones y conservar la decisión humana que aprueba o rechaza cada resultado.
+                Debe ayudarte a saber qué datos tienes, cómo se usan, dónde están, quién accede, qué terceros participan y qué evidencia existe; después debe convertir las brechas en trabajo concreto, responsables, fechas y criterios de cierre.
               </p>
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {[
-                [SearchCheck, 'Comprender', 'Fuentes, vigencia, versiones y contexto aplicable.'],
+                [SearchCheck, 'Entender', 'Datos, tratamientos, terceros, finalidades y contexto disponible.'],
                 [FileCheck2, 'Demostrar', 'Controles, evidencia, responsables y revisiones.'],
-                [Workflow, 'Ejecutar', 'Misiones, dependencias, fechas y criterios de cierre.'],
-                [Bot, 'Asistir', 'IA contextualizada con fuentes y escalamiento humano.'],
+                [Workflow, 'Resolver', 'Acciones, dependencias, fechas y criterios de cierre.'],
+                [Bot, 'Acompañar', 'Especialistas digitales con contexto, fuentes y escalamiento humano.'],
               ].map(([Icon, title, text]) => (
                 <article key={String(title)} className="rounded-2xl border border-border bg-card p-6">
                   <Icon className="h-7 w-7 text-primary" />
@@ -176,7 +182,7 @@ export default function SoftwareCumplimientoChilePage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Diferencia operativa</p>
               <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Más que una planilla y más que un repositorio documental.</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Una herramienta puede almacenar archivos. Kumplio busca mantener la relación entre el requisito, la decisión, el trabajo realizado y la evidencia que respalda el resultado.
+                Una herramienta puede almacenar archivos. Kumplio mantiene relacionada la información personal, el tratamiento, la brecha, la acción, la decisión y la evidencia que respalda el resultado.
               </p>
             </div>
 
@@ -209,17 +215,17 @@ export default function SoftwareCumplimientoChilePage() {
           <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Flujo de trabajo</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight">Del cambio normativo al resultado revisable.</h2>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight">De información dispersa a una decisión respaldada.</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
                 El producto organiza un recorrido verificable en lugar de entregar una recomendación aislada.
               </p>
             </div>
             <ol className="space-y-3">
               {[
-                ['1', 'Registrar la fuente', 'Origen, fecha, versión e integridad del documento o cambio.'],
-                ['2', 'Estructurar la obligación', 'Contenido, condiciones, sujetos, plazos y aplicabilidad.'],
+                ['1', 'Centralizar el contexto', 'Datos, tratamientos, documentos, proveedores y antecedentes disponibles.'],
+                ['2', 'Entender qué importa', 'Finalidades, responsables, obligaciones, riesgos y preguntas abiertas.'],
                 ['3', 'Relacionar controles', 'Responsables, periodicidad, evidencia y estado observado.'],
-                ['4', 'Crear una misión', 'Trabajo, dependencias, criterios de éxito y puntos de revisión.'],
+                ['4', 'Crear acciones', 'Trabajo, dependencias, criterios de éxito y puntos de revisión.'],
                 ['5', 'Revisar el resultado', 'Aprobar, solicitar cambios o rechazar con fundamento registrado.'],
               ].map(([number, title, text]) => (
                 <li key={number} className="grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[48px_1fr] sm:items-start">
@@ -238,16 +244,17 @@ export default function SoftwareCumplimientoChilePage() {
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Chile primero</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Una plataforma construida desde fuentes y necesidades locales.</h2>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Construido para la realidad de protección de datos en Chile.</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Kumplio prioriza fuentes oficiales chilenas, lenguaje operativo en español, precios en pesos chilenos y un modelo compatible con equipos legales, de cumplimiento, operaciones y gerencia.
+                Kumplio prioriza la Ley 21.719, fuentes oficiales chilenas, lenguaje operativo en español, precios en pesos chilenos y un modelo pensado para organizaciones que necesitan ordenar privacidad y protección de datos sin perder trazabilidad.
               </p>
             </div>
             <div className="mt-10 flex flex-wrap gap-3">
               {[
+                'Ley 21.719',
                 'LeyChile / BCN',
                 'Diario Oficial',
-                'Ley 21.719',
+                'Inventario de tratamientos',
                 'Evidencia organizacional privada',
                 'Revisión humana',
                 'Precios en CLP',
@@ -277,9 +284,9 @@ export default function SoftwareCumplimientoChilePage() {
         </section>
 
         <section className="border-t border-border bg-card px-6 py-24 text-center">
-          <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">Comienza con una organización y un primer objetivo.</h2>
+          <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">Empieza ordenando tu información y tu primera brecha.</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Configura el contexto inicial y prepara un primer caso de trabajo sin activar cobros automáticos.
+            Configura tu organización, centraliza el contexto inicial y comienza a preparar tu ruta para la Ley 21.719 sin activar cobros automáticos.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Button size="lg" asChild><Link href="/sign-up">Comenzar <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>

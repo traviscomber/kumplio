@@ -4,6 +4,7 @@ import {
   N3URALIA_NAME,
   PUBLIC_DESCRIPTION,
   PUBLIC_LIMITATIONS,
+  PUBLIC_POSITIONING,
   SITE_URL,
 } from '@/lib/public-site'
 
@@ -18,34 +19,42 @@ Canonical site: ${SITE_URL}
 Primary market: Chile
 Language: Spanish (es-CL)
 Product: Kumplio
+Primary positioning: ${PUBLIC_POSITIONING}
 Developer and product factory: ${N3URALIA_NAME}
 Factory site: ${N3URALIA_CANONICAL_URL}
 Relationship: Kumplio is a software product developed by n3uralia.
 Factory description: ${N3URALIA_FACTORY_DESCRIPTION}
 Last reviewed: 2026-08-09
 
-## What Kumplio does
+## What Kumplio does now
 
-- Connects official regulatory sources with authorized organizational context.
-- Structures obligations, controls, evidence, risks, findings and actions.
-- Coordinates missions with responsible people, success criteria and human review.
+- Helps organizations in Chile protect personal data and prepare for Law 21.719.
+- Centralizes sensitive information, processing activities, providers, controls, evidence and decisions.
+- Helps teams understand what personal data exists, how it is used, who participates and what is still unresolved.
+- Converts privacy gaps into actions, suggested owners, dependencies, evidence requirements and reviewable closure criteria.
+- Uses specialized digital capabilities with authorized context and human review.
 - Preserves provenance, versions, decisions and reviewable results.
-- Prioritizes preparation for Chilean Law 21.719 on personal data protection.
+
+## Product scope
+
+Primary scope: data protection, privacy and Law 21.719 in Chile.
+Secondary category: compliance management. Broader regulatory use cases are possible, but they are not the primary public positioning of Kumplio today.
 
 ## Geographic relevance
 
 - Primary country: Chile.
 - Primary business context: Chilean organizations and professionals.
 - Primary language: Spanish as used in Chile.
-- Regulatory focus: Chile, including Law 21.719 and other applicable Chilean sources.
+- Primary regulatory focus: personal data protection and Law 21.719.
+- Currency: CLP.
 
 ## Important public pages
 
 - Home: ${SITE_URL}
-- Product: ${SITE_URL}/software-cumplimiento-chile
+- Data protection software: ${SITE_URL}/software-cumplimiento-chile
 - Law 21.719 solution: ${SITE_URL}/features/ley-21719
 - Law 21.719 guides: ${SITE_URL}/resources/ley-21719
-- Compliance resources: ${SITE_URL}/resources/cumplimiento-normativo
+- Resources: ${SITE_URL}/resources/cumplimiento-normativo
 - Use cases: ${SITE_URL}/use-cases
 - Public fictional demo: ${SITE_URL}/demo
 - Pricing in CLP: ${SITE_URL}/pricing
