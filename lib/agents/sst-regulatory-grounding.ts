@@ -16,6 +16,70 @@ type GroundingScope = {
 
 type GroundingRef = { tool: string; table: string; id?: string }
 
+type SourceRow = {
+  id: string
+  authority_name: string | null
+  source_name: string | null
+  canonical_url: string | null
+  authority_level: string | null
+  terms_review_status: string | null
+  health_status: string | null
+  connector_version: string | null
+}
+
+type DocumentRow = {
+  id: string
+  source_id: string
+  canonical_identifier: string | null
+  title: string | null
+  document_type: string | null
+  canonical_url: string | null
+  external_reference: string | null
+  publication_date: string | null
+  status: string | null
+}
+
+type VersionRow = {
+  id: string
+  document_id: string
+  version_number: number
+  parser_version: string | null
+  status: string | null
+  created_at: string | null
+}
+
+type SectionRow = {
+  id: string
+  version_id: string
+  section_key: string | null
+  section_type: string | null
+  ordinal: number
+  reference_label: string | null
+  heading: string | null
+  body_text: string | null
+  section_hash: string | null
+}
+
+type GroundingRecord = {
+  authority: string | null
+  sourceName: string | null
+  sourceUrl: string | null
+  authorityLevel: string | null
+  termsReviewStatus: string | null
+  documentId: string | null
+  canonicalIdentifier: string | null
+  documentTitle: unknown
+  documentType: string | null
+  publicationDate: string | null
+  versionNumber: number | null
+  parserVersion: string | null
+  sectionId: string
+  referenceLabel: string | null
+  heading: unknown
+  bodyText: unknown
+  sectionHash: string | null
+}
+
 export type SstRegulatoryGroundingResult = {
   context: string
   sourceRefs: GroundingRef[]
@@ -82,13 +146,14 @@ export async function retrieveSstRegulatoryGrounding(
   const callId = await startAuditCall(supabase, scope)
 
   try {
-    const { data: sources, error: sourceError } = await supabase
+    const { data: sourceData, error: sourceError } = await supabase
       .from('regulatory_sources')
       .select('id, authority_name, source_name, canonical_url, authority_level, terms_review_status, health_status, connector_version')
       .in('canonical_url', SOURCE_URLS)
       .eq('is_active', true)
 
-    if (sourceError || !sources?.length) {
+    const sources = (sourceData || []) as SourceRow[]
+    if (sourceError || !sources.length) {
       await finishAuditCall(supabase, callId, {
         status: 'failed',
         error_code: sourceError?.code || 'sst_sources_unavailable',
@@ -96,8 +161,8 @@ export async function retrieveSstRegulatoryGrounding(
       return { context: '', sourceRefs: [], toolCallId: callId, warning: 'sst_regulatory_grounding: official sources unavailable' }
     }
 
-    const sourceIds = sources.map((source: { id: string }) => source.id)
-    const { data: documents, error: documentError } = await supabase
+    const sourceIds = sources.map((source) => source.id)
+    const { data: documentData, error: documentError } = await supabase
       .from('regulatory_documents')
       .select('id, source_id, canonical_identifier, title, document_type, canonical_url, external_reference, publication_date, status')
       .in('source_id', sourceIds)
@@ -105,9 +170,10 @@ export async function retrieveSstRegulatoryGrounding(
       .limit(24)
 
     if (documentError) throw Object.assign(new Error('sst_documents_query_failed'), { code: documentError.code })
+    const documents = (documentData || []) as DocumentRow[]
 
-    const documentIds = (documents || []).map((document: { id: string }) => document.id)
-    const { data: versions, error: versionError } = documentIds.length
+    const documentIds = documents.map((document) => document.id)
+    const versionResult = documentIds.length
       ? await supabase
         .from('regulatory_document_versions')
         .select('id, document_id, version_number, parser_version, status, created_at')
@@ -115,35 +181,37 @@ export async function retrieveSstRegulatoryGrounding(
         .eq('parser_version', PARSER_VERSION)
         .in('status', ['parsed', 'verified'])
         .order('version_number', { ascending: false })
-      : { data: [], error: null }
+      : { data: [] as VersionRow[], error: null }
 
-    if (versionError) throw Object.assign(new Error('sst_versions_query_failed'), { code: versionError.code })
+    if (versionResult.error) throw Object.assign(new Error('sst_versions_query_failed'), { code: versionResult.error.code })
+    const versions = (versionResult.data || []) as VersionRow[]
 
-    const latestByDocument = new Map<string, any>()
-    for (const version of versions || []) {
+    const latestByDocument = new Map<string, VersionRow>()
+    for (const version of versions) {
       if (!latestByDocument.has(version.document_id)) latestByDocument.set(version.document_id, version)
     }
     const versionIds = [...latestByDocument.values()].map((version) => version.id)
 
-    const { data: sections, error: sectionError } = versionIds.length
+    const sectionResult = versionIds.length
       ? await supabase
         .from('regulatory_document_sections')
         .select('id, version_id, section_key, section_type, ordinal, reference_label, heading, body_text, section_hash')
         .in('version_id', versionIds)
         .order('ordinal', { ascending: true })
         .limit(MAX_SECTIONS)
-      : { data: [], error: null }
+      : { data: [] as SectionRow[], error: null }
 
-    if (sectionError) throw Object.assign(new Error('sst_sections_query_failed'), { code: sectionError.code })
+    if (sectionResult.error) throw Object.assign(new Error('sst_sections_query_failed'), { code: sectionResult.error.code })
+    const sections = (sectionResult.data || []) as SectionRow[]
 
-    const sourceById = new Map((sources || []).map((source: any) => [source.id, source]))
-    const documentById = new Map((documents || []).map((document: any) => [document.id, document]))
-    const versionById = new Map([...latestByDocument.values()].map((version: any) => [version.id, version]))
+    const sourceById = new Map<string, SourceRow>(sources.map((source) => [source.id, source]))
+    const documentById = new Map<string, DocumentRow>(documents.map((document) => [document.id, document]))
+    const versionById = new Map<string, VersionRow>([...latestByDocument.values()].map((version) => [version.id, version]))
 
-    const records = (sections || []).map((section: any) => {
+    const records: GroundingRecord[] = sections.map((section) => {
       const version = versionById.get(section.version_id)
-      const document = version ? documentById.get(version.document_id) : null
-      const source = document ? sourceById.get(document.source_id) : null
+      const document = version ? documentById.get(version.document_id) : undefined
+      const source = document ? sourceById.get(document.source_id) : undefined
       return {
         authority: source?.authority_name || null,
         sourceName: source?.source_name || null,
@@ -165,9 +233,11 @@ export async function retrieveSstRegulatoryGrounding(
       }
     })
 
-    const sourceRefs = records.flatMap((record) => record.sectionId
-      ? [{ tool: 'read_sst_regulatory_grounding', table: 'regulatory_document_sections', id: record.sectionId }]
-      : [])
+    const sourceRefs: GroundingRef[] = records.map((record) => ({
+      tool: 'read_sst_regulatory_grounding',
+      table: 'regulatory_document_sections',
+      id: record.sectionId,
+    }))
 
     await finishAuditCall(supabase, callId, {
       status: 'completed',
