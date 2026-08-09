@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import {
   deriveSstOutcomeSignals,
   parseDtDs44LandingPage,
@@ -59,6 +60,14 @@ assert.equal(signals.riskManagementEvidence, true)
 assert.equal(signals.ds44OperationalGuidanceCount, 1)
 assert.ok(signals.candidateOutcomes.includes('inspection_gap_analysis'))
 assert.ok(signals.candidateOutcomes.includes('training_records_incident_controls'))
+
+const outcomeCatalog = JSON.parse(await readFile(new URL('../data/sst-ds44-outcomes.v1.json', import.meta.url), 'utf8'))
+assert.equal(outcomeCatalog.version, 1)
+assert.equal(outcomeCatalog.outcomes.length, 11)
+assert.ok(outcomeCatalog.statusModel.includes('human_reviewed'))
+assert.ok(outcomeCatalog.statusModel.includes('evidenced'))
+assert.match(outcomeCatalog.sourcePolicy.rule, /never promoted to a legal obligation/i)
+assert.ok(outcomeCatalog.outcomes.every((item) => item.evidenceCandidates.length > 0 && item.artifactCandidates.length > 0))
 
 assert.throws(
   () => parseSusesoCircularPage('<h1>Circular 1</h1>', 'https://example.com/circular'),
