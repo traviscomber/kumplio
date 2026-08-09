@@ -33,6 +33,7 @@ const checks = [
   ['check:processing-lifecycle'],
   ['check:processing-privacy-remediation'],
   ['check:processing-notice-mapping'],
+  ['check:processing-deletion-evidence'],
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
   ['check:e2e-data-lifecycle'],
