@@ -31,9 +31,9 @@ assert.ok(!grounding.includes('SUPABASE_SERVICE_ROLE_KEY'), 'SST grounding must 
 assert.ok(!grounding.includes('decrypted_secret'), 'SST grounding must not access Vault secrets')
 
 assert.ok(tools.includes("import { retrieveSstRegulatoryGrounding } from './sst-regulatory-grounding'"))
-assert.ok(tools.includes('const grounding = await retrieveSstRegulatoryGrounding(supabase, scope)'))
-assert.ok(tools.includes('sourceRefs.push(...grounding.sourceRefs)'))
-assert.ok(tools.includes('toolCallIds.push(grounding.toolCallId)'))
+assert.ok(tools.includes('sstGrounding = await retrieveSstRegulatoryGrounding(supabase, scope)'))
+assert.ok(tools.includes('sourceRefs.push(...sstGrounding.sourceRefs)'))
+assert.ok(tools.includes('toolCallIds.push(sstGrounding.toolCallId)'))
 assert.ok(tools.includes("warnings.push('sst_regulatory_grounding: unavailable')"))
 
 console.log('SST official agent grounding contract: PASS')
