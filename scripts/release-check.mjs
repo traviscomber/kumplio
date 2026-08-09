@@ -11,6 +11,7 @@ const checks = [
   ['check:sst-ds44'],
   ['check:sst-agent-grounding'],
   ['check:isidora-case-relevance'],
+  ['check:sst-input-domain-isolation'],
   ['check:leychile'],
   ['check:claims'],
   ['check:compliance-core'],
