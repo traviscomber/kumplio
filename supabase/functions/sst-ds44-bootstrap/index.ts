@@ -182,7 +182,7 @@ Deno.serve(async (request) => {
       sections: [
         ...dt.instruments.map((name: string, index: number) => ({
           key: `instrument:${index + 1}`,
-          type: "instrument",
+          type: "article",
           referenceLabel: `DS44-I${index + 1}`,
           heading: name,
           bodyText: name,
@@ -191,7 +191,7 @@ Deno.serve(async (request) => {
         })),
         ...dt.resources.map((resource: Record<string, unknown>, index: number) => ({
           key: `resource:${index + 1}`,
-          type: "resource",
+          type: "article",
           referenceLabel: String(resource.resourceType || `resource-${index + 1}`),
           heading: String(resource.title || "Recurso oficial"),
           bodyText: String(resource.url || ""),
@@ -241,7 +241,7 @@ Deno.serve(async (request) => {
         normalizedContent,
         sections: [{
           key: "circular",
-          type: "supervisory_instruction",
+          type: "article",
           referenceLabel: `Circular ${parsed.circularNumber}`,
           heading: parsed.subject || `Circular ${parsed.circularNumber}`,
           bodyText: [parsed.subject, parsed.topic, parsed.observation, parsed.action, parsed.sources].filter(Boolean).join("\n"),
