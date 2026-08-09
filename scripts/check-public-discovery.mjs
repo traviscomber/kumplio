@@ -21,6 +21,8 @@ const requiredFiles = [
   `app/${indexNowKey}.txt/route.ts`,
   'app/.well-known/security.txt/route.ts',
   'lib/indexnow.ts',
+  'lib/public-site.ts',
+  'next.config.mjs',
   '.github/workflows/indexnow.yml',
   '.github/workflows/public-discovery.yml',
 ]
@@ -51,6 +53,12 @@ await expectIncludes('app/layout.tsx', [
   '/kumplio.json',
 ])
 
+await expectIncludes('lib/public-site.ts', [
+  'N3URALIA_FACTORY_DESCRIPTION',
+  'factoría chilena de inteligencia artificial aplicada y software',
+  'Kumplio es un producto desarrollado por n3uralia',
+])
+
 await expectIncludes('app/robots.ts', [
   'OAI-SearchBot',
   'GPTBot',
@@ -62,8 +70,39 @@ await expectIncludes('app/robots.ts', [
 await expectIncludes('app/sitemap.ts', [
   '/software-cumplimiento-chile',
   '/resources/ley-21719',
+  '/resources/cumplimiento-normativo',
   '/faq',
   '/powered-by-n3uralia',
+  "2026-08-09T11:15:00-04:00",
+])
+
+await expectIncludes('app/llms.txt/route.ts', [
+  'Developer and product factory',
+  'Primary market: Chile',
+  'Last reviewed: 2026-08-09',
+  'N3URALIA_FACTORY_DESCRIPTION',
+])
+
+await expectIncludes('app/llms-full.txt/route.ts', [
+  'Last reviewed: 2026-08-09',
+  'Developer and product factory',
+  'Geographic relevance',
+  'N3URALIA_FACTORY_DESCRIPTION',
+])
+
+await expectIncludes('app/kumplio.json/route.ts', [
+  "schema_version: '1.1'",
+  "last_reviewed: '2026-08-09'",
+  "role: 'developer_and_product_factory'",
+  'geographic_relevance',
+])
+
+await expectIncludes('next.config.mjs', [
+  "source: '/sales-kit'",
+  "destination: '/software-cumplimiento-chile'",
+  "source: '/demo/transporte'",
+  "source: '/demo/mineria'",
+  'permanent: true',
 ])
 
 const footer = await expectIncludes('components/footer.tsx', ['Powered by n3uralia'])
