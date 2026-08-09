@@ -27,6 +27,7 @@
     "check:sst-agent-grounding": "node scripts/check-sst-agent-grounding-v1.mjs",
     "check:isidora-case-relevance": "node scripts/check-isidora-case-relevance-v1.mjs",
     "check:sst-input-domain-isolation": "node scripts/check-sst-input-domain-isolation-v1.mjs",
+    "check:isidora-applicability": "node scripts/check-isidora-applicability-contract-v1.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
     "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
