@@ -7,6 +7,7 @@ import {
   PUBLIC_CONTACT,
   PUBLIC_DESCRIPTION,
   PUBLIC_LIMITATIONS,
+  PUBLIC_POSITIONING,
   SITE_LOCALE,
   SITE_NAME,
   SITE_URL,
@@ -16,7 +17,7 @@ export const dynamic = 'force-static'
 
 export function GET() {
   const payload = {
-    schema_version: '1.1',
+    schema_version: '1.2',
     last_reviewed: '2026-08-09',
     product: {
       name: SITE_NAME,
@@ -24,7 +25,10 @@ export function GET() {
       locale: SITE_LOCALE,
       country: 'Chile',
       market: 'Chile',
-      category: 'Privacy, compliance management and regulatory intelligence software',
+      primary_category: 'Data protection and privacy software',
+      secondary_category: 'Compliance management software',
+      primary_positioning: PUBLIC_POSITIONING,
+      primary_regulatory_focus: 'Ley 21.719 sobre protección de datos personales en Chile',
       description: PUBLIC_DESCRIPTION,
       developed_by: {
         name: N3URALIA_NAME,
