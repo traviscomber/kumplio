@@ -2,16 +2,19 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {
   deriveSstOutcomeSignals,
   parseDtDs44LandingPage,
+  parseSusesoCircularIndexPage,
   parseSusesoCircularPage,
   sha256,
 } from "./core.mjs";
 
 const USER_AGENT = "KUMPLIO-Government-Intelligence/1.0 (+https://kumplio.app/regulatory)";
 const DT_DS44_URL = "https://www.dt.gob.cl/portal/1626/w3-article-127643.html";
-const SUSESO_URLS = [
+const SUSESO_INDEX_URL = "https://www.suseso.cl/612/w3-propertyvalue-69181.html";
+const SUSESO_ANCHOR_URLS = [
   "https://www.suseso.cl/612/w3-article-744080.html",
   "https://www.suseso.cl/612/w3-article-776436.html",
 ] as const;
+const MAX_SUSESO_DETAILS = 12;
 const MAX_BYTES = 4 * 1024 * 1024;
 
 function json(body: unknown, status = 200) {
@@ -62,17 +65,37 @@ Deno.serve(async (request) => {
     const dtCapture = await fetchOfficialHtml(DT_DS44_URL);
     const dt = parseDtDs44LandingPage(dtCapture.html, DT_DS44_URL);
 
-    const suseso = [];
-    const sourceTrace = [{
-      authority: "Dirección del Trabajo",
-      url: DT_DS44_URL,
-      contentHash: dtCapture.contentHash,
-      byteSize: dtCapture.byteSize,
-    }];
+    const indexCapture = await fetchOfficialHtml(SUSESO_INDEX_URL);
+    const discoveries = parseSusesoCircularIndexPage(indexCapture.html, SUSESO_INDEX_URL);
+    const discoveredCandidates = discoveries
+      .filter((item) => item.sstRelevant || item.ds44Hint)
+      .slice(0, MAX_SUSESO_DETAILS);
 
-    for (const url of SUSESO_URLS) {
+    const detailUrls = Array.from(new Set([
+      ...SUSESO_ANCHOR_URLS,
+      ...discoveredCandidates.map((item) => item.detailUrl),
+    ])).slice(0, MAX_SUSESO_DETAILS);
+
+    const suseso = [];
+    const sourceTrace = [
+      {
+        authority: "Dirección del Trabajo",
+        url: DT_DS44_URL,
+        contentHash: dtCapture.contentHash,
+        byteSize: dtCapture.byteSize,
+      },
+      {
+        authority: "SUSESO",
+        url: SUSESO_INDEX_URL,
+        contentHash: indexCapture.contentHash,
+        byteSize: indexCapture.byteSize,
+      },
+    ];
+
+    for (const url of detailUrls) {
       const capture = await fetchOfficialHtml(url);
-      suseso.push(parseSusesoCircularPage(capture.html, url));
+      const parsed = parseSusesoCircularPage(capture.html, url);
+      if (parsed.sstRelevant || parsed.ds44Related) suseso.push(parsed);
       sourceTrace.push({
         authority: "SUSESO",
         url,
@@ -83,9 +106,16 @@ Deno.serve(async (request) => {
 
     const signals = deriveSstOutcomeSignals({ dt, suseso });
     const snapshot = {
-      parserVersion: "sst-ds44-suseso-v1",
+      parserVersion: "sst-ds44-suseso-v2",
       capturedAt: new Date().toISOString(),
       dt,
+      susesoDiscovery: {
+        indexUrl: SUSESO_INDEX_URL,
+        discovered: discoveries.length,
+        relevantCandidates: discoveredCandidates.length,
+        fetchedDetails: detailUrls.length,
+        explicitDs44Hints: discoveries.filter((item) => item.ds44Hint).length,
+      },
       suseso,
       signals,
       sourceTrace,
