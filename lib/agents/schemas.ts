@@ -32,6 +32,9 @@ const schemas = {
       inference: z.boolean(),
       confidence,
       sources: z.array(sourceRef),
+      applicabilityToClient: z.enum(['direct', 'conditional', 'other_subject', 'unknown']),
+      applicabilityReason: z.string(),
+      requiresApplicabilityReview: z.boolean(),
     })),
     missingInformation: z.array(z.string()),
   }),
@@ -178,7 +181,7 @@ export function getAgentOutputSchema(agentId: AgentId) {
   return {
     name: `kumplio_${agentId}_output`,
     schema: jsonSchemas[agentId],
-    version: '1.0.0',
+    version: agentId === 'isidora' ? '1.1.0' : '1.0.0',
   }
 }
 
