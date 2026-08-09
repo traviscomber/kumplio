@@ -276,6 +276,8 @@ export async function executeWorkflowStage(input: {
       output_payload: result.output,
       output_text: result.outputText,
       response_id: result.responseId,
+      provider_request_id: result.providerTrace.requestId,
+      provider_organization: result.providerTrace.organization,
       model: result.model,
       prompt_version: result.promptVersion,
       schema_version: result.schemaVersion,
