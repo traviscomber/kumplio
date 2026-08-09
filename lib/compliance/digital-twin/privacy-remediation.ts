@@ -32,6 +32,21 @@ export type ProcessingPrivacyRemediation = {
     evidenceId: string | null
     reviewedAt: string | null
   }
+  primaryDeletion: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    executedAt: string | null
+    target: string | null
+  }
+  providerAssurance: {
+    status: string
+    evidenceId: string | null
+    snapshotHash: string | null
+    backupPurgeStatus: string
+    externalPropagationStatus: string
+    tenantConfigurationStatus: string
+  }
   deletion: {
     status: string
     evidenceId: string | null
@@ -78,6 +93,9 @@ export type ProcessingPrivacyRemediationSummary = {
   deletionRequestsOpen: number
   deletionRequestsAccepted: number
   controlledMechanismsValidated: number
+  primaryDeletionsDemonstrated: number
+  providerAssuranceReviewed: number
+  providerTenantConfigurationsVerified: number
   deletionsDemonstrated: number
 }
 
@@ -106,6 +124,8 @@ export async function getProcessingPrivacyRemediation(
     return [
       attributes.privacyNoticeEvidenceId,
       attributes.controlledDeletionEvidenceId,
+      attributes.primaryDeletionOperationalEvidenceId,
+      attributes.providerRetentionAssuranceEvidenceId,
       attributes.deletionEvidenceId,
     ]
   }))
@@ -168,6 +188,12 @@ export async function getProcessingPrivacyRemediation(
     const controlledEvidence = attributes.controlledDeletionEvidenceId
       ? evidenceById.get(String(attributes.controlledDeletionEvidenceId))
       : undefined
+    const primaryEvidence = attributes.primaryDeletionOperationalEvidenceId
+      ? evidenceById.get(String(attributes.primaryDeletionOperationalEvidenceId))
+      : undefined
+    const providerEvidence = attributes.providerRetentionAssuranceEvidenceId
+      ? evidenceById.get(String(attributes.providerRetentionAssuranceEvidenceId))
+      : undefined
     const deletionEvidence = attributes.deletionEvidenceId
       ? evidenceById.get(String(attributes.deletionEvidenceId))
       : undefined
@@ -219,6 +245,21 @@ export async function getProcessingPrivacyRemediation(
         evidenceId: controlledEvidence ? String(controlledEvidence.id) : text(attributes.controlledDeletionEvidenceId),
         reviewedAt: text(attributes.controlledDeletionReviewedAt),
       },
+      primaryDeletion: {
+        status: String(attributes.primaryDeletionOperationalStatus || 'not_run'),
+        evidenceId: primaryEvidence ? String(primaryEvidence.id) : text(attributes.primaryDeletionOperationalEvidenceId),
+        snapshotHash: text(attributes.primaryDeletionOperationalSnapshotHash),
+        executedAt: text(attributes.primaryDeletionOperationalExecutedAt),
+        target: text(attributes.primaryDeletionOperationalTarget),
+      },
+      providerAssurance: {
+        status: String(attributes.providerRetentionAssuranceStatus || 'not_reviewed'),
+        evidenceId: providerEvidence ? String(providerEvidence.id) : text(attributes.providerRetentionAssuranceEvidenceId),
+        snapshotHash: text(attributes.providerRetentionAssuranceSnapshotHash),
+        backupPurgeStatus: String(attributes.backupPurgeStatus || 'not_demonstrated'),
+        externalPropagationStatus: String(attributes.externalPropagationStatus || 'not_demonstrated'),
+        tenantConfigurationStatus: String(attributes.providerTenantConfigurationStatus || 'unverified'),
+      },
       deletion: {
         status: deletionStatus,
         evidenceId: deletionEvidence ? String(deletionEvidence.id) : text(attributes.deletionEvidenceId),
@@ -257,6 +298,23 @@ export async function getProcessingPrivacyRemediation(
     && Boolean(item.controlledDeletion.evidenceId)
   )
 
+  const isPrimaryDeletionDemonstrated = (item: ProcessingPrivacyRemediation) => (
+    item.primaryDeletion.status === 'demonstrated_controlled_primary'
+    && Boolean(item.primaryDeletion.evidenceId)
+    && Boolean(item.primaryDeletion.snapshotHash?.match(/^[0-9a-f]{64}$/))
+  )
+
+  const isProviderAssuranceReviewed = (item: ProcessingPrivacyRemediation) => (
+    ['partial_policy_verified', 'tenant_configuration_verified'].includes(item.providerAssurance.status)
+    && Boolean(item.providerAssurance.evidenceId)
+    && Boolean(item.providerAssurance.snapshotHash?.match(/^[0-9a-f]{64}$/))
+  )
+
+  const isProviderTenantVerified = (item: ProcessingPrivacyRemediation) => (
+    isProviderAssuranceReviewed(item)
+    && item.providerAssurance.tenantConfigurationStatus === 'verified'
+  )
+
   const isDeletionDemonstrated = (item: ProcessingPrivacyRemediation) => (
     item.deletion.status === 'demonstrated'
     && Boolean(item.deletion.evidenceId)
@@ -284,6 +342,9 @@ export async function getProcessingPrivacyRemediation(
         item.deletionRequest?.status === 'accepted' && item.deletionRequest.submittedEvidenceId
       )).length,
       controlledMechanismsValidated: actions.filter(isControlledMechanismValidated).length,
+      primaryDeletionsDemonstrated: actions.filter(isPrimaryDeletionDemonstrated).length,
+      providerAssuranceReviewed: actions.filter(isProviderAssuranceReviewed).length,
+      providerTenantConfigurationsVerified: actions.filter(isProviderTenantVerified).length,
       deletionsDemonstrated: actions.filter(isDeletionDemonstrated).length,
     },
   }
