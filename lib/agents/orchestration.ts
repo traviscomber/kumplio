@@ -23,7 +23,7 @@ const complianceAssessmentStages: WorkflowStageDefinition[] = [
     agentId: 'isidora',
     label: 'Obligaciones',
     dependsOn: [],
-    task: 'Extrae obligaciones, responsables, plazos, evidencia exigida, citas y limitaciones desde las fuentes del caso. Separa hechos expresos de inferencias.',
+    task: 'Extrae obligaciones, responsables, plazos, evidencia exigida, citas y limitaciones desde las fuentes del caso. Separa hechos expresos de inferencias. Antes de incluir cualquier registro operativo del proyecto dentro de obligations, exige relevancia directa con el objeto del caso y soporte suficiente. Si un registro pertenece a otro dominio o sólo es contexto histórico/interno, NO lo presentes como obligación del caso: descártalo de obligations y, si aporta una reserva útil, muévelo a limitations o missingInformation explicando que es contexto fuera de alcance.',
   },
   {
     index: 1,
