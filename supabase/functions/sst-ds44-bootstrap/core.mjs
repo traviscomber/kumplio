@@ -131,12 +131,77 @@ function parseSpanishDate(value = '') {
   return month ? `${match[3]}-${month}-${match[1].padStart(2, '0')}` : null
 }
 
+function parseNumericDate(value = '') {
+  const match = String(value).match(/\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b/)
+  return match ? `${match[3]}-${match[2].padStart(2, '0')}-${match[1].padStart(2, '0')}` : null
+}
+
 function extractLabel(text, label, stopLabels) {
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const stop = stopLabels.map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
   const pattern = new RegExp(`${escaped}\\s*:?\\s*([\\s\\S]*?)(?=${stop ? `(?:${stop})\\s*:?` : '$'})`, 'i')
   const match = String(text).match(pattern)
   return match ? normalizeWhitespace(match[1]) : ''
+}
+
+function classifySusesoRelevance(text = '') {
+  const normalized = normalizeWhitespace(text).toLocaleLowerCase('es-CL')
+  const ds44Hint = /d[.]?s[.]?\s*n?[°º]?\s*44|decreto\s+44/.test(normalized)
+  const sstRelevant = ds44Hint || [
+    'seguridad y salud en el trabajo',
+    'prevención',
+    'prevencion',
+    'gestión de riesgos',
+    'gestion de riesgos',
+    'incidentes peligrosos',
+    'comités paritarios',
+    'comites paritarios',
+    'higiene y seguridad',
+    'ley n°16.744',
+    'ley 16.744',
+  ].some((term) => normalized.includes(term))
+  return { sstRelevant, ds44Hint }
+}
+
+export function parseSusesoCircularIndexPage(html, sourceUrl = 'https://www.suseso.cl/612/w3-propertyvalue-69181.html') {
+  const canonicalUrl = canonicalOfficialUrl(sourceUrl, 'suseso')
+  const body = String(html || '')
+  const entries = []
+  const seen = new Set()
+  const linkPattern = /<a\b[^>]*href=["']([^"']*w3-article-[0-9]+[.]html)["'][^>]*>([\s\S]*?)<\/a>/gi
+
+  for (const match of body.matchAll(linkPattern)) {
+    let detailUrl
+    try {
+      detailUrl = canonicalOfficialUrl(new URL(match[1], canonicalUrl).toString(), 'suseso')
+    } catch {
+      continue
+    }
+    const anchorText = htmlToText(match[2])
+    const circularMatch = anchorText.match(/Circular\s+(\d{3,5})/i)
+    if (!circularMatch) continue
+    const start = Math.max(0, Number(match.index || 0) - 300)
+    const end = Math.min(body.length, Number(match.index || 0) + match[0].length + 900)
+    const context = htmlToText(body.slice(start, end))
+    const publicationDate = parseNumericDate(context)
+    const { sstRelevant, ds44Hint } = classifySusesoRelevance(`${anchorText} ${context}`)
+    const key = `${circularMatch[1]}:${detailUrl}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    entries.push({
+      circularNumber: circularMatch[1],
+      canonicalIdentifier: `suseso:circular:${circularMatch[1]}`,
+      detailUrl,
+      title: anchorText,
+      publicationDate,
+      summary: context.slice(0, 900),
+      sstRelevant,
+      ds44Hint,
+    })
+  }
+
+  entries.sort((a, b) => (b.publicationDate || '').localeCompare(a.publicationDate || '') || Number(b.circularNumber) - Number(a.circularNumber))
+  return entries
 }
 
 export function parseSusesoCircularPage(html, sourceUrl) {
@@ -150,7 +215,7 @@ export function parseSusesoCircularPage(html, sourceUrl) {
   const labels = ['Materia', 'Tema', 'Destinatario', 'Observación', 'Acción', 'Fuentes', 'Departamento(s)']
   const field = (label) => extractLabel(text, label, labels.filter((candidate) => candidate !== label))
   const sources = field('Fuentes')
-  const ds44Related = /D[.]?S[.]?\s*N?[°º]?\s*44|Decreto\s+44/i.test(`${sources} ${text}`)
+  const relevance = classifySusesoRelevance(`${field('Materia')} ${field('Tema')} ${sources} ${text}`)
 
   return {
     authority: 'SUSESO',
@@ -165,25 +230,29 @@ export function parseSusesoCircularPage(html, sourceUrl) {
     action: field('Acción'),
     sources,
     department: field('Departamento(s)'),
-    ds44Related,
+    sstRelevant: relevance.sstRelevant,
+    ds44Related: relevance.ds44Hint,
   }
 }
 
 export function deriveSstOutcomeSignals({ dt, suseso = [] } = {}) {
   const resources = Array.isArray(dt?.resources) ? dt.resources : []
-  const circulars = Array.isArray(suseso) ? suseso.filter((item) => item?.ds44Related) : []
+  const ds44Circulars = Array.isArray(suseso) ? suseso.filter((item) => item?.ds44Related) : []
+  const sstCirculars = Array.isArray(suseso) ? suseso.filter((item) => item?.sstRelevant) : []
   const hasInspectionForm = resources.some((item) => item.resourceType === 'inspection_form')
   const hasTypifier = resources.some((item) => item.resourceType === 'infraction_typifier')
   const hasRiskGuidance = resources.some((item) => ['risk_map_guidance', 'risk_assessment_guidance'].includes(item.resourceType))
   return {
     inspectionReadiness: hasInspectionForm && hasTypifier,
     riskManagementEvidence: hasRiskGuidance,
-    ds44OperationalGuidanceCount: circulars.length,
+    ds44OperationalGuidanceCount: ds44Circulars.length,
+    sstSupervisoryGuidanceCount: sstCirculars.length,
     candidateOutcomes: [
       ...(hasInspectionForm ? ['inspection_gap_analysis'] : []),
       ...(hasTypifier ? ['risk_prioritization'] : []),
       ...(hasRiskGuidance ? ['risk_matrix_and_controls'] : []),
-      ...(circulars.length ? ['training_records_incident_controls'] : []),
+      ...(ds44Circulars.length ? ['training_records_incident_controls'] : []),
+      ...(sstCirculars.length ? ['sst_supervisory_update'] : []),
     ],
   }
 }
