@@ -28,51 +28,95 @@ type Props = {
   canManage: boolean
 }
 
+type FeedbackState = { type: 'success' | 'error'; message: string } | null
+
+type DeletionDraft = {
+  method: 'deletion' | 'anonymization'
+  executedAt: string
+  provider: string
+  assetOrDataset: string
+  scope: string
+  executor: string
+  result: string
+  backupPurgaProgramada: string
+  backupPurgaConfirmada: string
+  reviewNote: string
+}
+
+const emptyDeletionDraft = (): DeletionDraft => ({
+  method: 'deletion',
+  executedAt: new Date(Date.now() - 60_000).toISOString().slice(0, 16),
+  provider: '',
+  assetOrDataset: '',
+  scope: '',
+  executor: '',
+  result: '',
+  backupPurgaProgramada: '',
+  backupPurgaConfirmada: '',
+  reviewNote: '',
+})
+
 export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canManage }: Props) {
   const router = useRouter()
+
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [scopeConfirmed, setScopeConfirmed] = useState(false)
   const [ownerAndDatesConfirmed, setOwnerAndDatesConfirmed] = useState(false)
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID())
   const [loading, setLoading] = useState(false)
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [feedback, setFeedback] = useState<FeedbackState>(null)
 
   const [mappingId, setMappingId] = useState<string | null>(null)
   const [mappingReviewed, setMappingReviewed] = useState(false)
   const [limitationsConfirmed, setLimitationsConfirmed] = useState(false)
   const [mappingRequestKey, setMappingRequestKey] = useState(() => crypto.randomUUID())
   const [mappingLoading, setMappingLoading] = useState(false)
-  const [mappingFeedback, setMappingFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [mappingFeedback, setMappingFeedback] = useState<FeedbackState>(null)
+
+  const [deletionId, setDeletionId] = useState<string | null>(null)
+  const [deletionRequestKey, setDeletionRequestKey] = useState(() => crypto.randomUUID())
+  const [deletionReviewed, setDeletionReviewed] = useState(false)
+  const [noPersonalDataConfirmed, setNoPersonalDataConfirmed] = useState(false)
+  const [deletionDraft, setDeletionDraft] = useState<DeletionDraft>(() => emptyDeletionDraft())
+  const [deletionLoading, setDeletionLoading] = useState(false)
+  const [deletionFeedback, setDeletionFeedback] = useState<FeedbackState>(null)
 
   const selected = actions.find((item) => item.processId === selectedId) || null
   const mappingSelected = actions.find((item) => item.processId === mappingId) || null
+  const deletionSelected = actions.find((item) => item.processId === deletionId) || null
+
+  function closeAll() {
+    setSelectedId(null)
+    setMappingId(null)
+    setDeletionId(null)
+  }
 
   function open(action: ProcessingPrivacyRemediation) {
+    closeAll()
     setSelectedId(action.processId)
-    setMappingId(null)
     setRequestKey(crypto.randomUUID())
     setScopeConfirmed(false)
     setOwnerAndDatesConfirmed(false)
     setFeedback(null)
   }
 
-  function close() {
-    setSelectedId(null)
-    setFeedback(null)
-  }
-
   function openMapping(action: ProcessingPrivacyRemediation) {
+    closeAll()
     setMappingId(action.processId)
-    setSelectedId(null)
     setMappingRequestKey(crypto.randomUUID())
     setMappingReviewed(false)
     setLimitationsConfirmed(false)
     setMappingFeedback(null)
   }
 
-  function closeMapping() {
-    setMappingId(null)
-    setMappingFeedback(null)
+  function openDeletion(action: ProcessingPrivacyRemediation) {
+    closeAll()
+    setDeletionId(action.processId)
+    setDeletionRequestKey(crypto.randomUUID())
+    setDeletionReviewed(false)
+    setNoPersonalDataConfirmed(false)
+    setDeletionDraft(emptyDeletionDraft())
+    setDeletionFeedback(null)
   }
 
   async function createPlan() {
@@ -105,11 +149,7 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
       const response = await fetch(`/api/processing-activities/${mappingSelected.processId}/notice-mapping`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requestKey: mappingRequestKey,
-          mappingReviewed,
-          limitationsConfirmed,
-        }),
+        body: JSON.stringify({ requestKey: mappingRequestKey, mappingReviewed, limitationsConfirmed }),
       })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'No fue posible aceptar el mapeo.')
@@ -123,6 +163,51 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
     }
   }
 
+  async function acceptDeletionEvidence() {
+    if (!deletionSelected) return
+    setDeletionLoading(true)
+    setDeletionFeedback(null)
+    try {
+      const executedAt = new Date(deletionDraft.executedAt)
+      const sourceRefs = [
+        {
+          type: 'backup_purga_programada',
+          label: 'Purga programada',
+          reference: deletionDraft.backupPurgaProgramada,
+        },
+        {
+          type: 'backup_purga_confirmada',
+          label: 'Purga confirmada',
+          reference: deletionDraft.backupPurgaConfirmada,
+        },
+      ]
+      const response = await fetch(`/api/processing-activities/${deletionSelected.processId}/deletion-evidence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestKey: deletionRequestKey,
+          ...deletionDraft,
+          executedAt: executedAt.toISOString(),
+          sourceRefs,
+          deletionReviewed,
+          noPersonalDataConfirmed,
+        }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'No fue posible aceptar la evidencia de eliminación.')
+      setDeletionFeedback({ type: 'success', message: result.message || 'Prueba aceptada.' })
+      setDeletionRequestKey(crypto.randomUUID())
+      router.refresh()
+    } catch (error) {
+      setDeletionFeedback({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'No fue posible aceptar la evidencia de eliminación.',
+      })
+    } finally {
+      setDeletionLoading(false)
+    }
+  }
+
   return (
     <section className="mt-10 space-y-6 rounded-3xl border bg-card p-5 sm:p-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -133,7 +218,7 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
           </div>
           <h2 className="mt-2 text-2xl font-black sm:text-3xl">La política pública no reemplaza la prueba.</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            Kumplio vincula la versión vigente, revisa cómo aplica a cada actividad y conserva las brechas que todavía necesitan contratos, decisiones o evidencia operacional.
+            Kumplio separa aviso, mapeo y ejecución. Una solicitud aceptada no cuenta como eliminación demostrada hasta que exista evidencia verificable de una ejecución real.
           </p>
           <a href={PRIVACY_NOTICE.route} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
             Ver aviso público v{PRIVACY_NOTICE.version}
@@ -144,16 +229,14 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
           <Metric label="Avisos vinculados" value={`${summary.noticesLinked}/${summary.activities}`} />
           <Metric label="Planes listos" value={`${summary.plansReady}/${summary.activities}`} />
           <Metric label="Mapeos aceptados" value={`${summary.noticeRequestsAccepted}/${summary.activities}`} />
-          <Metric label="Eliminaciones probadas" value={`${summary.deletionRequestsAccepted}/${summary.activities}`} />
+          <Metric label="Eliminaciones demostradas" value={`${summary.deletionsDemonstrated}/${summary.activities}`} />
         </div>
       </div>
 
       <div className="space-y-4">
         {actions.map((action) => {
-          const mappingAccepted = action.noticeRequest?.status === 'accepted'
-            && Boolean(action.noticeRequest.submittedEvidenceId)
-          const deletionAccepted = action.deletionRequest?.status === 'accepted'
-            && Boolean(action.deletionRequest.submittedEvidenceId)
+          const mappingAccepted = action.noticeRequest?.status === 'accepted' && Boolean(action.noticeRequest.submittedEvidenceId)
+          const deletionDemonstrated = isDeletionDemonstrated(action)
 
           return (
             <article key={action.processId} className="rounded-2xl border bg-background/40 p-4 sm:p-5">
@@ -176,20 +259,20 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
                     <EvidenceCard
                       icon={<ClipboardCheck className="h-4 w-4" />}
                       title="Mapeo aplicable"
-                      status={mappingAccepted
-                        ? `Aceptado con ${action.mapping.unknowns.length} brechas`
-                        : requestStatus(action.noticeRequest?.status)}
-                      due={action.mapping.snapshotHash
-                        ? `SHA-256 ${shortHash(action.mapping.snapshotHash)}`
-                        : formatDue(action.noticeRequest?.dueAt)}
+                      status={mappingAccepted ? `Aceptado con ${action.mapping.unknowns.length} brechas` : requestStatus(action.noticeRequest?.status)}
+                      due={action.mapping.snapshotHash ? `SHA-256 ${shortHash(action.mapping.snapshotHash)}` : formatDue(action.noticeRequest?.dueAt)}
                       success={mappingAccepted}
                     />
                     <EvidenceCard
                       icon={<Trash2 className="h-4 w-4" />}
                       title="Eliminación demostrada"
-                      status={requestStatus(action.deletionRequest?.status)}
-                      due={formatDue(action.deletionRequest?.dueAt)}
-                      success={deletionAccepted}
+                      status={deletionDemonstrated
+                        ? `${action.deletion.method === 'anonymization' ? 'Anonimización' : 'Eliminación'} · demostrada`
+                        : requestStatus(action.deletionRequest?.status)}
+                      due={deletionDemonstrated && action.deletion.snapshotHash
+                        ? `SHA-256 ${shortHash(action.deletion.snapshotHash)} · ${formatDateTime(action.deletion.executedAt)}`
+                        : formatDue(action.deletionRequest?.dueAt)}
+                      success={deletionDemonstrated}
                     />
                   </div>
 
@@ -216,6 +299,12 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
                       Revisar mapeo
                     </Button>
                   )}
+                  {canManage && action.deletionRequest && !deletionDemonstrated && (
+                    <Button type="button" variant="outline" onClick={() => openDeletion(action)} className="gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Registrar prueba real
+                    </Button>
+                  )}
                 </div>
               </div>
             </article>
@@ -223,24 +312,75 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
         })}
       </div>
 
-      {mappingSelected && (
+      {deletionSelected && (
         <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-background p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Revisión humana del mapeo</p>
-              <h3 className="mt-1 text-xl font-black">{mappingSelected.processName}</h3>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                El mapeo compara la actividad y su revisión lifecycle con el aviso público v{mappingSelected.mappingSuggestion.noticeVersion}. Puede aceptarse aunque conserve brechas, porque lo aceptado es la matriz y no una conclusión de cumplimiento.
-              </p>
-            </div>
-            <Button type="button" variant="ghost" size="icon" onClick={closeMapping} aria-label="Cerrar revisión del mapeo">
-              <X className="h-4 w-4" />
-            </Button>
+          <PanelHeader eyebrow="Prueba operacional" title={deletionSelected.processName} onClose={closeAll} />
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+            Registra una ejecución ya ocurrida. Kumplio conservará un snapshot con hash y sólo marcará la actividad como `demonstrated` después de aceptar evidencia revisada y verificable.
+          </p>
+          {deletionFeedback && <Feedback feedback={deletionFeedback} />}
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Método">
+              <select value={deletionDraft.method} onChange={(event) => setDeletionDraft((draft) => ({ ...draft, method: event.target.value as DeletionDraft['method'] }))} className={fieldClass}>
+                <option value="deletion">Eliminación</option>
+                <option value="anonymization">Anonimización</option>
+              </select>
+            </Field>
+            <Field label="Fecha y hora de ejecución">
+              <input type="datetime-local" value={deletionDraft.executedAt} onChange={(event) => updateDeletionDraft('executedAt', event.target.value)} className={fieldClass} />
+            </Field>
+            <Field label="Proveedor / sistema">
+              <input value={deletionDraft.provider} onChange={(event) => updateDeletionDraft('provider', event.target.value)} className={fieldClass} placeholder="Supabase, proveedor SaaS, sistema interno…" />
+            </Field>
+            <Field label="Activo o dataset">
+              <input value={deletionDraft.assetOrDataset} onChange={(event) => updateDeletionDraft('assetOrDataset', event.target.value)} className={fieldClass} placeholder="Tabla, bucket, CRM, dataset…" />
+            </Field>
+            <Field label="Responsable de la ejecución">
+              <input value={deletionDraft.executor} onChange={(event) => updateDeletionDraft('executor', event.target.value)} className={fieldClass} placeholder="Persona o sistema responsable" />
+            </Field>
+            <Field label="Purga programada">
+              <input value={deletionDraft.backupPurgaProgramada} onChange={(event) => updateDeletionDraft('backupPurgaProgramada', event.target.value)} className={fieldClass} placeholder="ID, log, ticket o referencia" />
+            </Field>
+            <Field label="Purga confirmada">
+              <input value={deletionDraft.backupPurgaConfirmada} onChange={(event) => updateDeletionDraft('backupPurgaConfirmada', event.target.value)} className={fieldClass} placeholder="ID, log, ticket o referencia distinta" />
+            </Field>
           </div>
 
-          {mappingFeedback && (
-            <Feedback feedback={mappingFeedback} />
-          )}
+          <Field label="Alcance exacto de la prueba">
+            <textarea value={deletionDraft.scope} onChange={(event) => updateDeletionDraft('scope', event.target.value)} className={`${fieldClass} min-h-24`} placeholder="Qué se eliminó o anonimizó, en qué sistema y qué quedó fuera del alcance." />
+          </Field>
+          <Field label="Resultado observado">
+            <textarea value={deletionDraft.result} onChange={(event) => updateDeletionDraft('result', event.target.value)} className={`${fieldClass} min-h-24`} placeholder="Resultado verificable de la ejecución y cualquier limitación observada." />
+          </Field>
+          <Field label="Nota de revisión humana">
+            <textarea value={deletionDraft.reviewNote} onChange={(event) => updateDeletionDraft('reviewNote', event.target.value)} className={`${fieldClass} min-h-24`} placeholder="Por qué esta evidencia acredita la ejecución y qué no acredita." />
+          </Field>
+
+          <div className="space-y-3">
+            <Confirmation checked={deletionReviewed} onChange={setDeletionReviewed} label="Revisé la ejecución, su alcance, el resultado y ambas referencias de purga." />
+            <Confirmation checked={noPersonalDataConfirmed} onChange={setNoPersonalDataConfirmed} label="Confirmo que la evidencia registrada no contiene datos personales innecesarios." />
+          </div>
+
+          <div className="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-3xl text-xs leading-5 text-muted-foreground">
+              Esto acredita una prueba operacional específica. No convierte automáticamente base jurídica, retención ni lifecycle en aprobados.
+            </p>
+            <Button type="button" onClick={acceptDeletionEvidence} disabled={!deletionReady || deletionLoading} className="gap-2">
+              {deletionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Aceptar prueba ejecutada
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {mappingSelected && (
+        <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-background p-5 sm:p-6">
+          <PanelHeader eyebrow="Revisión humana del mapeo" title={mappingSelected.processName} onClose={closeAll} />
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+            El mapeo compara la actividad y su revisión lifecycle con el aviso público v{mappingSelected.mappingSuggestion.noticeVersion}. Puede aceptarse con brechas porque lo aceptado es la matriz, no una conclusión de cumplimiento.
+          </p>
+          {mappingFeedback && <Feedback feedback={mappingFeedback} />}
 
           <div className="rounded-xl border bg-muted/20 p-4">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Scope principal</p>
@@ -273,28 +413,15 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
           </div>
 
           <div className="space-y-3">
-            <Confirmation
-              checked={mappingReviewed}
-              onChange={setMappingReviewed}
-              label="Revisé el scope principal, las dimensiones y las fuentes observadas para esta actividad."
-            />
-            <Confirmation
-              checked={limitationsConfirmed}
-              onChange={setLimitationsConfirmed}
-              label={mappingSelected.mappingSuggestion.limitation}
-            />
+            <Confirmation checked={mappingReviewed} onChange={setMappingReviewed} label="Revisé el scope principal, las dimensiones y las fuentes observadas para esta actividad." />
+            <Confirmation checked={limitationsConfirmed} onChange={setLimitationsConfirmed} label={mappingSelected.mappingSuggestion.limitation} />
           </div>
 
           <div className="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-3xl text-xs leading-5 text-muted-foreground">
-              La evidencia quedará `accepted · verified`, pero su suficiencia para el control será `partial` mientras existan brechas. Base jurídica, retención, destinatarios, subencargados, transferencias y eliminación siguen requiriendo evidencia separada.
+              La evidencia quedará `accepted · verified`, pero seguirá siendo parcial mientras existan brechas.
             </p>
-            <Button
-              type="button"
-              onClick={acceptMapping}
-              disabled={mappingLoading || !mappingReviewed || !limitationsConfirmed}
-              className="gap-2"
-            >
+            <Button type="button" onClick={acceptMapping} disabled={mappingLoading || !mappingReviewed || !limitationsConfirmed} className="gap-2">
               {mappingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardCheck className="h-4 w-4" />}
               Aceptar mapeo con brechas
             </Button>
@@ -304,35 +431,23 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
 
       {selected && (
         <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-background p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Plan operacional</p>
-              <h3 className="mt-1 text-xl font-black">{selected.processName}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Se vinculará el aviso v{PRIVACY_NOTICE.version}. Además se crearán una misión y dos solicitudes: mapeo del aviso y prueba de eliminación.
-              </p>
-            </div>
-            <Button type="button" variant="ghost" size="icon" onClick={close} aria-label="Cerrar plan de aviso y eliminación">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
+          <PanelHeader eyebrow="Plan operacional" title={selected.processName} onClose={closeAll} />
+          <p className="text-sm leading-6 text-muted-foreground">
+            Se vinculará el aviso v{PRIVACY_NOTICE.version}. Además se crearán una misión y dos solicitudes: mapeo del aviso y prueba de eliminación.
+          </p>
           {feedback && <Feedback feedback={feedback} />}
-
           <div className="grid gap-3 md:grid-cols-3">
             <PlanStep title="14 días" description="Matriz de cobertura o aviso corregido." />
             <PlanStep title="30 días" description="Prueba de eliminación o anonimización." />
             <PlanStep title="35 días" description="Cierre de la misión y revisión final." />
           </div>
-
           <div className="space-y-3">
             <Confirmation checked={scopeConfirmed} onChange={setScopeConfirmed} label="Entiendo que vincular el aviso general no demuestra que cubra esta actividad." />
             <Confirmation checked={ownerAndDatesConfirmed} onChange={setOwnerAndDatesConfirmed} label={`Confirmo a ${selected.ownerLabel || 'la persona responsable'} como owner y acepto los vencimientos propuestos.`} />
           </div>
-
           <div className="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-2xl text-xs leading-5 text-muted-foreground">
-              La evidencia de eliminación deberá incluir timestamp, proveedor, activo o dataset, alcance, responsable y los campos `backup_purga_programada` y `backup_purga_confirmada`.
+              La eliminación sólo contará cuando exista ejecución real, referencias de purga distintas, revisión humana y evidencia con integridad verificable.
             </p>
             <Button type="button" onClick={createPlan} disabled={loading || !scopeConfirmed || !ownerAndDatesConfirmed} className="gap-2">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
@@ -343,6 +458,49 @@ export function ProcessingPrivacyRemediationWorkspace({ actions, summary, canMan
       )}
     </section>
   )
+
+  function updateDeletionDraft<K extends keyof DeletionDraft>(key: K, value: DeletionDraft[K]) {
+    setDeletionDraft((draft) => ({ ...draft, [key]: value }))
+  }
+
+  function isDeletionFormReady() {
+    return deletionReviewed
+      && noPersonalDataConfirmed
+      && deletionDraft.provider.trim().length >= 2
+      && deletionDraft.assetOrDataset.trim().length >= 3
+      && deletionDraft.scope.trim().length >= 20
+      && deletionDraft.executor.trim().length >= 3
+      && deletionDraft.result.trim().length >= 20
+      && deletionDraft.reviewNote.trim().length >= 30
+      && deletionDraft.backupPurgaProgramada.trim().length >= 3
+      && deletionDraft.backupPurgaConfirmada.trim().length >= 3
+      && deletionDraft.backupPurgaProgramada.trim() !== deletionDraft.backupPurgaConfirmada.trim()
+      && Boolean(deletionDraft.executedAt)
+  }
+
+  function get deletionReady() {
+    return isDeletionFormReady()
+  }
+}
+
+const fieldClass = 'w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:border-primary'
+
+function PanelHeader({ eyebrow, title, onClose }: { eyebrow: string; title: string; onClose: () => void }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">{eyebrow}</p>
+        <h3 className="mt-1 text-xl font-black">{title}</h3>
+      </div>
+      <Button type="button" variant="ghost" size="icon" onClick={onClose} aria-label="Cerrar panel">
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="space-y-2 text-sm font-semibold"><span>{label}</span>{children}</label>
 }
 
 function Metric({ label, value }: { label: string; value: string | number }) {
@@ -388,13 +546,7 @@ function DimensionCard({ label, status, note }: { label: string; status: NoticeM
 }
 
 function CoverageBadge({ status }: { status: NoticeMappingCoverage }) {
-  const label = status === 'covered'
-    ? 'Cubierto'
-    : status === 'partial'
-      ? 'Parcial'
-      : status === 'not_applicable'
-        ? 'No aplica'
-        : 'No cubierto'
+  const label = status === 'covered' ? 'Cubierto' : status === 'partial' ? 'Parcial' : status === 'not_applicable' ? 'No aplica' : 'No cubierto'
   const className = status === 'covered'
     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
     : status === 'partial'
@@ -403,7 +555,7 @@ function CoverageBadge({ status }: { status: NoticeMappingCoverage }) {
   return <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${className}`}>{label}</span>
 }
 
-function Feedback({ feedback }: { feedback: { type: 'success' | 'error'; message: string } }) {
+function Feedback({ feedback }: { feedback: Exclude<FeedbackState, null> }) {
   return (
     <div className={`rounded-xl border p-3 text-sm ${feedback.type === 'error' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'}`}>
       {feedback.message}
@@ -417,6 +569,14 @@ function PlanStep({ title, description }: { title: string; description: string }
 
 function Confirmation({ checked, onChange, label }: { checked: boolean; onChange: (value: boolean) => void; label: string }) {
   return <label className="flex items-start gap-3 rounded-xl border bg-background px-4 py-3 text-sm"><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-4 w-4" /><span className="leading-6">{label}</span></label>
+}
+
+function isDeletionDemonstrated(action: ProcessingPrivacyRemediation) {
+  return action.deletion.status === 'demonstrated'
+    && action.deletion.validationStatus === 'accepted'
+    && action.deletion.integrityStatus === 'verified'
+    && Boolean(action.deletion.evidenceId)
+    && Boolean(action.deletion.snapshotHash)
 }
 
 function requestStatus(status: string | undefined) {
@@ -458,6 +618,15 @@ function formatDue(value: string | null | undefined) {
 function formatDate(value: string | null | undefined) {
   if (!value) return 'Sin fecha'
   return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeZone: 'America/Santiago' }).format(new Date(value))
+}
+
+function formatDateTime(value: string | null | undefined) {
+  if (!value) return 'Sin fecha'
+  return new Intl.DateTimeFormat('es-CL', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'America/Santiago',
+  }).format(new Date(value))
 }
 
 function shortHash(value: string) {
