@@ -139,7 +139,7 @@ function parseNumericDate(value = '') {
 function extractLabel(text, label, stopLabels) {
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const stop = stopLabels.map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
-  const pattern = new RegExp(`${escaped}\\s*:?\\s*([\\s\\S]*?)(?=${stop ? `(?:${stop})\\s*:?` : '$'})`, 'i')
+  const pattern = new RegExp(`(?:^|\\s)${escaped}\\s*:\\s*([\\s\\S]*?)(?=${stop ? `(?:\\s(?:${stop})\\s*:)` : '$'})`, 'i')
   const match = String(text).match(pattern)
   return match ? normalizeWhitespace(match[1]) : ''
 }
