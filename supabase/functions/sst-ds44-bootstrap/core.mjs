@@ -163,6 +163,33 @@ function classifySusesoRelevance(text = '') {
   return { sstRelevant, ds44Hint }
 }
 
+function circularEntryContext(body, matchIndex, matchLength) {
+  const index = Number(matchIndex || 0)
+  const containers = ['div', 'li', 'article', 'tr']
+  let best = null
+
+  for (const tag of containers) {
+    const openToken = `<${tag}`
+    const closeToken = `</${tag}>`
+    const start = body.lastIndexOf(openToken, index)
+    if (start < 0) continue
+    const end = body.indexOf(closeToken, index + matchLength)
+    if (end < 0) continue
+    const candidateEnd = end + closeToken.length
+    if (candidateEnd <= start) continue
+    const length = candidateEnd - start
+    if (!best || length < best.length) best = { start, end: candidateEnd, length }
+  }
+
+  if (best) return body.slice(best.start, best.end)
+
+  const previousLink = body.lastIndexOf('<a', Math.max(0, index - 1))
+  const nextLink = body.indexOf('<a', index + matchLength)
+  const start = previousLink >= 0 ? previousLink : Math.max(0, index - 300)
+  const end = nextLink > index ? nextLink : Math.min(body.length, index + matchLength + 500)
+  return body.slice(start, end)
+}
+
 export function parseSusesoCircularIndexPage(html, sourceUrl = 'https://www.suseso.cl/612/w3-propertyvalue-69181.html') {
   const canonicalUrl = canonicalOfficialUrl(sourceUrl, 'suseso')
   const body = String(html || '')
@@ -180,9 +207,7 @@ export function parseSusesoCircularIndexPage(html, sourceUrl = 'https://www.suse
     const anchorText = htmlToText(match[2])
     const circularMatch = anchorText.match(/Circular\s+(\d{3,5})/i)
     if (!circularMatch) continue
-    const start = Math.max(0, Number(match.index || 0) - 300)
-    const end = Math.min(body.length, Number(match.index || 0) + match[0].length + 900)
-    const context = htmlToText(body.slice(start, end))
+    const context = htmlToText(circularEntryContext(body, match.index, match[0].length))
     const publicationDate = parseNumericDate(context)
     const { sstRelevant, ds44Hint } = classifySusesoRelevance(`${anchorText} ${context}`)
     const key = `${circularMatch[1]}:${detailUrl}`
