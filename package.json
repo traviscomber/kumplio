@@ -24,6 +24,7 @@
     "check:mercado-publico": "node scripts/test-mercado-publico-fixtures.mjs",
     "check:chile-sources": "node scripts/check-chile-government-sources-v1.mjs",
     "check:sst-ds44": "node scripts/test-sst-ds44-fixtures.mjs",
+    "check:sst-agent-grounding": "node scripts/check-sst-agent-grounding-v1.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
     "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
