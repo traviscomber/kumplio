@@ -28,6 +28,13 @@ type ProviderTrace = {
   organization: string | null
 }
 
+type ProviderIdentity = {
+  userId: string | null
+  organizations: Array<{ id: string; title: string | null }>
+  requestId: string | null
+  organizationHeader: string | null
+}
+
 export async function POST(req: NextRequest) {
   const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim() || ''
   if (!token) return NextResponse.json({ error: 'Worker authorization required' }, { status: 401 })
@@ -37,6 +44,17 @@ export async function POST(req: NextRequest) {
   if (validationError || valid !== true) {
     console.error('[agent-worker/auth]', validationError?.code || 'invalid_token')
     return NextResponse.json({ error: 'Worker authorization failed' }, { status: 401 })
+  }
+
+  const body = await req.json().catch(() => ({})) as { mode?: unknown }
+  if (body.mode === 'provider_identity') {
+    try {
+      const providerIdentity = await readOpenAIKeyIdentity()
+      return NextResponse.json({ providerIdentity })
+    } catch (error) {
+      console.error('[agent-worker/provider-identity]', error instanceof Error ? error.name : 'unknown')
+      return NextResponse.json({ error: 'Provider identity assurance failed', code: 'provider_identity_failed' }, { status: 502 })
+    }
   }
 
   const workerId = `vercel-${crypto.randomUUID()}`
@@ -144,5 +162,36 @@ function readProviderTrace(value: unknown): ProviderTrace | null {
   return {
     requestId: typeof record.requestId === 'string' ? record.requestId : null,
     organization: typeof record.organization === 'string' ? record.organization : null,
+  }
+}
+
+async function readOpenAIKeyIdentity(): Promise<ProviderIdentity> {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) throw new Error('OPENAI_API_KEY missing')
+
+  const response = await fetch('https://api.openai.com/v1/me', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${apiKey}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
+  })
+  if (!response.ok) throw new Error(`OpenAI /v1/me returned ${response.status}`)
+
+  const payload = await response.json() as Record<string, unknown>
+  const orgContainer = payload.orgs && typeof payload.orgs === 'object' ? payload.orgs as Record<string, unknown> : {}
+  const organizations = Array.isArray(orgContainer.data)
+    ? orgContainer.data.flatMap((item) => {
+      if (!item || typeof item !== 'object') return []
+      const record = item as Record<string, unknown>
+      if (typeof record.id !== 'string') return []
+      return [{ id: record.id, title: typeof record.title === 'string' ? record.title : null }]
+    })
+    : []
+
+  return {
+    userId: typeof payload.id === 'string' ? payload.id : null,
+    organizations,
+    requestId: response.headers.get('x-request-id'),
+    organizationHeader: response.headers.get('openai-organization'),
   }
 }
