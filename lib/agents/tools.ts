@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { AgentId } from './catalog'
 import { buildCommitteeContrast } from './committee'
+import { retrieveSstRegulatoryGrounding } from './sst-regulatory-grounding'
 import { getOrganizationalMemoryContext } from '@/lib/compliance/context/organizational-memory'
 
 type SupabaseClientLike = any
@@ -220,6 +221,16 @@ export async function retrieveAgentContext(
     }
   } catch {
     warnings.push('organizational_memory: unavailable')
+  }
+
+  try {
+    const grounding = await retrieveSstRegulatoryGrounding(supabase, scope)
+    if (grounding.context) sections.push(grounding.context)
+    sourceRefs.push(...grounding.sourceRefs)
+    if (grounding.toolCallId) toolCallIds.push(grounding.toolCallId)
+    if (grounding.warning) warnings.push(grounding.warning)
+  } catch {
+    warnings.push('sst_regulatory_grounding: unavailable')
   }
 
   if (scope.caseId) {
