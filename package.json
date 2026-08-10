@@ -29,6 +29,7 @@
     "check:sst-input-domain-isolation": "node scripts/check-sst-input-domain-isolation-v1.mjs",
     "check:isidora-applicability": "node scripts/check-isidora-applicability-contract-v1.mjs",
     "check:sst-committee-domain-isolation": "node scripts/check-sst-committee-domain-isolation-v1.mjs",
+    "check:compliance-domain-tagging": "node scripts/check-compliance-domain-tagging-v1.mjs",
     "check:leychile": "node scripts/test-leychile-parser-v2.mjs",
     "check:claims": "node scripts/test-ley21719-claim-rules.mjs",
     "check:compliance-core": "node scripts/check-compliance-core-v1.mjs",
