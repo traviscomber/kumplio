@@ -14,6 +14,7 @@ const checks = [
   ['check:sst-input-domain-isolation'],
   ['check:isidora-applicability'],
   ['check:sst-committee-domain-isolation'],
+  ['check:compliance-domain-tagging'],
   ['check:leychile'],
   ['check:claims'],
   ['check:compliance-core'],
