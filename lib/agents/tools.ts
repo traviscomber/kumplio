@@ -26,6 +26,10 @@ type ToolDefinition = {
 
 type ToolRecord = Record<string, unknown>
 
+type ToolQueryOptions = {
+  allowedDomains?: string[]
+}
+
 export type AgentRetrievalResult = {
   context: string
   sourceRefs: Array<{ tool: string; table: string; id?: string }>
@@ -34,6 +38,8 @@ export type AgentRetrievalResult = {
 }
 
 const MAX_SERIALIZED_CHARS = 60000
+const SST_ALLOWED_PROJECT_DOMAINS = ['sst', 'general']
+const DOMAIN_FILTERABLE_TOOLS = new Set(['read_obligations', 'read_risks', 'read_controls', 'read_evidence'])
 
 const TOOL_REGISTRY: Record<AgentId, ToolDefinition[]> = {
   isidora: [
@@ -77,10 +83,10 @@ const TOOL_REGISTRY: Record<AgentId, ToolDefinition[]> = {
   ],
 }
 
-// Generic project tables are not domain-labelled yet. When an SST case has official
-// grounding, downstream specialists must rely on that grounding + same-case committee
-// artifacts instead of inheriting unrelated project records (for example privacy controls).
-const SST_GENERIC_TOOL_SKIP: Partial<Record<AgentId, ReadonlySet<string>>> = {
+// These generic tools can contain multiple compliance domains. In SST-grounded cases,
+// domain-capable tables are filtered to SST/general. Tools without a canonical domain
+// field remain skipped until their storage contract supports safe domain selection.
+const SST_SCOPED_TOOLS: Partial<Record<AgentId, ReadonlySet<string>>> = {
   isidora: new Set(['read_obligations']),
   rodrigo: new Set(['read_obligations', 'read_risks', 'read_controls']),
   javier: new Set(['read_risks', 'read_findings', 'read_actions']),
@@ -105,7 +111,12 @@ function isOptionalSchemaError(error: { code?: string; message?: string } | null
   return error?.code === '42P01' || error?.code === '42703' || error?.code === 'PGRST204' || error?.code === 'PGRST205'
 }
 
-async function createAuditCall(supabase: SupabaseClientLike, scope: ToolScope, tool: ToolDefinition) {
+async function createAuditCall(
+  supabase: SupabaseClientLike,
+  scope: ToolScope,
+  tool: ToolDefinition,
+  options: ToolQueryOptions = {},
+) {
   const { data } = await supabase
     .from('agent_tool_calls')
     .insert({
@@ -117,7 +128,12 @@ async function createAuditCall(supabase: SupabaseClientLike, scope: ToolScope, t
       user_id: scope.userId,
       agent_id: scope.agentId,
       tool_name: tool.name,
-      arguments: { table: tool.table, projectId: scope.projectId || null, limit: tool.limit },
+      arguments: {
+        table: tool.table,
+        projectId: scope.projectId || null,
+        limit: tool.limit,
+        allowedDomains: options.allowedDomains || null,
+      },
       status: 'running',
     })
     .select('id')
@@ -141,8 +157,9 @@ async function queryTool(
   supabase: SupabaseClientLike,
   scope: ToolScope,
   tool: ToolDefinition,
+  options: ToolQueryOptions = {},
 ): Promise<{ records: ToolRecord[]; callId?: string; warning?: string }> {
-  const callId = await createAuditCall(supabase, scope, tool)
+  const callId = await createAuditCall(supabase, scope, tool, options)
   let query = supabase.from(tool.table).select('*').limit(tool.limit)
 
   if (tool.table === 'compliance_cases') {
@@ -157,13 +174,20 @@ async function queryTool(
     query = query.eq('organization_id', scope.organizationId)
   }
 
+  if (options.allowedDomains?.length) {
+    query = query.in('compliance_domain', options.allowedDomains)
+  }
+
   const { data, error } = await query
   if (error) {
     const optional = isOptionalSchemaError(error)
     await finishAuditCall(supabase, callId, {
       status: optional ? 'skipped' : 'failed',
       error_code: error.code || 'tool_query_failed',
-      result_summary: { optionalSchemaMismatch: optional },
+      result_summary: {
+        optionalSchemaMismatch: optional,
+        domainFilter: options.allowedDomains || null,
+      },
     })
     if (optional) return { records: [], callId, warning: `${tool.name}: unavailable in the current schema` }
     return { records: [], callId, warning: `${tool.name}: query failed` }
@@ -178,7 +202,10 @@ async function queryTool(
   await finishAuditCall(supabase, callId, {
     status: 'completed',
     result_count: records.length,
-    result_summary: { fields: [...new Set(records.flatMap((record) => Object.keys(record)))].slice(0, 40) },
+    result_summary: {
+      fields: [...new Set(records.flatMap((record) => Object.keys(record)))].slice(0, 40),
+      domainFilter: options.allowedDomains || null,
+    },
     source_refs: sourceRefs,
   })
   return { records, callId }
@@ -205,10 +232,12 @@ export async function retrieveAgentContext(
   }
 
   const hasSstGrounding = Boolean(sstGrounding?.context && sstGrounding.sourceRefs.length)
-  const sstSkippedTools = hasSstGrounding ? SST_GENERIC_TOOL_SKIP[scope.agentId] : undefined
+  const sstScopedTools = hasSstGrounding ? SST_SCOPED_TOOLS[scope.agentId] : undefined
 
   for (const tool of TOOL_REGISTRY[scope.agentId]) {
-    if (sstSkippedTools?.has(tool.name)) {
+    const needsSstScope = Boolean(sstScopedTools?.has(tool.name))
+
+    if (needsSstScope && !DOMAIN_FILTERABLE_TOOLS.has(tool.name)) {
       const callId = await createAuditCall(supabase, scope, tool)
       if (callId) toolCallIds.push(callId)
       await finishAuditCall(supabase, callId, {
@@ -219,14 +248,18 @@ export async function retrieveAgentContext(
           groundingTool: 'read_sst_regulatory_grounding',
           parserVersion: 'sst-ds44-suseso-v4',
           agentId: scope.agentId,
+          domainFilterUnavailable: true,
         },
         source_refs: [],
       })
-      warnings.push(`${tool.name}: skipped because SST official grounding is active for ${scope.agentId}`)
+      warnings.push(`${tool.name}: skipped because safe SST domain filtering is unavailable for ${scope.agentId}`)
       continue
     }
 
-    const result = await queryTool(supabase, scope, tool)
+    const options: ToolQueryOptions = needsSstScope
+      ? { allowedDomains: SST_ALLOWED_PROJECT_DOMAINS }
+      : {}
+    const result = await queryTool(supabase, scope, tool, options)
     if (result.callId) toolCallIds.push(result.callId)
     if (result.warning) warnings.push(result.warning)
     if (!result.records.length) continue
