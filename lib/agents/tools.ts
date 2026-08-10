@@ -77,6 +77,18 @@ const TOOL_REGISTRY: Record<AgentId, ToolDefinition[]> = {
   ],
 }
 
+// Generic project tables are not domain-labelled yet. When an SST case has official
+// grounding, downstream specialists must rely on that grounding + same-case committee
+// artifacts instead of inheriting unrelated project records (for example privacy controls).
+const SST_GENERIC_TOOL_SKIP: Partial<Record<AgentId, ReadonlySet<string>>> = {
+  isidora: new Set(['read_obligations']),
+  rodrigo: new Set(['read_obligations', 'read_risks', 'read_controls']),
+  javier: new Set(['read_risks', 'read_findings', 'read_actions']),
+  beatriz: new Set(['read_obligations']),
+  veronica: new Set(['read_controls', 'read_evidence', 'read_findings']),
+  catalina: new Set(['read_obligations', 'read_controls', 'read_evidence', 'read_risks', 'read_findings', 'read_actions']),
+}
+
 function compactRecord(record: ToolRecord): ToolRecord {
   const blocked = new Set(['embedding', 'vector', 'raw_content', 'binary_data', 'file_bytes'])
   return Object.fromEntries(
@@ -193,9 +205,10 @@ export async function retrieveAgentContext(
   }
 
   const hasSstGrounding = Boolean(sstGrounding?.context && sstGrounding.sourceRefs.length)
+  const sstSkippedTools = hasSstGrounding ? SST_GENERIC_TOOL_SKIP[scope.agentId] : undefined
 
   for (const tool of TOOL_REGISTRY[scope.agentId]) {
-    if (hasSstGrounding && scope.agentId === 'isidora' && tool.name === 'read_obligations') {
+    if (sstSkippedTools?.has(tool.name)) {
       const callId = await createAuditCall(supabase, scope, tool)
       if (callId) toolCallIds.push(callId)
       await finishAuditCall(supabase, callId, {
@@ -205,10 +218,11 @@ export async function retrieveAgentContext(
           reason: 'sst_case_domain_isolation',
           groundingTool: 'read_sst_regulatory_grounding',
           parserVersion: 'sst-ds44-suseso-v4',
+          agentId: scope.agentId,
         },
         source_refs: [],
       })
-      warnings.push('read_obligations: skipped because SST official grounding is active for Isidora')
+      warnings.push(`${tool.name}: skipped because SST official grounding is active for ${scope.agentId}`)
       continue
     }
 
