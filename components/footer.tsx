@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
-import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
+import { getPublicSiteHref, type PublicLocale } from '@/lib/i18n/public-routing'
 import { N3URALIA_REFERRAL_URL, PUBLIC_CONTACT } from '@/lib/public-site'
 
 type FooterLink = [label: string, href: string]
@@ -22,7 +22,7 @@ type FooterCopy = {
 }
 
 function publicHref(locale: PublicLocale, pathname: string, hash = '') {
-  return `${withPublicLocale(pathname, locale)}${hash}`
+  return `${getPublicSiteHref(pathname, locale)}${hash}`
 }
 
 function getFooterCopy(locale: PublicLocale): FooterCopy {
