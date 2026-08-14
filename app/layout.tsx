@@ -5,7 +5,7 @@ import './globals.css'
 import { ClientProviders } from '@/app/providers'
 import { PUBLIC_SITE_METADATA } from '@/lib/i18n/public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
-import { isEnglishPublicPathReady, withPublicLocale } from '@/lib/i18n/public-routing'
+import { getPublicSiteHref, isEnglishPublicPathReady, withPublicLocale } from '@/lib/i18n/public-routing'
 import {
   N3URALIA_CANONICAL_URL,
   N3URALIA_NAME,
@@ -125,7 +125,7 @@ export const viewport: Viewport = {
 function buildGraph(locale: 'es' | 'en') {
   const copy = PUBLIC_SITE_METADATA[locale]
   const localizedHome = `${SITE_URL}${withPublicLocale('/', locale)}`
-  const localizedPricing = `${SITE_URL}${withPublicLocale('/pricing', locale)}`
+  const pricingUrl = `${SITE_URL}${getPublicSiteHref('/pricing', locale)}`
 
   return {
     '@context': 'https://schema.org',
@@ -222,7 +222,7 @@ function buildGraph(locale: 'es' | 'en') {
           {
             '@type': 'Offer',
             name: locale === 'es' ? 'Plan Esencial' : 'Essential plan',
-            url: localizedPricing,
+            url: pricingUrl,
             price: '79990',
             priceCurrency: 'CLP',
             availability: 'https://schema.org/InStock',
@@ -230,7 +230,7 @@ function buildGraph(locale: 'es' | 'en') {
           {
             '@type': 'Offer',
             name: locale === 'es' ? 'Plan Profesional' : 'Professional plan',
-            url: localizedPricing,
+            url: pricingUrl,
             price: '249990',
             priceCurrency: 'CLP',
             availability: 'https://schema.org/InStock',
@@ -238,7 +238,7 @@ function buildGraph(locale: 'es' | 'en') {
           {
             '@type': 'Offer',
             name: locale === 'es' ? 'Plan Acompañado' : 'Guided plan',
-            url: localizedPricing,
+            url: pricingUrl,
             price: '699990',
             priceCurrency: 'CLP',
             availability: 'https://schema.org/InStock',
