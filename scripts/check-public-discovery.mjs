@@ -103,7 +103,7 @@ await expectIncludes('lib/i18n/agent-public-copy.ts', [
   'ENGLISH_AGENT_PUBLIC_COPY',
   'Obligations and documentary evidence analyst',
   'Legal, quality and communication reviewer',
-  'human',
+  'supported/unsupported claims',
 ])
 
 await expectIncludes('app/page.tsx', [
