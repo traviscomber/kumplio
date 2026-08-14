@@ -3,6 +3,9 @@ import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, BrainCircuit, Braces, Building2, CheckCircle2, Workflow } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
+import { POWERED_PUBLIC_COPY } from '@/lib/i18n/institutional-public-copy'
+import { getPublicRequestContext } from '@/lib/i18n/request-context'
+import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 import {
   N3URALIA_CANONICAL_URL,
   N3URALIA_CONTACT_REFERRAL_URL,
@@ -11,53 +14,55 @@ import {
   SITE_URL,
 } from '@/lib/public-site'
 
-export const metadata: Metadata = {
-  title: 'Kumplio y n3uralia | Producto y factoría de IA en Chile',
-  description:
-    'Kumplio es un producto de cumplimiento y privacidad desarrollado por n3uralia, factoría chilena de inteligencia artificial aplicada y software para operaciones reales.',
-  alternates: { canonical: '/powered-by-n3uralia' },
-  openGraph: {
-    type: 'website',
-    url: '/powered-by-n3uralia',
-    title: 'Kumplio y n3uralia | Producto y factoría de IA en Chile',
-    description: 'La relación entre Kumplio y n3uralia, la factoría chilena de IA aplicada y software que desarrolla el producto.',
-  },
+const capabilityIcons = [BrainCircuit, Workflow, Braces, Building2] as const
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getPublicRequestContext()
+  const copy = POWERED_PUBLIC_COPY[locale]
+  const canonical = withPublicLocale('/powered-by-n3uralia', locale)
+
+  return {
+    title: copy.metadata.title,
+    description: copy.metadata.description,
+    alternates: {
+      canonical,
+      languages: {
+        'es-CL': withPublicLocale('/powered-by-n3uralia', 'es'),
+        en: withPublicLocale('/powered-by-n3uralia', 'en'),
+        'x-default': withPublicLocale('/powered-by-n3uralia', 'es'),
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: copy.metadata.title,
+      description: copy.metadata.ogDescription,
+    },
+  }
 }
 
-const capabilities = [
-  {
-    icon: BrainCircuit,
-    title: 'IA aplicada con contexto',
-    text: 'Capacidades que trabajan con fuentes, permisos, memoria y revisión humana dentro de un proceso definido.',
-  },
-  {
-    icon: Workflow,
-    title: 'Automatización gobernada',
-    text: 'Flujos con responsables, decisiones, evidencia, excepciones y trazabilidad.',
-  },
-  {
-    icon: Braces,
-    title: 'Ingeniería fullstack',
-    text: 'Aplicaciones web, backend, bases de datos, integraciones, observabilidad y operación continua.',
-  },
-  {
-    icon: Building2,
-    title: 'Implementación regional',
-    text: 'Sistemas adaptados a equipos, normativa, presupuestos y operación de Chile y Latinoamérica.',
-  },
-]
+export default async function PoweredByN3uraliaPage() {
+  const { locale } = await getPublicRequestContext()
+  const copy = POWERED_PUBLIC_COPY[locale]
+  const canonicalPath = withPublicLocale('/powered-by-n3uralia', locale)
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`
+  const homeHref = getPublicSiteHref('/', locale)
+  const aboutHref = getPublicSiteHref('/about', locale)
+  const productHref = getPublicSiteHref('/software-cumplimiento-chile', locale)
+  const pricingHref = getPublicSiteHref('/pricing', locale)
+  const alternateLocale = locale === 'es' ? 'en' : 'es'
+  const alternateHref = withPublicLocale('/powered-by-n3uralia', alternateLocale)
 
-export default function PoweredByN3uraliaPage() {
   const graph = {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'AboutPage',
-        '@id': `${SITE_URL}/powered-by-n3uralia#page`,
-        url: `${SITE_URL}/powered-by-n3uralia`,
-        name: 'Kumplio y n3uralia',
-        description: 'Relación entre el producto Kumplio y n3uralia, su desarrollador y factoría de producto.',
-        inLanguage: 'es-CL',
+        '@id': `${canonicalUrl}#page`,
+        url: canonicalUrl,
+        name: copy.graph.pageName,
+        description: copy.graph.pageDescription,
+        inLanguage: locale === 'es' ? 'es-CL' : 'en',
         about: [
           { '@id': `${SITE_URL}/#software` },
           { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
@@ -72,7 +77,7 @@ export default function PoweredByN3uraliaPage() {
         description: N3URALIA_FACTORY_DESCRIPTION,
         areaServed: [
           { '@type': 'Country', name: 'Chile' },
-          { '@type': 'Place', name: 'Latinoamérica' },
+          { '@type': 'Place', name: copy.graph.region },
         ],
         makesOffer: {
           '@type': 'Offer',
@@ -86,28 +91,23 @@ export default function PoweredByN3uraliaPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link href="/" className="font-extrabold tracking-[0.18em]">KUMPLIO</Link>
-          <Button variant="outline" asChild><Link href="/about">Sobre Kumplio</Link></Button>
+          <Link href={homeHref} className="font-extrabold tracking-[0.18em]">KUMPLIO</Link>
+          <div className="flex items-center gap-2">
+            <Link href={alternateHref} hrefLang={alternateLocale === 'es' ? 'es-CL' : 'en'} className="rounded-lg border border-border px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground">{copy.nav.switchLanguage}</Link>
+            <Button variant="outline" asChild><Link href={aboutHref}>{copy.nav.about}</Link></Button>
+          </div>
         </div>
       </header>
 
       <main>
         <section className="border-b border-border px-6 py-24 md:py-32">
           <div className="mx-auto max-w-5xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Powered by n3uralia</p>
-            <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-tight tracking-[-0.04em] md:text-7xl">
-              Kumplio es desarrollado por n3uralia.
-            </h1>
-            <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
-              Kumplio es la aplicación especializada en cumplimiento, privacidad e inteligencia regulatoria. n3uralia es la factoría chilena de IA aplicada y software que diseña, construye y evoluciona su arquitectura, automatización y capacidades de inteligencia artificial.
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">{copy.hero.eyebrow}</p>
+            <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-tight tracking-[-0.04em] md:text-7xl">{copy.hero.title}</h1>
+            <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">{copy.hero.description}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" variant="outline" asChild>
-                <a href={N3URALIA_SOLUTIONS_REFERRAL_URL} target="_blank" rel="noopener noreferrer">Ver n3uralia <ArrowUpRight className="ml-2 h-4 w-4" /></a>
-              </Button>
-              <Button size="lg" asChild>
-                <Link href="/software-cumplimiento-chile">Conocer Kumplio <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
+              <Button size="lg" variant="outline" asChild><a href={N3URALIA_SOLUTIONS_REFERRAL_URL} target="_blank" rel="noopener noreferrer">{copy.hero.n3uralia} <ArrowUpRight className="ml-2 h-4 w-4" /></a></Button>
+              <Button size="lg" asChild><Link href={productHref}>{copy.hero.kumplio} <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             </div>
           </div>
         </section>
@@ -115,21 +115,22 @@ export default function PoweredByN3uraliaPage() {
         <section className="px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Responsabilidades</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Producto especializado, factoría compartida.</h2>
-              <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Kumplio mantiene su propia propuesta de valor, experiencia y operación. n3uralia aporta la ingeniería y capacidad de producto necesarias para desarrollar Kumplio y para construir soluciones más amplias cuando una organización necesita integraciones o procesos fuera del alcance estándar.
-              </p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">{copy.responsibilities.eyebrow}</p>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">{copy.responsibilities.title}</h2>
+              <p className="mt-5 text-lg leading-8 text-muted-foreground">{copy.responsibilities.description}</p>
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2">
-              {capabilities.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="rounded-2xl border border-border bg-card p-7">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-foreground"><Icon className="h-5 w-5" /></div>
-                  <h3 className="mt-6 text-xl font-bold">{title}</h3>
-                  <p className="mt-3 leading-7 text-muted-foreground">{text}</p>
-                </article>
-              ))}
+              {copy.responsibilities.capabilities.map(({ title, description }, index) => {
+                const Icon = capabilityIcons[index]
+                return (
+                  <article key={title} className="rounded-2xl border border-border bg-card p-7">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-foreground"><Icon className="h-5 w-5" /></div>
+                    <h3 className="mt-6 text-xl font-bold">{title}</h3>
+                    <p className="mt-3 leading-7 text-muted-foreground">{description}</p>
+                  </article>
+                )
+              })}
             </div>
           </div>
         </section>
@@ -137,38 +138,28 @@ export default function PoweredByN3uraliaPage() {
         <section className="border-y border-border bg-muted/30 px-6 py-24">
           <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-2">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Kumplio</p>
-              <h2 className="mt-4 text-3xl font-extrabold">Para operar cumplimiento y privacidad con una plataforma especializada.</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">{copy.comparison.kumplioDescription}</p>
+              <h2 className="mt-4 text-3xl font-extrabold">{copy.comparison.kumplioTitle}</h2>
               <ul className="mt-7 space-y-4 text-muted-foreground">
-                {[
-                  'Preparación y operación de la Ley 21.719.',
-                  'Relación entre obligaciones, controles y evidencia.',
-                  'Misiones con responsables y revisión humana.',
-                  'Trazabilidad de fuentes, decisiones y resultados.',
-                ].map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" />{item}</li>)}
+                {copy.comparison.kumplioItems.map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" />{item}</li>)}
               </ul>
-              <Button asChild className="mt-8"><Link href="/pricing">Ver planes <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+              <Button asChild className="mt-8"><Link href={pricingHref}>{copy.comparison.kumplioAction} <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             </div>
 
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">n3uralia</p>
-              <h2 className="mt-4 text-3xl font-extrabold">Factoría de IA aplicada y software para construir sistemas fuera del producto estándar.</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">{copy.comparison.n3uraliaDescription}</p>
+              <h2 className="mt-4 text-3xl font-extrabold">{copy.comparison.n3uraliaTitle}</h2>
               <ul className="mt-7 space-y-4 text-muted-foreground">
-                {[
-                  'Aplicaciones fullstack para procesos propios.',
-                  'Integraciones con ERP, CRM y sistemas existentes.',
-                  'Agentes IA y automatización para otras áreas operativas.',
-                  'Arquitectura, despliegue y evolución de sistemas a medida.',
-                ].map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" />{item}</li>)}
+                {copy.comparison.n3uraliaItems.map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-primary" />{item}</li>)}
               </ul>
-              <Button variant="outline" asChild className="mt-8"><a href={N3URALIA_CONTACT_REFERRAL_URL} target="_blank" rel="noopener noreferrer">Contactar n3uralia <ArrowUpRight className="ml-2 h-4 w-4" /></a></Button>
+              <Button variant="outline" asChild className="mt-8"><a href={N3URALIA_CONTACT_REFERRAL_URL} target="_blank" rel="noopener noreferrer">{copy.comparison.n3uraliaAction} <ArrowUpRight className="ml-2 h-4 w-4" /></a></Button>
             </div>
           </div>
         </section>
       </main>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <Footer />
+      <Footer locale={locale} />
     </div>
   )
 }

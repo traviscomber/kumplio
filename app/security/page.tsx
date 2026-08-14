@@ -3,56 +3,49 @@ import Link from 'next/link'
 import { Database, ExternalLink, Eye, KeyRound, LockKeyhole, ShieldCheck, UserCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
+import { SECURITY_PUBLIC_COPY } from '@/lib/i18n/legal-public-copy'
+import { getPublicRequestContext } from '@/lib/i18n/request-context'
+import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 import { N3URALIA_CANONICAL_URL, SITE_URL } from '@/lib/public-site'
 
-export const metadata: Metadata = {
-  title: 'Seguridad y aislamiento de datos',
-  description: 'Enfoque de seguridad, aislamiento de organizaciones, trazabilidad y revisión humana en Kumplio.',
-  alternates: { canonical: '/security' },
+const controlIcons = [LockKeyhole, UserCheck, Database, Eye, KeyRound, ShieldCheck] as const
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getPublicRequestContext()
+  const copy = SECURITY_PUBLIC_COPY[locale]
+  const canonical = withPublicLocale('/security', locale)
+
+  return {
+    title: copy.metadata.title,
+    description: copy.metadata.description,
+    alternates: {
+      canonical,
+      languages: {
+        'es-CL': withPublicLocale('/security', 'es'),
+        en: withPublicLocale('/security', 'en'),
+        'x-default': withPublicLocale('/security', 'es'),
+      },
+    },
+  }
 }
 
-const controls = [
-  {
-    icon: LockKeyhole,
-    title: 'Aislamiento por organización',
-    text: 'Los datos privados se relacionan con una organización y se protegen mediante permisos y políticas de acceso en la base de datos.',
-  },
-  {
-    icon: UserCheck,
-    title: 'Autenticación y membresías',
-    text: 'El acceso al workspace requiere una cuenta autenticada y una membresía válida en la organización correspondiente.',
-  },
-  {
-    icon: Database,
-    title: 'Persistencia trazable',
-    text: 'Misiones, resultados, revisiones y eventos conservan identificadores y relaciones que permiten reconstruir el trabajo realizado.',
-  },
-  {
-    icon: Eye,
-    title: 'Revisión humana',
-    text: 'Las propuestas generadas mediante inteligencia artificial requieren validación humana cuando afectan decisiones jurídicas, de riesgo o cumplimiento.',
-  },
-  {
-    icon: KeyRound,
-    title: 'Acceso restringido',
-    text: 'Las funciones administrativas y los datos internos se limitan según el rol y el contexto de la organización.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Desarrollo seguro',
-    text: 'Kumplio aplica validación de entradas, controles de autorización y revisión de cambios antes de publicar funcionalidades sensibles.',
-  },
-]
+export default async function SecurityPage() {
+  const { locale } = await getPublicRequestContext()
+  const copy = SECURITY_PUBLIC_COPY[locale]
+  const canonicalPath = withPublicLocale('/security', locale)
+  const homeHref = getPublicSiteHref('/', locale)
+  const contactHref = getPublicSiteHref('/contact', locale)
+  const alternateLocale = locale === 'es' ? 'en' : 'es'
+  const alternateHref = withPublicLocale('/security', alternateLocale)
 
-export default function SecurityPage() {
   const graph = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    '@id': `${SITE_URL}/security#page`,
-    url: `${SITE_URL}/security`,
-    name: 'Seguridad y aislamiento de datos en Kumplio',
-    description: metadata.description,
-    inLanguage: 'es-CL',
+    '@id': `${SITE_URL}${canonicalPath}#page`,
+    url: `${SITE_URL}${canonicalPath}`,
+    name: copy.graphName,
+    description: copy.metadata.description,
+    inLanguage: locale === 'es' ? 'es-CL' : 'en',
     publisher: { '@id': `${N3URALIA_CANONICAL_URL}/#organization` },
   }
 
@@ -60,64 +53,66 @@ export default function SecurityPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="font-extrabold tracking-[0.18em]">KUMPLIO</Link>
-          <Button asChild><Link href="/contact">Contactar</Link></Button>
+          <Link href={homeHref} className="font-extrabold tracking-[0.18em]">KUMPLIO</Link>
+          <div className="flex items-center gap-2">
+            <Link href={alternateHref} hrefLang={alternateLocale === 'es' ? 'es-CL' : 'en'} className="rounded-lg border border-border px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground">{copy.nav.switchLanguage}</Link>
+            <Button asChild><Link href={contactHref}>{copy.nav.contact}</Link></Button>
+          </div>
         </div>
       </header>
 
       <main>
         <section className="border-b border-border px-6 py-24 md:py-32">
           <div className="mx-auto max-w-5xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Seguridad y confianza</p>
-            <h1 className="mt-4 max-w-4xl text-balance text-5xl font-black tracking-tight md:text-7xl">
-              Protegemos el contexto privado de cada organización.
-            </h1>
-            <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Kumplio separa el conocimiento público del contexto privado de cada empresa. La seguridad se diseña alrededor de autenticación, autorización, aislamiento de datos, trazabilidad y revisión humana.
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">{copy.hero.eyebrow}</p>
+            <h1 className="mt-4 max-w-4xl text-balance text-5xl font-black tracking-tight md:text-7xl">{copy.hero.title}</h1>
+            <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground">{copy.hero.description}</p>
           </div>
         </section>
 
         <section className="px-6 py-24">
           <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {controls.map(({ icon: Icon, title, text }) => (
-              <article key={title} className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h2 className="mt-5 text-xl font-bold">{title}</h2>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{text}</p>
-              </article>
-            ))}
+            {copy.controls.map(({ title, description }, index) => {
+              const Icon = controlIcons[index]
+              return (
+                <article key={title} className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Icon className="h-5 w-5" /></div>
+                  <h2 className="mt-5 text-xl font-bold">{title}</h2>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>
+                </article>
+              )
+            })}
           </div>
         </section>
 
         <section className="border-y border-border bg-muted/30 px-6 py-20">
           <div className="mx-auto max-w-5xl">
-            <h2 className="text-3xl font-bold">Alcance actual</h2>
-            <p className="mt-4 leading-7 text-muted-foreground">
-              Esta página describe controles y principios actualmente aplicados por Kumplio. No afirma certificaciones externas, disponibilidad garantizada ni cumplimiento de estándares que todavía no hayan sido auditados formalmente.
-            </p>
+            <h2 className="text-3xl font-bold">{copy.current.title}</h2>
+            <p className="mt-4 leading-7 text-muted-foreground">{copy.current.description}</p>
             <div className="mt-6 rounded-2xl border border-border bg-card p-5">
-              <p className="font-bold">Reporte de seguridad</p>
+              <p className="font-bold">{copy.current.reportTitle}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Para reportar una vulnerabilidad o incidente potencial, escribe a <a className="font-semibold text-primary hover:underline" href="mailto:security@kumplio.app">security@kumplio.app</a>. Para privacidad o evaluación de proveedores, utiliza <a className="font-semibold text-primary hover:underline" href="mailto:info@kumplio.app">info@kumplio.app</a>.
+                {copy.current.reportTextBeforeSecurity}{' '}
+                <a className="font-semibold text-primary hover:underline" href="mailto:security@kumplio.app">security@kumplio.app</a>
+                {copy.current.reportTextBetween}{' '}
+                <a className="font-semibold text-primary hover:underline" href="mailto:info@kumplio.app">info@kumplio.app</a>
+                {copy.current.reportTextAfterInfo}
               </p>
               <a href="/.well-known/security.txt" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-                Ver security.txt <ExternalLink className="h-4 w-4" />
+                {copy.current.securityTxt} <ExternalLink className="h-4 w-4" />
               </a>
             </div>
           </div>
         </section>
 
         <section className="px-6 py-24 text-center">
-          <h2 className="mx-auto max-w-3xl text-4xl font-bold">¿Necesitas revisar requisitos de seguridad o tratamiento de datos?</h2>
-          <Button size="lg" asChild className="mt-8"><Link href="/contact">Conversar con Kumplio</Link></Button>
+          <h2 className="mx-auto max-w-3xl text-4xl font-bold">{copy.cta.title}</h2>
+          <Button size="lg" asChild className="mt-8"><Link href={contactHref}>{copy.cta.action}</Link></Button>
         </section>
       </main>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <Footer />
+      <Footer locale={locale} />
     </div>
   )
 }

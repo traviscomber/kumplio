@@ -1,38 +1,66 @@
 import type { MetadataRoute } from 'next'
 import { chileComplianceGuides } from '@/lib/chile-compliance-content'
+import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
 import { SITE_URL } from '@/lib/public-site'
 
 // Google recomienda que lastModified represente cambios sustantivos reales.
-const publicUpdatedAt = new Date('2026-08-09T11:15:00-04:00')
+const publicUpdatedAt = new Date('2026-08-14T09:54:00-04:00')
 const legalUpdatedAt = new Date('2026-08-03T12:00:00-04:00')
 
+function localizedUrl(pathname: string, locale: PublicLocale) {
+  return `${SITE_URL}${withPublicLocale(pathname, locale)}`
+}
+
+function currentPublicUrl(pathname: string) {
+  return `${SITE_URL}${pathname}`
+}
+
+function localizedPair(
+  pathname: string,
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
+  priorityEs: number,
+  priorityEn: number,
+  lastModified = publicUpdatedAt,
+): MetadataRoute.Sitemap {
+  return [
+    { url: localizedUrl(pathname, 'es'), lastModified, changeFrequency, priority: priorityEs },
+    { url: localizedUrl(pathname, 'en'), lastModified, changeFrequency, priority: priorityEn },
+  ]
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const core: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 1 },
-    { url: `${SITE_URL}/software-cumplimiento-chile`, lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${SITE_URL}/features/ley-21719`, lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${SITE_URL}/resources/ley-21719`, lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.92 },
-    { url: `${SITE_URL}/resources/cumplimiento-normativo`, lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.82 },
-    { url: `${SITE_URL}/use-cases`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.82 },
-    { url: `${SITE_URL}/pricing`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${SITE_URL}/enterprise`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.76 },
-    { url: `${SITE_URL}/demo`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.72 },
-    { url: `${SITE_URL}/faq`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.78 },
-    { url: `${SITE_URL}/about`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITE_URL}/como-pensamos`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITE_URL}/powered-by-n3uralia`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.68 },
-    { url: `${SITE_URL}/contact`, lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.62 },
-    { url: `${SITE_URL}/security`, lastModified: legalUpdatedAt, changeFrequency: 'monthly', priority: 0.55 },
-    { url: `${SITE_URL}/privacy`, lastModified: legalUpdatedAt, changeFrequency: 'yearly', priority: 0.4 },
-    { url: `${SITE_URL}/terms`, lastModified: legalUpdatedAt, changeFrequency: 'yearly', priority: 0.4 },
+  // Locale migration is route-by-route. Only reviewed pages are published under
+  // both locale prefixes; the rest keep their existing canonical URL until their
+  // copy, metadata, links and discovery behavior are migrated together.
+  const localized: MetadataRoute.Sitemap = [
+    ...localizedPair('/', 'weekly', 1, 0.9),
+    ...localizedPair('/pricing', 'monthly', 0.8, 0.72),
+    ...localizedPair('/faq', 'monthly', 0.78, 0.7),
+    ...localizedPair('/contact', 'monthly', 0.62, 0.56),
+    ...localizedPair('/about', 'monthly', 0.7, 0.63),
+    ...localizedPair('/como-pensamos', 'monthly', 0.7, 0.63),
+    ...localizedPair('/powered-by-n3uralia', 'monthly', 0.68, 0.61),
+    ...localizedPair('/security', 'monthly', 0.55, 0.5, legalUpdatedAt),
+    ...localizedPair('/privacy', 'yearly', 0.4, 0.36, legalUpdatedAt),
+    ...localizedPair('/terms', 'yearly', 0.4, 0.36, legalUpdatedAt),
+  ]
+
+  const current: MetadataRoute.Sitemap = [
+    { url: currentPublicUrl('/software-cumplimiento-chile'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
+    { url: currentPublicUrl('/features/ley-21719'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
+    { url: currentPublicUrl('/resources/ley-21719'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.92 },
+    { url: currentPublicUrl('/resources/cumplimiento-normativo'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.82 },
+    { url: currentPublicUrl('/use-cases'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.82 },
+    { url: currentPublicUrl('/enterprise'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.76 },
+    { url: currentPublicUrl('/demo'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.72 },
   ]
 
   const guides: MetadataRoute.Sitemap = chileComplianceGuides.map((guide) => ({
-    url: `${SITE_URL}/resources/ley-21719/${guide.slug}`,
+    url: currentPublicUrl(`/resources/ley-21719/${guide.slug}`),
     lastModified: publicUpdatedAt,
     changeFrequency: 'monthly',
     priority: 0.8,
   }))
 
-  return [...core, ...guides]
+  return [...localized, ...current, ...guides]
 }
