@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server'
 import {
   DEFAULT_PUBLIC_LOCALE,
   getStoredPublicLocale,
-  isEnglishPublicPathReady,
   isInfrastructurePath,
+  isLocalizedPublicPathReady,
   isPublicSitePath,
   LOCALE_REQUEST_HEADER,
   PUBLIC_LOCALE_COOKIE,
@@ -30,9 +30,9 @@ export async function proxy(request: NextRequest) {
   const localized = splitPublicLocale(pathname)
 
   if (localized) {
-    // Locale prefixes are intentionally limited to the public site in this increment.
-    // Private workspace/auth routes remain on their existing URLs and Spanish UX.
-    if (!isPublicSitePath(localized.pathname)) {
+    // Locale migration is explicit per route. Requests for a prefixed route that is
+    // not ready yet are sent back to the current canonical unprefixed page.
+    if (!isPublicSitePath(localized.pathname) || !isLocalizedPublicPathReady(localized.pathname, localized.locale)) {
       const unprefixedUrl = request.nextUrl.clone()
       unprefixedUrl.pathname = localized.pathname
       return NextResponse.redirect(unprefixedUrl, 308)
@@ -62,20 +62,17 @@ export async function proxy(request: NextRequest) {
     })
     response.headers.set('Content-Language', localized.locale === 'es' ? 'es-CL' : 'en')
 
-    // English pages can be QA'd before they are ready for search. Only paths whose
-    // public copy and claims have completed review are allowed to be indexed.
-    if (localized.locale === 'en' && !isEnglishPublicPathReady(localized.pathname)) {
-      response.headers.set('X-Robots-Tag', 'noindex, follow')
-    }
-
     return response
   }
 
   if (isPublicSitePath(pathname)) {
     const locale = getStoredPublicLocale(request.cookies.get(PUBLIC_LOCALE_COOKIE)?.value) || DEFAULT_PUBLIC_LOCALE
-    const localizedUrl = request.nextUrl.clone()
-    localizedUrl.pathname = withPublicLocale(pathname, locale)
-    return NextResponse.redirect(localizedUrl, 308)
+
+    if (isLocalizedPublicPathReady(pathname, locale)) {
+      const localizedUrl = request.nextUrl.clone()
+      localizedUrl.pathname = withPublicLocale(pathname, locale)
+      return NextResponse.redirect(localizedUrl, 308)
+    }
   }
 
   return updateSession(request)
