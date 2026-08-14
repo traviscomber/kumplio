@@ -1,21 +1,21 @@
 import type { MetadataRoute } from 'next'
 import { chileComplianceGuides } from '@/lib/chile-compliance-content'
-import { withPublicLocale } from '@/lib/i18n/public-routing'
+import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
 import { SITE_URL } from '@/lib/public-site'
 
 // Google recomienda que lastModified represente cambios sustantivos reales.
 const publicUpdatedAt = new Date('2026-08-14T09:54:00-04:00')
 const legalUpdatedAt = new Date('2026-08-03T12:00:00-04:00')
 
-function publicUrl(pathname: string) {
-  return `${SITE_URL}${withPublicLocale(pathname, 'es')}`
+function publicUrl(pathname: string, locale: PublicLocale = 'es') {
+  return `${SITE_URL}${withPublicLocale(pathname, locale)}`
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // English remains intentionally excluded while /en carries a temporary noindex.
-  // It will be added only after the English public copy passes content and claim review.
+  // English pages are added only after their copy and claims complete review.
   const core: MetadataRoute.Sitemap = [
     { url: publicUrl('/'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 1 },
+    { url: publicUrl('/', 'en'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.9 },
     { url: publicUrl('/software-cumplimiento-chile'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
     { url: publicUrl('/features/ley-21719'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.95 },
     { url: publicUrl('/resources/ley-21719'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.92 },
