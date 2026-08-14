@@ -35,6 +35,10 @@ const PUBLIC_PREFIX_PATHS = [
   '/demo/',
 ]
 
+// English URLs are enabled for QA as the migration progresses, but only paths in
+// this set may be indexed and advertised as hreflang alternatives.
+const ENGLISH_PUBLIC_PATHS_READY = new Set(['/'])
+
 const INFRASTRUCTURE_EXACT_PATHS = new Set([
   '/robots.txt',
   '/sitemap.xml',
@@ -65,6 +69,10 @@ export function splitPublicLocale(pathname: string): { locale: PublicLocale; pat
 export function isPublicSitePath(pathname: string) {
   if (PUBLIC_EXACT_PATHS.has(pathname)) return true
   return PUBLIC_PREFIX_PATHS.some((prefix) => pathname.startsWith(prefix))
+}
+
+export function isEnglishPublicPathReady(pathname: string) {
+  return ENGLISH_PUBLIC_PATHS_READY.has(pathname)
 }
 
 export function withPublicLocale(pathname: string, locale: PublicLocale) {
