@@ -35,8 +35,9 @@ const PUBLIC_PREFIX_PATHS = [
   '/demo/',
 ]
 
-// English URLs are enabled for QA as the migration progresses, but only paths in
-// this set may be indexed and advertised as hreflang alternatives.
+// Locale migration is route-by-route. A path enters one of these sets only after
+// its copy, links, metadata, claims and discovery behavior have been reviewed.
+const SPANISH_PUBLIC_PATHS_READY = new Set(['/'])
 const ENGLISH_PUBLIC_PATHS_READY = new Set(['/'])
 
 const INFRASTRUCTURE_EXACT_PATHS = new Set([
@@ -71,6 +72,12 @@ export function isPublicSitePath(pathname: string) {
   return PUBLIC_PREFIX_PATHS.some((prefix) => pathname.startsWith(prefix))
 }
 
+export function isLocalizedPublicPathReady(pathname: string, locale: PublicLocale) {
+  return locale === 'en'
+    ? ENGLISH_PUBLIC_PATHS_READY.has(pathname)
+    : SPANISH_PUBLIC_PATHS_READY.has(pathname)
+}
+
 export function isEnglishPublicPathReady(pathname: string) {
   return ENGLISH_PUBLIC_PATHS_READY.has(pathname)
 }
@@ -78,6 +85,12 @@ export function isEnglishPublicPathReady(pathname: string) {
 export function withPublicLocale(pathname: string, locale: PublicLocale) {
   if (pathname === '/') return `/${locale}`
   return `/${locale}${pathname.startsWith('/') ? pathname : `/${pathname}`}`
+}
+
+export function getPublicSiteHref(pathname: string, locale: PublicLocale) {
+  return isLocalizedPublicPathReady(pathname, locale)
+    ? withPublicLocale(pathname, locale)
+    : pathname
 }
 
 export function getStoredPublicLocale(value: string | undefined): PublicLocale {
