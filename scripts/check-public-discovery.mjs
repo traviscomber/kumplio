@@ -23,6 +23,10 @@ const requiredFiles = [
   'app/.well-known/security.txt/route.ts',
   'lib/indexnow.ts',
   'lib/public-site.ts',
+  'lib/i18n/public-routing.ts',
+  'lib/i18n/request-context.ts',
+  'lib/i18n/public-copy.ts',
+  'proxy.ts',
   'next.config.mjs',
   '.github/workflows/indexnow.yml',
   '.github/workflows/public-discovery.yml',
@@ -52,6 +56,36 @@ await expectIncludes('app/layout.tsx', [
   'provider',
   '/llms.txt',
   '/kumplio.json',
+  'generateMetadata',
+  'withPublicLocale',
+  'getPublicRequestContext',
+])
+
+await expectIncludes('lib/i18n/public-routing.ts', [
+  "PUBLIC_LOCALES = ['es', 'en']",
+  "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'",
+  "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
+  'splitPublicLocale',
+  'isPublicSitePath',
+  'withPublicLocale',
+  "'/pricing'",
+  "'/resources/ley-21719'",
+])
+
+await expectIncludes('lib/i18n/public-copy.ts', [
+  "htmlLang: 'es-CL'",
+  "htmlLang: 'en'",
+  'Chile Law 21.719',
+  'human review',
+])
+
+await expectIncludes('proxy.ts', [
+  'splitPublicLocale',
+  'NextResponse.rewrite',
+  'PUBLIC_LOCALE_COOKIE',
+  "response.headers.set('Content-Language'",
+  "response.headers.set('X-Robots-Tag', 'noindex, follow')",
+  'updateSession(request)',
 ])
 
 await expectIncludes('lib/public-site.ts', [
@@ -86,7 +120,8 @@ await expectIncludes('app/sitemap.ts', [
   '/como-pensamos',
   '/faq',
   '/powered-by-n3uralia',
-  "2026-08-09T11:15:00-04:00",
+  'withPublicLocale',
+  "2026-08-14T09:54:00-04:00",
 ])
 
 await expectIncludes('app/como-pensamos/page.tsx', [
