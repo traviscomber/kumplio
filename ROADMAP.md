@@ -2,9 +2,9 @@
 
 > **Documento canónico de producto, arquitectura, evidencia y prioridades**  
 > Estado: activo  
-> Revisión: 9 de agosto de 2026  
+> Revisión: 14 de agosto de 2026  
 > Mercado principal: Chile  
-> Idioma visible obligatorio: español  
+> Idioma visible: español primario; migración controlada del sitio público a `/es` y `/en`  
 > Última migración aplicada: `20260809141500_agent_run_provider_trace_v1`  
 > Assurance UI 3/3: `docs/assurance/ui-golden-path-production-3x-2026-08-07.md`  
 > Assurance inventario 3/3: `docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md`  
@@ -434,6 +434,21 @@ Hasta cerrar P0:
 - no marcar `DONE` fuera del alcance probado;
 - no pasar al Bloque 17 mientras tenant-specific, eliminación final y lifecycle sigan abiertos.
 
+### Excepción explícita del owner — rutas públicas `/es` y `/en` — 14 de agosto de 2026
+
+El owner autoriza una migración transversal y acotada del **sitio público** a rutas canónicas `/es/...` y `/en/...` sin abrir un nuevo módulo funcional ni alterar la continuidad del Bloque 16.
+
+Reglas de esta excepción:
+
+1. español sigue siendo el idioma principal del producto y del workspace privado;
+2. la aplicación autenticada, APIs, callbacks, datos y RLS no se duplican por idioma;
+3. las rutas públicas antiguas migran a `/es/...` con redirección permanente y preservación de query params;
+4. `/en/...` puede existir para QA, pero debe permanecer `noindex` hasta que su copy, claims, guardrails, metadata y navegación estén realmente traducidos y revisados;
+5. sitemap e IndexNow no deben publicar páginas inglesas incompletas;
+6. ninguna traducción puede ampliar claims jurídicos o de cumplimiento respecto de la versión española aprobada;
+7. build, typecheck, public discovery, auth/session y preview de Vercel deben pasar antes de fusionar;
+8. esta excepción no autoriza Bloque 17, Enterprise, beta autoservicio ni cambios de base de datos.
+
 ---
 
 ## 13. Decisión vigente
@@ -458,5 +473,7 @@ Dentro del Bloque 16:
 La única continuidad funcional autorizada es:
 
 > **Ejecutar/reconciliar la identidad runtime OpenAI, obtener la configuración tenant-specific efectiva de Supabase/OpenAI y, sólo cuando sea suficiente, ejecutar o aceptar la prueba operacional final de eliminación/anonimización sin sobreafirmar backups, retención ni propagación externa.**
+
+La decisión transversal de distribución pública del 14 de agosto de 2026 autoriza únicamente la fundación y migración segura de `/es` y `/en`; no modifica la secuencia funcional anterior ni el estado de los gates P0.
 
 No se habilitará beta autoservicio hasta cerrar Leaked Password Protection, la evidencia tenant-specific/final, las dimensiones lifecycle críticas y observar al menos una organización externa supervisada.
