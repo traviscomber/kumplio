@@ -61,9 +61,10 @@ export async function proxy(request: NextRequest) {
     })
     response.headers.set('Content-Language', localized.locale === 'es' ? 'es-CL' : 'en')
 
-    // English is routed now so translation can be completed incrementally in the
-    // same branch, but it must not be indexed until its public copy is complete.
-    if (localized.locale === 'en') {
+    // The English home is fully translated in this vertical slice. Other English
+    // public routes stay available for QA but remain out of search until their copy
+    // and claims are reviewed in subsequent increments.
+    if (localized.locale === 'en' && localized.pathname !== '/') {
       response.headers.set('X-Robots-Tag', 'noindex, follow')
     }
 
@@ -71,8 +72,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isPublicSitePath(pathname)) {
-    const storedLocale = getStoredPublicLocale(request.cookies.get(PUBLIC_LOCALE_COOKIE)?.value)
-    const locale = storedLocale || DEFAULT_PUBLIC_LOCALE
+    const locale = getStoredPublicLocale(request.cookies.get(PUBLIC_LOCALE_COOKIE)?.value) || DEFAULT_PUBLIC_LOCALE
     const localizedUrl = request.nextUrl.clone()
     localizedUrl.pathname = withPublicLocale(pathname, locale)
     return NextResponse.redirect(localizedUrl, 308)
