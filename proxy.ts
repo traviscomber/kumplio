@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import {
   DEFAULT_PUBLIC_LOCALE,
   getStoredPublicLocale,
+  isEnglishPublicPathReady,
   isInfrastructurePath,
   isPublicSitePath,
   LOCALE_REQUEST_HEADER,
@@ -61,10 +62,9 @@ export async function proxy(request: NextRequest) {
     })
     response.headers.set('Content-Language', localized.locale === 'es' ? 'es-CL' : 'en')
 
-    // The English home is fully translated in this vertical slice. Other English
-    // public routes stay available for QA but remain out of search until their copy
-    // and claims are reviewed in subsequent increments.
-    if (localized.locale === 'en' && localized.pathname !== '/') {
+    // English pages can be QA'd before they are ready for search. Only paths whose
+    // public copy and claims have completed review are allowed to be indexed.
+    if (localized.locale === 'en' && !isEnglishPublicPathReady(localized.pathname)) {
       response.headers.set('X-Robots-Tag', 'noindex, follow')
     }
 
