@@ -37,8 +37,30 @@ const PUBLIC_PREFIX_PATHS = [
 
 // Locale migration is route-by-route. A path enters one of these sets only after
 // its copy, links, metadata, claims and discovery behavior have been reviewed.
-const SPANISH_PUBLIC_PATHS_READY = new Set(['/', '/pricing', '/faq', '/contact'])
-const ENGLISH_PUBLIC_PATHS_READY = new Set(['/', '/pricing', '/faq', '/contact'])
+const SPANISH_PUBLIC_PATHS_READY = new Set([
+  '/',
+  '/pricing',
+  '/faq',
+  '/contact',
+  '/about',
+  '/como-pensamos',
+  '/powered-by-n3uralia',
+  '/security',
+  '/privacy',
+  '/terms',
+])
+const ENGLISH_PUBLIC_PATHS_READY = new Set([
+  '/',
+  '/pricing',
+  '/faq',
+  '/contact',
+  '/about',
+  '/como-pensamos',
+  '/powered-by-n3uralia',
+  '/security',
+  '/privacy',
+  '/terms',
+])
 
 const INFRASTRUCTURE_EXACT_PATHS = new Set([
   '/robots.txt',
