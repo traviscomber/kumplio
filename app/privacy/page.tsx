@@ -6,10 +6,12 @@ import { getPublicRequestContext } from '@/lib/i18n/request-context'
 import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 import { PRIVACY_NOTICE } from '@/lib/privacy/notice'
 
+const noticeMetadata = { canonical: PRIVACY_NOTICE.route }
+
 export async function generateMetadata(): Promise<Metadata> {
   const { locale } = await getPublicRequestContext()
   const copy = PRIVACY_PUBLIC_COPY[locale]
-  const canonical = withPublicLocale(PRIVACY_NOTICE.route, locale)
+  const canonical = withPublicLocale(noticeMetadata.canonical, locale)
 
   return {
     title: copy.metadata.title,
@@ -52,7 +54,11 @@ export default async function PrivacyPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">{copy.hero.eyebrow}</p>
             <h1 className="mt-4 text-4xl font-black tracking-tight md:text-6xl">{copy.hero.title}</h1>
             <p className="mt-5 text-muted-foreground">
-              {copy.hero.updatedLabel}: {copy.hero.updatedAt} · {copy.hero.versionLabel} {PRIVACY_NOTICE.version}
+              {locale === 'es' ? (
+                <>{copy.hero.updatedLabel}: {copy.hero.updatedAt} · versión {PRIVACY_NOTICE.version}</>
+              ) : (
+                <>{copy.hero.updatedLabel}: {copy.hero.updatedAt} · version {PRIVACY_NOTICE.version}</>
+              )}
             </p>
           </div>
         </section>
