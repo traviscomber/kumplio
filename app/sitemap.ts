@@ -20,10 +20,11 @@ function localizedPair(
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
   priorityEs: number,
   priorityEn: number,
+  lastModified = publicUpdatedAt,
 ): MetadataRoute.Sitemap {
   return [
-    { url: localizedUrl(pathname, 'es'), lastModified: publicUpdatedAt, changeFrequency, priority: priorityEs },
-    { url: localizedUrl(pathname, 'en'), lastModified: publicUpdatedAt, changeFrequency, priority: priorityEn },
+    { url: localizedUrl(pathname, 'es'), lastModified, changeFrequency, priority: priorityEs },
+    { url: localizedUrl(pathname, 'en'), lastModified, changeFrequency, priority: priorityEn },
   ]
 }
 
@@ -36,6 +37,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...localizedPair('/pricing', 'monthly', 0.8, 0.72),
     ...localizedPair('/faq', 'monthly', 0.78, 0.7),
     ...localizedPair('/contact', 'monthly', 0.62, 0.56),
+    ...localizedPair('/about', 'monthly', 0.7, 0.63),
+    ...localizedPair('/como-pensamos', 'monthly', 0.7, 0.63),
+    ...localizedPair('/powered-by-n3uralia', 'monthly', 0.68, 0.61),
+    ...localizedPair('/security', 'monthly', 0.55, 0.5, legalUpdatedAt),
+    ...localizedPair('/privacy', 'yearly', 0.4, 0.36, legalUpdatedAt),
+    ...localizedPair('/terms', 'yearly', 0.4, 0.36, legalUpdatedAt),
   ]
 
   const current: MetadataRoute.Sitemap = [
@@ -46,12 +53,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: currentPublicUrl('/use-cases'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.82 },
     { url: currentPublicUrl('/enterprise'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.76 },
     { url: currentPublicUrl('/demo'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.72 },
-    { url: currentPublicUrl('/about'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
-    { url: currentPublicUrl('/como-pensamos'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.7 },
-    { url: currentPublicUrl('/powered-by-n3uralia'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.68 },
-    { url: currentPublicUrl('/security'), lastModified: legalUpdatedAt, changeFrequency: 'monthly', priority: 0.55 },
-    { url: currentPublicUrl('/privacy'), lastModified: legalUpdatedAt, changeFrequency: 'yearly', priority: 0.4 },
-    { url: currentPublicUrl('/terms'), lastModified: legalUpdatedAt, changeFrequency: 'yearly', priority: 0.4 },
   ]
 
   const guides: MetadataRoute.Sitemap = chileComplianceGuides.map((guide) => ({
