@@ -5,7 +5,7 @@ import './globals.css'
 import { ClientProviders } from '@/app/providers'
 import { PUBLIC_SITE_METADATA } from '@/lib/i18n/public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
-import { withPublicLocale } from '@/lib/i18n/public-routing'
+import { isEnglishPublicPathReady, withPublicLocale } from '@/lib/i18n/public-routing'
 import {
   N3URALIA_CANONICAL_URL,
   N3URALIA_NAME,
@@ -25,6 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const { locale, pathname } = await getPublicRequestContext()
   const copy = PUBLIC_SITE_METADATA[locale]
   const canonical = pathname ? withPublicLocale(pathname, locale) : '/'
+  const englishReady = pathname ? isEnglishPublicPathReady(pathname) : false
+  const shouldIndex = locale !== 'en' || !pathname || englishReady
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -39,11 +41,11 @@ export async function generateMetadata(): Promise<Metadata> {
     classification: copy.classification,
     referrer: 'origin-when-cross-origin',
     robots: {
-      index: true,
+      index: shouldIndex,
       follow: true,
       nocache: false,
       googleBot: {
-        index: true,
+        index: shouldIndex,
         follow: true,
         noimageindex: false,
         'max-snippet': -1,
@@ -56,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       languages: pathname
         ? {
             'es-CL': withPublicLocale(pathname, 'es'),
-            en: withPublicLocale(pathname, 'en'),
+            ...(englishReady ? { en: withPublicLocale(pathname, 'en') } : {}),
             'x-default': withPublicLocale(pathname, 'es'),
           }
         : { 'es-CL': '/', 'x-default': '/' },
