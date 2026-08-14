@@ -19,7 +19,7 @@ import { AGENT_CATALOG } from '@/lib/agents/catalog'
 import { ENGLISH_AGENT_PUBLIC_COPY } from '@/lib/i18n/agent-public-copy'
 import { HOME_PUBLIC_COPY } from '@/lib/i18n/home-public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
-import { withPublicLocale } from '@/lib/i18n/public-routing'
+import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 
 const privacyIcons = [Database, SearchCheck, LockKeyhole] as const
 const guideIcons = [FolderKanban, SearchCheck, Sparkles, Users, FileCheck2, CheckCircle2] as const
@@ -28,7 +28,7 @@ export default async function HomePage() {
   const { locale } = await getPublicRequestContext()
   const copy = HOME_PUBLIC_COPY[locale]
   const homeHref = withPublicLocale('/', locale)
-  const pricingHref = withPublicLocale('/pricing', locale)
+  const pricingHref = getPublicSiteHref('/pricing', locale)
   const alternateLocale = locale === 'es' ? 'en' : 'es'
   const alternateHomeHref = withPublicLocale('/', alternateLocale)
 
