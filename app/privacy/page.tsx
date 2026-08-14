@@ -12,6 +12,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const { locale } = await getPublicRequestContext()
   const copy = PRIVACY_PUBLIC_COPY[locale]
   const canonical = withPublicLocale(noticeMetadata.canonical, locale)
+  const discoveryCanonical = withPublicLocale('/privacy', locale)
+
+  if (canonical !== discoveryCanonical) {
+    throw new Error('Privacy route must remain aligned with the canonical privacy notice route')
+  }
 
   return {
     title: copy.metadata.title,
