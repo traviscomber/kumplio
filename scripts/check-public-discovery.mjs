@@ -5,6 +5,7 @@ const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
 
 const requiredFiles = [
   'app/layout.tsx',
+  'app/page.tsx',
   'app/robots.ts',
   'app/sitemap.ts',
   'app/software-cumplimiento-chile/page.tsx',
@@ -21,8 +22,12 @@ const requiredFiles = [
   'app/indexnow-key.txt/route.ts',
   `app/${indexNowKey}.txt/route.ts`,
   'app/.well-known/security.txt/route.ts',
+  'components/footer.tsx',
+  'components/marketing/resolution-entry.tsx',
   'lib/indexnow.ts',
   'lib/public-site.ts',
+  'lib/i18n/agent-public-copy.ts',
+  'lib/i18n/home-public-copy.ts',
   'lib/i18n/public-routing.ts',
   'lib/i18n/request-context.ts',
   'lib/i18n/public-copy.ts',
@@ -58,15 +63,21 @@ await expectIncludes('app/layout.tsx', [
   '/kumplio.json',
   'generateMetadata',
   'withPublicLocale',
+  'getPublicSiteHref',
   'getPublicRequestContext',
+  'isEnglishPublicPathReady',
 ])
 
 await expectIncludes('lib/i18n/public-routing.ts', [
   "PUBLIC_LOCALES = ['es', 'en']",
   "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'",
   "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
+  "SPANISH_PUBLIC_PATHS_READY = new Set(['/'])",
+  "ENGLISH_PUBLIC_PATHS_READY = new Set(['/'])",
   'splitPublicLocale',
   'isPublicSitePath',
+  'isLocalizedPublicPathReady',
+  'getPublicSiteHref',
   'withPublicLocale',
   "'/pricing'",
   "'/resources/ley-21719'",
@@ -79,12 +90,45 @@ await expectIncludes('lib/i18n/public-copy.ts', [
   'human review',
 ])
 
+await expectIncludes('lib/i18n/home-public-copy.ts', [
+  'HOME_PUBLIC_COPY',
+  "nav: {",
+  'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.',
+  'Protect your data. Understand what to do. Move forward with a clear path.',
+  'Chilean Law 21.719',
+  'human review',
+])
+
+await expectIncludes('lib/i18n/agent-public-copy.ts', [
+  'ENGLISH_AGENT_PUBLIC_COPY',
+  'Obligations and documentary evidence analyst',
+  'Legal, quality and communication reviewer',
+  'human',
+])
+
+await expectIncludes('app/page.tsx', [
+  'HOME_PUBLIC_COPY',
+  'ENGLISH_AGENT_PUBLIC_COPY',
+  'getPublicRequestContext',
+  'getPublicSiteHref',
+  'alternateHomeHref',
+  '<ResolutionEntry locale={locale} />',
+  '<Footer locale={locale} />',
+])
+
+await expectIncludes('components/marketing/resolution-entry.tsx', [
+  "locale = 'es'",
+  'What do you need to protect or resolve?',
+  'Start with expert guidance',
+  "router.push('/sign-up?next=/cases/new')",
+])
+
 await expectIncludes('proxy.ts', [
   'splitPublicLocale',
   'NextResponse.rewrite',
   'PUBLIC_LOCALE_COOKIE',
+  'isLocalizedPublicPathReady',
   "response.headers.set('Content-Language'",
-  "response.headers.set('X-Robots-Tag', 'noindex, follow')",
   'updateSession(request)',
 ])
 
@@ -120,7 +164,10 @@ await expectIncludes('app/sitemap.ts', [
   '/como-pensamos',
   '/faq',
   '/powered-by-n3uralia',
-  'withPublicLocale',
+  'localizedHome',
+  "localizedHome('es')",
+  "localizedHome('en')",
+  'currentPublicUrl',
   "2026-08-14T09:54:00-04:00",
 ])
 
@@ -167,7 +214,11 @@ await expectIncludes('next.config.mjs', [
   'permanent: true',
 ])
 
-const footer = await expectIncludes('components/footer.tsx', ['Powered by n3uralia'])
+const footer = await expectIncludes('components/footer.tsx', [
+  'Powered by n3uralia',
+  'getPublicSiteHref',
+  'All rights reserved.',
+])
 const poweredMentions = footer.match(/Powered by n3uralia/g)?.length || 0
 if (poweredMentions !== 1) {
   failures.push(`El footer debe mostrar una sola mención discreta de Powered by n3uralia; encontradas: ${poweredMentions}`)
