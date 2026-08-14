@@ -3,41 +3,109 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
+import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
 import { N3URALIA_REFERRAL_URL, PUBLIC_CONTACT } from '@/lib/public-site'
 
-const productLinks = [
-  ['Resolución guiada', '/#diferencia'],
-  ['Cómo funciona', '/#como-funciona'],
-  ['Para quién', '/#para-quien'],
-  ['Demostración', '/demo'],
-  ['Planes', '/pricing'],
-]
+type FooterLink = [label: string, href: string]
 
-const resourceLinks = [
-  ['Guías Ley 21.719', '/resources/ley-21719'],
-  ['Centro de recursos', '/resources/cumplimiento-normativo'],
-  ['Preguntas frecuentes', '/faq'],
-  ['Cómo pensamos', '/como-pensamos'],
-  ['Sobre Kumplio', '/about'],
-]
+type FooterCopy = {
+  description: string
+  product: string
+  resources: string
+  company: string
+  contact: string
+  rights: string
+  productLinks: FooterLink[]
+  resourceLinks: FooterLink[]
+  companyLinks: FooterLink[]
+  legalLinks: FooterLink[]
+}
 
-const companyLinks = [
-  ['Enterprise Studio', '/enterprise'],
-  ['Kumplio y n3uralia', '/powered-by-n3uralia'],
-  ['Ingresar', '/sign-in'],
-  ['Resolver un caso', '/#resolver'],
-  ['Contacto', '/contact'],
-]
+function publicHref(locale: PublicLocale, pathname: string, hash = '') {
+  return `${withPublicLocale(pathname, locale)}${hash}`
+}
 
-const legalLinks = [
-  ['Privacidad', '/privacy'],
-  ['Términos', '/terms'],
-  ['Seguridad', '/security'],
-  ['llms.txt', '/llms.txt'],
-]
+function getFooterCopy(locale: PublicLocale): FooterCopy {
+  if (locale === 'en') {
+    return {
+      description:
+        'Guided resolution for privacy, regulatory, contractual and compliance situations in Chile. From the initial objective to the decision, evidence and closure.',
+      product: 'Product',
+      resources: 'Resources',
+      company: 'Company',
+      contact: 'Contact',
+      rights: 'All rights reserved.',
+      productLinks: [
+        ['Guided resolution', publicHref(locale, '/', '#resolver')],
+        ['How it works', publicHref(locale, '/', '#guia')],
+        ['Who it is for', publicHref(locale, '/', '#proteccion')],
+        ['Demo', publicHref(locale, '/demo')],
+        ['Plans', publicHref(locale, '/pricing')],
+      ],
+      resourceLinks: [
+        ['Law 21.719 guides', publicHref(locale, '/resources/ley-21719')],
+        ['Resource center', publicHref(locale, '/resources/cumplimiento-normativo')],
+        ['FAQ', publicHref(locale, '/faq')],
+        ['How we think', publicHref(locale, '/como-pensamos')],
+        ['About Kumplio', publicHref(locale, '/about')],
+      ],
+      companyLinks: [
+        ['Enterprise Studio', publicHref(locale, '/enterprise')],
+        ['Kumplio and n3uralia', publicHref(locale, '/powered-by-n3uralia')],
+        ['Sign in', '/sign-in'],
+        ['Resolve a case', publicHref(locale, '/', '#resolver')],
+        ['Contact', publicHref(locale, '/contact')],
+      ],
+      legalLinks: [
+        ['Privacy', publicHref(locale, '/privacy')],
+        ['Terms', publicHref(locale, '/terms')],
+        ['Security', publicHref(locale, '/security')],
+        ['llms.txt', '/llms.txt'],
+      ],
+    }
+  }
 
-export function Footer() {
+  return {
+    description:
+      'Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento. Desde el objetivo inicial hasta la decisión, la evidencia y el cierre.',
+    product: 'Producto',
+    resources: 'Recursos',
+    company: 'Empresa',
+    contact: 'Contacto',
+    rights: 'Todos los derechos reservados.',
+    productLinks: [
+      ['Resolución guiada', publicHref(locale, '/', '#resolver')],
+      ['Cómo funciona', publicHref(locale, '/', '#guia')],
+      ['Para quién', publicHref(locale, '/', '#proteccion')],
+      ['Demostración', publicHref(locale, '/demo')],
+      ['Planes', publicHref(locale, '/pricing')],
+    ],
+    resourceLinks: [
+      ['Guías Ley 21.719', publicHref(locale, '/resources/ley-21719')],
+      ['Centro de recursos', publicHref(locale, '/resources/cumplimiento-normativo')],
+      ['Preguntas frecuentes', publicHref(locale, '/faq')],
+      ['Cómo pensamos', publicHref(locale, '/como-pensamos')],
+      ['Sobre Kumplio', publicHref(locale, '/about')],
+    ],
+    companyLinks: [
+      ['Enterprise Studio', publicHref(locale, '/enterprise')],
+      ['Kumplio y n3uralia', publicHref(locale, '/powered-by-n3uralia')],
+      ['Ingresar', '/sign-in'],
+      ['Resolver un caso', publicHref(locale, '/', '#resolver')],
+      ['Contacto', publicHref(locale, '/contact')],
+    ],
+    legalLinks: [
+      ['Privacidad', publicHref(locale, '/privacy')],
+      ['Términos', publicHref(locale, '/terms')],
+      ['Seguridad', publicHref(locale, '/security')],
+      ['llms.txt', '/llms.txt'],
+    ],
+  }
+}
+
+export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
   const currentYear = new Date().getFullYear()
+  const copy = getFooterCopy(locale)
 
   return (
     <footer className="border-t border-border bg-background">
@@ -46,7 +114,7 @@ export function Footer() {
           <div>
             <Image src="/logo-kumplio.svg" alt="Kumplio" width={120} height={48} className="h-12 w-auto" />
             <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">
-              Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento. Desde el objetivo inicial hasta la decisión, la evidencia y el cierre.
+              {copy.description}
             </p>
             <a
               href={N3URALIA_REFERRAL_URL}
@@ -58,12 +126,12 @@ export function Footer() {
             </a>
           </div>
 
-          <FooterColumn title="Producto" links={productLinks} />
-          <FooterColumn title="Recursos" links={resourceLinks} />
-          <FooterColumn title="Empresa" links={companyLinks} />
+          <FooterColumn title={copy.product} links={copy.productLinks} />
+          <FooterColumn title={copy.resources} links={copy.resourceLinks} />
+          <FooterColumn title={copy.company} links={copy.companyLinks} />
 
           <div>
-            <h3 className="font-semibold">Contacto</h3>
+            <h3 className="font-semibold">{copy.contact}</h3>
             <ul className="mt-5 space-y-4 text-sm text-muted-foreground">
               <li className="flex items-center gap-3"><Mail className="h-4 w-4 text-primary" /><a href={`mailto:${PUBLIC_CONTACT.email}`} className="hover:text-primary">{PUBLIC_CONTACT.email}</a></li>
               <li className="flex items-center gap-3"><Phone className="h-4 w-4 text-primary" /><a href={PUBLIC_CONTACT.phoneHref} className="hover:text-primary">{PUBLIC_CONTACT.phone}</a></li>
@@ -75,15 +143,15 @@ export function Footer() {
 
       <div className="border-t border-border bg-muted/20">
         <div className="container mx-auto flex flex-col gap-4 px-6 py-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <p>© {currentYear} Kumplio. Todos los derechos reservados.</p>
-          <div className="flex flex-wrap gap-5">{legalLinks.map(([label, href]) => <Link key={href} href={href} className="hover:text-primary">{label}</Link>)}</div>
+          <p>© {currentYear} Kumplio. {copy.rights}</p>
+          <div className="flex flex-wrap gap-5">{copy.legalLinks.map(([label, href]) => <Link key={href} href={href} className="hover:text-primary">{label}</Link>)}</div>
         </div>
       </div>
     </footer>
   )
 }
 
-function FooterColumn({ title, links }: { title: string; links: string[][] }) {
+function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
       <h3 className="font-semibold">{title}</h3>
