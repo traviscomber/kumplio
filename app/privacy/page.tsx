@@ -9,7 +9,7 @@ import { PRIVACY_NOTICE } from '@/lib/privacy/notice'
 export async function generateMetadata(): Promise<Metadata> {
   const { locale } = await getPublicRequestContext()
   const copy = PRIVACY_PUBLIC_COPY[locale]
-  const canonical = withPublicLocale('/privacy', locale)
+  const canonical = withPublicLocale(PRIVACY_NOTICE.route, locale)
 
   return {
     title: copy.metadata.title,
@@ -17,9 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical,
       languages: {
-        'es-CL': withPublicLocale('/privacy', 'es'),
-        en: withPublicLocale('/privacy', 'en'),
-        'x-default': withPublicLocale('/privacy', 'es'),
+        'es-CL': withPublicLocale(PRIVACY_NOTICE.route, 'es'),
+        en: withPublicLocale(PRIVACY_NOTICE.route, 'en'),
+        'x-default': withPublicLocale(PRIVACY_NOTICE.route, 'es'),
       },
     },
   }
@@ -32,7 +32,7 @@ export default async function PrivacyPage() {
   const contactHref = getPublicSiteHref('/contact', locale)
   const securityHref = getPublicSiteHref('/security', locale)
   const alternateLocale = locale === 'es' ? 'en' : 'es'
-  const alternateHref = withPublicLocale('/privacy', alternateLocale)
+  const alternateHref = withPublicLocale(PRIVACY_NOTICE.route, alternateLocale)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
