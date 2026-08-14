@@ -6,12 +6,14 @@ const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
 const requiredFiles = [
   'app/layout.tsx',
   'app/page.tsx',
+  'app/pricing/page.tsx',
+  'app/faq/page.tsx',
+  'app/contact/page.tsx',
   'app/robots.ts',
   'app/sitemap.ts',
   'app/software-cumplimiento-chile/page.tsx',
   'app/resources/ley-21719/page.tsx',
   'app/resources/ley-21719/[slug]/page.tsx',
-  'app/faq/page.tsx',
   'app/como-pensamos/page.tsx',
   'app/powered-by-n3uralia/page.tsx',
   'app/llms.txt/route.ts',
@@ -24,10 +26,14 @@ const requiredFiles = [
   'app/.well-known/security.txt/route.ts',
   'components/footer.tsx',
   'components/marketing/resolution-entry.tsx',
+  'components/marketing/contact-page-content.tsx',
   'lib/indexnow.ts',
   'lib/public-site.ts',
   'lib/i18n/agent-public-copy.ts',
   'lib/i18n/home-public-copy.ts',
+  'lib/i18n/pricing-public-copy.ts',
+  'lib/i18n/faq-public-copy.ts',
+  'lib/i18n/contact-public-copy.ts',
   'lib/i18n/public-routing.ts',
   'lib/i18n/request-context.ts',
   'lib/i18n/public-copy.ts',
@@ -72,14 +78,13 @@ await expectIncludes('lib/i18n/public-routing.ts', [
   "PUBLIC_LOCALES = ['es', 'en']",
   "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'",
   "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
-  "SPANISH_PUBLIC_PATHS_READY = new Set(['/'])",
-  "ENGLISH_PUBLIC_PATHS_READY = new Set(['/'])",
+  "SPANISH_PUBLIC_PATHS_READY = new Set(['/', '/pricing', '/faq', '/contact'])",
+  "ENGLISH_PUBLIC_PATHS_READY = new Set(['/', '/pricing', '/faq', '/contact'])",
   'splitPublicLocale',
   'isPublicSitePath',
   'isLocalizedPublicPathReady',
   'getPublicSiteHref',
   'withPublicLocale',
-  "'/pricing'",
   "'/resources/ley-21719'",
 ])
 
@@ -92,7 +97,6 @@ await expectIncludes('lib/i18n/public-copy.ts', [
 
 await expectIncludes('lib/i18n/home-public-copy.ts', [
   'HOME_PUBLIC_COPY',
-  "nav: {",
   'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.',
   'Protect your data. Understand what to do. Move forward with a clear path.',
   'Chilean Law 21.719',
@@ -106,6 +110,35 @@ await expectIncludes('lib/i18n/agent-public-copy.ts', [
   'supported/unsupported claims',
 ])
 
+await expectIncludes('lib/i18n/pricing-public-copy.ts', [
+  'PRICING_PUBLIC_COPY',
+  'Elige cuánto trabajo manual quieres recuperar',
+  'Choose how much manual work you want to recover',
+  "id: 'acompanado'",
+  "price: '$249.990'",
+  "price: '$249,990'",
+  'Prices are in Chilean pesos and exclude VAT',
+])
+
+await expectIncludes('lib/i18n/faq-public-copy.ts', [
+  'FAQ_PUBLIC_COPY',
+  '¿Kumplio declara automáticamente que una empresa cumple?',
+  'Does Kumplio automatically declare that a company is compliant?',
+  'revisión humana',
+  'human review',
+  'December 1, 2026',
+  'should not turn missing evidence into a positive conclusion of compliance',
+])
+
+await expectIncludes('lib/i18n/contact-public-copy.ts', [
+  'CONTACT_PUBLIC_COPY',
+  'Conversemos sobre el resultado que necesitas.',
+  'Let’s discuss the outcome you need.',
+  "acompanado: 'Plan Acompañado'",
+  "acompanado: 'Guided plan'",
+  'Prices',
+])
+
 await expectIncludes('app/page.tsx', [
   'HOME_PUBLIC_COPY',
   'ENGLISH_AGENT_PUBLIC_COPY',
@@ -113,6 +146,41 @@ await expectIncludes('app/page.tsx', [
   'getPublicSiteHref',
   'alternateHomeHref',
   '<ResolutionEntry locale={locale} />',
+  '<Footer locale={locale} />',
+])
+
+await expectIncludes('app/pricing/page.tsx', [
+  'PRICING_PUBLIC_COPY',
+  'generateMetadata',
+  "withPublicLocale('/pricing', locale)",
+  'alternatePricingHref',
+  '<Footer locale={locale} />',
+])
+
+await expectIncludes('app/faq/page.tsx', [
+  'FAQ_PUBLIC_COPY',
+  'generateMetadata',
+  "withPublicLocale('/faq', locale)",
+  "'@type': 'FAQPage'",
+  'alternateFaqHref',
+  '<Footer locale={locale} />',
+])
+
+await expectIncludes('app/contact/page.tsx', [
+  'ContactPageContent',
+  'CONTACT_PUBLIC_COPY',
+  'generateMetadata',
+  "withPublicLocale('/contact', locale)",
+  '<ContactPageContent locale={locale} />',
+])
+
+await expectIncludes('components/marketing/contact-page-content.tsx', [
+  "fetch('/api/leads'",
+  'canonicalServiceLabels',
+  "acompanado: 'Plan Acompañado'",
+  "source: service ? `contact-${service}` : 'contact-page'",
+  'getPublicSiteHref',
+  'alternateContactHref',
   '<Footer locale={locale} />',
 ])
 
@@ -162,11 +230,12 @@ await expectIncludes('app/sitemap.ts', [
   '/resources/ley-21719',
   '/resources/cumplimiento-normativo',
   '/como-pensamos',
-  '/faq',
   '/powered-by-n3uralia',
-  'localizedHome',
-  "localizedHome('es')",
-  "localizedHome('en')",
+  'localizedUrl',
+  "localizedPair('/', 'weekly'",
+  "localizedPair('/pricing', 'monthly'",
+  "localizedPair('/faq', 'monthly'",
+  "localizedPair('/contact', 'monthly'",
   'currentPublicUrl',
   "2026-08-14T09:54:00-04:00",
 ])
@@ -227,7 +296,8 @@ if (poweredMentions !== 1) {
 const publicClaims = [
   ['app/software-cumplimiento-chile/page.tsx', 'declara automáticamente'],
   ['app/resources/ley-21719/page.tsx', 'No reemplazan'],
-  ['app/faq/page.tsx', 'revisión humana'],
+  ['lib/i18n/faq-public-copy.ts', 'revisión humana'],
+  ['lib/i18n/faq-public-copy.ts', 'human review'],
 ]
 
 for (const [file, requiredGuardrail] of publicClaims) {
