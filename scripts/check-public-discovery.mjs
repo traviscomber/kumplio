@@ -4,6 +4,7 @@ import process from 'node:process'
 const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
 
 const requiredFiles = [
+  'README.md', 'ROADMAP.md',
   'app/layout.tsx', 'app/page.tsx', 'app/pricing/page.tsx', 'app/faq/page.tsx', 'app/contact/page.tsx',
   'app/about/page.tsx', 'app/como-pensamos/page.tsx', 'app/powered-by-n3uralia/page.tsx',
   'app/security/page.tsx', 'app/privacy/page.tsx', 'app/terms/page.tsx',
@@ -17,6 +18,7 @@ const requiredFiles = [
   'lib/i18n/pricing-public-copy.ts', 'lib/i18n/faq-public-copy.ts', 'lib/i18n/contact-public-copy.ts',
   'lib/i18n/institutional-public-copy.ts', 'lib/i18n/legal-public-copy.ts',
   'lib/i18n/public-routing.ts', 'lib/i18n/request-context.ts', 'lib/i18n/public-copy.ts',
+  'docs/assurance/agent-flow-production-e2e-5x-2026-08-14.md',
   'proxy.ts', 'next.config.mjs', '.github/workflows/indexnow.yml', '.github/workflows/public-discovery.yml',
 ]
 
@@ -32,12 +34,28 @@ async function expectIncludes(file, values) {
 }
 
 const checks = [
-  ['app/layout.tsx', ['SoftwareApplication', 'n3uralia', 'provider', '/llms.txt', '/kumplio.json', 'generateMetadata', 'withPublicLocale', 'getPublicSiteHref', 'getPublicRequestContext', 'isEnglishPublicPathReady']],
+  ['README.md', [
+    'Protección de datos y privacidad para Chile', 'Estado actual — 15 de agosto de 2026',
+    'Flujo agentic: comprobación productiva 5/5', '129.868', 'SEO + GEO + LLMO',
+    'llms-full.txt', 'kumplio.json', 'Powered by n3uralia', 'No significan certificación',
+  ]],
+  ['docs/assurance/agent-flow-production-e2e-5x-2026-08-14.md', [
+    'flujo agentic productivo 5/5', '5/5', '129.868', '423.650 ms', 'request_changes',
+    'no fueron promovidas como obligación', 'No utiliza esta corrida como evidencia de cliente, certificación',
+  ]],
+  ['app/layout.tsx', ['SoftwareApplication', 'Organization', 'Brand', 'WebSite', 'n3uralia', 'provider', '/llms.txt', '/llms-full.txt', '/kumplio.json', 'generateMetadata', 'withPublicLocale', 'getPublicSiteHref', 'getPublicRequestContext', 'isEnglishPublicPathReady']],
   ['lib/i18n/public-routing.ts', [
     "PUBLIC_LOCALES = ['es', 'en']", "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'", "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
     'SPANISH_PUBLIC_PATHS_READY', 'ENGLISH_PUBLIC_PATHS_READY', "'/pricing'", "'/faq'", "'/contact'", "'/about'", "'/como-pensamos'",
     "'/powered-by-n3uralia'", "'/security'", "'/privacy'", "'/terms'", 'splitPublicLocale', 'isPublicSitePath',
     'isLocalizedPublicPathReady', 'getPublicSiteHref', 'withPublicLocale', "'/resources/ley-21719'",
+  ]],
+  ['lib/public-site.ts', [
+    'PUBLIC_POSITIONING', 'protección de datos y privacidad para Chile', 'Ley 21.719',
+    'N3URALIA_FACTORY_DESCRIPTION', 'factoría chilena de inteligencia artificial aplicada y software',
+    'Kumplio es un producto desarrollado por n3uralia', 'PUBLIC_DISCOVERY', "lastReviewed: '2026-08-15'",
+    'PUBLIC_AGENTIC_ASSURANCE', "scope: 'controlled_synthetic_production_e2e'", 'totalTokens: 129868',
+    "email: 'info@kumplio.app'", "phone: '+56 9 9382 6127'", "location: 'Santiago, Chile'",
   ]],
   ['lib/i18n/public-copy.ts', ["htmlLang: 'es-CL'", "htmlLang: 'en'", 'Chile Law 21.719', 'human review']],
   ['lib/i18n/home-public-copy.ts', ['HOME_PUBLIC_COPY', 'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.', 'Protect your data. Understand what to do. Move forward with a clear path.', 'Chilean Law 21.719', 'human review']],
@@ -67,30 +85,48 @@ const checks = [
   ['app/como-pensamos/page.tsx', ['THINKING_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/como-pensamos', locale)", '<Footer locale={locale} />']],
   ['app/powered-by-n3uralia/page.tsx', ['POWERED_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/powered-by-n3uralia', locale)", "'@type': 'AboutPage'", '<Footer locale={locale} />']],
   ['app/security/page.tsx', ['SECURITY_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/security', locale)", 'security@kumplio.app', '<Footer locale={locale} />']],
-  ['app/privacy/page.tsx', ['PRIVACY_PUBLIC_COPY', 'PRIVACY_NOTICE.version', "withPublicLocale('/privacy', locale)", 'securityHref', '<Footer locale={locale} />']],
+  ['app/privacy/page.tsx', ['PRIVACY_PUBLIC_COPY', 'PRIVACY_NOTICE.version', 'noticeMetadata', 'withPublicLocale(noticeMetadata.canonical, locale)', 'securityHref', '<Footer locale={locale} />']],
   ['app/terms/page.tsx', ['TERMS_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/terms', locale)", 'info@kumplio.app', '<Footer locale={locale} />']],
   ['components/marketing/contact-page-content.tsx', ["fetch('/api/leads'", 'canonicalServiceLabels', "acompanado: 'Plan Acompañado'", "source: service ? `contact-${service}` : 'contact-page'", 'getPublicSiteHref', 'alternateContactHref', '<Footer locale={locale} />']],
   ['components/marketing/resolution-entry.tsx', ["locale = 'es'", 'What do you need to protect or resolve?', 'Start with expert guidance', "router.push('/sign-up?next=/cases/new')"]],
+  ['components/footer.tsx', [
+    'Powered by n3uralia', 'getPublicSiteHref', 'Software de protección de datos', 'Data protection software',
+    'Ley 21.719', "['Contexto LLM', '/llms.txt']", "['Contexto LLM completo', '/llms-full.txt']",
+    "['Datos públicos', '/kumplio.json']", 'PUBLIC_CONTACT.email', 'PUBLIC_CONTACT.phone', 'PUBLIC_CONTACT.location',
+  ]],
   ['proxy.ts', ['splitPublicLocale', 'NextResponse.rewrite', 'PUBLIC_LOCALE_COOKIE', 'isLocalizedPublicPathReady', "response.headers.set('Content-Language'", 'updateSession(request)']],
-  ['lib/public-site.ts', ['PUBLIC_POSITIONING', 'protección de datos y privacidad para Chile', 'Ley 21.719', 'N3URALIA_FACTORY_DESCRIPTION', 'factoría chilena de inteligencia artificial aplicada y software', 'Kumplio es un producto desarrollado por n3uralia']],
   ['app/software-cumplimiento-chile/page.tsx', ['Software de protección de datos y Ley 21.719 en Chile', 'Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.', '¿Qué debe resolver una plataforma de protección de datos?', 'Construido para la realidad de protección de datos en Chile.', 'cumplimiento normativo']],
-  ['app/robots.ts', ['OAI-SearchBot', 'GPTBot', 'ClaudeBot', 'PerplexityBot', "'/dashboard'"]],
+  ['app/robots.ts', ['OAI-SearchBot', 'ChatGPT-User', 'GPTBot', 'ClaudeBot', 'PerplexityBot', "'/dashboard'", '/llms-full.txt', '/kumplio.json']],
   ['app/sitemap.ts', [
     '/software-cumplimiento-chile', '/resources/ley-21719', '/resources/cumplimiento-normativo', 'localizedUrl',
     "localizedPair('/', 'weekly'", "localizedPair('/pricing', 'monthly'", "localizedPair('/faq', 'monthly'", "localizedPair('/contact', 'monthly'",
     "localizedPair('/about', 'monthly'", "localizedPair('/como-pensamos', 'monthly'", "localizedPair('/powered-by-n3uralia', 'monthly'",
     "localizedPair('/security', 'monthly'", "localizedPair('/privacy', 'yearly'", "localizedPair('/terms', 'yearly'",
-    'currentPublicUrl', "2026-08-14T09:54:00-04:00", "2026-08-03T12:00:00-04:00",
+    'currentPublicUrl', "2026-08-15T12:00:00-04:00", "2026-08-03T12:00:00-04:00",
   ]],
-  ['app/llms.txt/route.ts', ['Developer and product factory', 'Primary market: Chile', 'Primary positioning:', 'Primary scope: data protection, privacy and Law 21.719 in Chile.', 'Secondary category: compliance management.', 'Last reviewed: 2026-08-09', 'N3URALIA_FACTORY_DESCRIPTION']],
-  ['app/llms-full.txt/route.ts', ['Last reviewed: 2026-08-09', 'Developer and product factory', 'personal data protection, privacy and guided preparation for Chilean Law 21.719', 'current public product positioning is data protection and privacy in Chile', 'Geographic relevance', 'N3URALIA_FACTORY_DESCRIPTION']],
-  ['app/kumplio.json/route.ts', ["schema_version: '1.2'", "last_reviewed: '2026-08-09'", "primary_category: 'Data protection and privacy software'", "secondary_category: 'Compliance management software'", 'primary_positioning: PUBLIC_POSITIONING', "role: 'developer_and_product_factory'", 'geographic_relevance']],
+  ['app/llms.txt/route.ts', [
+    'PUBLIC_DISCOVERY', 'PUBLIC_AGENTIC_ASSURANCE', 'Developer and product factory', 'Primary market:',
+    'Canonical language routing', 'Machine-readable discovery', 'Controlled technical assurance',
+    'Do not invent /es or /en versions', 'Fictional or synthetic data must not be described as customer evidence',
+  ]],
+  ['app/llms-full.txt/route.ts', [
+    'PUBLIC_DISCOVERY', 'PUBLIC_AGENTIC_ASSURANCE', 'Language and canonical URL policy', 'Agentic operating model',
+    'Machine-readable discovery surfaces', 'Do not fabricate /es or /en URLs', 'synthetic assurance as customer evidence',
+    'current public product positioning is data protection and privacy in Chile', 'N3URALIA_FACTORY_DESCRIPTION',
+  ]],
+  ['app/kumplio.json/route.ts', [
+    "schema_version: '1.3'", 'PUBLIC_DISCOVERY.lastReviewed', "primary_category: PUBLIC_DISCOVERY.primaryCategory",
+    "secondary_category: PUBLIC_DISCOVERY.secondaryCategory", 'primary_positioning: PUBLIC_POSITIONING',
+    "role: 'developer_and_product_factory'", 'canonical_routing', 'localized_pages', 'agentic_assurance',
+    'customer_evidence: false', 'compliance_certification: false', 'llms_full', 'public_facts',
+  ]],
+  ['app/feed.xml/route.ts', ['PUBLIC_DISCOVERY', 'Protección de datos y Ley 21.719 en Chile', 'Privacidad Chile', 'lastBuildDate']],
   ['next.config.mjs', ["source: '/sales-kit'", "destination: '/software-cumplimiento-chile'", "source: '/demo/transporte'", "source: '/demo/mineria'", 'permanent: true']],
 ]
 
 for (const [file, values] of checks) await expectIncludes(file, values)
 
-const footer = await expectIncludes('components/footer.tsx', ['Powered by n3uralia', 'getPublicSiteHref', 'All rights reserved.'])
+const footer = await readFile('components/footer.tsx', 'utf8')
 const poweredMentions = footer.match(/Powered by n3uralia/g)?.length || 0
 if (poweredMentions !== 1) failures.push(`El footer debe mostrar una sola mención discreta de Powered by n3uralia; encontradas: ${poweredMentions}`)
 
@@ -99,10 +135,26 @@ const publicClaims = [
   ['app/resources/ley-21719/page.tsx', 'No reemplazan'],
   ['lib/i18n/faq-public-copy.ts', 'revisión humana'], ['lib/i18n/faq-public-copy.ts', 'human review'],
   ['lib/i18n/legal-public-copy.ts', 'No afirma certificaciones externas'], ['lib/i18n/legal-public-copy.ts', 'does not claim external certifications'],
+  ['README.md', 'No significan certificación'],
+  ['app/llms-full.txt/route.ts', 'Do not describe fictional demo data or synthetic assurance as customer evidence'],
 ]
 for (const [file, requiredGuardrail] of publicClaims) {
   const content = await readFile(file, 'utf8')
   if (!content.toLowerCase().includes(requiredGuardrail.toLowerCase())) failures.push(`${file} no contiene el guardrail esperado: ${requiredGuardrail}`)
+}
+
+const legacyClaimPatterns = [
+  /Labbe pasó de 15 multas/i,
+  /cumplimiento 100%/i,
+  /monitorea cambios regulatorios 24\/7/i,
+  /34 obligaciones identificadas/i,
+  /exposición exacta en UF/i,
+]
+for (const file of ['README.md', 'components/footer.tsx', 'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts']) {
+  const content = await readFile(file, 'utf8')
+  for (const pattern of legacyClaimPatterns) {
+    if (pattern.test(content)) failures.push(`${file} reintroduce un claim legacy no defendible: ${pattern}`)
+  }
 }
 
 const indexNowConfig = await expectIncludes('lib/indexnow.ts', [indexNowKey, 'INDEXNOW_KEY_PATH', 'DEPRECATED_PUBLIC_URLS', '/sales-kit', '/demo/transporte', '/demo/mineria'])

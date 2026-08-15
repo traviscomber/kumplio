@@ -53,6 +53,31 @@ const discoveryAgents = [
   'CCBot',
 ]
 
+const publicDiscoveryPaths = [
+  '/',
+  '/es',
+  '/en',
+  '/software-cumplimiento-chile',
+  '/features/ley-21719',
+  '/resources/',
+  '/use-cases',
+  '/demo',
+  '/pricing',
+  '/enterprise',
+  '/faq',
+  '/about',
+  '/como-pensamos',
+  '/powered-by-n3uralia',
+  '/contact',
+  '/security',
+  '/privacy',
+  '/terms',
+  '/llms.txt',
+  '/llms-full.txt',
+  '/kumplio.json',
+  '/feed.xml',
+]
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -63,26 +88,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       ...discoveryAgents.map((userAgent) => ({
         userAgent,
-        allow: [
-          '/',
-          '/software-cumplimiento-chile',
-          '/features/ley-21719',
-          '/resources/',
-          '/use-cases',
-          '/demo',
-          '/pricing',
-          '/enterprise',
-          '/faq',
-          '/about',
-          '/powered-by-n3uralia',
-          '/security',
-          '/privacy',
-          '/terms',
-          '/llms.txt',
-          '/llms-full.txt',
-          '/kumplio.json',
-          '/feed.xml',
-        ],
+        allow: publicDiscoveryPaths,
         disallow: privatePaths,
       })),
     ],

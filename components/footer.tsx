@@ -29,76 +29,80 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
   if (locale === 'en') {
     return {
       description:
-        'Guided resolution for privacy, regulatory, contractual and compliance situations in Chile. From the initial objective to the decision, evidence and closure.',
+        'Guided resolution for privacy, regulatory, contractual and compliance situations in Chile, with a current public focus on data protection, Law 21.719, evidence, traceability and human review.',
       product: 'Product',
       resources: 'Resources',
       company: 'Company',
       contact: 'Contact',
       rights: 'All rights reserved.',
       productLinks: [
+        ['Data protection software', publicHref(locale, '/software-cumplimiento-chile')],
+        ['Law 21.719', publicHref(locale, '/features/ley-21719')],
         ['Guided resolution', publicHref(locale, '/', '#resolver')],
-        ['How it works', publicHref(locale, '/', '#guia')],
-        ['Who it is for', publicHref(locale, '/', '#proteccion')],
-        ['Demo', publicHref(locale, '/demo')],
+        ['Public demo', publicHref(locale, '/demo')],
         ['Plans', publicHref(locale, '/pricing')],
       ],
       resourceLinks: [
         ['Law 21.719 guides', publicHref(locale, '/resources/ley-21719')],
         ['Resource center', publicHref(locale, '/resources/cumplimiento-normativo')],
+        ['Use cases', publicHref(locale, '/use-cases')],
         ['FAQ', publicHref(locale, '/faq')],
         ['How we think', publicHref(locale, '/como-pensamos')],
-        ['About Kumplio', publicHref(locale, '/about')],
       ],
       companyLinks: [
+        ['About Kumplio', publicHref(locale, '/about')],
         ['Enterprise Studio', publicHref(locale, '/enterprise')],
         ['Kumplio and n3uralia', publicHref(locale, '/powered-by-n3uralia')],
-        ['Sign in', '/sign-in'],
-        ['Resolve a case', publicHref(locale, '/', '#resolver')],
         ['Contact', publicHref(locale, '/contact')],
+        ['Sign in', '/sign-in'],
       ],
       legalLinks: [
         ['Privacy', publicHref(locale, '/privacy')],
         ['Terms', publicHref(locale, '/terms')],
         ['Security', publicHref(locale, '/security')],
-        ['llms.txt', '/llms.txt'],
+        ['LLM context', '/llms.txt'],
+        ['Full LLM context', '/llms-full.txt'],
+        ['Public facts', '/kumplio.json'],
       ],
     }
   }
 
   return {
     description:
-      'Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento. Desde el objetivo inicial hasta la decisión, la evidencia y el cierre.',
+      'Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento en Chile, con foco público actual en protección de datos, Ley 21.719, evidencia, trazabilidad y revisión humana.',
     product: 'Producto',
     resources: 'Recursos',
     company: 'Empresa',
     contact: 'Contacto',
     rights: 'Todos los derechos reservados.',
     productLinks: [
+      ['Software de protección de datos', publicHref(locale, '/software-cumplimiento-chile')],
+      ['Ley 21.719', publicHref(locale, '/features/ley-21719')],
       ['Resolución guiada', publicHref(locale, '/', '#resolver')],
-      ['Cómo funciona', publicHref(locale, '/', '#guia')],
-      ['Para quién', publicHref(locale, '/', '#proteccion')],
-      ['Demostración', publicHref(locale, '/demo')],
+      ['Demostración pública', publicHref(locale, '/demo')],
       ['Planes', publicHref(locale, '/pricing')],
     ],
     resourceLinks: [
       ['Guías Ley 21.719', publicHref(locale, '/resources/ley-21719')],
       ['Centro de recursos', publicHref(locale, '/resources/cumplimiento-normativo')],
+      ['Casos de uso', publicHref(locale, '/use-cases')],
       ['Preguntas frecuentes', publicHref(locale, '/faq')],
       ['Cómo pensamos', publicHref(locale, '/como-pensamos')],
-      ['Sobre Kumplio', publicHref(locale, '/about')],
     ],
     companyLinks: [
+      ['Sobre Kumplio', publicHref(locale, '/about')],
       ['Enterprise Studio', publicHref(locale, '/enterprise')],
       ['Kumplio y n3uralia', publicHref(locale, '/powered-by-n3uralia')],
-      ['Ingresar', '/sign-in'],
-      ['Resolver un caso', publicHref(locale, '/', '#resolver')],
       ['Contacto', publicHref(locale, '/contact')],
+      ['Ingresar', '/sign-in'],
     ],
     legalLinks: [
       ['Privacidad', publicHref(locale, '/privacy')],
       ['Términos', publicHref(locale, '/terms')],
       ['Seguridad', publicHref(locale, '/security')],
-      ['llms.txt', '/llms.txt'],
+      ['Contexto LLM', '/llms.txt'],
+      ['Contexto LLM completo', '/llms-full.txt'],
+      ['Datos públicos', '/kumplio.json'],
     ],
   }
 }
@@ -144,7 +148,9 @@ export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
       <div className="border-t border-border bg-muted/20">
         <div className="container mx-auto flex flex-col gap-4 px-6 py-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© {currentYear} Kumplio. {copy.rights}</p>
-          <div className="flex flex-wrap gap-5">{copy.legalLinks.map(([label, href]) => <Link key={href} href={href} className="hover:text-primary">{label}</Link>)}</div>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {copy.legalLinks.map(([label, href]) => <Link key={href} href={href} className="hover:text-primary">{label}</Link>)}
+          </div>
         </div>
       </div>
     </footer>
