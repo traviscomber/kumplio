@@ -41,7 +41,7 @@ const checks = [
   ]],
   ['docs/assurance/agent-flow-production-e2e-5x-2026-08-14.md', [
     'flujo agentic productivo 5/5', '5/5', '129.868', '423.650 ms', 'request_changes',
-    'no fueron promovidas como obligación', 'no constituye certificación',
+    'no fueron promovidas como obligación', 'No utiliza esta corrida como evidencia de cliente, certificación',
   ]],
   ['app/layout.tsx', ['SoftwareApplication', 'Organization', 'Brand', 'WebSite', 'n3uralia', 'provider', '/llms.txt', '/llms-full.txt', '/kumplio.json', 'generateMetadata', 'withPublicLocale', 'getPublicSiteHref', 'getPublicRequestContext', 'isEnglishPublicPathReady']],
   ['lib/i18n/public-routing.ts', [
@@ -55,6 +55,7 @@ const checks = [
     'N3URALIA_FACTORY_DESCRIPTION', 'factoría chilena de inteligencia artificial aplicada y software',
     'Kumplio es un producto desarrollado por n3uralia', 'PUBLIC_DISCOVERY', "lastReviewed: '2026-08-15'",
     'PUBLIC_AGENTIC_ASSURANCE', "scope: 'controlled_synthetic_production_e2e'", 'totalTokens: 129868',
+    "email: 'info@kumplio.app'", "phone: '+56 9 9382 6127'", "location: 'Santiago, Chile'",
   ]],
   ['lib/i18n/public-copy.ts', ["htmlLang: 'es-CL'", "htmlLang: 'en'", 'Chile Law 21.719', 'human review']],
   ['lib/i18n/home-public-copy.ts', ['HOME_PUBLIC_COPY', 'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.', 'Protect your data. Understand what to do. Move forward with a clear path.', 'Chilean Law 21.719', 'human review']],
@@ -91,7 +92,7 @@ const checks = [
   ['components/footer.tsx', [
     'Powered by n3uralia', 'getPublicSiteHref', 'Software de protección de datos', 'Data protection software',
     'Ley 21.719', "['Contexto LLM', '/llms.txt']", "['Contexto LLM completo', '/llms-full.txt']",
-    "['Datos públicos', '/kumplio.json']", 'info@kumplio.app', '+56 9 9382 6127', 'Santiago, Chile',
+    "['Datos públicos', '/kumplio.json']", 'PUBLIC_CONTACT.email', 'PUBLIC_CONTACT.phone', 'PUBLIC_CONTACT.location',
   ]],
   ['proxy.ts', ['splitPublicLocale', 'NextResponse.rewrite', 'PUBLIC_LOCALE_COOKIE', 'isLocalizedPublicPathReady', "response.headers.set('Content-Language'", 'updateSession(request)']],
   ['app/software-cumplimiento-chile/page.tsx', ['Software de protección de datos y Ley 21.719 en Chile', 'Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.', '¿Qué debe resolver una plataforma de protección de datos?', 'Construido para la realidad de protección de datos en Chile.', 'cumplimiento normativo']],
