@@ -16,7 +16,7 @@ export const OFFICIAL_LEY_21719_URL =
   'https://www.bcn.cl/leychile/Navegar?idNorma=1209272&idParte=10527471&idVersion=2026-12-01'
 
 export const PUBLIC_DESCRIPTION =
-  'Kumplio ayuda a organizaciones en Chile a proteger datos personales y prepararse para la Ley 21.719: centraliza tratamientos, proveedores, controles, evidencia y decisiones; identifica brechas; coordina especialistas digitales; y convierte cada situación en una ruta clara con responsables, trazabilidad y revisión humana.'
+  'Kumplio ayuda a organizaciones en Chile a proteger datos y resolver obligaciones de privacidad, con foco en la Ley 21.719: centraliza tratamientos, proveedores, controles, evidencia y decisiones; identifica brechas; coordina especialistas digitales; y convierte cada situación en una ruta clara con responsables, trazabilidad y revisión humana.'
 
 export const PUBLIC_POSITIONING =
   'Plataforma de protección de datos y privacidad para Chile, con foco inicial en la Ley 21.719 y resolución guiada de situaciones reales.'
@@ -62,8 +62,7 @@ export const PUBLIC_AGENTIC_ASSURANCE = {
   reviewsApproved: 5,
   totalToolCalls: 24,
   totalTokens: 129868,
-  limitation:
-    'Esta evidencia demuestra el flujo técnico controlado y su trazabilidad; no constituye certificación, asesoría jurídica ni evidencia de un cliente externo.',
+  limitation: 'Esta evidencia demuestra el flujo técnico controlado y su trazabilidad; no constituye certificación, asesoría jurídica ni evidencia de un cliente externo.',
 } as const
 
 export const CORE_CAPABILITIES = [
