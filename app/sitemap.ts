@@ -4,7 +4,7 @@ import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
 import { SITE_URL } from '@/lib/public-site'
 
 // Google recomienda que lastModified represente cambios sustantivos reales.
-const publicUpdatedAt = new Date('2026-08-15T12:00:00-04:00')
+const publicUpdatedAt = new Date('2026-08-15T17:38:00-04:00')
 const legalUpdatedAt = new Date('2026-08-03T12:00:00-04:00')
 
 function localizedUrl(pathname: string, locale: PublicLocale) {
@@ -34,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // copy, metadata, links and discovery behavior are migrated together.
   const localized: MetadataRoute.Sitemap = [
     ...localizedPair('/', 'weekly', 1, 0.9),
+    ...localizedPair('/demo', 'monthly', 0.86, 0.78),
     ...localizedPair('/pricing', 'monthly', 0.8, 0.72),
     ...localizedPair('/faq', 'monthly', 0.78, 0.7),
     ...localizedPair('/contact', 'monthly', 0.62, 0.56),
@@ -52,7 +53,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: currentPublicUrl('/resources/cumplimiento-normativo'), lastModified: publicUpdatedAt, changeFrequency: 'weekly', priority: 0.82 },
     { url: currentPublicUrl('/use-cases'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.82 },
     { url: currentPublicUrl('/enterprise'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.76 },
-    { url: currentPublicUrl('/demo'), lastModified: publicUpdatedAt, changeFrequency: 'monthly', priority: 0.72 },
   ]
 
   const guides: MetadataRoute.Sitemap = chileComplianceGuides.map((guide) => ({
