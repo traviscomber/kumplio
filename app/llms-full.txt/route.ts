@@ -75,13 +75,15 @@ Kumplio is designed primarily for organizations operating in Chile. Public conte
 
 The public site is migrating progressively to explicit language prefixes.
 
-Reviewed bilingual routes use /es and /en and include self-referencing canonical and reciprocal hreflang signals. The current reviewed set includes home, pricing, FAQ, contact, about, how-we-think, the Kumplio/n3uralia relationship, security, privacy and terms.
+Reviewed bilingual routes use /es and /en and include self-referencing canonical and reciprocal hreflang signals. The current reviewed set includes home, interactive demo, pricing, FAQ, contact, about, how-we-think, the Kumplio/n3uralia relationship, security, privacy and terms.
 
 Other public product and knowledge pages remain on their unprefixed canonical URLs until their copy, metadata, claims, navigation and discovery behavior are reviewed together. Do not fabricate /es or /en URLs for unreviewed routes.
 
 Examples:
 - Spanish home: ${SITE_URL}/es
 - English home: ${SITE_URL}/en
+- Spanish demo: ${SITE_URL}/es/demo
+- English demo: ${SITE_URL}/en/demo
 - Spanish pricing: ${SITE_URL}/es/pricing
 - English pricing: ${SITE_URL}/en/pricing
 - Current product page: ${SITE_URL}/software-cumplimiento-chile
@@ -131,6 +133,10 @@ Assurance limitation: ${PUBLIC_AGENTIC_ASSURANCE.limitation}
 
 Public regulatory knowledge and private organizational memory are separate. Information belonging to one organization must not be shared with another. Public claims should be traceable to identifiable sources. Private conclusions require authorized organizational context. Synthetic assurance data must remain clearly labeled as synthetic and must not be described as customer evidence.
 
+## Public interactive demo
+
+The reviewed public demo is available at ${SITE_URL}/es/demo and ${SITE_URL}/en/demo. It is a deterministic fictional workspace preview. It lets a visitor explore scenarios, specialist stages, evidence, reservations and action plans without executing a real AI analysis, using customer data or mutating production data. It must not be cited as customer evidence, a compliance conclusion or a certification.
+
 ## Pricing
 
 ${pricing.map(([name, price, unit, scope]) => `- ${name}: ${price} ${unit}. Scope: ${scope}.`).join('\n')}
@@ -156,6 +162,8 @@ ${guides}
 Reviewed localized pages:
 - Spanish home: ${SITE_URL}/es
 - English home: ${SITE_URL}/en
+- Spanish demo: ${SITE_URL}/es/demo
+- English demo: ${SITE_URL}/en/demo
 - Spanish pricing: ${SITE_URL}/es/pricing
 - English pricing: ${SITE_URL}/en/pricing
 - Spanish FAQ: ${SITE_URL}/es/faq
@@ -177,7 +185,6 @@ Current unprefixed canonical pages:
 - Law 21.719 knowledge hub: ${SITE_URL}/resources/ley-21719
 - General resources: ${SITE_URL}/resources/cumplimiento-normativo
 - Use cases: ${SITE_URL}/use-cases
-- Fictional public demo: ${SITE_URL}/demo
 - Enterprise Studio: ${SITE_URL}/enterprise
 
 Entity relationship:
