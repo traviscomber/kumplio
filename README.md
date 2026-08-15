@@ -198,7 +198,7 @@ Cada agente tiene fronteras explícitas, herramientas autorizadas y salida estru
 
 ---
 
-## Ley 21.719 y privacidad
+## Bloque 16 — evidencia real y privacidad
 
 El foco público actual es ayudar a organizaciones en Chile a ordenar y ejecutar trabajo de protección de datos con trazabilidad.
 
