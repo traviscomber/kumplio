@@ -389,9 +389,11 @@ ROADMAP.md                   prioridad y estado canónicos
 
 ---
 
-## Roadmap canónico
+## Roadmap canónico: trabajar sin desviaciones
 
 [`ROADMAP.md`](./ROADMAP.md) es la **única fuente canónica de prioridad, secuencia y estado**.
+
+Contrato vinculante de gobernanza: [`docs/governance/canonical-roadmap-contract.md`](./docs/governance/canonical-roadmap-contract.md).
 
 Un cambio está autorizado cuando cumple al menos una condición:
 
