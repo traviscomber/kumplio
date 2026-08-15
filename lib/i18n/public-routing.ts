@@ -40,6 +40,7 @@ const PUBLIC_PREFIX_PATHS = [
 const SPANISH_PUBLIC_PATHS_READY = new Set([
   '/',
   '/pricing',
+  '/demo',
   '/faq',
   '/contact',
   '/about',
@@ -52,6 +53,7 @@ const SPANISH_PUBLIC_PATHS_READY = new Set([
 const ENGLISH_PUBLIC_PATHS_READY = new Set([
   '/',
   '/pricing',
+  '/demo',
   '/faq',
   '/contact',
   '/about',
