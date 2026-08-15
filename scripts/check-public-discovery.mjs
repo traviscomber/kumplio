@@ -117,7 +117,7 @@ const checks = [
     'PUBLIC_DISCOVERY', 'PUBLIC_AGENTIC_ASSURANCE', 'Language and canonical URL policy', 'Agentic operating model',
     'Machine-readable discovery surfaces', 'Do not fabricate /es or /en URLs', 'synthetic assurance as customer evidence',
     'current public product positioning is data protection and privacy in Chile', 'N3URALIA_FACTORY_DESCRIPTION',
-    'Public interactive demo', 'does not execute a real AI analysis',
+    'Public interactive demo', 'without executing a real AI analysis',
   ]],
   ['app/kumplio.json/route.ts', [
     "schema_version: '1.3'", 'PUBLIC_DISCOVERY.lastReviewed', "primary_category: PUBLIC_DISCOVERY.primaryCategory",
