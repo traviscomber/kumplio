@@ -5,7 +5,7 @@ const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
 
 const requiredFiles = [
   'README.md', 'ROADMAP.md',
-  'app/layout.tsx', 'app/page.tsx', 'app/pricing/page.tsx', 'app/faq/page.tsx', 'app/contact/page.tsx',
+  'app/layout.tsx', 'app/page.tsx', 'app/demo/page.tsx', 'app/pricing/page.tsx', 'app/faq/page.tsx', 'app/contact/page.tsx',
   'app/about/page.tsx', 'app/como-pensamos/page.tsx', 'app/powered-by-n3uralia/page.tsx',
   'app/security/page.tsx', 'app/privacy/page.tsx', 'app/terms/page.tsx',
   'app/robots.ts', 'app/sitemap.ts', 'app/software-cumplimiento-chile/page.tsx',
@@ -13,7 +13,8 @@ const requiredFiles = [
   'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts', 'app/feed.xml/route.ts',
   'app/api/indexnow/route.ts', 'app/indexnow-key.txt/route.ts', `app/${indexNowKey}.txt/route.ts`,
   'app/.well-known/security.txt/route.ts', 'components/footer.tsx',
-  'components/marketing/resolution-entry.tsx', 'components/marketing/contact-page-content.tsx',
+  'components/marketing/resolution-entry.tsx', 'components/marketing/public-workspace-preview.tsx',
+  'components/marketing/contact-page-content.tsx',
   'lib/indexnow.ts', 'lib/public-site.ts', 'lib/i18n/agent-public-copy.ts', 'lib/i18n/home-public-copy.ts',
   'lib/i18n/pricing-public-copy.ts', 'lib/i18n/faq-public-copy.ts', 'lib/i18n/contact-public-copy.ts',
   'lib/i18n/institutional-public-copy.ts', 'lib/i18n/legal-public-copy.ts',
@@ -46,7 +47,7 @@ const checks = [
   ['app/layout.tsx', ['SoftwareApplication', 'Organization', 'Brand', 'WebSite', 'n3uralia', 'provider', '/llms.txt', '/llms-full.txt', '/kumplio.json', 'generateMetadata', 'withPublicLocale', 'getPublicSiteHref', 'getPublicRequestContext', 'isEnglishPublicPathReady']],
   ['lib/i18n/public-routing.ts', [
     "PUBLIC_LOCALES = ['es', 'en']", "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'", "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
-    'SPANISH_PUBLIC_PATHS_READY', 'ENGLISH_PUBLIC_PATHS_READY', "'/pricing'", "'/faq'", "'/contact'", "'/about'", "'/como-pensamos'",
+    'SPANISH_PUBLIC_PATHS_READY', 'ENGLISH_PUBLIC_PATHS_READY', "'/pricing'", "'/demo'", "'/faq'", "'/contact'", "'/about'", "'/como-pensamos'",
     "'/powered-by-n3uralia'", "'/security'", "'/privacy'", "'/terms'", 'splitPublicLocale', 'isPublicSitePath',
     'isLocalizedPublicPathReady', 'getPublicSiteHref', 'withPublicLocale', "'/resources/ley-21719'",
   ]],
@@ -77,7 +78,9 @@ const checks = [
     'Estos términos se rigen por las leyes de la República de Chile.', 'governed by the laws of the Republic of Chile',
     'revisión humana', 'human review',
   ]],
-  ['app/page.tsx', ['HOME_PUBLIC_COPY', 'ENGLISH_AGENT_PUBLIC_COPY', 'getPublicRequestContext', 'getPublicSiteHref', 'alternateHomeHref', '<ResolutionEntry locale={locale} />', '<Footer locale={locale} />']],
+  ['app/page.tsx', ['HOME_PUBLIC_COPY', 'PublicWorkspacePreview', 'getPublicRequestContext', 'getPublicSiteHref', 'alternateHomeHref', '<ResolutionEntry locale={locale} />', '<PublicWorkspacePreview locale={locale} mode="compact" />', '<Footer locale={locale} />']],
+  ['app/demo/page.tsx', ['PublicWorkspacePreview', 'generateMetadata', "withPublicLocale('/demo', locale)", "withPublicLocale('/demo', 'es')", "withPublicLocale('/demo', 'en')", 'datos ficticios', 'fictional data', '<PublicWorkspacePreview locale={locale} mode="full" />', '<Footer locale={locale} />']],
+  ['components/marketing/public-workspace-preview.tsx', ['Demo ficticia', 'Fictional demo', 'No declarar cumplimiento', 'Do not declare compliance', 'Revisión humana requerida', 'Human review required', "mode = 'compact'"]],
   ['app/pricing/page.tsx', ['PRICING_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/pricing', locale)", 'alternatePricingHref', '<Footer locale={locale} />']],
   ['app/faq/page.tsx', ['FAQ_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/faq', locale)", "'@type': 'FAQPage'", 'alternateFaqHref', '<Footer locale={locale} />']],
   ['app/contact/page.tsx', ['ContactPageContent', 'CONTACT_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/contact', locale)", '<ContactPageContent locale={locale} />']],
@@ -87,7 +90,7 @@ const checks = [
   ['app/security/page.tsx', ['SECURITY_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/security', locale)", 'security@kumplio.app', '<Footer locale={locale} />']],
   ['app/privacy/page.tsx', ['PRIVACY_PUBLIC_COPY', 'PRIVACY_NOTICE.version', 'noticeMetadata', 'withPublicLocale(noticeMetadata.canonical, locale)', 'securityHref', '<Footer locale={locale} />']],
   ['app/terms/page.tsx', ['TERMS_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/terms', locale)", 'info@kumplio.app', '<Footer locale={locale} />']],
-  ['components/marketing/contact-page-content.tsx', ["fetch('/api/leads'", 'canonicalServiceLabels', "acompanado: 'Plan Acompañado'", "source: service ? `contact-${service}` : 'contact-page'", 'getPublicSiteHref', 'alternateContactHref', '<Footer locale={locale} />']],
+  ['components/marketing/contact-page-content.tsx', ["fetch('/api/leads'", 'canonicalServiceLabels', "acompanado: 'Plan Acompañado'", "acompanado: 'Guided plan'", "source: service ? `contact-${service}` : 'contact-page'", 'getPublicSiteHref', 'alternateContactHref', '<Footer locale={locale} />']],
   ['components/marketing/resolution-entry.tsx', ["locale = 'es'", 'What do you need to protect or resolve?', 'Start with expert guidance', "router.push('/sign-up?next=/cases/new')"]],
   ['components/footer.tsx', [
     'Powered by n3uralia', 'getPublicSiteHref', 'Software de protección de datos', 'Data protection software',
@@ -99,7 +102,7 @@ const checks = [
   ['app/robots.ts', ['OAI-SearchBot', 'ChatGPT-User', 'GPTBot', 'ClaudeBot', 'PerplexityBot', "'/dashboard'", '/llms-full.txt', '/kumplio.json']],
   ['app/sitemap.ts', [
     '/software-cumplimiento-chile', '/resources/ley-21719', '/resources/cumplimiento-normativo', 'localizedUrl',
-    "localizedPair('/', 'weekly'", "localizedPair('/pricing', 'monthly'", "localizedPair('/faq', 'monthly'", "localizedPair('/contact', 'monthly'",
+    "localizedPair('/', 'weekly'", "localizedPair('/demo', 'monthly'", "localizedPair('/pricing', 'monthly'", "localizedPair('/faq', 'monthly'", "localizedPair('/contact', 'monthly'",
     "localizedPair('/about', 'monthly'", "localizedPair('/como-pensamos', 'monthly'", "localizedPair('/powered-by-n3uralia', 'monthly'",
     "localizedPair('/security', 'monthly'", "localizedPair('/privacy', 'yearly'", "localizedPair('/terms', 'yearly'",
     'currentPublicUrl', "2026-08-15T12:00:00-04:00", "2026-08-03T12:00:00-04:00",
@@ -137,6 +140,8 @@ const publicClaims = [
   ['lib/i18n/legal-public-copy.ts', 'No afirma certificaciones externas'], ['lib/i18n/legal-public-copy.ts', 'does not claim external certifications'],
   ['README.md', 'No significan certificación'],
   ['app/llms-full.txt/route.ts', 'Do not describe fictional demo data or synthetic assurance as customer evidence'],
+  ['app/demo/page.tsx', 'Esta demo no ejecuta un análisis real'],
+  ['app/demo/page.tsx', 'This demo does not run a real analysis'],
 ]
 for (const [file, requiredGuardrail] of publicClaims) {
   const content = await readFile(file, 'utf8')
@@ -150,7 +155,7 @@ const legacyClaimPatterns = [
   /34 obligaciones identificadas/i,
   /exposición exacta en UF/i,
 ]
-for (const file of ['README.md', 'components/footer.tsx', 'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts']) {
+for (const file of ['README.md', 'components/footer.tsx', 'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts', 'app/demo/page.tsx']) {
   const content = await readFile(file, 'utf8')
   for (const pattern of legacyClaimPatterns) {
     if (pattern.test(content)) failures.push(`${file} reintroduce un claim legacy no defendible: ${pattern}`)
