@@ -2,7 +2,7 @@
 
 > **Documento canónico de producto, arquitectura, evidencia y prioridades**  
 > Estado: activo  
-> Revisión: 14 de agosto de 2026  
+> Revisión: 15 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible: español primario; migración controlada del sitio público a `/es` y `/en`  
 > Última migración aplicada: `20260809141500_agent_run_provider_trace_v1`  
@@ -449,6 +449,23 @@ Reglas de esta excepción:
 7. build, typecheck, public discovery, auth/session y preview de Vercel deben pasar antes de fusionar;
 8. esta excepción no autoriza Bloque 17, Enterprise, beta autoservicio ni cambios de base de datos.
 
+### Excepción explícita del owner — Home 2.0 + Demo 2.0 públicas — 15 de agosto de 2026
+
+El owner autoriza una intervención transversal del **sitio público** para hacer visible el producto antes que su explicación, sin abrir un módulo funcional nuevo ni alterar la continuidad del Bloque 16.
+
+Alcance autorizado:
+
+1. simplificar la home pública y reducir bloques explicativos redundantes;
+2. mostrar un preview determinístico del workspace con datos inequívocamente ficticios;
+3. convertir `/demo` en una demostración navegable e interactiva, disponible en `/es/demo` y `/en/demo`;
+4. permitir explorar escenarios, especialistas, evidencia, reservas y plan sin ejecutar IA ni tocar datos de producción;
+5. mantener revisión humana, incertidumbre y límites visibles;
+6. no presentar la demo como cliente, certificación, resultado real ni prueba de cumplimiento;
+7. no modificar base de datos, RLS, Auth, APIs privadas, agentes runtime ni gates P0;
+8. build, typecheck, discovery, contratos de posicionamiento y previews Vercel deben pasar antes de fusionar.
+
+Esta excepción es de **UX y distribución pública**. No cambia la prioridad funcional: Bloque 16 continúa siendo `NEXT / ACTIVE`.
+
 ---
 
 ## 13. Decisión vigente
@@ -474,6 +491,6 @@ La única continuidad funcional autorizada es:
 
 > **Ejecutar/reconciliar la identidad runtime OpenAI, obtener la configuración tenant-specific efectiva de Supabase/OpenAI y, sólo cuando sea suficiente, ejecutar o aceptar la prueba operacional final de eliminación/anonimización sin sobreafirmar backups, retención ni propagación externa.**
 
-La decisión transversal de distribución pública del 14 de agosto de 2026 autoriza únicamente la fundación y migración segura de `/es` y `/en`; no modifica la secuencia funcional anterior ni el estado de los gates P0.
+Las decisiones transversales de distribución pública del 14 y 15 de agosto de 2026 autorizan la migración segura `/es`/`/en` y la intervención Home 2.0 + Demo 2.0; ninguna modifica la secuencia funcional anterior ni el estado de los gates P0.
 
 No se habilitará beta autoservicio hasta cerrar Leaked Password Protection, la evidencia tenant-specific/final, las dimensiones lifecycle críticas y observar al menos una organización externa supervisada.
