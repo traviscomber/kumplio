@@ -64,6 +64,8 @@ Kumplio is migrating the public site route by route. Fully reviewed translated p
 Localized examples:
 - Spanish home: ${SITE_URL}/es
 - English home: ${SITE_URL}/en
+- Spanish demo: ${SITE_URL}/es/demo
+- English demo: ${SITE_URL}/en/demo
 - Spanish pricing: ${SITE_URL}/es/pricing
 - English pricing: ${SITE_URL}/en/pricing
 - Spanish FAQ: ${SITE_URL}/es/faq
@@ -77,7 +79,6 @@ Current unprefixed canonical product and knowledge routes:
 - Law 21.719 guides: ${SITE_URL}/resources/ley-21719
 - General resources: ${SITE_URL}/resources/cumplimiento-normativo
 - Use cases: ${SITE_URL}/use-cases
-- Public fictional demo: ${SITE_URL}/demo
 - Enterprise Studio: ${SITE_URL}/enterprise
 
 ## Machine-readable discovery
