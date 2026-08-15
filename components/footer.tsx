@@ -29,7 +29,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
   if (locale === 'en') {
     return {
       description:
-        'Data protection and privacy software for organizations operating in Chile, focused on Law 21.719, guided resolution, evidence, traceability and human review.',
+        'Guided resolution for privacy, regulatory, contractual and compliance situations in Chile, with a current public focus on data protection, Law 21.719, evidence, traceability and human review.',
       product: 'Product',
       resources: 'Resources',
       company: 'Company',
@@ -69,7 +69,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
 
   return {
     description:
-      'Software de protección de datos y privacidad para organizaciones en Chile, con foco en la Ley 21.719, resolución guiada, evidencia, trazabilidad y revisión humana.',
+      'Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento en Chile, con foco público actual en protección de datos, Ley 21.719, evidencia, trazabilidad y revisión humana.',
     product: 'Producto',
     resources: 'Recursos',
     company: 'Empresa',
