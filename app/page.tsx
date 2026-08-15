@@ -1,34 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  ArrowRight,
-  CheckCircle2,
-  Database,
-  FileCheck2,
-  FolderKanban,
-  LockKeyhole,
-  SearchCheck,
-  ShieldCheck,
-  Sparkles,
-  Users,
-} from 'lucide-react'
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
+import { PublicWorkspacePreview } from '@/components/marketing/public-workspace-preview'
 import { ResolutionEntry } from '@/components/marketing/resolution-entry'
-import { AGENT_CATALOG } from '@/lib/agents/catalog'
-import { ENGLISH_AGENT_PUBLIC_COPY } from '@/lib/i18n/agent-public-copy'
 import { HOME_PUBLIC_COPY } from '@/lib/i18n/home-public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
 import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
-
-const privacyIcons = [Database, SearchCheck, LockKeyhole] as const
-const guideIcons = [FolderKanban, SearchCheck, Sparkles, Users, FileCheck2, CheckCircle2] as const
 
 export default async function HomePage() {
   const { locale } = await getPublicRequestContext()
   const copy = HOME_PUBLIC_COPY[locale]
   const homeHref = withPublicLocale('/', locale)
   const pricingHref = getPublicSiteHref('/pricing', locale)
+  const demoHref = getPublicSiteHref('/demo', locale)
   const alternateLocale = locale === 'es' ? 'en' : 'es'
   const alternateHomeHref = withPublicLocale('/', alternateLocale)
 
@@ -40,9 +26,9 @@ export default async function HomePage() {
             <Image src="/logo-kumplio.svg" alt="Kumplio" width={150} height={64} priority className="h-12 w-auto" />
           </Link>
           <div className="hidden items-center gap-6 lg:flex">
-            <a href="#proteccion" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.dataProtection}</a>
-            <a href="#guia" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.guide}</a>
-            <a href="#equipo" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.specialists}</a>
+            <a href="#producto" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.dataProtection}</a>
+            <Link href={demoHref} className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.guide}</Link>
+            <a href="#casos" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.specialists}</a>
             <a href="#seguridad" className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.security}</a>
             <Link href={pricingHref} className="text-sm font-medium text-white/65 hover:text-white">{copy.nav.plans}</Link>
           </div>
@@ -64,7 +50,7 @@ export default async function HomePage() {
       </nav>
 
       <main>
-        <section id="resolver" className="relative border-b border-white/10 px-5 pb-24 pt-36 sm:px-8 md:pb-32 md:pt-44 lg:px-12">
+        <section id="resolver" className="relative border-b border-white/10 px-5 pb-20 pt-36 sm:px-8 md:pb-28 md:pt-44 lg:px-12">
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(184,245,66,0.13),transparent_27%),radial-gradient(circle_at_84%_20%,rgba(75,98,130,0.22),transparent_31%)]" />
           <div className="mx-auto grid max-w-[1440px] items-center gap-14 lg:grid-cols-[0.96fr_1.04fr] lg:gap-20">
             <div>
@@ -83,79 +69,42 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-10 max-w-2xl text-sm leading-7 text-white/42">
-                {copy.hero.note}
-              </p>
+              <p className="mt-8 max-w-2xl text-sm leading-7 text-white/42">{copy.hero.note}</p>
             </div>
-
             <ResolutionEntry locale={locale} />
           </div>
         </section>
 
-        <section id="proteccion" className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+        <section id="producto" className="border-b border-white/10 bg-[#0d131e] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
-            <div className="grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.protection.eyebrow}</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">
+                  {locale === 'es' ? 'Producto, no promesa' : 'Product, not a promise'}
+                </p>
                 <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
-                  {copy.protection.title}
+                  {locale === 'es' ? 'Mira cómo se transforma una situación en trabajo revisable.' : 'See how a situation becomes reviewable work.'}
                 </h2>
                 <p className="mt-6 max-w-2xl text-base leading-8 text-white/55">
-                  {copy.protection.description}
+                  {locale === 'es'
+                    ? 'Este preview usa datos ficticios. Cambia el escenario y recorre cómo Kumplio conecta objetivo, prioridad, reservas, evidencia y revisión humana antes de avanzar.'
+                    : 'This preview uses fictional data. Change the scenario and see how Kumplio connects the objective, priority, reservations, evidence and human review before moving forward.'}
                 </p>
+                <Button asChild variant="outline" className="mt-7 h-12 rounded-[10px] px-6 font-black">
+                  <Link href={demoHref}>{locale === 'es' ? 'Abrir demo navegable' : 'Open interactive demo'} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
               </div>
-
-              <div className="overflow-hidden rounded-[28px] border border-white/10 bg-card">
-                <div className="grid border-b border-white/10 sm:grid-cols-2">
-                  <div className="p-6 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-white/35">{copy.protection.scatteredLabel}</p>
-                    <p className="mt-4 text-xl font-bold text-white/75">{copy.protection.scatteredProblem}</p>
-                  </div>
-                  <div className="border-t border-white/10 bg-primary/[0.055] p-6 sm:border-l sm:border-t-0 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Kumplio</p>
-                    <p className="mt-4 text-xl font-bold">{copy.protection.scatteredSolution}</p>
-                  </div>
-                </div>
-                <div className="grid sm:grid-cols-2">
-                  <div className="p-6 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-white/35">{copy.protection.reactiveLabel}</p>
-                    <p className="mt-4 text-xl font-bold text-white/75">{copy.protection.reactiveProblem}</p>
-                  </div>
-                  <div className="border-t border-white/10 bg-primary/[0.055] p-6 sm:border-l sm:border-t-0 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Kumplio</p>
-                    <p className="mt-4 text-xl font-bold">{copy.protection.reactiveSolution}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-14 grid gap-5 lg:grid-cols-3">
-              {copy.protection.pillars.map(({ title, description }, index) => {
-                const Icon = privacyIcons[index]
-                return (
-                  <article key={title} className="rounded-[24px] border border-white/10 bg-card p-7">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="mt-6 text-xl font-black">{title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-white/50">{description}</p>
-                  </article>
-                )
-              })}
+              <PublicWorkspacePreview locale={locale} mode="compact" />
             </div>
           </div>
         </section>
 
-        <section className="border-b border-white/10 px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+        <section className="border-b border-white/10 px-5 py-20 sm:px-8 md:py-28 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
             <div className="max-w-4xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.solution.eyebrow}</p>
-              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
-                {copy.solution.title}
-              </h2>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">
-                {copy.solution.description}
-              </p>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">{copy.solution.title}</h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">{copy.solution.description}</p>
             </div>
             <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {copy.solution.layers.map((item, index) => (
@@ -169,100 +118,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="guia" className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
+        <section id="casos" className="border-b border-white/10 bg-[#0d131e] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
-            <div className="max-w-4xl">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.guide.eyebrow}</p>
-              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
-                {copy.guide.title}
-              </h2>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">
-                {copy.guide.description}
+            <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.scenarios.eyebrow}</p>
+                <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">{copy.scenarios.title}</h2>
+              </div>
+              <p className="max-w-2xl text-base leading-8 text-white/50 lg:justify-self-end">
+                {locale === 'es'
+                  ? 'No necesitas saber qué módulo usar. Empieza por lo que está pasando y Kumplio organiza el contexto, las capacidades y la revisión necesarias.'
+                  : 'You do not need to know which module to use. Start with what is happening and Kumplio organizes the context, capabilities and review that are needed.'}
               </p>
-            </div>
-            <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {copy.guide.steps.map(({ title, description }, index) => {
-                const Icon = guideIcons[index]
-                return (
-                  <article key={title} className="rounded-[22px] border border-white/10 bg-card p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="text-xs font-black text-white/25">0{index + 1}</span>
-                    </div>
-                    <h3 className="mt-6 text-xl font-black">{title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-white/50">{description}</p>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section id="equipo" className="border-b border-white/10 px-5 py-24 sm:px-8 md:py-32 lg:px-12">
-          <div className="mx-auto max-w-[1440px]">
-            <div className="max-w-4xl">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.specialists.eyebrow}</p>
-              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
-                {copy.specialists.title}
-              </h2>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">
-                {copy.specialists.description}
-              </p>
-            </div>
-
-            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {AGENT_CATALOG.map((agent, index) => {
-                const localizedAgent = locale === 'en'
-                  ? ENGLISH_AGENT_PUBLIC_COPY[agent.id]
-                  : { role: agent.role, mission: agent.mission, delivers: agent.delivers }
-
-                return (
-                  <article key={agent.id} className="rounded-[24px] border border-white/10 bg-card p-7">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">{copy.specialists.specialistLabel} 0{index + 1}</p>
-                        <h3 className="mt-3 text-2xl font-black">{agent.name}</h3>
-                        <p className="mt-2 text-sm font-semibold text-white/70">{localizedAgent.role}</p>
-                      </div>
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <Users className="h-5 w-5" />
-                      </div>
-                    </div>
-                    <p className="mt-5 text-sm leading-7 text-white/50">{localizedAgent.mission}</p>
-                    <div className="mt-6 border-t border-white/10 pt-5">
-                      <p className="text-xs font-black uppercase tracking-[0.14em] text-white/35">{copy.specialists.deliverableLabel}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {localizedAgent.delivers.slice(0, 3).map((deliverable) => (
-                          <span key={deliverable} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/55">
-                            {deliverable}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-
-            <p className="mt-8 max-w-3xl text-sm leading-7 text-white/42">
-              {copy.specialists.note}
-            </p>
-          </div>
-        </section>
-
-        <section className="border-b border-white/10 bg-[#0d131e] px-5 py-24 sm:px-8 md:py-32 lg:px-12">
-          <div className="mx-auto max-w-[1440px]">
-            <div className="max-w-4xl">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.scenarios.eyebrow}</p>
-              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.03em] md:text-5xl">
-                {copy.scenarios.title}
-              </h2>
             </div>
             <div className="mt-12 grid gap-5 lg:grid-cols-3">
               {copy.scenarios.items.map((scenario) => (
-                <article key={scenario.label} className="rounded-[24px] border border-white/10 bg-card p-7">
+                <article key={scenario.label} className="group rounded-[24px] border border-white/10 bg-card p-7 transition hover:-translate-y-1 hover:border-primary/25">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">{scenario.label}</p>
                   <h3 className="mt-5 text-2xl font-black leading-tight">{scenario.title}</h3>
                   <div className="mt-6 space-y-3">
@@ -279,18 +150,18 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section id="seguridad" className="border-b border-white/10 px-5 py-24 sm:px-8 md:py-32 lg:px-12">
-          <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+        <section id="seguridad" className="border-b border-white/10 px-5 py-20 sm:px-8 md:py-28 lg:px-12">
+          <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
             <div>
               <ShieldCheck className="h-10 w-10 text-primary" />
               <p className="mt-6 text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.security.eyebrow}</p>
               <h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] md:text-5xl">{copy.security.title}</h2>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-white/55">
-                {copy.security.description}
-              </p>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/42">
-                {copy.security.note}
-              </p>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-white/55">{copy.security.description}</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <span className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-white/55">{locale === 'es' ? 'Fuentes trazables' : 'Traceable sources'}</span>
+                <span className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-white/55">{locale === 'es' ? 'Contexto por organización' : 'Organization-scoped context'}</span>
+                <span className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-white/55">{locale === 'es' ? 'Revisión humana' : 'Human review'}</span>
+              </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {copy.security.cards.map(({ title, description }) => (
@@ -303,18 +174,21 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="px-5 py-24 text-center sm:px-8 md:py-32 lg:px-12">
+        <section className="relative overflow-hidden px-5 py-24 text-center sm:px-8 md:py-32 lg:px-12">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_80%,rgba(184,245,66,0.10),transparent_28%)]" />
           <div className="mx-auto max-w-4xl">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.cta.eyebrow}</p>
-            <h2 className="mt-5 text-balance text-4xl font-extrabold tracking-[-0.035em] md:text-6xl">
-              {copy.cta.title}
-            </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/55">
-              {copy.cta.description}
-            </p>
-            <Button size="lg" asChild className="mt-8 h-13 rounded-[10px] px-8 font-black">
-              <a href="#resolver">{copy.cta.action} <ArrowRight className="ml-2 h-4 w-4" /></a>
-            </Button>
+            <Sparkles className="mx-auto h-8 w-8 text-primary" />
+            <p className="mt-6 text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.cta.eyebrow}</p>
+            <h2 className="mt-5 text-balance text-4xl font-extrabold tracking-[-0.035em] md:text-6xl">{copy.cta.title}</h2>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/55">{copy.cta.description}</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button size="lg" asChild className="h-13 rounded-[10px] px-8 font-black">
+                <a href="#resolver">{copy.cta.action} <ArrowRight className="ml-2 h-4 w-4" /></a>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="h-13 rounded-[10px] px-8 font-black">
+                <Link href={demoHref}>{locale === 'es' ? 'Explorar demo' : 'Explore demo'}</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
