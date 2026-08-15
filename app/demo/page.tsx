@@ -1,134 +1,180 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  FileCheck2,
-  FolderKanban,
-  SearchCheck,
-  ShieldCheck,
-  Users,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/footer'
+import { PublicWorkspacePreview } from '@/components/marketing/public-workspace-preview'
+import { getPublicRequestContext } from '@/lib/i18n/request-context'
+import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 
-export const metadata = {
-  title: 'Cómo se resuelve un caso con Kumplio',
-  description: 'Recorre cómo Kumplio transforma una situación regulatoria, contractual o de cumplimiento en una decisión, un plan y evidencia de cierre.',
+const COPY = {
+  es: {
+    metadata: {
+      title: 'Demo interactiva | Cómo funciona Kumplio',
+      description: 'Explora una demostración ficticia y navegable de cómo Kumplio organiza un caso de protección de datos, especialistas, evidencia, reservas y acciones.',
+    },
+    back: 'Volver a Kumplio',
+    eyebrow: 'Demostración pública · datos ficticios',
+    title: 'Entra al producto antes de crear una cuenta.',
+    description: 'Cambia el escenario, recorre especialistas, abre evidencia y revisa el plan. Esta demo no ejecuta un análisis real: representa de forma determinística cómo Kumplio organiza un expediente y mantiene la revisión humana.',
+    guardrails: ['Sin datos reales', 'Sin conclusión de cumplimiento', 'Sin acciones sobre producción'],
+    sectionEyebrow: 'Workspace demostrativo',
+    sectionTitle: 'Un expediente conecta lo que antes vivía separado.',
+    sectionDescription: 'El objetivo, las fuentes, los especialistas, la evidencia, las reservas y las acciones permanecen relacionados. Eso permite revisar por qué se propone un siguiente paso y qué falta demostrar antes de cerrar.',
+    points: [
+      ['Contexto antes de conclusiones', 'Kumplio separa lo aportado, lo recuperado y lo que todavía falta confirmar.'],
+      ['Especialistas con fronteras', 'Cada capacidad tiene una función definida y sus resultados quedan sujetos a revisión.'],
+      ['Evidencia conectada', 'Los documentos no quedan aislados: se relacionan con controles, decisiones y criterios de cierre.'],
+    ],
+    ctaEyebrow: 'Pasa de la demo a tu situación',
+    ctaTitle: 'Describe lo que necesitas proteger o resolver.',
+    ctaDescription: 'Tu expediente real comienza con tu objetivo y contexto autorizado. Kumplio no reutiliza los datos ficticios de esta demostración.',
+    cta: 'Empezar un caso',
+    pricing: 'Ver planes',
+    switchLanguage: 'English',
+  },
+  en: {
+    metadata: {
+      title: 'Interactive demo | How Kumplio works',
+      description: 'Explore a fictional, interactive demonstration of how Kumplio organizes a data-protection case, specialists, evidence, reservations and actions.',
+    },
+    back: 'Back to Kumplio',
+    eyebrow: 'Public demo · fictional data',
+    title: 'Enter the product before creating an account.',
+    description: 'Change the scenario, explore specialists, open evidence and review the plan. This demo does not run a real analysis: it deterministically represents how Kumplio organizes a case file and preserves human review.',
+    guardrails: ['No real data', 'No compliance conclusion', 'No production actions'],
+    sectionEyebrow: 'Demo workspace',
+    sectionTitle: 'One case file connects what used to live apart.',
+    sectionDescription: 'The objective, sources, specialists, evidence, reservations and actions stay connected. That makes it possible to review why a next step is proposed and what still needs to be demonstrated before closure.',
+    points: [
+      ['Context before conclusions', 'Kumplio separates what was provided, what was retrieved and what still needs confirmation.'],
+      ['Specialists with boundaries', 'Each capability has a defined responsibility and its outputs remain subject to review.'],
+      ['Connected evidence', 'Documents do not remain isolated: they connect to controls, decisions and closure criteria.'],
+    ],
+    ctaEyebrow: 'Move from the demo to your situation',
+    ctaTitle: 'Describe what you need to protect or resolve.',
+    ctaDescription: 'Your real case file begins with your objective and authorized context. Kumplio does not reuse the fictional data from this demonstration.',
+    cta: 'Start a case',
+    pricing: 'View plans',
+    switchLanguage: 'Español',
+  },
+} as const
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getPublicRequestContext()
+  const copy = COPY[locale]
+  const canonical = withPublicLocale('/demo', locale)
+
+  return {
+    title: copy.metadata.title,
+    description: copy.metadata.description,
+    alternates: {
+      canonical,
+      languages: {
+        'es-CL': withPublicLocale('/demo', 'es'),
+        en: withPublicLocale('/demo', 'en'),
+        'x-default': withPublicLocale('/demo', 'es'),
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: copy.metadata.title,
+      description: copy.metadata.description,
+    },
+  }
 }
 
-const steps = [
-  {
-    label: 'Situación',
-    title: 'Explicas lo que necesitas resolver.',
-    description: 'No debes elegir un módulo ni conocer el nombre exacto de la obligación. Puedes describir el problema con tus propias palabras.',
-    example: '“Un cliente me está exigiendo demostrar cómo protegemos sus datos.”',
-    icon: SearchCheck,
-  },
-  {
-    label: 'Expediente',
-    title: 'Kumplio organiza el caso y sus antecedentes.',
-    description: 'El objetivo, los documentos, las fuentes y las preguntas abiertas quedan reunidos en un expediente vivo.',
-    example: 'El sistema distingue lo aportado por el usuario, lo recuperado desde fuentes y lo que todavía falta confirmar.',
-    icon: FolderKanban,
-  },
-  {
-    label: 'Equipo',
-    title: 'Se activa el trabajo especializado necesario.',
-    description: 'Los especialistas digitales analizan obligaciones, riesgos, controles, plan y calidad según el tipo de caso.',
-    example: 'Cada estado visible corresponde a una ejecución y un resultado realmente persistido.',
-    icon: Users,
-  },
-  {
-    label: 'Decisión',
-    title: 'Recibes lo importante en un orden útil.',
-    description: 'Kumplio muestra qué requiere atención, qué puede esperar, qué debes hacer y qué reservas siguen abiertas.',
-    example: 'La persona revisa, aprueba, solicita cambios o detiene el avance antes de la siguiente etapa.',
-    icon: ShieldCheck,
-  },
-  {
-    label: 'Evidencia',
-    title: 'El respaldo queda conectado con la conclusión.',
-    description: 'Fuentes, documentos, artefactos, revisiones y decisiones permanecen relacionados dentro del expediente.',
-    example: 'No se presenta una afirmación importante como certeza cuando falta contexto o evidencia suficiente.',
-    icon: FileCheck2,
-  },
-  {
-    label: 'Cierre',
-    title: 'El diagnóstico se convierte en trabajo terminado.',
-    description: 'El plan continúa con acciones, responsables, evidencia esperada y criterio de cierre hasta que el caso pueda resolverse.',
-    example: 'Kumplio conserva el historial para futuras revisiones, cambios regulatorios o casos relacionados.',
-    icon: CheckCircle2,
-  },
-]
+export default async function DemoPage() {
+  const { locale } = await getPublicRequestContext()
+  const copy = COPY[locale]
+  const alternateLocale = locale === 'es' ? 'en' : 'es'
+  const homeHref = getPublicSiteHref('/', locale)
+  const pricingHref = getPublicSiteHref('/pricing', locale)
+  const alternateDemoHref = withPublicLocale('/demo', alternateLocale)
 
-export default function DemoPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-white/10 bg-[#111723]">
-        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
-          <Link href="/" aria-label="Volver a Kumplio">
-            <Image src="/logo-kumplio.svg" alt="Kumplio" width={140} height={56} priority className="h-11 w-auto" />
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#111723]/92 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+          <Link href={homeHref} aria-label="Kumplio">
+            <Image src="/logo-kumplio.svg" alt="Kumplio" width={145} height={58} priority className="h-11 w-auto" />
           </Link>
-          <Button asChild className="rounded-[10px] font-black">
-            <Link href="/#resolver">Resolver un caso</Link>
-          </Button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href={alternateDemoHref}
+              hrefLang={alternateLocale === 'es' ? 'es-CL' : 'en'}
+              className="rounded-lg border border-white/12 px-3 py-2 text-xs font-black text-white/70 transition hover:border-white/30 hover:text-white"
+            >
+              {copy.switchLanguage}
+            </Link>
+            <Button asChild className="hidden rounded-[10px] font-black sm:inline-flex">
+              <Link href={`${homeHref}#resolver`}>{copy.cta}</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
       <main>
-        <section className="border-b border-white/10 px-5 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto max-w-4xl text-center">
-            <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-white/55 hover:text-white">
-              <ArrowLeft className="h-4 w-4" /> Volver
+        <section className="relative overflow-hidden border-b border-white/10 px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_15%,rgba(184,245,66,0.12),transparent_28%),radial-gradient(circle_at_80%_45%,rgba(75,98,130,0.2),transparent_30%)]" />
+          <div className="mx-auto max-w-[1180px] text-center">
+            <Link href={homeHref} className="inline-flex items-center gap-2 text-sm font-semibold text-white/45 hover:text-white">
+              <ArrowLeft className="h-4 w-4" /> {copy.back}
             </Link>
-            <p className="mt-8 text-xs font-black uppercase tracking-[0.2em] text-primary">Demostración del recorrido</p>
-            <h1 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.04em] sm:text-6xl">
-              De una situación difícil a un cierre respaldado.
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/55">
-              No te mostraremos un catálogo de módulos. Te mostraremos cómo Kumplio entiende un objetivo, organiza el trabajo y mantiene el control humano hasta resolver el caso.
-            </p>
-          </div>
-        </section>
-
-        <section className="px-5 py-16 sm:px-8 sm:py-24">
-          <div className="mx-auto max-w-5xl space-y-5">
-            {steps.map(({ label, title, description, example, icon: Icon }, index) => (
-              <article key={label} className="grid gap-5 rounded-[24px] border border-white/10 bg-card p-6 sm:grid-cols-[84px_64px_1fr] sm:items-start sm:p-8">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-white/35">Paso</p>
-                  <p className="mt-2 text-2xl font-extrabold text-primary">0{index + 1}</p>
-                </div>
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">{label}</p>
-                  <h2 className="mt-2 text-2xl font-extrabold">{title}</h2>
-                  <p className="mt-3 text-base leading-7 text-white/65">{description}</p>
-                  <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3 text-sm leading-6 text-white/48">{example}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="border-y border-white/10 bg-[#0d131e] px-5 py-16 sm:px-8 sm:py-24">
-          <div className="mx-auto grid max-w-5xl gap-8 rounded-[28px] border border-primary/20 bg-primary/[0.055] p-7 sm:grid-cols-[1fr_auto] sm:items-center sm:p-10">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">El resultado</p>
-              <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">No solo sabes qué falta. Sabes qué hacer después y cómo demostrar el cierre.</h2>
-              <p className="mt-4 max-w-2xl leading-7 text-white/55">
-                Las prioridades dependen de la información real del caso. Kumplio muestra expresamente las fuentes, reservas y decisiones humanas que sostienen cada avance.
-              </p>
+            <p className="mt-8 text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.eyebrow}</p>
+            <h1 className="mx-auto mt-4 max-w-5xl text-balance text-4xl font-extrabold tracking-[-0.04em] sm:text-6xl md:text-7xl">{copy.title}</h1>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/55">{copy.description}</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {copy.guardrails.map((item) => <span key={item} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.025] px-4 py-2 text-xs font-bold text-white/50"><CheckCircle2 className="h-3.5 w-3.5 text-primary" />{item}</span>)}
             </div>
-            <Button size="lg" asChild className="rounded-[10px] px-7 font-black">
-              <Link href="/#resolver">Describe tu situación <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
+          </div>
+        </section>
+
+        <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
+          <div className="mx-auto max-w-[1440px]">
+            <PublicWorkspacePreview locale={locale} mode="full" />
+          </div>
+        </section>
+
+        <section className="border-y border-white/10 bg-[#0d131e] px-5 py-20 sm:px-8 md:py-24 lg:px-12">
+          <div className="mx-auto max-w-[1180px]">
+            <div className="max-w-4xl">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.sectionEyebrow}</p>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] md:text-5xl">{copy.sectionTitle}</h2>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-white/55">{copy.sectionDescription}</p>
+            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {copy.points.map(([title, description]) => (
+                <article key={title} className="rounded-[22px] border border-white/10 bg-card p-6">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  <h3 className="mt-5 text-lg font-black">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/48">{description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 py-24 text-center sm:px-8 md:py-28 lg:px-12">
+          <div className="mx-auto max-w-4xl">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.ctaEyebrow}</p>
+            <h2 className="mt-5 text-balance text-4xl font-extrabold tracking-[-0.035em] md:text-6xl">{copy.ctaTitle}</h2>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/55">{copy.ctaDescription}</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Button size="lg" asChild className="h-13 rounded-[10px] px-8 font-black">
+                <Link href={`${homeHref}#resolver`}>{copy.cta} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="h-13 rounded-[10px] px-8 font-black">
+                <Link href={pricingHref}>{copy.pricing}</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
+
+      <Footer locale={locale} />
     </div>
   )
 }
