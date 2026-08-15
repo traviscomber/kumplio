@@ -57,6 +57,7 @@ export function GET() {
         'Only fully reviewed translated routes use /es and /en canonicals. Routes not yet localized keep their existing unprefixed canonical URL.',
       localized_pages: {
         home: { es: `${SITE_URL}/es`, en: `${SITE_URL}/en` },
+        demo: { es: `${SITE_URL}/es/demo`, en: `${SITE_URL}/en/demo` },
         pricing: { es: `${SITE_URL}/es/pricing`, en: `${SITE_URL}/en/pricing` },
         faq: { es: `${SITE_URL}/es/faq`, en: `${SITE_URL}/en/faq` },
         contact: { es: `${SITE_URL}/es/contact`, en: `${SITE_URL}/en/contact` },
@@ -98,6 +99,15 @@ export function GET() {
       customer_evidence: false,
       compliance_certification: false,
     },
+    public_demo: {
+      kind: 'deterministic_fictional_workspace',
+      es: `${SITE_URL}/es/demo`,
+      en: `${SITE_URL}/en/demo`,
+      executes_real_ai_analysis: false,
+      uses_customer_data: false,
+      mutates_production_data: false,
+      compliance_conclusion: false,
+    },
     public_pages: {
       home_es: `${SITE_URL}/es`,
       home_en: `${SITE_URL}/en`,
@@ -106,7 +116,8 @@ export function GET() {
       law_guides: `${SITE_URL}/resources/ley-21719`,
       compliance_resources: `${SITE_URL}/resources/cumplimiento-normativo`,
       use_cases: `${SITE_URL}/use-cases`,
-      demo: `${SITE_URL}/demo`,
+      demo_es: `${SITE_URL}/es/demo`,
+      demo_en: `${SITE_URL}/en/demo`,
       pricing_es: `${SITE_URL}/es/pricing`,
       pricing_en: `${SITE_URL}/en/pricing`,
       enterprise: `${SITE_URL}/enterprise`,
