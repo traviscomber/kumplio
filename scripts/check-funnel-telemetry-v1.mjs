@@ -10,18 +10,22 @@ const [helper, resolutionEntry, signUp, onboardingForm, betaCaseEntry] = await P
 ])
 
 // Only the typed helper is allowed to talk to Vercel Analytics for this funnel.
-assert.match(helper, /from '@vercel\/analytics'/)
+assert.ok(helper.includes("from '@vercel/analytics'"), 'Typed funnel helper must own the Vercel Analytics import')
 for (const source of [resolutionEntry, signUp, onboardingForm, betaCaseEntry]) {
-  assert.doesNotMatch(source, /from '@vercel\/analytics'/)
+  assert.ok(!source.includes("from '@vercel/analytics'"), 'Funnel callers must not import Vercel Analytics directly')
 }
 
 // Call sites send only categorical state; the helper owns timing and event names.
-assert.match(resolutionEntry, /trackFunnelIntentStarted\(\{ audience, locale \}\)/)
-assert.match(signUp, /trackFunnelSignupCompleted\(\{/)
-assert.match(onboardingForm, /trackFunnelWorkspaceInitialized\(\{/)
-assert.match(betaCaseEntry, /trackFunnelGuidedCaseCreated\(\{/)
-assert.match(betaCaseEntry, /trackFunnelFirstStageQueued\(\{ audience, recovered: recoverable \}\)/)
-assert.match(betaCaseEntry, /clearFunnelTiming\(\)/)
+for (const [source, expected] of [
+  [resolutionEntry, 'trackFunnelIntentStarted({ audience, locale })'],
+  [signUp, 'trackFunnelSignupCompleted({'],
+  [onboardingForm, 'trackFunnelWorkspaceInitialized({'],
+  [betaCaseEntry, 'trackFunnelGuidedCaseCreated({'],
+  [betaCaseEntry, 'trackFunnelFirstStageQueued({ audience, recovered: recoverable })'],
+  [betaCaseEntry, 'clearFunnelTiming()'],
+]) {
+  assert.ok(source.includes(expected), `Funnel caller contract missing: ${expected}`)
+}
 
 for (const expected of [
   "const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'",
@@ -43,7 +47,8 @@ for (const expected of [
 
 // Privacy boundary: no identity, free-text case content or database record identifiers in the telemetry API.
 for (const forbidden of ['email', 'organizationName', 'firstName', 'lastName', 'goal', 'caseId', 'workflowId', 'userId']) {
-  assert.ok(!new RegExp(`\\b${forbidden}\\b`, 'i').test(helper), `Funnel telemetry helper exposes forbidden field: ${forbidden}`)
+  const fieldPattern = new RegExp(`\\b${forbidden}\\b`, 'i')
+  assert.ok(!fieldPattern.test(helper), `Funnel telemetry helper exposes forbidden field: ${forbidden}`)
 }
 
 console.log('Privacy-safe funnel telemetry contract: OK')
