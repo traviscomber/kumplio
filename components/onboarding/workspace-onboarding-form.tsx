@@ -2,9 +2,9 @@
 
 import { FormEvent, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { track } from '@vercel/analytics'
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { trackFunnelWorkspaceInitialized } from '@/lib/analytics/funnel-client'
 
 type Industry = 'general' | 'transport' | 'agriculture' | 'mining' | 'health' | 'finance' | 'construction' | 'other'
 type OrganizationSize = 'micro' | 'small' | 'medium' | 'large' | 'enterprise'
@@ -16,8 +16,6 @@ type Props = {
   initialLastName?: string | null
   nextPath?: string | null
 }
-
-const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'
 
 const industries: Array<{ value: Industry; label: string }> = [
   { value: 'general', label: 'Servicios generales' },
@@ -47,16 +45,6 @@ const suggestions: Record<Industry, { project: string; complianceCase: string }>
   finance: { project: 'Privacidad y cumplimiento financiero', complianceCase: 'Diagnóstico inicial de datos financieros y decisiones automatizadas' },
   construction: { project: 'Cumplimiento de obras y protección de datos', complianceCase: 'Diagnóstico inicial de contratistas, seguridad y datos personales' },
   other: { project: 'Primer ámbito de cumplimiento', complianceCase: 'Diagnóstico inicial de cumplimiento' },
-}
-
-function funnelElapsedSeconds() {
-  try {
-    const startedAt = Number(window.sessionStorage.getItem(FUNNEL_STARTED_AT_KEY))
-    if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > Date.now()) return null
-    return Math.max(0, Math.round((Date.now() - startedAt) / 1000))
-  } catch {
-    return null
-  }
 }
 
 export function WorkspaceOnboardingForm({
@@ -102,10 +90,8 @@ export function WorkspaceOnboardingForm({
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'No fue posible crear el workspace')
 
-      const elapsedSeconds = funnelElapsedSeconds()
-      track('Funnel Workspace Initialized', {
+      trackFunnelWorkspaceInitialized({
         continuation: continuesCase ? 'guided_case' : 'default',
-        ...(elapsedSeconds === null ? {} : { elapsed_seconds: elapsedSeconds }),
       })
 
       const caseId = data.workspace?.caseId as string | null | undefined
