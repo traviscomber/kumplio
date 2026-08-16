@@ -4,7 +4,7 @@ import { withPublicLocale, type PublicLocale } from '@/lib/i18n/public-routing'
 import { SITE_URL } from '@/lib/public-site'
 
 // Google recomienda que lastModified represente cambios sustantivos reales.
-const publicUpdatedAt = new Date('2026-08-15T12:00:00-04:00')
+const publicUpdatedAt = new Date('2026-08-16T10:35:00-04:00')
 const legalUpdatedAt = new Date('2026-08-03T12:00:00-04:00')
 
 function localizedUrl(pathname: string, locale: PublicLocale) {
@@ -35,6 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const localized: MetadataRoute.Sitemap = [
     ...localizedPair('/', 'weekly', 1, 0.9),
     ...localizedPair('/demo', 'monthly', 0.86, 0.78),
+    ...localizedPair('/trust', 'monthly', 0.84, 0.76),
     ...localizedPair('/pricing', 'monthly', 0.8, 0.72),
     ...localizedPair('/faq', 'monthly', 0.78, 0.7),
     ...localizedPair('/contact', 'monthly', 0.62, 0.56),
