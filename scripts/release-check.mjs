@@ -44,6 +44,7 @@ const checks = [
   ['check:processing-notice-mapping'],
   ['check:processing-deletion-evidence'],
   ['check:openai-provider-trace'],
+  ['check:openai-retention-probe'],
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
   ['check:e2e-data-lifecycle'],
