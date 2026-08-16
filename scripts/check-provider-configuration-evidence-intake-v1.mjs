@@ -43,7 +43,7 @@ for (const marker of [
   "configurationKind: z.literal('openai_data_retention')",
   "projectBindingObserved: z.literal(true)",
   "dataRetentionMode: z.enum(['standard', 'modified_abuse_monitoring', 'zero_data_retention'])",
-  "body.action === 'submit'",
+  "parsed.data.action === 'submit'",
   "admin.rpc('submit_processing_provider_tenant_configuration_evidence_v1'",
   "admin.rpc('review_processing_provider_tenant_configuration_evidence_v1'",
   'access.canAssignWork',
