@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowUpRight, BookOpenText, Mail, MapPin, Phone } from 'lucide-react'
 import { getPublicSiteHref, type PublicLocale } from '@/lib/i18n/public-routing'
 import { N3URALIA_REFERRAL_URL, PUBLIC_CONTACT } from '@/lib/public-site'
 
@@ -20,6 +20,11 @@ type FooterCopy = {
   companyLinks: FooterLink[]
   legalLinks: FooterLink[]
 }
+
+const OFFICIAL_SOURCE_URLS = {
+  leychile: 'https://www.bcn.cl/leychile/navegar?i=1209272',
+  diarioOficial: 'https://www.diariooficial.interior.gob.cl/publicaciones/2024/12/13/44023/01/2583630.pdf',
+} as const
 
 function publicHref(locale: PublicLocale, pathname: string, hash = '') {
   return `${getPublicSiteHref(pathname, locale)}${hash}`
@@ -107,6 +112,77 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
   }
 }
 
+function OfficialSources({ locale }: { locale: PublicLocale }) {
+  const english = locale === 'en'
+
+  return (
+    <div className="mb-14 rounded-[24px] border border-border bg-muted/20 p-6 md:p-8">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div>
+          <div className="flex items-center gap-2 text-primary">
+            <BookOpenText className="h-5 w-5" />
+            <p className="text-xs font-black uppercase tracking-[0.18em]">
+              {english ? 'Official sources' : 'Fuentes oficiales'}
+            </p>
+          </div>
+          <h2 className="mt-4 max-w-xl text-2xl font-extrabold tracking-tight md:text-3xl">
+            {english
+              ? 'Important conclusions should lead back to their source.'
+              : 'Las conclusiones importantes deben poder volver a su fuente.'}
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
+            {english
+              ? 'Kumplio prioritizes official sources, preserves provenance and separates observed facts from what still requires evidence or human review.'
+              : 'Kumplio prioriza fuentes oficiales, conserva procedencia y separa lo observado de lo que todavía requiere evidencia o revisión humana.'}
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <OfficialSourceLink
+            href={OFFICIAL_SOURCE_URLS.leychile}
+            title="BCN · LeyChile"
+            description={english
+              ? 'Official consolidated text and versions of Chilean Law 21.719.'
+              : 'Texto oficial consolidado y versiones de la Ley 21.719.'}
+          />
+          <OfficialSourceLink
+            href={OFFICIAL_SOURCE_URLS.diarioOficial}
+            title={english ? 'Official Gazette of Chile' : 'Diario Oficial de la República de Chile'}
+            description={english
+              ? 'Official publication of Law 21.719 dated December 13, 2024.'
+              : 'Publicación oficial de la Ley 21.719 del 13 de diciembre de 2024.'}
+          />
+        </div>
+      </div>
+
+      <p className="mt-6 border-t border-border pt-5 text-xs leading-6 text-muted-foreground">
+        {english
+          ? 'Kumplio is an independent product. It is not affiliated with, sponsored, certified or endorsed by the institutions referenced above. Names and trademarks belong to their respective owners.'
+          : 'Kumplio es un producto independiente. No está afiliado, patrocinado, certificado ni respaldado por las instituciones mencionadas. Los nombres y marcas pertenecen a sus respectivos titulares.'}
+      </p>
+    </div>
+  )
+}
+
+function OfficialSourceLink({ href, title, description }: { href: string; title: string; description: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group rounded-2xl border border-border bg-background p-5 transition hover:border-primary/35"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-bold">{title}</p>
+          <p className="mt-2 text-xs leading-6 text-muted-foreground">{description}</p>
+        </div>
+        <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:text-primary" />
+      </div>
+    </a>
+  )
+}
+
 export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
   const currentYear = new Date().getFullYear()
   const copy = getFooterCopy(locale)
@@ -114,6 +190,8 @@ export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
   return (
     <footer className="border-t border-border bg-background">
       <div className="container mx-auto px-6 py-16">
+        <OfficialSources locale={locale} />
+
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.8fr_0.8fr_1fr]">
           <div>
             <Image src="/logo-kumplio.svg" alt="Kumplio" width={120} height={48} className="h-12 w-auto" />
