@@ -14,6 +14,7 @@ const [
   onboardingPage,
   onboardingForm,
   betaCaseEntry,
+  artifactPreview,
 ] = await Promise.all([
   readFile('app/cases/[caseId]/page.tsx', 'utf8'),
   readFile('components/cases/guided-case-workspace.tsx', 'utf8'),
@@ -27,6 +28,7 @@ const [
   readFile('app/onboarding/page.tsx', 'utf8'),
   readFile('components/onboarding/workspace-onboarding-form.tsx', 'utf8'),
   readFile('components/cases/beta-case-entry.tsx', 'utf8'),
+  readFile('components/cases/artifact-result-preview.tsx', 'utf8'),
 ])
 
 assert.match(casePage, /GuidedCaseWorkspace/)
@@ -83,5 +85,15 @@ assert.ok(betaCaseEntry.includes('persistDraft(normalizedGoal, audience)'))
 assert.ok(betaCaseEntry.includes('window.sessionStorage.removeItem(DRAFT_STORAGE_KEY)'))
 assert.ok(betaCaseEntry.includes('window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)'))
 assert.ok(betaCaseEntry.includes('recargas la página o vuelves a intentar'))
+
+// Review UI must expose evidence and limitations before treating findings as actionable.
+const evidenceIndex = artifactPreview.indexOf('Fuentes y evidencia de respaldo')
+const caveatsIndex = artifactPreview.indexOf('Reservas y pendientes')
+const findingsIndex = artifactPreview.indexOf('Hallazgos (')
+assert.ok(evidenceIndex >= 0, 'Artifact preview must expose evidence sources')
+assert.ok(caveatsIndex > evidenceIndex, 'Reservations must follow evidence')
+assert.ok(findingsIndex > caveatsIndex, 'Findings must appear after evidence and reservations')
+assert.ok(artifactPreview.includes('Fuentes no expuestas en este resumen.'))
+assert.ok(artifactPreview.includes('Antes de aprobar, revisa la trazabilidad del expediente'))
 
 console.log('Authenticated guided resolution contract: OK')
