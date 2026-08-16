@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic'
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { track } from '@vercel/analytics'
 import {
   AlertCircle,
   Building2,
@@ -17,6 +16,7 @@ import {
   Mail,
   ShieldCheck,
 } from 'lucide-react'
+import { trackFunnelSignupCompleted } from '@/lib/analytics/funnel-client'
 import { createClient } from '@/lib/supabase/client'
 import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
@@ -99,7 +99,7 @@ export default function SignUp() {
         return
       }
 
-      track('Funnel Signup Completed', {
+      trackFunnelSignupCompleted({
         source: selectedPlan ? 'pricing' : 'guided_resolution',
         continuation: next === '/cases/new' ? 'guided_case' : 'other',
         confirmation: data.session ? 'instant' : 'email',
