@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 const [migration, route, loader, workspace, page] = await Promise.all([
-  readFile('supabase/migrations/20260816210500_provider_tenant_configuration_evidence_intake_v1.sql', 'utf8'),
+  readFile('supabase/migrations/20260816211617_provider_tenant_configuration_evidence_intake_v1.sql', 'utf8'),
   readFile('app/api/processing-activities/[processId]/provider-configuration/route.ts', 'utf8'),
   readFile('lib/compliance/digital-twin/provider-configuration.ts', 'utf8'),
   readFile('components/digital-twin/provider-configuration-workspace.tsx', 'utf8'),
