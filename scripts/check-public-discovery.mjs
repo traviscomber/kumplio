@@ -5,7 +5,7 @@ const indexNowKey = '5f3a9c7d2e4b6810a9d5f4c2b7e8a163'
 
 const requiredFiles = [
   'README.md', 'ROADMAP.md',
-  'app/layout.tsx', 'app/page.tsx', 'app/demo/page.tsx', 'app/pricing/page.tsx', 'app/faq/page.tsx', 'app/contact/page.tsx',
+  'app/layout.tsx', 'app/page.tsx', 'app/demo/page.tsx', 'app/trust/page.tsx', 'app/pricing/page.tsx', 'app/faq/page.tsx', 'app/contact/page.tsx',
   'app/about/page.tsx', 'app/como-pensamos/page.tsx', 'app/powered-by-n3uralia/page.tsx',
   'app/security/page.tsx', 'app/privacy/page.tsx', 'app/terms/page.tsx',
   'app/robots.ts', 'app/sitemap.ts', 'app/software-cumplimiento-chile/page.tsx',
@@ -47,7 +47,7 @@ const checks = [
   ['app/layout.tsx', ['SoftwareApplication', 'Organization', 'Brand', 'WebSite', 'n3uralia', 'provider', '/llms.txt', '/llms-full.txt', '/kumplio.json', 'generateMetadata', 'withPublicLocale', 'getPublicSiteHref', 'getPublicRequestContext', 'isEnglishPublicPathReady']],
   ['lib/i18n/public-routing.ts', [
     "PUBLIC_LOCALES = ['es', 'en']", "DEFAULT_PUBLIC_LOCALE: PublicLocale = 'es'", "PUBLIC_LOCALE_COOKIE = 'kumplio_public_locale'",
-    'SPANISH_PUBLIC_PATHS_READY', 'ENGLISH_PUBLIC_PATHS_READY', "'/pricing'", "'/demo'", "'/faq'", "'/contact'", "'/about'", "'/como-pensamos'",
+    'SPANISH_PUBLIC_PATHS_READY', 'ENGLISH_PUBLIC_PATHS_READY', "'/pricing'", "'/demo'", "'/trust'", "'/faq'", "'/contact'", "'/about'", "'/como-pensamos'",
     "'/powered-by-n3uralia'", "'/security'", "'/privacy'", "'/terms'", 'splitPublicLocale', 'isPublicSitePath',
     'isLocalizedPublicPathReady', 'getPublicSiteHref', 'withPublicLocale', "'/resources/ley-21719'",
   ]],
@@ -80,6 +80,12 @@ const checks = [
   ]],
   ['app/page.tsx', ['HOME_PUBLIC_COPY', 'PublicWorkspacePreview', 'getPublicRequestContext', 'getPublicSiteHref', 'alternateHomeHref', '<ResolutionEntry locale={locale} />', '<PublicWorkspacePreview locale={locale} mode="compact" />', '<Footer locale={locale} />']],
   ['app/demo/page.tsx', ['PublicWorkspacePreview', 'generateMetadata', "withPublicLocale('/demo', locale)", "withPublicLocale('/demo', 'es')", "withPublicLocale('/demo', 'en')", 'datos ficticios', 'fictional data', '<PublicWorkspacePreview locale={locale} mode="full" />', '<Footer locale={locale} />']],
+  ['app/trust/page.tsx', [
+    "withPublicLocale('/trust', locale)", "withPublicLocale('/trust', 'es')", "withPublicLocale('/trust', 'en')",
+    'Confianza que puede inspeccionarse.', 'Trust you can inspect.', 'BCN · LeyChile', 'Diario Oficial de la República de Chile',
+    'Kumplio es un producto independiente.', 'Kumplio is an independent product.', 'PUBLIC_AGENTIC_ASSURANCE',
+    'no es evidencia de cliente, certificación de cumplimiento ni conclusión jurídica',
+  ]],
   ['components/marketing/public-workspace-preview.tsx', ['Demo ficticia', 'Fictional demo', 'No declarar cumplimiento', 'Do not declare compliance', 'Revisión humana requerida', 'Human review required', "mode = 'compact'"]],
   ['app/pricing/page.tsx', ['PRICING_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/pricing', locale)", 'alternatePricingHref', '<Footer locale={locale} />']],
   ['app/faq/page.tsx', ['FAQ_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/faq', locale)", "'@type': 'FAQPage'", 'alternateFaqHref', '<Footer locale={locale} />']],
@@ -96,16 +102,18 @@ const checks = [
     'Powered by n3uralia', 'getPublicSiteHref', 'Software de protección de datos', 'Data protection software',
     'Ley 21.719', "['Contexto LLM', '/llms.txt']", "['Contexto LLM completo', '/llms-full.txt']",
     "['Datos públicos', '/kumplio.json']", 'PUBLIC_CONTACT.email', 'PUBLIC_CONTACT.phone', 'PUBLIC_CONTACT.location',
+    'Fuentes oficiales', 'Official sources', 'BCN · LeyChile', 'Diario Oficial de la República de Chile',
+    'Kumplio es un producto independiente.', 'Kumplio is an independent product.',
   ]],
   ['proxy.ts', ['splitPublicLocale', 'NextResponse.rewrite', 'PUBLIC_LOCALE_COOKIE', 'isLocalizedPublicPathReady', "response.headers.set('Content-Language'", 'updateSession(request)']],
   ['app/software-cumplimiento-chile/page.tsx', ['Software de protección de datos y Ley 21.719 en Chile', 'Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.', '¿Qué debe resolver una plataforma de protección de datos?', 'Construido para la realidad de protección de datos en Chile.', 'cumplimiento normativo']],
   ['app/robots.ts', ['OAI-SearchBot', 'ChatGPT-User', 'GPTBot', 'ClaudeBot', 'PerplexityBot', "'/dashboard'", '/llms-full.txt', '/kumplio.json']],
   ['app/sitemap.ts', [
     '/software-cumplimiento-chile', '/resources/ley-21719', '/resources/cumplimiento-normativo', 'localizedUrl',
-    "localizedPair('/', 'weekly'", "localizedPair('/demo', 'monthly'", "localizedPair('/pricing', 'monthly'", "localizedPair('/faq', 'monthly'", "localizedPair('/contact', 'monthly'",
+    "localizedPair('/', 'weekly'", "localizedPair('/demo', 'monthly'", "localizedPair('/trust', 'monthly'", "localizedPair('/pricing', 'monthly'", "localizedPair('/faq', 'monthly'", "localizedPair('/contact', 'monthly'",
     "localizedPair('/about', 'monthly'", "localizedPair('/como-pensamos', 'monthly'", "localizedPair('/powered-by-n3uralia', 'monthly'",
     "localizedPair('/security', 'monthly'", "localizedPair('/privacy', 'yearly'", "localizedPair('/terms', 'yearly'",
-    'currentPublicUrl', "2026-08-15T12:00:00-04:00", "2026-08-03T12:00:00-04:00",
+    'currentPublicUrl', "2026-08-16T10:35:00-04:00", "2026-08-03T12:00:00-04:00",
   ]],
   ['app/llms.txt/route.ts', [
     'PUBLIC_DISCOVERY', 'PUBLIC_AGENTIC_ASSURANCE', 'Developer and product factory', 'Primary market:',
@@ -145,6 +153,8 @@ const publicClaims = [
   ['app/llms-full.txt/route.ts', 'Do not describe fictional demo data or synthetic assurance as customer evidence'],
   ['app/demo/page.tsx', 'Esta demo no ejecuta un análisis real'],
   ['app/demo/page.tsx', 'This demo does not run a real analysis'],
+  ['app/trust/page.tsx', 'No afirmamos certificaciones externas'],
+  ['app/trust/page.tsx', 'We do not claim external certifications'],
 ]
 for (const [file, requiredGuardrail] of publicClaims) {
   const content = await readFile(file, 'utf8')
@@ -158,7 +168,7 @@ const legacyClaimPatterns = [
   /34 obligaciones identificadas/i,
   /exposición exacta en UF/i,
 ]
-for (const file of ['README.md', 'components/footer.tsx', 'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts', 'app/demo/page.tsx']) {
+for (const file of ['README.md', 'components/footer.tsx', 'app/llms.txt/route.ts', 'app/llms-full.txt/route.ts', 'app/kumplio.json/route.ts', 'app/demo/page.tsx', 'app/trust/page.tsx']) {
   const content = await readFile(file, 'utf8')
   for (const pattern of legacyClaimPatterns) {
     if (pattern.test(content)) failures.push(`${file} reintroduce un claim legacy no defendible: ${pattern}`)
