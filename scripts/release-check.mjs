@@ -44,6 +44,7 @@ const checks = [
   ['check:processing-notice-mapping'],
   ['check:processing-deletion-evidence'],
   ['check:processing-provider-tenant-config'],
+  ['check:provider-config-intake'],
   ['check:openai-provider-trace'],
   ['check:openai-retention-probe'],
   ['check:tenant-assurance'],
