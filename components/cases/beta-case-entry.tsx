@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { track } from '@vercel/analytics'
 import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
 import type { UserAudience } from '@/lib/agents/orchestrator'
 
 const DRAFT_STORAGE_KEY = 'kumplio:case-draft'
 const START_KEY_STORAGE_KEY = 'kumplio:case-start-key'
+const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 const EXAMPLES: Record<UserAudience, string[]> = {
@@ -72,6 +74,16 @@ function clearStartKey() {
     window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
   } catch {
     // Ignore storage failures and keep the current in-memory flow usable.
+  }
+}
+
+function funnelElapsedSeconds() {
+  try {
+    const startedAt = Number(window.sessionStorage.getItem(FUNNEL_STARTED_AT_KEY))
+    if (!Number.isFinite(startedAt) || startedAt <= 0 || startedAt > Date.now()) return null
+    return Math.max(0, Math.round((Date.now() - startedAt) / 1000))
+  } catch {
+    return null
   }
 }
 
@@ -159,6 +171,13 @@ export function BetaCaseEntry() {
       const workflowId = startPayload.workflowId as string | undefined
       if (!caseId || !workflowId) throw new Error('El caso quedó incompleto y no puede abrirse todavía')
 
+      const elapsedToCase = funnelElapsedSeconds()
+      track('Funnel Guided Case Created', {
+        audience,
+        resumed: Boolean(startPayload.resumed),
+        ...(elapsedToCase === null ? {} : { elapsed_seconds: elapsedToCase }),
+      })
+
       setCreatedCaseId(caseId)
       setStep('execution')
 
@@ -173,8 +192,16 @@ export function BetaCaseEntry() {
         throw new Error(advancePayload.error || 'El expediente está listo, pero no fue posible iniciar la primera etapa')
       }
 
+      const elapsedToExecution = funnelElapsedSeconds()
+      track('Funnel First Stage Queued', {
+        audience,
+        recovered: recoverable,
+        ...(elapsedToExecution === null ? {} : { elapsed_seconds: elapsedToExecution }),
+      })
+
       window.sessionStorage.removeItem(DRAFT_STORAGE_KEY)
       window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
+      window.sessionStorage.removeItem(FUNNEL_STARTED_AT_KEY)
       setIdempotencyKey(null)
       setStep('opening')
       router.push(`/cases/${caseId}`)
