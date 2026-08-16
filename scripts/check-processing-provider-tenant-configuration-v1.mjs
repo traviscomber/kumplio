@@ -6,6 +6,9 @@ const migration = await readFile(
   'utf8',
 )
 
+const normalize = (value) => value.replace(/\s+/g, '').toLowerCase()
+const normalizedMigration = normalize(migration)
+
 for (const marker of [
   'promote_processing_provider_tenant_configuration_v1',
   'security invoker',
@@ -30,7 +33,7 @@ for (const marker of [
   'grant execute on function public.promote_processing_provider_tenant_configuration_v1',
   'to service_role',
 ]) {
-  assert.ok(migration.toLowerCase().includes(marker.toLowerCase()), `Tenant configuration guardrail missing: ${marker}`)
+  assert.ok(normalizedMigration.includes(normalize(marker)), `Tenant configuration guardrail missing: ${marker}`)
 }
 
 for (const forbidden of [
@@ -42,14 +45,14 @@ for (const forbidden of [
   "'externalPropagationStatus','demonstrated'",
   "'finalDeletionDemonstrated',true",
 ]) {
-  assert.ok(!migration.includes(forbidden), `Promotion RPC must not manufacture prerequisite/final state: ${forbidden}`)
+  assert.ok(!normalizedMigration.includes(normalize(forbidden)), `Promotion RPC must not manufacture prerequisite/final state: ${forbidden}`)
 }
 
-const acceptedCheck = migration.indexOf("v_request.status <> 'accepted'")
-const processPromotion = migration.indexOf("'providerTenantConfigurationStatus','verified'")
+const acceptedCheck = normalizedMigration.indexOf(normalize("v_request.status <> 'accepted'"))
+const processPromotion = normalizedMigration.indexOf(normalize("'providerTenantConfigurationStatus','verified'"))
 assert.ok(acceptedCheck >= 0 && processPromotion > acceptedCheck, 'Accepted evidence must be checked before process promotion')
 
-const integrityCheck = migration.indexOf("v_evidence.integrity_status <> 'verified'")
+const integrityCheck = normalizedMigration.indexOf(normalize("v_evidence.integrity_status <> 'verified'"))
 assert.ok(integrityCheck >= 0 && processPromotion > integrityCheck, 'Integrity verification must precede process promotion')
 
 console.log('Processing provider tenant configuration promotion v1: PASS')
