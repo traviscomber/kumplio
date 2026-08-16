@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { track } from '@vercel/analytics'
 import { ArrowRight } from 'lucide-react'
+import { trackFunnelIntentStarted } from '@/lib/analytics/funnel-client'
 import type { PublicLocale } from '@/lib/i18n/public-routing'
 
 type Audience = 'person' | 'company' | 'professional'
@@ -17,7 +17,6 @@ type ResolutionCopy = {
   note: string
 }
 
-const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'
 const audienceOrder: Audience[] = ['company', 'professional', 'person']
 
 const COPY: Record<PublicLocale, ResolutionCopy> = {
@@ -93,12 +92,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
       'kumplio:case-draft',
       JSON.stringify({ goal: normalizedGoal, audience }),
     )
-    window.sessionStorage.setItem(FUNNEL_STARTED_AT_KEY, String(Date.now()))
-    track('Funnel Intent Started', {
-      audience,
-      locale,
-      destination: 'guided_case',
-    })
+    trackFunnelIntentStarted({ audience, locale })
     router.push('/sign-up?next=/cases/new')
   }
 
