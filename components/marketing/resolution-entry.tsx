@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { track } from '@vercel/analytics'
 import { ArrowRight } from 'lucide-react'
 import type { PublicLocale } from '@/lib/i18n/public-routing'
 
@@ -91,6 +92,11 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
       'kumplio:case-draft',
       JSON.stringify({ goal: normalizedGoal, audience }),
     )
+    track('Funnel Intent Started', {
+      audience,
+      locale,
+      destination: 'guided_case',
+    })
     router.push('/sign-up?next=/cases/new')
   }
 
