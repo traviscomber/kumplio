@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, ChevronDown, FileText, Link2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, FileText, Link2, ShieldAlert } from 'lucide-react'
 import { CaseActionPlan } from '@/components/cases/case-action-plan'
 
 type JsonRecord = Record<string, unknown>
@@ -10,6 +10,7 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
   const sources = firstList(record, ['sources', 'fuentes', 'citations', 'citas', 'sourceRefs', 'source_refs'])
   const caveats = firstList(record, ['caveats', 'reservations', 'reservas', 'limitations', 'limitaciones', 'assumptions', 'supuestos', 'openQuestions', 'preguntas_abiertas'])
   const hasRecognizedSummary = Boolean(summary || findings.length || sources.length || caveats.length)
+  const hasReviewableContent = Boolean(summary || findings.length || caveats.length)
 
   return (
     <div className="mt-4 space-y-3 sm:space-y-4">
@@ -28,21 +29,37 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
         </div>
       )}
 
-      {findings.length > 0 && (
-        <PreviewSection icon={<CheckCircle2 className="h-4 w-4" />} title={`Hallazgos (${findings.length})`} defaultOpen>
-          {findings.slice(0, 6).map((item, index) => <PreviewItem key={`finding-${index}`} value={item} />)}
+      {sources.length > 0 ? (
+        <PreviewSection
+          icon={<Link2 className="h-4 w-4" />}
+          title={`Fuentes y evidencia de respaldo (${sources.length})`}
+          defaultOpen
+        >
+          {sources.slice(0, 6).map((item, index) => <PreviewItem key={`source-${index}`} value={item} />)}
         </PreviewSection>
-      )}
+      ) : hasReviewableContent ? (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm leading-6">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
+          <p className="text-muted-foreground">
+            <strong className="text-foreground">Fuentes no expuestas en este resumen.</strong>{' '}
+            Antes de aprobar, revisa la trazabilidad del expediente y confirma el respaldo utilizado por esta etapa.
+          </p>
+        </div>
+      ) : null}
 
       {caveats.length > 0 && (
-        <PreviewSection icon={<AlertTriangle className="h-4 w-4" />} title={`Reservas y pendientes (${caveats.length})`}>
+        <PreviewSection
+          icon={<AlertTriangle className="h-4 w-4" />}
+          title={`Reservas y pendientes (${caveats.length})`}
+          defaultOpen
+        >
           {caveats.slice(0, 6).map((item, index) => <PreviewItem key={`caveat-${index}`} value={item} />)}
         </PreviewSection>
       )}
 
-      {sources.length > 0 && (
-        <PreviewSection icon={<Link2 className="h-4 w-4" />} title={`Fuentes utilizadas (${sources.length})`}>
-          {sources.slice(0, 6).map((item, index) => <PreviewItem key={`source-${index}`} value={item} />)}
+      {findings.length > 0 && (
+        <PreviewSection icon={<CheckCircle2 className="h-4 w-4" />} title={`Hallazgos (${findings.length})`}>
+          {findings.slice(0, 6).map((item, index) => <PreviewItem key={`finding-${index}`} value={item} />)}
         </PreviewSection>
       )}
     </div>
