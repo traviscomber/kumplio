@@ -97,7 +97,6 @@ export function WorkspaceOnboardingForm({
       const caseId = data.workspace?.caseId as string | null | undefined
       const destination = nextPath || (caseId ? `/cases/${caseId}` : '/dashboard')
       router.replace(destination)
-      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No fue posible terminar la configuración')
     } finally {
