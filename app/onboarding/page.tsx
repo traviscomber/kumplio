@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { CheckCircle2 } from 'lucide-react'
 import { WorkspaceOnboardingForm } from '@/components/onboarding/workspace-onboarding-form'
+import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -17,10 +18,23 @@ const planDetails: Record<string, { name: string; price: string }> = {
   profesional: { name: 'Profesional', price: '$249.990 al mes + IVA' },
 }
 
-export default async function OnboardingPage() {
+type OnboardingSearchParams = Promise<{
+  next?: string | string[]
+}>
+
+export default async function OnboardingPage({ searchParams }: { searchParams: OnboardingSearchParams }) {
+  const params = await searchParams
+  const requestedNext = Array.isArray(params.next) ? params.next[0] : params.next
+  const continuation = requestedNext ? safeInternalPath(requestedNext, '/dashboard') : null
+  const onboardingTarget = continuation
+    ? `/onboarding?next=${encodeURIComponent(continuation)}`
+    : '/onboarding'
+
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) redirect('/sign-in?next=/onboarding')
+  if (authError || !user) {
+    redirect(`/sign-in?next=${encodeURIComponent(onboardingTarget)}`)
+  }
 
   const { data: membership } = await supabase
     .from('organization_members')
@@ -29,7 +43,7 @@ export default async function OnboardingPage() {
     .limit(1)
     .maybeSingle()
 
-  if (membership?.organization_id) redirect('/dashboard')
+  if (membership?.organization_id) redirect(continuation || '/dashboard')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -39,6 +53,7 @@ export default async function OnboardingPage() {
 
   const selectedPlanId = typeof user.user_metadata?.selected_plan === 'string' ? user.user_metadata.selected_plan : ''
   const selectedPlan = planDetails[selectedPlanId]
+  const continuesCase = continuation === '/cases/new'
 
   return (
     <main className="min-h-screen bg-background px-6 py-10 text-foreground md:py-16">
@@ -47,7 +62,9 @@ export default async function OnboardingPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Primeros minutos</p>
           <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Quiero entender tu organización antes de pedirte trabajo.</h1>
           <p className="mt-5 text-lg leading-8 text-muted-foreground">
-            Responde una pregunta a la vez. Kumplio preparará internamente el primer ámbito, el expediente inicial y la trazabilidad necesaria.
+            {continuesCase
+              ? 'Responde una pregunta a la vez. Al terminar volverás a la situación que ya describiste para convertirla en tu primer expediente guiado.'
+              : 'Responde una pregunta a la vez. Kumplio preparará internamente el primer ámbito, el expediente inicial y la trazabilidad necesaria.'}
           </p>
         </header>
 
@@ -68,6 +85,7 @@ export default async function OnboardingPage() {
             initialOrganizationName={profile?.company_name || (user.user_metadata?.company_name as string | undefined) || null}
             initialFirstName={profile?.first_name}
             initialLastName={profile?.last_name}
+            nextPath={continuation}
           />
         </section>
       </div>
