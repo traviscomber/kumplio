@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
 import type { UserAudience } from '@/lib/agents/orchestrator'
 
+const DRAFT_STORAGE_KEY = 'kumplio:case-draft'
+const START_KEY_STORAGE_KEY = 'kumplio:case-start-key'
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 const EXAMPLES: Record<UserAudience, string[]> = {
   person: [
     'Quiero saber qué datos personales tienen sobre mí y cómo ejercer mis derechos',
@@ -55,6 +59,22 @@ function isAudience(value: unknown): value is UserAudience {
   return ['person', 'company', 'professional', 'industry'].includes(String(value))
 }
 
+function persistDraft(goal: string, audience: UserAudience) {
+  try {
+    window.sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify({ goal, audience }))
+  } catch {
+    // Storage is a continuity enhancement; the form remains usable without it.
+  }
+}
+
+function clearStartKey() {
+  try {
+    window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
+  } catch {
+    // Ignore storage failures and keep the current in-memory flow usable.
+  }
+}
+
 export function BetaCaseEntry() {
   const router = useRouter()
   const [goal, setGoal] = useState('')
@@ -67,33 +87,59 @@ export function BetaCaseEntry() {
 
   useEffect(() => {
     try {
-      const stored = window.sessionStorage.getItem('kumplio:case-draft')
-      if (!stored) return
-      const draft = JSON.parse(stored) as { goal?: unknown; audience?: unknown }
-      if (typeof draft.goal === 'string' && draft.goal.trim().length >= 8) setGoal(draft.goal.trim())
-      if (isAudience(draft.audience)) setAudience(draft.audience)
+      const stored = window.sessionStorage.getItem(DRAFT_STORAGE_KEY)
+      if (stored) {
+        const draft = JSON.parse(stored) as { goal?: unknown; audience?: unknown }
+        if (typeof draft.goal === 'string' && draft.goal.trim().length >= 8) setGoal(draft.goal.trim())
+        if (isAudience(draft.audience)) setAudience(draft.audience)
+      }
+
+      const storedStartKey = window.sessionStorage.getItem(START_KEY_STORAGE_KEY)
+      if (storedStartKey && UUID_PATTERN.test(storedStartKey)) {
+        setIdempotencyKey(storedStartKey)
+      } else if (storedStartKey) {
+        window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
+      }
     } catch {
-      window.sessionStorage.removeItem('kumplio:case-draft')
+      window.sessionStorage.removeItem(DRAFT_STORAGE_KEY)
+      window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
     }
   }, [])
 
   function updateGoal(value: string) {
-    if (value !== goal) setIdempotencyKey(null)
+    if (value !== goal) {
+      setIdempotencyKey(null)
+      clearStartKey()
+    }
     setGoal(value)
+    persistDraft(value, audience)
   }
 
   function updateAudience(value: UserAudience) {
-    if (value !== audience) setIdempotencyKey(null)
+    if (value !== audience) {
+      setIdempotencyKey(null)
+      clearStartKey()
+    }
     setAudience(value)
+    persistDraft(goal, value)
   }
 
   async function start() {
-    if (busy || goal.trim().length < 8) return
+    const normalizedGoal = goal.trim()
+    if (busy || normalizedGoal.length < 8) return
     setError('')
     setCreatedCaseId(null)
 
     const startKey = idempotencyKey || crypto.randomUUID()
-    if (!idempotencyKey) setIdempotencyKey(startKey)
+    if (!idempotencyKey) {
+      setIdempotencyKey(startKey)
+      try {
+        window.sessionStorage.setItem(START_KEY_STORAGE_KEY, startKey)
+      } catch {
+        // In-memory idempotency still protects retries during this render lifecycle.
+      }
+    }
+    persistDraft(normalizedGoal, audience)
 
     try {
       setStep('preparing')
@@ -101,7 +147,7 @@ export function BetaCaseEntry() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          goal: goal.trim(),
+          goal: normalizedGoal,
           audience,
           idempotencyKey: startKey,
         }),
@@ -127,7 +173,8 @@ export function BetaCaseEntry() {
         throw new Error(advancePayload.error || 'El expediente está listo, pero no fue posible iniciar la primera etapa')
       }
 
-      window.sessionStorage.removeItem('kumplio:case-draft')
+      window.sessionStorage.removeItem(DRAFT_STORAGE_KEY)
+      window.sessionStorage.removeItem(START_KEY_STORAGE_KEY)
       setIdempotencyKey(null)
       setStep('opening')
       router.push(`/cases/${caseId}`)
@@ -154,7 +201,7 @@ export function BetaCaseEntry() {
         <div className="mb-5 flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <p className="text-sm leading-6 text-muted-foreground">
-            <strong className="text-foreground">Un inicio, un expediente.</strong> Si la conexión se corta o vuelves a intentar, Kumplio recupera el mismo caso en vez de crear duplicados.
+            <strong className="text-foreground">Un inicio, un expediente.</strong> Si la conexión se corta, recargas la página o vuelves a intentar, Kumplio reutiliza la misma clave de inicio para evitar duplicados.
           </p>
         </div>
 
