@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { track } from '@vercel/analytics'
 import {
   AlertCircle,
   Building2,
@@ -97,6 +98,12 @@ export default function SignUp() {
         setError(authErrorMessage(signUpError))
         return
       }
+
+      track('Funnel Signup Completed', {
+        source: selectedPlan ? 'pricing' : 'guided_resolution',
+        continuation: next === '/cases/new' ? 'guided_case' : 'other',
+        confirmation: data.session ? 'instant' : 'email',
+      })
 
       if (data.session) {
         router.replace(next)
