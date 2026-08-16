@@ -10,6 +10,7 @@ const [
   navigation,
   advisor,
   resolutionEntry,
+  signUp,
   newCasePage,
   onboardingPage,
   onboardingForm,
@@ -24,6 +25,7 @@ const [
   readFile('components/workspace-nav.tsx', 'utf8'),
   readFile('app/advisor/page.tsx', 'utf8'),
   readFile('components/marketing/resolution-entry.tsx', 'utf8'),
+  readFile('app/(auth)/sign-up/page.tsx', 'utf8'),
   readFile('app/cases/new/page.tsx', 'utf8'),
   readFile('app/onboarding/page.tsx', 'utf8'),
   readFile('components/onboarding/workspace-onboarding-form.tsx', 'utf8'),
@@ -95,5 +97,24 @@ assert.ok(caveatsIndex > evidenceIndex, 'Reservations must follow evidence')
 assert.ok(findingsIndex > caveatsIndex, 'Findings must appear after evidence and reservations')
 assert.ok(artifactPreview.includes('Fuentes no expuestas en este resumen.'))
 assert.ok(artifactPreview.includes('Antes de aprobar, revisa la trazabilidad del expediente'))
+
+// Funnel telemetry must stay categorical/elapsed-time only: no free-text goal, identity or record IDs.
+assert.ok(resolutionEntry.includes("track('Funnel Intent Started'"))
+assert.ok(resolutionEntry.includes("const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'"))
+assert.ok(resolutionEntry.includes('String(Date.now())'))
+assert.ok(signUp.includes("track('Funnel Signup Completed'"))
+assert.ok(onboardingForm.includes("track('Funnel Workspace Initialized'"))
+assert.ok(onboardingForm.includes('elapsed_seconds: elapsedSeconds'))
+assert.ok(betaCaseEntry.includes("track('Funnel Guided Case Created'"))
+assert.ok(betaCaseEntry.includes("track('Funnel First Stage Queued'"))
+assert.ok(betaCaseEntry.includes('elapsed_seconds: elapsedToCase'))
+assert.ok(betaCaseEntry.includes('elapsed_seconds: elapsedToExecution'))
+assert.ok(betaCaseEntry.includes('window.sessionStorage.removeItem(FUNNEL_STARTED_AT_KEY)'))
+
+const telemetryLines = [resolutionEntry, signUp, onboardingForm, betaCaseEntry]
+  .flatMap((source) => source.split('\n'))
+  .filter((line) => /track\('Funnel |audience,|locale,|destination:|source:|continuation:|confirmation:|resumed:|recovered:|elapsed_seconds:/.test(line))
+  .join('\n')
+assert.doesNotMatch(telemetryLines, /email|organizationName|firstName|lastName|normalizedGoal|goal:|caseId|workflowId|userId/i)
 
 console.log('Authenticated guided resolution contract: OK')
