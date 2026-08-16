@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
 const migration = await readFile(
-  'supabase/migrations/20260816161000_processing_provider_tenant_configuration_review_v1.sql',
+  'supabase/migrations/20260816162119_processing_provider_tenant_configuration_review_v1.sql',
   'utf8',
 )
 
