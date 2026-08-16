@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [migration, route] = await Promise.all([
+const [migration, route, loader, workspace, page] = await Promise.all([
   readFile('supabase/migrations/20260816210500_provider_tenant_configuration_evidence_intake_v1.sql', 'utf8'),
   readFile('app/api/processing-activities/[processId]/provider-configuration/route.ts', 'utf8'),
+  readFile('lib/compliance/digital-twin/provider-configuration.ts', 'utf8'),
+  readFile('components/digital-twin/provider-configuration-workspace.tsx', 'utf8'),
+  readFile('app/digital-twin/page.tsx', 'utf8'),
 ])
 const compact = (value) => value.replace(/\s+/g, '').toLowerCase()
 const sql = compact(migration)
@@ -47,5 +50,25 @@ for (const marker of [
 ]) {
   assert.ok(route.includes(marker), `Provider configuration API missing guardrail: ${marker}`)
 }
+
+for (const marker of [
+  'providerTenantConfigurationEvidenceRequestId',
+  'providerTenantConfigurationVendor',
+  'submitted_evidence_id',
+]) assert.ok(loader.includes(marker), `Provider configuration loader missing marker: ${marker}`)
+
+for (const marker of [
+  'Cierra el dato administrado, no la inferencia.',
+  'Entregar configuración',
+  'Revisar configuración',
+  "management_api",
+  "provider_dashboard",
+  "provider_contract",
+  "modified_abuse_monitoring",
+  "fetch(`/api/processing-activities/${selected.processId}/provider-configuration`",
+]) assert.ok(workspace.includes(marker), `Provider configuration workspace missing marker: ${marker}`)
+
+assert.ok(page.includes('getProviderConfigurationWork(admin, access.organizationId)'))
+assert.ok(page.includes('<ProviderConfigurationWorkspace'))
 
 console.log('Provider tenant configuration evidence intake v1: PASS')
