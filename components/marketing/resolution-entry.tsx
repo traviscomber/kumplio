@@ -17,6 +17,7 @@ type ResolutionCopy = {
   note: string
 }
 
+const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'
 const audienceOrder: Audience[] = ['company', 'professional', 'person']
 
 const COPY: Record<PublicLocale, ResolutionCopy> = {
@@ -92,6 +93,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
       'kumplio:case-draft',
       JSON.stringify({ goal: normalizedGoal, audience }),
     )
+    window.sessionStorage.setItem(FUNNEL_STARTED_AT_KEY, String(Date.now()))
     track('Funnel Intent Started', {
       audience,
       locale,
