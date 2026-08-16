@@ -1,26 +1,17 @@
 # KUMPLIO — Roadmap Maestro de Producto y Ejecución
 
 > **Documento canónico de producto, arquitectura, evidencia y prioridades**  
-> Estado: activo  
-> Revisión: 14 de agosto de 2026  
+> Estado: **cierre técnico / freeze de alcance**  
+> Revisión: 16 de agosto de 2026  
 > Mercado principal: Chile  
-> Idioma visible: español primario; migración controlada del sitio público a `/es` y `/en`  
-> Última migración aplicada: `20260809141500_agent_run_provider_trace_v1`  
-> Assurance UI 3/3: `docs/assurance/ui-golden-path-production-3x-2026-08-07.md`  
-> Assurance inventario 3/3: `docs/assurance/n3uralia-processing-inventory-3x-2026-08-08.md`  
-> Assurance lifecycle 3/3: `docs/assurance/n3uralia-processing-lifecycle-3x-2026-08-08.md`  
-> Assurance aviso y eliminación 3/3: `docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md`  
-> Assurance mapeo del aviso 3/3: `docs/assurance/n3uralia-processing-notice-mapping-3x-2026-08-08.md`  
-> Assurance eliminación primaria 3/3: `docs/assurance/n3uralia-primary-deletion-3x-2026-08-08.md`  
-> Assurance proveedor 3/3: `docs/assurance/n3uralia-provider-retention-assurance-3x-2026-08-08.md`  
-> Solicitudes tenant-specific 3/3: `docs/assurance/n3uralia-provider-configuration-requests-3x-2026-08-08.md`  
+> Idioma visible: español primario; superficies públicas localizadas de forma controlada  
 > Repositorio: `traviscomber/kumplio`
 
 ---
 
 ## 1. Regla de este roadmap
 
-Este archivo representa el **estado comprobable del producto**, no el historial de ideas, conversaciones, issues o PRs.
+Este archivo representa el **estado comprobable del producto y la única secuencia autorizada de trabajo**. No es un historial de ideas ni una lista de features deseables.
 
 Prioridad de evidencia para cambiar un estado:
 
@@ -29,9 +20,9 @@ Prioridad de evidencia para cambiar un estado:
 3. prueba técnica, transaccional, funcional o de seguridad;
 4. Release Gate, build, smoke y despliegues;
 5. uso real por una persona o piloto;
-6. métrica de resultado cuando el bloque la requiera.
+6. métrica de resultado cuando corresponda.
 
-Si una conversación, pantalla o documento secundario contradice `main`, Supabase o una prueba real, prevalece la evidencia técnica.
+`DEPLOYED` no equivale a `VALIDATED`. Una prueba sintética no equivale a evidencia de cliente. Una política pública del proveedor no equivale a configuración tenant observada. Un score no equivale a cumplimiento.
 
 ### Estados oficiales
 
@@ -40,50 +31,29 @@ Si una conversación, pantalla o documento secundario contradice `main`, Supabas
 | `PLANNED` | Definido, sin implementación activa. |
 | `ACTIVE` | Desarrollo, prueba o cierre en curso. |
 | `DEPLOYED` | Código o migración en producción. |
-| `VALIDATED` | Flujo probado con datos reales o prueba representativa. |
-| `VALIDATED INICIAL` | Primer alcance comprobado; falta cobertura o piloto externo. |
+| `VALIDATED` | Flujo probado con evidencia suficiente dentro de su alcance. |
+| `VALIDATED INICIAL` | Primer alcance comprobado; falta cobertura o evidencia externa. |
 | `DONE` | Validado y sin gate técnico relevante dentro de su alcance. |
-| `BLOCKED` | Requiere acción externa, permiso o decisión explícita. |
-| `DEFERRED` | Tiene valor, pero no compite con la ruta crítica. |
-
-`DEPLOYED` no equivale a `VALIDATED`. `VALIDATED` internamente no equivale a piloto externo. Trabajo creado, una matriz aceptada, una prueba sintética o una política pública del proveedor no equivalen por sí solas a cumplimiento demostrado.
+| `BLOCKED` | Requiere acción externa, permiso o evidencia que Kumplio no puede fabricar. |
+| `DEFERRED` | Preservado fuera de la ruta crítica. |
 
 ---
 
 ## 2. Tesis de producto vigente
 
-Kumplio es un **sistema operativo de cumplimiento** para centralizar información sensible, coordinar especialistas, convertir análisis en trabajo y demostrar qué hizo una organización.
+Kumplio es un **sistema operativo de cumplimiento para Chile** que transforma una situación en un expediente vivo con contexto, fuentes, evidencia, especialistas, reservas, revisión humana, acciones, responsables y trazabilidad.
 
 ```text
-Una persona describe una situación
-→ Kumplio abre un expediente vivo
-→ centraliza contexto, fuentes y evidencia
-→ especialistas analizan dentro de fronteras explícitas
-→ un supervisor detecta contradicciones y reservas
-→ una persona valida decisiones sensibles
-→ quedan acciones, responsables y plazos
-→ controles y evidencia demuestran el avance
-→ el conocimiento aprobado mejora el siguiente caso
+Situación
+→ expediente
+→ fuentes y evidencia
+→ especialistas
+→ reservas y contradicciones
+→ revisión humana
+→ acciones y controles
+→ evidencia del avance
+→ conocimiento reutilizable aprobado
 ```
-
-### Propuesta de valor
-
-**Proteger y ordenar la información de cumplimiento para resolver situaciones con guía experta, evidencia y revisión humana, dejando cada decisión trazable.**
-
-### Lo que Kumplio no debe afirmar
-
-- cumplimiento global por un score alto;
-- inexistencia porque Kumplio no tiene un dato;
-- operación efectiva por un documento aislado;
-- sustitución de abogado, auditor, DPO o autoridad;
-- base jurídica validada cuando solo fue propuesta;
-- inventario completo por registrar tres actividades;
-- aviso suficiente porque el mapeo fue aceptado;
-- eliminación final demostrada por una prueba primaria sintética;
-- purga de backups por conocer la política pública de un proveedor;
-- ZDR/MAM porque una llamada use `store:false`;
-- tenant OpenAI verificado sólo por capturar un response header;
-- piloto externo a partir de un tenant sintético.
 
 ### Principios no negociables
 
@@ -97,383 +67,332 @@ Una persona describe una situación
 8. Los unknowns se conservan hasta resolverse.
 9. No se agregan módulos atractivos mientras un gate P0 siga abierto.
 
+### Lo que Kumplio no debe afirmar
+
+- cumplimiento global o certificación por un score;
+- inexistencia porque Kumplio no tiene un dato;
+- operación efectiva por un documento aislado;
+- sustitución de abogado, auditor, DPO o autoridad;
+- base jurídica validada cuando solo fue propuesta;
+- inventario completo por registrar tres actividades;
+- aviso suficiente porque un mapeo fue aceptado con brechas;
+- purga de backups por una prueba primaria;
+- ZDR/MAM por usar `store:false`;
+- Standard o MAM por inferencia conductual;
+- tenant OpenAI verificado solo por un header;
+- piloto externo a partir de un tenant sintético.
+
 ---
 
-## 3. Estado ejecutivo al 9 de agosto de 2026
+## 3. Snapshot ejecutivo de cierre técnico — 16 de agosto de 2026
 
-### Release funcional vigente
+Anchor de producción previo a esta PR de cierre: `128ab01ba09ffadd9a9fb418f97872f3c8274d25`.
 
-Las PR #238, #241, #244, #245 y #246 están fusionadas a `main`. Los cambios críticos pasaron Release Gate, Application validation, Release qualification, typecheck, build, smoke y los proyectos Vercel aplicables en `success`.
-
-Bloque 16 comprobado:
+### Estado comprobado
 
 | Capa | Estado |
-|---|---:|
-| Actividades reales | 3/3 |
-| Lifecycle | `changes_requested` 3/3 |
+|---|---|
+| Auth, workspace y tenant isolation | `VALIDATED INTERNO` |
+| Golden Path | `VALIDATED x3` |
+| Especialistas y supervisor | `VALIDATED x3` |
+| Cola durable, retry y recovery | `VALIDATED x3` |
+| Artefactos, evidencia, integridad y revisión | `VALIDATED x3` |
+| UI Golden Path | `VALIDATED x3` |
+| Inventario real N3uralia | 3 actividades |
 | Mapeo del aviso | `accepted_with_gaps` 3/3 |
-| Mecanismo controlado | 3/3 |
-| Eliminación primaria operativa | 3/3 |
-| Assurance de proveedor | 3/3 |
-| Solicitudes tenant-specific | 3/3 |
-| Supabase plan | Pro verificado |
-| OpenAI provider runtime trace | capturado en ejecución real |
-| OpenAI provider identity `/v1/me` | implementado/desplegado; ejecución pendiente |
-| Configuración tenant proveedor | 0/3 |
+| Eliminación primaria controlada | 3/3 |
+| Assurance proveedor | 3/3 parcial |
+| Lifecycle V2 | `changes_requested` 3/3 |
+| Paquetes de cierre lifecycle | open 3/3 |
+| Solicitudes tenant-specific | `changes_requested` 3/3 |
+| Configuración tenant proveedor | 0/3 `verified` |
 | Eliminación operacional final | 0/3 |
+| Organización externa supervisada | 0 |
+| Leaked Password Protection | `disabled` |
 
-**3/3 mapeos aceptados con brechas** sigue siendo un resultado válido. **0/3 eliminaciones demostradas** se refiere exclusivamente a eliminación operacional final, no al subgate de eliminación primaria, que ya está 3/3.
+### OpenAI
 
-La ejecución real de provider trace acreditó una llamada exitosa a `gpt-5.6-sol`, un `x-request-id` real y un valor `openai-organization` devuelto por OpenAI. Ese header demuestra trazabilidad de la request, pero no equivale todavía a Data Retention tenant-specific verificada ni a ZDR/MAM.
+- identidad/runtime productiva reconciliada a nivel organización;
+- organización observada: `org-WMy0WPkUDGJIP7ZUq9cqMzQL`;
+- retention probe productivo: `store:true` creado, recuperado y eliminado con HTTP 200;
+- ZDR queda **contradicho para la request/configuración observada**;
+- Standard vs Modified Abuse Monitoring sigue pendiente de evidencia administrativa;
+- project binding efectivo sigue pendiente de evidencia administrativa;
+- DELETE del application state no se presenta como purga de abuse-monitoring logs ni eliminación operacional final.
 
-### Migraciones aplicadas más recientes
+### Supabase
 
-| Versión | Migración |
-|---|---|
-| `20260808151723` | `processing_activity_privacy_remediation_v1` |
-| `20260808152005` | `seed_n3uralia_privacy_remediation_v1` |
-| `20260808174718` | `processing_notice_mapping_review_v1` |
-| `20260808175012` | `seed_n3uralia_notice_mapping_reviews_v1` |
-| `20260808235300` | `processing_deletion_evidence_review_v1` |
-| `20260809011800` | `processing_controlled_deletion_drill_review_v1` |
-| `20260809013200` | `processing_primary_deletion_exercise_v1` |
-| `20260809014500` | `processing_primary_deletion_exercises_remaining_v1` |
-| `20260809024500` | `processing_provider_retention_assurance_v1` |
-| `20260809030500` | `processing_provider_configuration_requests_v1` |
-| `20260809141500` | `agent_run_provider_trace_v1` |
+- proyecto productivo identificado;
+- organización en plan Pro observada;
+- configuración efectiva Daily/PITR y ventana recuperable siguen pendientes de evidencia administrativa;
+- tres RPC de intake/review/promoción tenant-specific están instalados con `SECURITY INVOKER`, `search_path=''`, sin execute para `anon/authenticated`, y execute solo para `service_role/postgres`;
+- Leaked Password Protection continúa desactivada.
 
-### Preparación actual
+### Migraciones de cierre relevantes
 
-| Nivel | Estado real |
-|---|---|
-| Desarrollo técnico | sólido |
-| Demo comercial acompañada | apta |
-| Golden Path productivo por UI | `VALIDATED x3` |
-| Assurance multiempresa interno | `VALIDATED` |
-| Inventario real de N3uralia | 3 actividades revisadas |
-| Eliminación primaria | 3/3 `demonstrated_controlled_primary` |
-| Assurance proveedor | 3/3 `partial_policy_verified` |
-| Supabase plan | Pro verificado; PITR pendiente |
-| OpenAI runtime tenant trace | request real capturada; `/v1/me` pendiente de ejecutar |
-| Tenant proveedor | 0/3 `verified` |
-| Eliminación final | 0/3 `demonstrated` |
-| Piloto supervisado externo | pendiente |
-| Beta privada autoservicio | no habilitar todavía |
+- `20260816162119_processing_provider_tenant_configuration_review_v1`;
+- `20260816162336_provider_retention_probe_dispatch_v1`;
+- `20260816211617_provider_tenant_configuration_evidence_intake_v1`.
+
+### Pull requests de cierre
+
+- #266 merged — bounded OpenAI retention probe + promotion guard;
+- #267 merged — reconciliación de evidencia productiva;
+- #269 merged — intake/review tenant-specific operativo;
+- #268 merged — Lifecycle V2 y paquetes de cierre;
+- #265 cerrada **sin merge** y preservada como `DEFERRED` por freeze;
+- PRs históricas #30, #31, #35, #55, #197 y #240 cerradas como superseded.
 
 ---
 
 ## 4. Hitos validados
 
-### Hito A — Golden Path y baseline assurance — `VALIDATED`
+### A. Golden Path y expediente — `VALIDATED`
 
-Caso → misión → evidencia → control → revisión → cierre auditable. La confianza no se presenta como certificación.
+Caso → fuentes/evidencia → especialistas → revisión → plan → controles → cierre auditable.
 
-### Hito B — Inventario real de N3uralia — `VALIDATED INICIAL / ACTIVE`
+### B. Tenant Assurance — `VALIDATED INTERNO`
 
-Tres actividades reales tienen propósito, owner, titulares, categorías, dataset, sistema, tercero, fuente, evidencia, hash y unknowns.
+Aislamiento multiempresa, jobs, artifacts, reviews, workflow y acceso tenant-scoped sin fuga cross-tenant en las pruebas controladas.
 
-### Hito C — Revisión jurídica y lifecycle — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
+### C. Evidencia e integridad — `VALIDATED`
 
-Las tres actividades permanecen `changes_requested`; base, retención, destinatarios, subencargados y transferencias no se marcan como resueltos sin evidencia independiente.
+Versionado, SHA-256, procedencia, revisión humana, reservas y separación entre diseño, operación y suficiencia.
 
-### Hito D — Tenant Assurance — `VALIDATED`
+### D. Inventario real — `VALIDATED INICIAL`
 
-Aislamiento multiempresa, especialistas, revisiones, cola durable, baseline e inventario sin fuga cross-tenant.
+Tres actividades reales de N3uralia con owner, propósito, titulares, categorías, sistemas, terceros, evidencia y unknowns.
 
-### Hito E — UI Golden Path — `VALIDATED x3`
+### E. Lifecycle V2 — `VALIDATED INICIAL / CAMBIOS REQUERIDOS`
 
-Tres recorridos productivos completos, 51/51 aserciones persistidas y 15/15 jobs succeeded.
+V2 latest 3/3, supersede V1 3/3, evidencia `accepted · verified` 3/3 y cero dimensiones promovidas artificialmente a `validated`.
 
-### Hito F — Aviso y eliminación convertidos en trabajo — `VALIDATED INICIAL`
+### F. Eliminación primaria — `VALIDATED CONTROLADO 3/3`
 
-Un aviso versionado, tres enlaces, tres misiones, tres solicitudes de mapeo y tres solicitudes de eliminación. Trabajo creado no equivale a cumplimiento demostrado.
+Probada sobre registros sintéticos en el data plane real. No demuestra backup purge ni propagación a terceros.
 
-### Hito G — Mapeo del aviso — `VALIDATED INICIAL / ACEPTADO CON BRECHAS`
+### G. Provider assurance — `VALIDATED PARCIAL`
 
-- mapeos con evidencia: 3/3;
-- estado `accepted_with_gaps`: 3/3;
-- SHA-256 válido: 3/3;
-- suficiencia de control: `partial` 3/3;
-- lifecycle: `changes_requested` 3/3.
+Supabase Pro observado; OpenAI organization/runtime reconciliado y ZDR contradicho para la request observada. La configuración administrativa final permanece explícitamente abierta.
 
-### Hito H — Eliminación primaria — `VALIDATED CONTROLADO 3/3`
+### H. Release y CI — `DONE EN SU ALCANCE TÉCNICO`
 
-Se probó el mecanismo contra el data plane real con registros sintéticos controlados:
-
-1. `public.commercial_leads`;
-2. Supabase Auth + perfiles/membresías;
-3. `public.compliance_cases` + workflow/run.
-
-En 3/3: evidencia `accepted · verified`, SHA-256, `productionSubjectDataTouched = false` y `primaryStoreRemainingMatches = 0`.
-
-Esto no demuestra purga física de backups ni propagación a procesadores externos.
-
-### Hito I — Assurance de proveedor — `VALIDATED PARCIAL 3/3`
-
-- Supabase: política oficial de backups revisada y plan Pro del tenant confirmado;
-- OpenAI: `store:false` verificado en runtime y política oficial de Data Controls revisada;
-- provider trace OpenAI real: `x-request-id` + `openai-organization` capturados mediante el worker normal;
-- assurance de identidad OpenAI mediante `/v1/me`: implementado y desplegado, ejecución productiva pendiente;
-- PITR Supabase: no verificado;
-- Data Retention OpenAI (`None`, MAM o ZDR): no verificada;
-- tenant-specific: 0/3.
+Release Gate, typecheck, build, smoke, qualification y previews forman parte obligatoria del release. Vulnerabilidades npm no críticas conocidas permanecen deuda separada; no existe autorización para un `npm audit fix --force` durante el freeze.
 
 ---
 
 ## 5. Capacidades actuales
 
-### A. Identidad y multiempresa — `VALIDATED INTERNO`
+Kumplio ya posee, dentro del alcance comprobado:
 
-Auth, onboarding, workspace, roles, RLS y RPC tenant-scoped. Deuda: **Supabase Auth Leaked Password Protection desactivada**.
+- autenticación, onboarding, workspace y roles;
+- expedientes y situaciones;
+- especialistas digitales y supervisor;
+- ejecución durable y recuperación;
+- artifacts, lineage, revisiones y decisiones humanas;
+- fuentes oficiales y procedencia;
+- controles, evidence requests y planes operativos;
+- Digital Twin e inventario de tratamientos;
+- lifecycle versionado;
+- mapeo de avisos;
+- mecanismos controlados de eliminación;
+- provider assurance;
+- intake tenant-specific con revisión humana y promoción protegida;
+- release gates y assurance reproducible.
 
-### B. Expedientes — `VALIDATED x3`
-
-Situación, prioridad, owner, timeline, fuentes, documentos, evidencia y controles.
-
-### C. Consejo de Especialistas — `VALIDATED x3`
-
-Especialistas con contratos estructurados y revisión explícita.
-
-### D. Ejecución durable — `VALIDATED x3`
-
-PGMQ, lease, heartbeat, retry, recuperación, dead-letter y telemetría persistida.
-
-### E. Plan operativo — `VALIDATED x3`
-
-Misión, owner, prioridad, vencimiento, solicitudes, SLA y seguimiento.
-
-### F. Controles y evidencia — `VALIDATED x3`
-
-Procedencia, vigencia, SHA-256, suficiencia, diseño y operación separados.
-
-### G. Inventario, lifecycle y aviso — `VALIDATED INICIAL / ACTIVE`
-
-Tres actividades; mapeo 3/3; eliminación primaria 3/3; assurance proveedor 3/3; provider trace OpenAI capturado; tenant 0/3; final 0/3.
-
-### H. Release y assurance — `DONE EN SU ALCANCE TÉCNICO`
-
-Release Gate, typecheck, build, smoke, previews y producción Vercel verdes.
+No se autoriza ampliar esta lista durante el cierre.
 
 ---
 
-## 6. Estado de los bloques 1–18
+## 6. Estado de bloques
 
 | Bloque | Resultado | Estado |
 |---:|---|---|
-| 1 | Auth, workspace y tenant | `VALIDATED INICIAL / BLOCKED` por leaked passwords |
-| 2 | Golden Path Ley N.º 21.719 | `VALIDATED x3` técnico |
+| 1 | Auth, workspace y tenant | `VALIDATED INICIAL / BLOCKED` solo por leaked passwords |
+| 2 | Golden Path Ley N.º 21.719 | `VALIDATED x3` |
 | 3 | UX operacional | `DEPLOYED` |
 | 4 | Ejecución durable | `VALIDATED x3` |
 | 5 | Evidencia y controles | `VALIDATED x3` |
 | 6 | Release Gate | `DONE` |
 | 7 | Grafo y reutilización | `DEPLOYED` |
-| 8 | Timeline, confianza e impacto | `DEPLOYED / VALIDATED INICIAL` |
-| 9 | Memoria y casos similares | `DEPLOYED / SIN DATOS REALES` |
+| 8 | Timeline, confianza e impacto | `VALIDATED INICIAL` |
+| 9 | Memoria y casos similares | `DEPLOYED / SIN PILOTO EXTERNO` |
 | 10 | Especialización y supervisor | `VALIDATED x3` |
-| 11 | Escritorio, SLA y delegación | `DEPLOYED / VALIDATED INICIAL` |
+| 11 | Escritorio, SLA y delegación | `VALIDATED INICIAL` |
 | 12 | Expediente → plan operativo | `VALIDATED x3` |
 | 13 | Baseline assurance | `VALIDATED x3` |
-| 14 | Inventario real | `VALIDATED` |
-| 15 | Tenant assurance | `DONE` |
-| 16 | Calidad del inventario y evidencia real | `NEXT / ACTIVE` |
-| 17 | Aprendizaje organizacional | `PLANNED` |
-| 18 | Piloto externo y medición | `PLANNED` |
+| 14 | Inventario real | `VALIDATED INICIAL` |
+| 15 | Tenant assurance | `DONE EN ALCANCE INTERNO` |
+| 16 | Cierre técnico y evidencia real | `ACTIVE / EXTERNAL GATES` |
+| 17 | Aprendizaje organizacional adicional | `DEFERRED` |
+| 18 | Beta autoservicio / expansión | `DEFERRED` |
 
 ---
 
 ## 7. Gates P0 antes de beta privada autoservicio
 
-### 1. Leaked Password Protection — `BLOCKED`
+### P0-A — Leaked Password Protection — `BLOCKED`
 
-Activar en Supabase Auth, verificar advisor y probar registro/recuperación.
+Acción externa/configuración de Supabase Auth:
 
-### 2. Multiempresa — `VALIDATED INTERNO / ACTIVE EXTERNO`
+1. activar protección de contraseñas filtradas;
+2. verificar Security Advisor;
+3. ejecutar registro, recuperación y cambio de contraseña;
+4. documentar evidencia.
 
-Falta organización externa y observación humana.
+Hasta entonces, el producto puede permanecer en demo/piloto supervisado, pero **no se declara listo para beta autoservicio**.
 
-### 3. Inventario y lifecycle — `3/3 REAL / ACTIVE`
+### P0-B — Configuración tenant Supabase — `BLOCKED EXTERNO`
 
-Completado: tres actividades, lifecycle versionado, mapeo 3/3, eliminación primaria 3/3, assurance proveedor 3/3 y trazabilidad runtime OpenAI verificada en una request real.
+Requiere evidencia administrativa válida de:
 
-Falta: PITR Supabase, identidad/configuración OpenAI tenant-specific, tenant-specific 0/3, eliminación operacional final 0/3 y resolución de dimensiones lifecycle.
+- project reference;
+- `backupModeObserved = daily|pitr`;
+- PITR enabled/disabled;
+- ventana efectiva de recuperación;
+- fuente `management_api`, `provider_dashboard` o `provider_contract`.
 
-### 4. Golden Path — `3/3 / VALIDATED`
+No se deduce desde `wal_level`, `archive_mode` u otros settings PostgreSQL.
 
-Repetibilidad técnica cerrada. Falta tiempo humano, costo, retrabajo y experiencia externa.
+### P0-C — Configuración tenant OpenAI — `BLOCKED EXTERNO`
 
-### 5. Aviso y eliminación — `ACTIVE`
+Requiere evidencia administrativa válida de:
 
-- 3/3 mapeos aceptados con brechas;
-- 3/3 mecanismos controlados;
-- 3/3 eliminaciones primarias;
-- 3/3 assurance de proveedor;
-- 3/3 solicitudes tenant-specific;
-- provider trace OpenAI real capturado;
-- `/v1/me` assurance implementado, ejecución pendiente;
-- 0/3 configuraciones tenant verificadas;
-- **0/3 eliminaciones demostradas** como cierre operacional final.
+- organization reference;
+- project reference;
+- `projectBindingObserved=true`;
+- modo exacto `standard|modified_abuse_monitoring|zero_data_retention`.
 
-Aceptar una matriz, una prueba sintética, un response header o una política pública no completa lifecycle ni purga de backups/proveedores.
+El retention probe descarta ZDR para la request observada, pero **no distingue Standard de MAM**.
 
-### 6. Piloto externo — `PLANNED`
+### P0-D — Lifecycle — `ACTIVE / EVIDENCIA EXTERNA`
 
-1–3 organizaciones, tareas y evidencia reales, feedback UX y métricas de valor.
+Tres paquetes de cierre están abiertos. No se validan base, retención, destinatarios, subencargados ni transferencias sin evidencia independiente suficiente.
+
+### P0-E — Eliminación operacional final — `BLOCKED POR P0-B/P0-C`
+
+No ejecutar ni acreditar 3/3 hasta que el assurance tenant-specific aplicable sea suficiente. La eliminación primaria ya demostrada permanece separada.
+
+### P0-F — Piloto externo — `DEFERRED HASTA GATES`
+
+El protocolo puede prepararse, pero un piloto externo no se inventa ni se sustituye por un tenant sintético.
 
 ---
 
-## 8. Backlog ordenado
+## 8. Backlog autorizado durante el freeze
 
-### P1 — Cierre de evidencia real
+Solo se autoriza:
 
-1. Ejecutar `provider_identity` (`/v1/me`) con la configuración productiva de Kumplio y reconciliar el `user-*`/organizaciones asociados sin exponer credenciales.
-2. Verificar configuración tenant Supabase de backups/PITR.
-3. Verificar Data Retention efectiva de OpenAI (`None`, MAM o ZDR) para la identidad/proyecto realmente usado por Kumplio.
-4. **Ejecutar y acreditar tres pruebas de eliminación o anonimización** sólo después de que la evidencia tenant-specific aplicable sea suficiente.
-5. Resolver lifecycle mediante evidencia independiente aprobada.
-6. Activar Leaked Password Protection.
-7. Preparar piloto externo supervisado.
+1. seguridad P0;
+2. evidencia administrativa tenant-specific;
+3. revisión humana de evidencia ya solicitada;
+4. eliminación operacional final cuando los prerequisitos estén cumplidos;
+5. corrección de bugs críticos o regresiones;
+6. documentación/assurance necesaria para reflejar hechos comprobados;
+7. preparación de piloto supervisado sin habilitar autoservicio.
 
-### P2 — Valor acumulativo
-
-Aprendizaje organizacional, biblioteca viva, reutilización de evidencia, terceros críticos y preparación continua de auditoría.
-
-### P3 — Operación avanzada y Enterprise
-
-Modo incidente, cadena de custodia, Data Room, holdings, multi-framework, SSO, API, marketplace y verticales.
+Todo lo demás queda fuera de alcance.
 
 ---
 
 ## 9. Próximos bloques de 3
 
-### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`
+### Bloque 16 — Cierre técnico y evidencia externa — `NEXT`
 
-1. **Completado:** tres actividades reales registradas y revisadas.
-2. **Completado en su alcance de revisión:** lifecycle separado; resultado `changes_requested` en 3/3.
-3. **Completado en subgates técnicos:** 3/3 mapeos aceptados con brechas, 3/3 eliminación primaria, 3/3 assurance proveedor, 3/3 requests tenant-specific y provider trace OpenAI real capturado.
+**Subbloque A — Seguridad controlable**
 
-Pendiente canónico:
+1. activar y verificar Leaked Password Protection cuando el proveedor/conector permita el cambio;
+2. reejecutar Security Advisor;
+3. probar auth básico después del cambio.
 
-- ejecutar/reconciliar OpenAI `/v1/me` assurance;
-- confirmar PITR/backups efectivos de Supabase;
-- confirmar Data Retention OpenAI efectiva;
-- configuración tenant proveedor 0/3;
-- eliminación operacional final 0/3;
-- lifecycle sin resolver.
+**Subbloque B — Evidencia administrativa**
 
-Siguiente secuencia obligatoria:
+1. Supabase Daily/PITR + ventana efectiva;
+2. OpenAI project binding;
+3. OpenAI Standard vs MAM.
 
-1. ejecutar el assurance OpenAI `/v1/me` ya desplegado y reconciliar la identidad runtime;
-2. confirmar Supabase plan/configuración efectiva de backups/PITR para `qhhybqfuenxojboymrsd`;
-3. confirmar Data Retention OpenAI del tenant/proyecto realmente usado por `OPENAI_API_KEY`;
-4. **Ejecutar y acreditar tres pruebas de eliminación o anonimización.** Sólo la capa final puede promocionarse cuando la evidencia tenant-specific sea suficiente;
-5. adjuntar cada evidencia a su solicitud y someterla a revisión humana;
-6. aceptar sólo pruebas con timestamp, proveedor, dataset/activo, alcance, responsable, resultado y referencias de backup/propagación aplicables.
+**Subbloque C — Cierre operacional**
 
-**Salida:** tres actividades con mapeo aceptado y cierre final demostrado, o un estado abierto honesto con brecha, owner y vencimiento.
+1. revisar/aceptar únicamente evidencia suficiente mediante el workflow tenant-specific;
+2. ejecutar eliminación operacional final aplicable 3/3;
+3. versionar lifecycle nuevamente solo cuando la nueva evidencia justifique cambiar estados.
 
-### Bloque 17 — Aprendizaje organizacional
-
-1. capturar correcciones humanas clasificadas;
-2. versionar vigencia, supersesión y conflictos;
-3. reutilizar un aprendizaje aprobado en un caso equivalente.
-
-### Bloque 18 — Piloto externo y medición
-
-1. incorporar organización externa supervisada;
-2. observar el recorrido sin intervención técnica;
-3. medir tiempo, costo, retrabajo, claridad, confianza y disposición a pagar.
+Después de esos tres subbloques, la única decisión permitida es evaluar formalmente si Kumplio puede pasar de **cierre técnico** a **beta privada supervisada**. No existe autorización automática para Bloque 17 ni 18.
 
 ---
 
-## 10. Métricas de cierre v1.0
+## 10. Claims permitidos en cierre técnico
 
-| Indicador | Gate | Estado actual |
-|---|---:|---:|
-| Bugs críticos conocidos | 0 | 0 |
-| Release Gate en cambios críticos | 100% | 100% |
-| Golden Paths | ≥ 3 | 3/3 |
-| Fugas cross-tenant | 0 | 0 en assurance interno |
-| Actividades reales revisadas | ≥ 3 | 3/3 |
-| Lifecycle versionado | 100% | 3/3 |
-| Mapeo del aviso aceptado | 100% | 3/3 con brechas |
-| Eliminación primaria | 100% | 3/3 controlado |
-| Assurance proveedor | 100% | 3/3 parcial |
-| OpenAI runtime trace | ≥ 1 request real | 1 request real capturada |
-| OpenAI provider identity | 1 ejecución `/v1/me` | implementado, pendiente de ejecutar |
-| Supabase PITR/config backup | 100% | pendiente |
-| Configuración tenant proveedor | 100% | 0/3 |
-| Base jurídicamente validada | 100% | 0/3 |
-| Retención aprobada | 100% | 0/3 |
-| Destinatarios/subencargados completos | 100% | 0/3 |
-| Eliminación demostrada | 100% | 0/3 |
-| Organización externa observada | ≥ 1 | 0 |
-| Tiempo humano y costo | medir | pendiente |
+Se puede afirmar:
+
+- Kumplio tiene un Golden Path técnico validado x3;
+- existen especialistas digitales con revisión humana;
+- las decisiones y evidencias son trazables;
+- el inventario real inicial contiene tres actividades revisadas;
+- la eliminación primaria controlada está demostrada 3/3;
+- Lifecycle V2 permanece changes_requested 3/3;
+- existen workflows para resolver evidencia tenant-specific;
+- OpenAI ZDR fue contradicho para una request/configuración observada mediante un probe sintético controlado;
+- los unknowns permanecen visibles.
+
+No se puede afirmar:
+
+- cumplimiento total;
+- certificación;
+- eliminación final 3/3;
+- PITR observado;
+- OpenAI Standard o MAM confirmado;
+- tenant configuration verified 3/3;
+- piloto externo;
+- beta autoservicio lista.
 
 ---
 
-## 11. Política de datos E2E y limpieza
+## 11. Mapa de evidencia de cierre
 
-Los tenants y probes sintéticos son evidencia técnica, no activos comerciales. No eliminar evidencia auditada sólo para “limpiar” el sistema; cualquier limpieza destructiva debe ser tenant-scoped, auditable y explícitamente aprobada.
+Documentos principales:
+
+- `docs/assurance/agent-flow-production-e2e-5x-2026-08-14.md`;
+- `docs/assurance/block16-tenant-configuration-progress-2026-08-16.md`;
+- `docs/assurance/n3uralia-processing-lifecycle-v2-3x-2026-08-16.md`;
+- `docs/assurance/n3uralia-lifecycle-closure-requests-3x-2026-08-16.md`;
+- `docs/assurance/kumplio-technical-close-2026-08-16.md` cuando la PR de cierre sea fusionada.
+
+Verificadores read-only relevantes:
+
+- `scripts/69-verify-n3uralia-processing-lifecycle-v2-3x.sql`;
+- `scripts/70-verify-n3uralia-lifecycle-closure-requests-3x.sql`.
+
+El estado persistido en producción prevalece sobre cualquier documento histórico que haya quedado desactualizado.
 
 ---
 
 ## 12. Congelamiento de alcance
 
-Hasta cerrar P0:
+Desde esta revisión, Kumplio entra en **technical freeze**.
+
+Reglas:
 
 - no crear módulos nuevos solo porque son atractivos;
-- no construir Enterprise antes de pilotos externos;
-- no presentar tres actividades como inventario completo;
-- no aumentar scores ocultando parcialidad;
-- no convertir bases propuestas o riesgos provisionales en conclusiones;
-- no presentar mapeo aceptado como aviso suficiente;
-- no presentar eliminación primaria como purga final;
-- no presentar política de proveedor como configuración tenant verificada;
-- no presentar provider trace o `/v1/me` como prueba de ZDR/MAM;
-- no automatizar decisiones irreversibles sin aprobación;
-- no marcar `DONE` fuera del alcance probado;
-- no pasar al Bloque 17 mientras tenant-specific, eliminación final y lifecycle sigan abiertos.
+- no iniciar Bloque 17 o 18 por iniciativa propia;
+- no reabrir PRs históricas cerradas como superseded sin decisión explícita del owner;
+- no fusionar la PR experimental Home/Demo 2.0 sin rebase y revalidación completa;
+- no cambiar modelos, permisos, RLS o infraestructura salvo seguridad, bug crítico o gate P0;
+- no usar evidencia parcial para promocionar un estado `verified`;
+- no ejecutar eliminación operacional final antes de cerrar el assurance tenant aplicable;
+- no convertir un test sintético en claim comercial de cliente;
+- cualquier excepción debe quedar documentada en `ROADMAP.md` en la misma PR.
 
-### Excepción explícita del owner — rutas públicas `/es` y `/en` — 14 de agosto de 2026
-
-El owner autoriza una migración transversal y acotada del **sitio público** a rutas canónicas `/es/...` y `/en/...` sin abrir un nuevo módulo funcional ni alterar la continuidad del Bloque 16.
-
-Reglas de esta excepción:
-
-1. español sigue siendo el idioma principal del producto y del workspace privado;
-2. la aplicación autenticada, APIs, callbacks, datos y RLS no se duplican por idioma;
-3. las rutas públicas antiguas migran a `/es/...` con redirección permanente y preservación de query params;
-4. `/en/...` puede existir para QA, pero debe permanecer `noindex` hasta que su copy, claims, guardrails, metadata y navegación estén realmente traducidos y revisados;
-5. sitemap e IndexNow no deben publicar páginas inglesas incompletas;
-6. ninguna traducción puede ampliar claims jurídicos o de cumplimiento respecto de la versión española aprobada;
-7. build, typecheck, public discovery, auth/session y preview de Vercel deben pasar antes de fusionar;
-8. esta excepción no autoriza Bloque 17, Enterprise, beta autoservicio ni cambios de base de datos.
+El freeze termina únicamente por una decisión explícita del owner registrada en este archivo.
 
 ---
 
 ## 13. Decisión vigente
 
-El Bloque 15 permanece `DONE` dentro del assurance técnico interno.
+**Decisión del owner — 16 de agosto de 2026:** cerrar el desarrollo de Kumplio y dejarlo operativo, estable y auditable; desde este punto solo se trabaja en cierre, seguridad, evidencia externa, bugs críticos y preparación de piloto supervisado.
 
-Dentro del Bloque 16:
+Estado objetivo actual:
 
-1. tres actividades reales están `VALIDATED`;
-2. lifecycle está `VALIDATED INICIAL / CAMBIOS REQUERIDOS` 3/3;
-3. mapeo está `accepted_with_gaps` 3/3;
-4. mecanismo controlado está validado 3/3;
-5. eliminación primaria está demostrada de forma controlada 3/3;
-6. assurance de proveedor está revisado 3/3;
-7. solicitudes tenant-specific están abiertas 3/3;
-8. Supabase plan Pro está verificado y PITR sigue pendiente;
-9. OpenAI provider trace de una ejecución real está capturado;
-10. OpenAI `/v1/me` assurance está implementado/desplegado, pero aún no ejecutado;
-11. configuración tenant proveedor está verificada 0/3;
-12. eliminación operacional final demostrada está 0/3.
+> **Kumplio técnicamente cerrado y apto para demo/piloto supervisado; beta autoservicio todavía no habilitada.**
 
-La única continuidad funcional autorizada es:
-
-> **Ejecutar/reconciliar la identidad runtime OpenAI, obtener la configuración tenant-specific efectiva de Supabase/OpenAI y, sólo cuando sea suficiente, ejecutar o aceptar la prueba operacional final de eliminación/anonimización sin sobreafirmar backups, retención ni propagación externa.**
-
-La decisión transversal de distribución pública del 14 de agosto de 2026 autoriza únicamente la fundación y migración segura de `/es` y `/en`; no modifica la secuencia funcional anterior ni el estado de los gates P0.
-
-No se habilitará beta autoservicio hasta cerrar Leaked Password Protection, la evidencia tenant-specific/final, las dimensiones lifecycle críticas y observar al menos una organización externa supervisada.
+La ruta crítica restante no es “construir más Kumplio”. Es demostrar o resolver los gates externos que todavía están abiertos sin fabricar evidencia.

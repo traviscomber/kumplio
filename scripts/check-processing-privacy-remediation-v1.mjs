@@ -115,12 +115,12 @@ const required = [
     'configuración tenant               0/3',
   ]],
   ['ROADMAP.md', [
-    'Assurance aviso y eliminación 3/3',
-    '`20260808151723`',
-    '`20260808152005`',
-    '### Bloque 16 — Ampliación y calidad del inventario real — `NEXT`',
-    '3/3 mapeos aceptados con brechas',
-    '0/3 eliminaciones demostradas',
+    '| Mapeo del aviso | `accepted_with_gaps` 3/3 |',
+    '| Eliminación primaria controlada | 3/3 |',
+    '| Configuración tenant proveedor | 0/3 `verified` |',
+    '| Eliminación operacional final | 0/3 |',
+    '### Bloque 16 — Cierre técnico y evidencia externa — `NEXT`',
+    'Una prueba sintética no equivale a evidencia de cliente.',
   ]],
   ['package.json', [
     'check:processing-privacy-remediation',
