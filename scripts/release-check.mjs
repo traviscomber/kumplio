@@ -43,6 +43,7 @@ const checks = [
   ['check:processing-privacy-remediation'],
   ['check:processing-notice-mapping'],
   ['check:processing-deletion-evidence'],
+  ['check:processing-provider-tenant-config'],
   ['check:openai-provider-trace'],
   ['check:openai-retention-probe'],
   ['check:tenant-assurance'],
