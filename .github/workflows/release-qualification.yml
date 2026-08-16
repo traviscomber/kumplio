@@ -39,13 +39,17 @@ jobs:
       - name: Validate security boundary migration
         run: node scripts/check-security-function-boundaries.mjs
 
-      - name: Validate public, auth and server boundaries
+      - name: Validate public and auth boundaries
         run: |
           npm run check:discovery
           npm run check:boundaries
           npm run check:auth
-          npm run check:guided-resolution
-          npm run check:authenticated-resolution
+
+      - name: Validate guided resolution positioning
+        run: npm run check:guided-resolution
+
+      - name: Validate authenticated resolution continuity
+        run: npm run check:authenticated-resolution
 
       - name: Validate regulatory fixtures and runners
         run: |
