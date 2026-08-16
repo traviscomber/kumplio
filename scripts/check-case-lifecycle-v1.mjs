@@ -38,10 +38,11 @@ assert.match(livePage, /from\('compliance_case_events'\)/)
 assert.match(livePage, /FinalCaseSummary/)
 assert.doesNotMatch(livePage, /Math[.]random|progress\s*=|setTimeout/)
 
-// Una cuenta sin workspace debe completar onboarding antes de crear casos.
+// Una cuenta sin workspace debe completar onboarding sin perder el caso que intentaba crear.
 assert.match(newCasePage, /from\('organization_members'\)/)
 assert.match(newCasePage, /eq\('user_id', user[.]id\)/)
-assert.match(newCasePage, /if \(!membership[?][.]organization_id\) redirect\('\/onboarding'\)/)
+assert.ok(newCasePage.includes("if (!membership?.organization_id)"))
+assert.ok(newCasePage.includes("redirect(`/onboarding?next=${encodeURIComponent('/cases/new')}`)"))
 
 // El usuario puede continuar desde el centro de casos sin confundir expediente y ejecución.
 assert.match(caseCenter, /\/cases\/\$\{item[.]id\}\/live/)
