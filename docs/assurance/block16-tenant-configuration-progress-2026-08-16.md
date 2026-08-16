@@ -2,7 +2,7 @@
 
 Estado: **EVIDENCIA PARCIAL / CAMBIOS REQUERIDOS**
 
-Este documento registra evidencia observada en producción para las tres solicitudes tenant-specific del Bloque 16. No acredita configuración tenant completa, ZDR/MAM, PITR ni eliminación operacional final.
+Este documento registra evidencia observada en producción para las tres solicitudes tenant-specific del Bloque 16. No acredita configuración tenant completa, Modified Abuse Monitoring, PITR ni eliminación operacional final.
 
 ## Estado resumido
 
@@ -10,7 +10,9 @@ Este documento registra evidencia observada en producción para las tres solicit
 |---|---|---|
 | Supabase — contactos | proyecto productivo identificado; organización conectada en plan Pro; política oficial de backups diarios aplicable; PITR no observable con el conector actual | `changes_requested` |
 | Supabase — cuentas/Auth | mismo proyecto productivo y misma configuración observable; PITR no observable con el conector actual | `changes_requested` |
-| OpenAI — expedientes/IA | `/v1/me` ejecutado con la `OPENAI_API_KEY` productiva y correlacionado con provider traces persistidos | `changes_requested` |
+| OpenAI — expedientes/IA | `/v1/me` reconciliado + probe productivo `store:true` creado, recuperado y eliminado 200/200/200 | `changes_requested` |
+| Zero Data Retention OpenAI | contradicho para la request productiva observada | **descartado para esta request** |
+| Estándar vs Modified Abuse Monitoring | no distinguible por el probe actual | **pendiente** |
 | Configuración tenant proveedor | ninguna de las tres capas tiene evidencia suficiente para `verified` | **0/3** |
 | Eliminación operacional final | no se ha promovido ninguna prueba a cierre final | **0/3** |
 
@@ -27,20 +29,14 @@ Proyecto conectado:
 
 La documentación oficial de Supabase establece backups diarios para proyectos Pro y una retención de siete días para esas copias diarias. PITR es una capacidad separada y el conector disponible no expone si está habilitada para este proyecto ni su ventana efectiva.
 
-Por lo anterior, se creó una evidencia restringida compartida con scope:
+Evidencia restringida compartida:
 
-`supabase_project_backup_configuration_partial_assurance`
-
-Evidencia:
-
-`a4c65403-5969-4fff-a439-0ed116d7a899`
-
-Fue sometida a las solicitudes:
-
+- scope: `supabase_project_backup_configuration_partial_assurance`;
+- evidence id: `a4c65403-5969-4fff-a439-0ed116d7a899`;
 - contactos: `6595082e-6140-43cb-b69f-ca65e74f34f2`;
 - cuentas/Auth: `21494958-a7db-4d86-b1fa-d55549913f9d`.
 
-Ambas quedaron revisadas como `changes_requested`. La evidencia tiene integridad SHA-256 verificada, pero conserva explícitamente:
+Ambas solicitudes permanecen `changes_requested`. La evidencia conserva explícitamente:
 
 - inventario de backups no observado;
 - PITR `unknown`;
@@ -49,78 +45,120 @@ Ambas quedaron revisadas como `changes_requested`. La evidencia tiene integridad
 
 ## 2. OpenAI — identidad productiva reconciliada
 
-El worker privado ya desplegado fue invocado mediante su token existente desde Supabase `pg_net`, sin leer ni exponer la API key de OpenAI.
+El worker privado fue invocado mediante su token existente desde Supabase `pg_net`, sin leer ni exponer la API key de OpenAI.
 
 El modo `provider_identity` ejecutó `/v1/me` con la misma `OPENAI_API_KEY` productiva usada por los especialistas.
 
-Resultado acotado:
+Resultado:
 
-- respuesta HTTP 200;
+- HTTP 200;
 - identidad y organización OpenAI observables;
 - `organizationHeader` exacto correlacionado con `agent_runs.provider_organization`;
 - **19 ejecuciones productivas** con `provider_request_id` y el mismo provider identity;
 - **5 especialistas distintos** dentro de esa correlación.
 
-Además, la conexión OpenAI Platform disponible muestra la misma organización y un único proyecto visible en la cuenta conectada. Esto ayuda a orientar la revisión, pero no se presenta como prueba directa del project binding de la key.
+Evidencia restringida previa:
 
-Se creó evidencia restringida:
+- evidence id: `1a36b153-554f-4c76-88c3-e0b815b338ab`;
+- scope: `processing_provider_identity_assurance`;
+- request: `b97fb811-55d5-416e-becc-b54d0d9753a0`.
 
-`1a36b153-554f-4c76-88c3-e0b815b338ab`
+La identidad por sí sola no demuestra Data Retention, ZDR o MAM.
 
-Scope:
+## 3. Probe productivo OpenAI — application state observable
 
-`processing_provider_identity_assurance`
+Después del merge de PR #266 y con ambos despliegues Vercel productivos verdes, se aplicaron en Supabase:
 
-La solicitud OpenAI:
+- `20260816162119_processing_provider_tenant_configuration_review_v1`;
+- `20260816162336_provider_retention_probe_dispatch_v1`.
 
-`b97fb811-55d5-416e-becc-b54d0d9753a0`
-
-quedó `changes_requested` porque aún no existe evidencia administrativa/contractual suficiente de la configuración efectiva de Data Retention, Zero Data Retention o Modified Abuse Monitoring.
-
-## 3. Lo que esta evidencia NO demuestra
-
-No demuestra:
-
-- que PITR esté habilitado o deshabilitado en Supabase;
-- que una copia concreta de Supabase ya no pueda recuperar un registro eliminado;
-- que OpenAI tenga ZDR o MAM habilitado;
-- que `store:false` equivalga a ZDR;
-- que `/v1/me` o `openai-organization` demuestren una política de retención;
-- que la eliminación primaria 3/3 equivalga a purga de backups o de procesadores externos;
-- cumplimiento jurídico global.
-
-## 4. Probe OpenAI de almacenamiento observable
-
-Esta rama incorpora un probe adicional, server-only y protegido por el mismo token del worker:
+El dispatcher privado reutiliza el secreto `kumplio_agent_worker_token` dentro de Vault y llama al modo autenticado:
 
 `provider_retention_probe`
 
-Objetivo: observar únicamente el comportamiento de **application state** del Responses API con la key productiva.
+Request interna `pg_net`:
 
-Secuencia:
+`13997`
 
-1. crear una Response con un input fijo sintético y `store:true`;
-2. no devolver ni persistir el contenido generado;
-3. recuperar la Response por ID;
-4. registrar únicamente status, flags de storage y trazabilidad acotada;
-5. eliminar inmediatamente la Response en un `finally`;
-6. registrar si la limpieza fue exitosa.
+Resultado del worker:
 
-Interpretación deliberadamente conservadora:
+| Señal | Resultado |
+|---|---:|
+| HTTP worker | 200 |
+| modelo | `gpt-4.1` |
+| create `/v1/responses` | 200 |
+| `createStoreFlag` | `true` |
+| retrieve por response id | 200 |
+| `retrievable` | `true` |
+| `retrievedStoreFlag` | `true` |
+| DELETE response | 200 |
+| `deleted` | `true` |
+| `applicationStateObserved` | `true` |
 
-- si `store:true` produce un objeto recuperable, existe application state observable para esa request y el resultado contradice un comportamiento de ZDR que fuerce `store:false` en Responses;
-- si no existe objeto recuperable o `store` vuelve `false`, el resultado es solamente consistente con non-storage y **no prueba ZDR**;
-- este probe **no distingue** configuración estándar de Modified Abuse Monitoring;
-- no se promueve `providerTenantConfigurationStatus` a `verified` por este probe por sí solo.
+Provider request id observado:
 
-## 5. Gates que permanecen abiertos
+`req_40a58cd2609a4fc199857236249df03c`
+
+La documentación oficial vigente de OpenAI establece que, cuando Zero Data Retention está habilitado, `store=true` en `/v1/responses` se trata siempre como `false`. En esta prueba `store=true` fue aceptado, persistido y recuperable. Por tanto, **Zero Data Retention queda contradicho para esta request/configuración observada**.
+
+El mismo documento indica que Modified Abuse Monitoring excluye contenido de abuse monitoring logs, pero conserva las capacidades normales de la plataforma. Por eso este probe **no distingue configuración estándar de Modified Abuse Monitoring**.
+
+La Response sintética fue eliminada inmediatamente después de la lectura. El DELETE 200 acredita la eliminación solicitada del objeto de application state; no acredita purga inmediata de abuse monitoring logs ni otros sistemas externos.
+
+Nueva evidencia restringida:
+
+- evidence id: `50e82c04-83cb-479c-8fdf-b4b83d69fe93`;
+- scope: `processing_provider_retention_probe`;
+- SHA-256: `9849ad22216e655f5c8f27211008ccc57650cff9175e68701b5b48ea53d9bfa6`;
+- integrity: `verified`;
+- request OpenAI: `changes_requested`;
+- `providerTenantConfigurationStatus`: `unverified`;
+- eventos de promoción a `verified`: `0`.
+
+## 4. Contrato de promoción tenant-specific
+
+La migración `20260816162119_processing_provider_tenant_configuration_review_v1` instala:
+
+`promote_processing_provider_tenant_configuration_v1(...)`
+
+La función sólo puede promover un proveedor cuando existe evidencia tenant-specific aceptada e íntegra. Para OpenAI exige project binding observado y un modo efectivo explícito entre:
+
+- `standard`;
+- `modified_abuse_monitoring`;
+- `zero_data_retention`.
+
+El probe actual no cumple esos requisitos deliberadamente, por lo que no puede promover el estado.
+
+Privilegios verificados:
+
+- `SECURITY INVOKER`;
+- `search_path=''`;
+- `anon`: sin execute;
+- `authenticated`: sin execute;
+- `service_role`: execute permitido.
+
+## 5. Lo que esta evidencia NO demuestra
+
+No demuestra:
+
+- si PITR está habilitado o deshabilitado en Supabase;
+- cuándo una copia concreta de Supabase deja de poder recuperar un registro eliminado;
+- si OpenAI usa configuración estándar o Modified Abuse Monitoring;
+- el project binding administrativo de la API key productiva;
+- que DELETE 200 purgue abuse monitoring logs;
+- eliminación operacional final 3/3;
+- cumplimiento jurídico global.
+
+## 6. Gates que permanecen abiertos
 
 ```text
 solicitudes tenant-specific con evidencia parcial   3/3 changes_requested
+OpenAI ZDR para request observada                    contradicho
+OpenAI standard vs MAM                               pendiente
 configuración tenant proveedor verified             0/3
 eliminación operacional final demonstrated          0/3
 lifecycle                                             changes_requested 3/3
 Leaked Password Protection                            disabled
 ```
 
-La siguiente acción válida es ejecutar el probe en un despliegue que use la configuración productiva aplicable, registrar el resultado como evidencia adicional y continuar buscando la configuración administrativa efectiva de PITR y Data Retention. Hasta entonces, los gates permanecen abiertos.
+La siguiente acción válida es obtener evidencia administrativa del project binding y del modo de Data Retention efectivo de OpenAI, además de observar PITR/ventana efectiva en Supabase. Sólo después puede evaluarse una promoción a `verified` y el cierre operacional final.
