@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { runOpenAIRetentionProbe } from '@/lib/agents/openai-retention-probe'
 import {
   classifyWorkflowExecutionFailure,
   executeWorkflowStage,
@@ -54,6 +55,16 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       console.error('[agent-worker/provider-identity]', error instanceof Error ? error.name : 'unknown')
       return NextResponse.json({ error: 'Provider identity assurance failed', code: 'provider_identity_failed' }, { status: 502 })
+    }
+  }
+
+  if (body.mode === 'provider_retention_probe') {
+    try {
+      const retentionProbe = await runOpenAIRetentionProbe()
+      return NextResponse.json({ retentionProbe })
+    } catch (error) {
+      console.error('[agent-worker/provider-retention-probe]', error instanceof Error ? error.name : 'unknown')
+      return NextResponse.json({ error: 'Provider retention probe failed', code: 'provider_retention_probe_failed' }, { status: 502 })
     }
   }
 
