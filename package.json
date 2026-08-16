@@ -59,6 +59,7 @@
     "check:processing-notice-mapping": "node scripts/check-processing-notice-mapping-v1.mjs",
     "check:processing-deletion-evidence": "node scripts/check-processing-deletion-evidence-v1.mjs",
     "check:openai-provider-trace": "node scripts/check-openai-provider-trace-v1.mjs",
+    "check:openai-retention-probe": "node scripts/check-openai-retention-probe-v1.mjs",
     "check:tenant-assurance": "node scripts/check-tenant-assurance-v1.mjs",
     "check:ui-golden-path": "node scripts/check-ui-golden-path-v1.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
