@@ -51,6 +51,9 @@ jobs:
       - name: Validate authenticated resolution continuity
         run: npm run check:authenticated-resolution
 
+      - name: Validate privacy-safe funnel telemetry
+        run: node scripts/check-funnel-telemetry-v1.mjs
+
       - name: Validate regulatory fixtures and runners
         run: |
           npm run check:diario
