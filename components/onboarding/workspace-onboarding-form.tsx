@@ -13,6 +13,7 @@ type Props = {
   initialOrganizationName?: string | null
   initialFirstName?: string | null
   initialLastName?: string | null
+  nextPath?: string | null
 }
 
 const industries: Array<{ value: Industry; label: string }> = [
@@ -45,7 +46,13 @@ const suggestions: Record<Industry, { project: string; complianceCase: string }>
   other: { project: 'Primer ámbito de cumplimiento', complianceCase: 'Diagnóstico inicial de cumplimiento' },
 }
 
-export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName, initialFirstName, initialLastName }: Props) {
+export function WorkspaceOnboardingForm({
+  initialEmail,
+  initialOrganizationName,
+  initialFirstName,
+  initialLastName,
+  nextPath,
+}: Props) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [organizationName, setOrganizationName] = useState(initialOrganizationName || '')
@@ -58,6 +65,7 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
 
   const suggestion = useMemo(() => suggestions[industry], [industry])
   const totalSteps = 4
+  const continuesCase = nextPath === '/cases/new'
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -82,7 +90,9 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
       if (!response.ok) throw new Error(data.error || 'No fue posible crear el workspace')
 
       const caseId = data.workspace?.caseId as string | null | undefined
-      router.replace(caseId ? `/cases/${caseId}` : '/dashboard')
+      const destination = nextPath || (caseId ? `/cases/${caseId}` : '/dashboard')
+      router.replace(destination)
+      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No fue posible terminar la configuración')
     } finally {
@@ -149,7 +159,11 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="font-semibold">Ya tengo lo necesario para comenzar.</p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">Prepararé {suggestion.complianceCase.toLowerCase()} y conservaré toda decisión con trazabilidad.</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {continuesCase
+                    ? 'Crearé tu espacio y volverás a la situación que ya escribiste, sin pedirte que la redactes de nuevo.'
+                    : `Prepararé ${suggestion.complianceCase.toLowerCase()} y conservaré toda decisión con trazabilidad.`}
+                </p>
               </div>
             </div>
           </div>
@@ -170,7 +184,11 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
         ) : (
           <Button type="submit" disabled={loading || !canContinue}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-            {loading ? 'Preparando tu organización…' : 'Preparar mi diagnóstico'}
+            {loading
+              ? 'Preparando tu organización…'
+              : continuesCase
+                ? 'Crear mi espacio y continuar'
+                : 'Preparar mi diagnóstico'}
           </Button>
         )}
       </div>
