@@ -20,7 +20,7 @@
     "check:sma": "node scripts/test-sma-snifa-fixtures.mjs",
     "check:sma-bootstrap": "node scripts/check-sma-snifa-bootstrap.mjs",
     "check:sma-detail": "node scripts/test-sma-snifa-detail-fixtures.mjs",
-    "check:sma-detail-bootstrap": "node scripts/test-sma-snifa-detail-bootstrap.mjs",
+    "check:sma-detail-bootstrap": "node scripts/check-sma-snifa-detail-bootstrap.mjs",
     "check:mercado-publico": "node scripts/test-mercado-publico-fixtures.mjs",
     "check:chile-sources": "node scripts/check-chile-government-sources-v1.mjs",
     "check:sst-ds44": "node scripts/test-sst-ds44-fixtures.mjs",
