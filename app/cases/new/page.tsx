@@ -22,7 +22,9 @@ export default async function NewCasePage() {
     .limit(1)
     .maybeSingle()
 
-  if (!membership?.organization_id) redirect('/onboarding')
+  if (!membership?.organization_id) {
+    redirect(`/onboarding?next=${encodeURIComponent('/cases/new')}`)
+  }
 
   return (
     <>
