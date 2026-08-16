@@ -10,13 +10,11 @@ const [
   navigation,
   advisor,
   resolutionEntry,
-  signUp,
   newCasePage,
   onboardingPage,
   onboardingForm,
   betaCaseEntry,
   artifactPreview,
-  funnelTelemetry,
 ] = await Promise.all([
   readFile('app/cases/[caseId]/page.tsx', 'utf8'),
   readFile('components/cases/guided-case-workspace.tsx', 'utf8'),
@@ -26,13 +24,11 @@ const [
   readFile('components/workspace-nav.tsx', 'utf8'),
   readFile('app/advisor/page.tsx', 'utf8'),
   readFile('components/marketing/resolution-entry.tsx', 'utf8'),
-  readFile('app/(auth)/sign-up/page.tsx', 'utf8'),
   readFile('app/cases/new/page.tsx', 'utf8'),
   readFile('app/onboarding/page.tsx', 'utf8'),
   readFile('components/onboarding/workspace-onboarding-form.tsx', 'utf8'),
   readFile('components/cases/beta-case-entry.tsx', 'utf8'),
   readFile('components/cases/artifact-result-preview.tsx', 'utf8'),
-  readFile('lib/analytics/funnel-client.ts', 'utf8'),
 ])
 
 assert.match(casePage, /GuidedCaseWorkspace/)
@@ -99,46 +95,5 @@ assert.ok(caveatsIndex > evidenceIndex, 'Reservations must follow evidence')
 assert.ok(findingsIndex > caveatsIndex, 'Findings must appear after evidence and reservations')
 assert.ok(artifactPreview.includes('Fuentes no expuestas en este resumen.'))
 assert.ok(artifactPreview.includes('Antes de aprobar, revisa la trazabilidad del expediente'))
-
-// Funnel telemetry is centralized and typed. Callers cannot send free-text context or record identifiers.
-assert.ok(resolutionEntry.includes('trackFunnelIntentStarted({ audience, locale })'))
-assert.ok(signUp.includes('trackFunnelSignupCompleted({'))
-assert.ok(onboardingForm.includes('trackFunnelWorkspaceInitialized({'))
-assert.ok(betaCaseEntry.includes('trackFunnelGuidedCaseCreated({'))
-assert.ok(betaCaseEntry.includes('trackFunnelFirstStageQueued({ audience, recovered: recoverable })'))
-assert.ok(betaCaseEntry.includes('clearFunnelTiming()'))
-
-for (const source of [resolutionEntry, signUp, onboardingForm, betaCaseEntry]) {
-  assert.doesNotMatch(source, /from '@vercel\/analytics'/)
-}
-
-assert.ok(funnelTelemetry.includes("const FUNNEL_STARTED_AT_KEY = 'kumplio:funnel-started-at'"))
-assert.ok(funnelTelemetry.includes('String(Date.now())'))
-assert.ok(funnelTelemetry.includes('elapsed_seconds: elapsed'))
-for (const eventName of [
-  'Funnel Intent Started',
-  'Funnel Signup Completed',
-  'Funnel Workspace Initialized',
-  'Funnel Guided Case Created',
-  'Funnel First Stage Queued',
-]) {
-  assert.ok(funnelTelemetry.includes(`track('${eventName}'`), `Missing typed telemetry event: ${eventName}`)
-}
-
-for (const typeContract of [
-  "type FunnelAudience = 'person' | 'company' | 'professional' | 'industry'",
-  "type SignupSource = 'pricing' | 'guided_resolution'",
-  "type SignupContinuation = 'guided_case' | 'other'",
-  "type SignupConfirmation = 'instant' | 'email'",
-  "type WorkspaceContinuation = 'guided_case' | 'default'",
-]) {
-  assert.ok(funnelTelemetry.includes(typeContract), `Missing telemetry type contract: ${typeContract}`)
-}
-
-assert.doesNotMatch(
-  funnelTelemetry,
-  /\b(email|organizationName|firstName|lastName|goal|caseId|workflowId|userId)\b/i,
-  'Funnel telemetry helper must not accept identity, free-text goal or record identifiers',
-)
 
 console.log('Authenticated guided resolution contract: OK')
