@@ -2,6 +2,7 @@ import {
   N3URALIA_CANONICAL_URL,
   N3URALIA_FACTORY_DESCRIPTION,
   N3URALIA_NAME,
+  OFFICIAL_LEY_21719_URL,
   PUBLIC_AGENTIC_ASSURANCE,
   PUBLIC_CONTACT,
   PUBLIC_DESCRIPTION,
@@ -12,6 +13,8 @@ import {
 } from '@/lib/public-site'
 
 export const dynamic = 'force-static'
+
+const OFFICIAL_DIARIO_21719_URL = 'https://www.diariooficial.interior.gob.cl/publicaciones/2024/12/13/44023/01/2583630.pdf'
 
 export function GET() {
   const content = `# Kumplio
@@ -66,6 +69,8 @@ Localized examples:
 - English home: ${SITE_URL}/en
 - Spanish demo: ${SITE_URL}/es/demo
 - English demo: ${SITE_URL}/en/demo
+- Spanish trust center: ${SITE_URL}/es/trust
+- English trust center: ${SITE_URL}/en/trust
 - Spanish pricing: ${SITE_URL}/es/pricing
 - English pricing: ${SITE_URL}/en/pricing
 - Spanish FAQ: ${SITE_URL}/es/faq
@@ -80,6 +85,14 @@ Current unprefixed canonical product and knowledge routes:
 - General resources: ${SITE_URL}/resources/cumplimiento-normativo
 - Use cases: ${SITE_URL}/use-cases
 - Enterprise Studio: ${SITE_URL}/enterprise
+
+## Official source transparency
+
+For the current Law 21.719 focus, the primary official public references are:
+- BCN / LeyChile consolidated legal text: ${OFFICIAL_LEY_21719_URL}
+- Official Gazette publication dated December 13, 2024: ${OFFICIAL_DIARIO_21719_URL}
+
+Kumplio is independent. It is not affiliated with, sponsored, certified or endorsed by BCN, the Official Gazette or other public institutions referenced as sources. Source names and trademarks belong to their respective owners.
 
 ## Machine-readable discovery
 
