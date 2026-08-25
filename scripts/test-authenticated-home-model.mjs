@@ -19,4 +19,20 @@ assert.equal('score' in model.primaryStatus, false)
 const onboarding = buildAuthenticatedHomeModel({ health: { status: 'attention', label: 'Información incompleta', explanation: 'Completa el primer trabajo.' }, priorities: [], changes: [], initialNextAction: { title: 'Subir documento inicial', href: '/app/documentos' } })
 assert.deepEqual(onboarding.nextAction, { title: 'Subir documento inicial', href: '/app/documentos' })
 
+const legacyPriority = buildAuthenticatedHomeModel({
+  health: { status: 'attention', label: 'Requiere atención', explanation: 'Hay trabajo pendiente.' },
+  priorities: [{ id: 'legacy', title: 'Revisar evidencia pendiente', summary: 'Resumen', href: '/review-center', severity: 'high' }],
+  changes: [],
+})
+assert.equal(legacyPriority.priorities[0].href, '/app/inicio')
+assert.equal(legacyPriority.nextAction.href, '/app/inicio')
+assert.ok(legacyPriority.priorities.every((priority) => priority.href.startsWith('/app/')))
+
+const canonicalPriority = buildAuthenticatedHomeModel({
+  health: { status: 'attention', label: 'Requiere atención', explanation: 'Hay trabajo pendiente.' },
+  priorities: [{ id: 'canonical', title: 'Revisar evidencia', summary: 'Resumen', href: '/app/evidencia', severity: 'high' }],
+  changes: [],
+})
+assert.equal(canonicalPriority.priorities[0].href, '/app/evidencia')
+
 console.log('Authenticated home model: PASS')

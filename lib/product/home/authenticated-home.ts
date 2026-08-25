@@ -27,9 +27,10 @@ export function buildAuthenticatedHomeModel<P extends PriorityInput, C extends C
 
 function canonicalHref(href?: string | null) {
   if (!href) return '/app/inicio'
+  if (href === '/app' || href.startsWith('/app/')) return href
   const match = href.match(/^\/cases\/([^/]+)$/)
   if (match) return `/app/casos/${match[1]}`
   if (href === '/documents') return '/app/documentos'
   if (href === '/evidence') return '/app/evidencia'
-  return href
+  return '/app/inicio'
 }
