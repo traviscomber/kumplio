@@ -44,14 +44,14 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
     cases: activeCases || [],
     initialNextAction: initialDiagnosis?.nextAction?.title ? {
       title: initialDiagnosis.nextAction.title,
-      href: initialDiagnosis.nextAction.href || (selectedCase ? `/app/casos/${selectedCase.id}` : '/app/casos'),
+      href: resolveInitialActionHref(initialDiagnosis.nextAction.href, selectedCase?.id),
     } : null,
   })
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 pb-12">
       <section className={statusCardTone(health.status)}>
-        <p className="text-sm font-semibold text-primary">Estado de cumplimiento de hoy</p>
+        <p className="text-sm font-semibold text-primary">Estado actual</p>
         <div className="mt-3 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="max-w-3xl text-3xl font-extrabold tracking-tight sm:text-4xl">{home.primaryStatus.label}</h1>
@@ -74,6 +74,7 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
       <section>
         <p className="text-sm font-semibold text-primary">Lo que requiere atención</p>
         <h2 className="mt-1 text-2xl font-bold">Prioridades actuales</h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">El orden prioriza el trabajo; no reemplaza la revisión humana ni acredita cumplimiento.</p>
 
         <div className="mt-5 space-y-4">
           {home.priorities.length === 0 ? (
@@ -94,20 +95,14 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
 
       <Cases items={home.cases} />
       <Timeline items={home.changes} />
-
-      <section className="rounded-2xl border bg-muted/20 p-5 sm:p-6">
-        <div className="flex items-start gap-3">
-          <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-          <div>
-            <h2 className="font-bold">La prioridad combina criticidad, urgencia y evidencia disponible.</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              El score ordena el trabajo; no reemplaza el juicio profesional ni la aprobación humana.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   )
+}
+
+function resolveInitialActionHref(href: string | undefined, selectedCaseId?: string) {
+  if (!href) return selectedCaseId ? `/app/casos/${selectedCaseId}` : '/app/casos'
+  if (href === '/app/casos' && selectedCaseId) return `/app/casos/${selectedCaseId}`
+  return href
 }
 
 function PriorityCard({ priority, index }: { priority: ScoredPriority; index: number }) {
@@ -142,17 +137,21 @@ function PriorityCard({ priority, index }: { priority: ScoredPriority; index: nu
   )
 }
 
+function Cases({ items }: { items: Array<{ id: string; title: string; status: string; href: string }> }) {
+  return <section className="rounded-2xl border bg-card p-5 sm:p-6"><p className="text-sm font-semibold text-primary">Casos activos</p><h2 className="mt-1 text-2xl font-bold">Trabajo en curso</h2>{items.length ? <div className="mt-5 divide-y">{items.map(item => <Link key={item.id} href={item.href} className="flex items-center justify-between gap-4 py-4"><div><p className="font-semibold">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.status}</p></div><ArrowRight className="h-4 w-4 text-primary" /></Link>)}</div> : <div className="mt-5 rounded-xl border border-dashed p-5"><p className="font-semibold">Aún no tienes casos activos.</p><p className="mt-1 text-sm text-muted-foreground">Completa tu contexto y Kumplio organizará el primer trabajo que necesites resolver.</p><Link href="/app/casos" className="mt-3 inline-flex text-sm font-bold text-primary">Ver casos</Link></div>}</section>
+}
+
 function Timeline({ items }: { items: ComplianceTimelineItem[] }) {
   return (
     <section className="rounded-2xl border bg-card p-5 sm:p-6">
       <div className="flex items-start gap-3">
         <Activity className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-primary">Cambios recientes</p>
-          <h2 className="mt-1 text-2xl font-bold">Qué cambió en los últimos días</h2>
+          <p className="text-sm font-semibold text-primary">Cambios relevantes</p>
+          <h2 className="mt-1 text-2xl font-bold">Cambios que afectan tu trabajo</h2>
           <div className="mt-5 divide-y">
             {items.length === 0 ? (
-              <p className="py-4 text-sm text-muted-foreground">Todavía no hay revisiones históricas suficientes.</p>
+              <p className="py-4 text-sm text-muted-foreground">No hay cambios relevantes que alteren tu siguiente paso.</p>
             ) : items.map((item) => (
               <div key={item.id} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -172,10 +171,6 @@ function Timeline({ items }: { items: ComplianceTimelineItem[] }) {
       </div>
     </section>
   )
-}
-
-function Cases({ items }: { items: Array<{ id: string; title: string; status: string; href: string }> }) {
-  return <section className="rounded-2xl border bg-card p-5 sm:p-6"><p className="text-sm font-semibold text-primary">Casos activos</p><h2 className="mt-1 text-2xl font-bold">Trabajo en curso</h2>{items.length ? <div className="mt-5 divide-y">{items.map(item => <Link key={item.id} href={item.href} className="flex items-center justify-between gap-4 py-4"><div><p className="font-semibold">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">{item.status}</p></div><ArrowRight className="h-4 w-4 text-primary" /></Link>)}</div> : <div className="mt-5 rounded-xl border border-dashed p-5"><p className="font-semibold">Aún no tienes casos activos.</p><p className="mt-1 text-sm text-muted-foreground">Completa tu contexto y Kumplio organizará el primer trabajo que necesites resolver.</p><Link href="/app/casos" className="mt-3 inline-flex text-sm font-bold text-primary">Ver casos</Link></div>}</section>
 }
 
 function statusCardTone(status: 'healthy' | 'attention' | 'critical') {

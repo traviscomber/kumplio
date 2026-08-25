@@ -10,7 +10,7 @@ const required = {
   'app/app/layout.tsx': ['x-kumplio-authenticated-path', '<AppNavigation />'],
   'proxy.ts': ['x-kumplio-authenticated-path', "pathname === '/app' || pathname.startsWith('/app/')", 'request.nextUrl.pathname', 'request.nextUrl.search'],
   'ROADMAP.md': ['Onboarding contextual + Inicio enfocado — `ACTIVE`'],
-  'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff', 'check:activation-document-progress', 'check:activation-case-context', 'check:activation-first-action'],
+  'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff', 'check:activation-document-progress', 'check:activation-case-context', 'check:activation-first-action', 'check:daily-operations'],
   'scripts/release-check.mjs': ["['check:contextual-onboarding-home']"],
 }
 for (const [file, markers] of Object.entries(required)) {
@@ -27,5 +27,6 @@ execFileSync(process.execPath, ['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON'
 execFileSync(process.execPath, ['scripts/check-activation-document-progress-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-activation-case-context-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-activation-first-action-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-daily-operations-close-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')

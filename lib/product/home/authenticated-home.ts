@@ -12,9 +12,12 @@ export function buildAuthenticatedHomeModel<P extends PriorityInput, C extends C
   initialNextAction?: { title: string; href: string } | null
 }) {
   const priorities = input.priorities.slice(0, 3).map(item => ({ ...item, href: canonicalHref(item.href) }))
+  const initialNextAction = input.initialNextAction
+    ? { ...input.initialNextAction, href: canonicalHref(input.initialNextAction.href) }
+    : null
   const nextAction = priorities[0]
     ? { title: priorities[0].title, href: priorities[0].href }
-    : input.initialNextAction || { title: 'Crear o revisar un caso', href: '/app/casos' }
+    : initialNextAction || { title: 'Crear o revisar un caso', href: '/app/casos' }
   return {
     primaryStatus: { status: input.health.status, label: input.health.label, explanation: input.health.explanation },
     nextAction,
