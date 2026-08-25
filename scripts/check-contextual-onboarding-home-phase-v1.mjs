@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { execFileSync } from 'node:child_process'
 
 const required = {
   'components/onboarding/workspace-onboarding-form.tsx': ["'persona'", "'profesional'", "'empresa'", '/app/inicio?case='],
@@ -9,7 +10,7 @@ const required = {
   'app/app/layout.tsx': ['x-kumplio-authenticated-path', '<AppNavigation />'],
   'proxy.ts': ['x-kumplio-authenticated-path', "pathname === '/app' || pathname.startsWith('/app/')", 'request.nextUrl.pathname', 'request.nextUrl.search'],
   'ROADMAP.md': ['Onboarding contextual + Inicio enfocado — `ACTIVE`'],
-  'package.json': ['check:contextual-onboarding-home'],
+  'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff'],
   'scripts/release-check.mjs': ["['check:contextual-onboarding-home']"],
 }
 for (const [file, markers] of Object.entries(required)) {
@@ -21,5 +22,7 @@ const topNav = fs.readFileSync('components/layout/top-nav.tsx', 'utf8')
 for (const forbidden of ['const productLinks =', 'aria-label="Acceso al producto"', 'productLinks.map']) {
   if (topNav.includes(forbidden)) throw new Error(`TopNav duplicates authenticated product navigation: ${forbidden}`)
 }
+
+execFileSync(process.execPath, ['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', 'scripts/test-activation-handoff.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
