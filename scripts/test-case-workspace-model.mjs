@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import { buildCaseWorkspaceModel } from '../lib/product/cases/case-workspace-model.ts'
 
 const base = {
@@ -37,5 +38,10 @@ assert.ok(completed.status.label.length > 0)
 for (const model of [withAction, evidenceReview, humanReview, closable]) {
   assert.ok(model.nextAction?.href.startsWith('/app/'), `Non-canonical case action: ${model.nextAction?.href}`)
 }
+
+const guided = await readFile('components/cases/guided-case-workspace.tsx', 'utf8')
+assert.match(guided, /buildCaseWorkspaceModel/, 'Canonical case workspace must consume the bounded read model')
+assert.match(guided, /Estado del caso/, 'Canonical case workspace must render the bounded case status')
+assert.match(guided, /workspaceModel\.nextAction/, 'Canonical case workspace must render at most one dominant next action from the model')
 
 console.log('Case workspace model: PASS')
