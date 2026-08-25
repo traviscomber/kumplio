@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
 import { resolveAuthenticatedAppAccess } from '../lib/product/authenticated-app-access.ts'
 
 const unauthenticated = await resolveAuthenticatedAppAccess({
@@ -31,5 +32,19 @@ const activeWorkspace = await resolveAuthenticatedAppAccess({
   },
 })
 assert.deepEqual(activeWorkspace, { kind: 'ready', userId: 'user-1', organizationId: 'active-org' })
+
+const appLayout = fs.readFileSync('app/app/layout.tsx', 'utf8')
+assert.ok(
+  !appLayout.includes("nextPath: '/app'"),
+  'the authenticated layout must not collapse every requested route to /app before sign-in',
+)
+assert.ok(
+  appLayout.includes("x-kumplio-authenticated-path"),
+  'the authenticated layout must consume the request-scoped canonical app path',
+)
+
+const proxy = fs.readFileSync('proxy.ts', 'utf8')
+assert.ok(proxy.includes("x-kumplio-authenticated-path"), 'proxy must preserve the requested /app path for the auth guard')
+assert.ok(proxy.includes("'/app/:path*'"), 'proxy must be scoped to authenticated app routes')
 
 console.log('Authenticated app access behavior: PASS')
