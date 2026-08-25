@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import type { PublicLocale } from '@/lib/i18n/public-routing'
+import { buildGuidedOnboardingSignUpPath, GUIDED_ONBOARDING_DRAFT_KEY } from '@/lib/product/onboarding/guided-entry'
 
 type Audience = 'person' | 'company' | 'professional'
 
@@ -88,10 +89,10 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
     if (normalizedGoal.length < 8) return
 
     window.sessionStorage.setItem(
-      'kumplio:case-draft',
+      GUIDED_ONBOARDING_DRAFT_KEY,
       JSON.stringify({ goal: normalizedGoal, audience }),
     )
-    router.push('/sign-up?next=/cases/new')
+    router.push(buildGuidedOnboardingSignUpPath())
   }
 
   return (

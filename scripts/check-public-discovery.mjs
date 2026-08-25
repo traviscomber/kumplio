@@ -88,7 +88,7 @@ const checks = [
   ['app/privacy/page.tsx', ['PRIVACY_PUBLIC_COPY', 'PRIVACY_NOTICE.version', 'noticeMetadata', 'withPublicLocale(noticeMetadata.canonical, locale)', 'securityHref', '<Footer locale={locale} />']],
   ['app/terms/page.tsx', ['TERMS_PUBLIC_COPY', 'generateMetadata', "withPublicLocale('/terms', locale)", 'info@kumplio.app', '<Footer locale={locale} />']],
   ['components/marketing/contact-page-content.tsx', ["fetch('/api/leads'", 'canonicalServiceLabels', "acompanado: 'Plan Acompañado'", "source: service ? `contact-${service}` : 'contact-page'", 'getPublicSiteHref', 'alternateContactHref', '<Footer locale={locale} />']],
-  ['components/marketing/resolution-entry.tsx', ["locale = 'es'", 'What do you need to protect or resolve?', 'Start with expert guidance', "router.push('/sign-up?next=/cases/new')"]],
+  ['components/marketing/resolution-entry.tsx', ["locale = 'es'", 'What do you need to protect or resolve?', 'Start with expert guidance', 'buildGuidedOnboardingSignUpPath()', 'GUIDED_ONBOARDING_DRAFT_KEY']],
   ['components/footer.tsx', [
     'Powered by n3uralia', 'getPublicSiteHref', 'Software de protección de datos', 'Data protection software',
     'Ley 21.719', "['Contexto LLM', '/llms.txt']", "['Contexto LLM completo', '/llms-full.txt']",

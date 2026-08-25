@@ -58,6 +58,9 @@ const required = [
     "timezoneId: 'America/Santiago'",
   ]],
   ['tests/e2e/ui-golden-path.spec.mjs', [
+    "page.goto('/es')",
+    "name: 'Empezar con guía experta', exact: true",
+    "searchParams.get('next')).toBe('/onboarding')",
     "page.goto('/sign-in?next=/onboarding')",
     "name: 'Iniciar sesión', exact: true",
     "name: 'Crear mi primer diagnóstico', exact: true",

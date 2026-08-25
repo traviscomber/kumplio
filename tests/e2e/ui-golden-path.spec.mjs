@@ -10,6 +10,15 @@ const goal = `UI E2E ${marker}: preparar una organización sintética para la Le
 const activityName = `Gestión sintética de solicitudes de privacidad ${marker}`
 
 test('completa el tercer golden path usando únicamente la interfaz', async ({ page }, testInfo) => {
+  await test.step('conservar el contexto desde la entrada pública', async () => {
+    await page.goto('/es')
+    await page.getByRole('button', { name: 'Persona', exact: true }).click()
+    await page.getByRole('button', { name: 'Quiero entender cómo están usando mis datos', exact: true }).click()
+    await page.getByRole('button', { name: 'Empezar con guía experta', exact: true }).click()
+    await expect(page).toHaveURL(/\/sign-up\?/, { timeout: 30_000 })
+    expect(new URL(page.url()).searchParams.get('next')).toBe('/onboarding')
+  })
+
   await test.step('iniciar sesión con una cuenta E2E confirmada', async () => {
     await page.goto('/sign-in?next=/onboarding')
     await page.getByLabel('Correo electrónico').fill(email)

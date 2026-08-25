@@ -55,6 +55,7 @@ const checks = [
   ['check:contextual-onboarding-ui'],
   ['check:authenticated-home'],
   ['check:contextual-onboarding-home'],
+  ['check:guided-onboarding-entry'],
   ['build'],
 ]
 

@@ -7,10 +7,14 @@ on:
       - '.github/workflows/ui-golden-path.yml'
       - 'app/api/onboarding/**'
       - 'app/api/internal/ui-golden-path/**'
+      - 'components/marketing/resolution-entry.tsx'
+      - 'components/onboarding/workspace-onboarding-form.tsx'
+      - 'lib/product/onboarding/guided-entry.ts'
       - 'lib/security/github-actions-ui-oidc.ts'
       - 'tests/e2e/ui-golden-path.spec.mjs'
       - 'playwright.ui-golden-path.config.mjs'
       - 'scripts/check-ui-golden-path-v1.mjs'
+      - 'scripts/test-guided-onboarding-entry.mjs'
       - 'supabase/migrations/**'
   workflow_dispatch:
 

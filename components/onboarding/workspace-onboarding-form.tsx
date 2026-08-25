@@ -1,10 +1,11 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { buildInitialDiagnosis, type DocumentAvailability, type OnboardingUrgency, type UserContextType } from '@/lib/product/onboarding/contextual-diagnosis'
+import { GUIDED_ONBOARDING_DRAFT_KEY, parseGuidedOnboardingDraft } from '@/lib/product/onboarding/guided-entry'
 
 type Props = { initialEmail: string; initialOrganizationName?: string | null; initialFirstName?: string | null; initialLastName?: string | null }
 const contexts = [
@@ -36,6 +37,13 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    const draft = parseGuidedOnboardingDraft(window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY))
+    if (!draft) return
+    setUserType(draft.userType)
+    setProblem(draft.problem)
+  }, [])
+
   const diagnosis = useMemo(() => problem.trim() ? buildInitialDiagnosis({ userType, problem, intent, urgency, documentsAvailable, targetDate, region, industry, organizationName, organizationSize, professionalActivity }) : null, [userType, problem, intent, urgency, documentsAvailable, targetDate, region, industry, organizationName, organizationSize, professionalActivity])
   const canContinue = step === 0 ? Boolean(userType) : step === 1 ? problem.trim().length >= 3 : step === 2 ? firstName.trim().length > 0 && (userType !== 'empresa' || organizationName.trim().length >= 2) && (userType !== 'profesional' || professionalActivity.trim().length >= 2) : Boolean(diagnosis)
 
@@ -52,6 +60,7 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'No fue posible preparar tu espacio')
       const caseId = data.workspace?.caseId as string | undefined
+      window.sessionStorage.removeItem(GUIDED_ONBOARDING_DRAFT_KEY)
       router.replace(`/app/inicio?case=${encodeURIComponent(caseId || '')}`)
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No fue posible terminar la configuración') }
     finally { setLoading(false) }
