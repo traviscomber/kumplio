@@ -24,4 +24,12 @@ assert.doesNotMatch(
   'Inicio intro remains overly layered',
 )
 
+const cases = fs.readFileSync('components/cases-workspace.tsx', 'utf8')
+assert.doesNotMatch(cases, /href=\{`\/cases\/\$\{item\.id\}`\}/)
+assert.doesNotMatch(cases, /\/cases\/\$\{item\.id\}\/live/)
+assert.doesNotMatch(cases, />Trazabilidad</)
+assert.match(cases, /`\/app\/casos\/\$\{item\.id\}`/)
+assert.match(cases, /router\.push\(`\/app\/casos\/\$\{data\.complianceCase\.id\}`\)/)
+assert.match(cases, /focus-visible:/)
+
 console.log('Product polish: PASS')
