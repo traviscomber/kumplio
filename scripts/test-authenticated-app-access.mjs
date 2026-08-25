@@ -52,7 +52,10 @@ assert.ok(
 
 const proxy = fs.readFileSync('proxy.ts', 'utf8')
 assert.ok(proxy.includes("x-kumplio-authenticated-path"), 'proxy must preserve the requested /app path for the auth guard')
-assert.ok(proxy.includes("pathname.startsWith('/app')"), 'proxy must scope return-context forwarding to authenticated app routes')
+assert.ok(
+  proxy.includes("pathname === '/app' || pathname.startsWith('/app/')"),
+  'proxy must scope return-context forwarding to /app and its descendants only',
+)
 assert.ok(proxy.includes('request.nextUrl.search'), 'proxy must preserve query-string context such as the active case')
 
 console.log('Authenticated app access behavior: PASS')
