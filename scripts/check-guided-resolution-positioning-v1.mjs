@@ -31,7 +31,8 @@ assert.match(homeCopy, /Protect your data\. Understand what to do\. Move forward
 assert.match(homeCopy, /Chilean Law 21\.719/)
 assert.match(homeCopy, /human review/)
 
-assert.match(entry, /kumplio:case-draft/)
+assert.match(entry, /GUIDED_ONBOARDING_DRAFT_KEY/)
+assert.match(entry, /buildGuidedOnboardingSignUpPath\(\)/)
 assert.match(entry, /¿Qué necesitas proteger o resolver\?/)
 assert.match(entry, /Empezar con guía experta/)
 assert.match(entry, /What do you need to protect or resolve\?/)
