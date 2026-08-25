@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
     return updateSession(request)
   }
 
-  if (pathname.startsWith('/app')) {
+  if (pathname === '/app' || pathname.startsWith('/app/')) {
     const forwardedHeaders = new Headers(request.headers)
     forwardedHeaders.set(
       AUTHENTICATED_PATH_HEADER,
