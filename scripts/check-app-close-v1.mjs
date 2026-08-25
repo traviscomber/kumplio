@@ -47,5 +47,7 @@ for (const [file, source] of productSources) {
 const guided = fs.readFileSync('components/cases/guided-case-workspace.tsx', 'utf8')
 assert.doesNotMatch(guided, /href="\/cases"/, 'Canonical case surface must not link back to legacy case index')
 assert.doesNotMatch(guided, /next=\/cases\//, 'Canonical auth return must not target legacy case route')
+assert.doesNotMatch(guided, /\/cases\/\$\{caseId\}\/live/, 'Canonical case surface must not escape to legacy technical trace UI')
+assert.doesNotMatch(guided, /Ver trazabilidad/, 'Primary case flow must use bounded product history instead of technical trace navigation')
 
 console.log('Authenticated app close: PASS')
