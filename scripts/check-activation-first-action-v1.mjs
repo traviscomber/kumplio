@@ -23,7 +23,9 @@ for (const marker of [
   "searchParams.get('activation') === '1'",
   "searchParams.get('case')",
   'Primer antecedente agregado',
-  'Volver a Inicio y ver el siguiente paso',
+  'Volver al caso',
+  '/app/casos/',
+  'Ir a Inicio y ver el siguiente paso',
   '/app/inicio?case=',
 ]) {
   assert.ok(documents.includes(marker), `activation document flow missing marker: ${marker}`)
