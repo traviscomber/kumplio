@@ -34,5 +34,6 @@ execFileSync(process.execPath, ['scripts/check-case-grounding-chain-v1.mjs'], { 
 execFileSync(process.execPath, ['scripts/check-case-specialist-surface-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-case-evidence-review-surface-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-case-close-experience-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-authenticated-cross-surface-close-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
