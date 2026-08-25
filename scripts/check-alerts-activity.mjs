@@ -54,4 +54,20 @@ for (const marker of [
   if (!activity.includes(marker)) throw new Error(`Activity model missing: ${marker}`)
 }
 
+const activityPage = read('app/app/actividad/page.tsx')
+for (const marker of [
+  'buildOperationalActivity',
+  "redirect('/sign-in?next=/app/actividad')",
+  "from('organization_members')",
+  "from('compliance_case_events')",
+  "eq('organization_id', organizationId)",
+  "from('compliance_cases')",
+  'Actividad reciente',
+]) {
+  if (!activityPage.includes(marker)) throw new Error(`Actividad surface missing: ${marker}`)
+}
+for (const forbidden of ['attempt_count', 'max_attempts', 'prompt', 'token', 'agent_id', 'queue', 'createAdminClient', 'service_role']) {
+  if (activityPage.includes(forbidden)) throw new Error(`Actividad exposes technical plumbing: ${forbidden}`)
+}
+
 console.log('Alerts + Activity contract: PASS')
