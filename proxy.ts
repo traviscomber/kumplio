@@ -15,6 +15,7 @@ import {
 import { updateSession } from '@/lib/supabase/proxy'
 
 const ONE_YEAR = 60 * 60 * 24 * 365
+const AUTHENTICATED_PATH_HEADER = 'x-kumplio-authenticated-path'
 
 function copySessionCookies(source: NextResponse, target: NextResponse) {
   for (const cookie of source.cookies.getAll()) target.cookies.set(cookie)
@@ -25,6 +26,15 @@ export async function proxy(request: NextRequest) {
 
   if (isInfrastructurePath(pathname)) {
     return updateSession(request)
+  }
+
+  if (pathname.startsWith('/app')) {
+    const forwardedHeaders = new Headers(request.headers)
+    forwardedHeaders.set(
+      AUTHENTICATED_PATH_HEADER,
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    )
+    return updateSession(request, forwardedHeaders)
   }
 
   const localized = splitPublicLocale(pathname)
