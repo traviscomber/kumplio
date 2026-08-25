@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AgentRuntimeError, runAgent } from './openai-runtime'
-import { getWorkflowStage, serializeWorkflowContext } from './orchestration'
+import { buildBoundedCommitteeContext } from './committee'
+import { getWorkflowDefinition, getWorkflowStage, serializeWorkflowContext } from './orchestration'
 import { retrieveAgentContext } from './tools'
 
 export class WorkflowExecutionError extends Error {
@@ -78,6 +79,9 @@ export async function executeWorkflowStage(input: {
     throw new WorkflowExecutionError('workflow_not_available', `Workflow is ${workflow.status}`, 409)
   }
 
+  const legacyStageCount = getWorkflowDefinition(workflow.workflow_type, 'v1')?.stages.length
+  const workflowVersion = legacyStageCount === workflow.total_stages ? 'v1' : 'v2'
+
   let effectiveStageIndex = workflow.current_stage
   if (workflow.status === 'pending_review') {
     const { data: currentStageCheck } = await db
@@ -109,7 +113,7 @@ export async function executeWorkflowStage(input: {
     }).eq('id', workflow.id).eq('organization_id', organizationId)
   }
 
-  const stageDefinition = getWorkflowStage(workflow.workflow_type, effectiveStageIndex)
+  const stageDefinition = getWorkflowStage(workflow.workflow_type, effectiveStageIndex, workflowVersion)
   if (!stageDefinition) throw new WorkflowExecutionError('stage_definition_not_found', 'Workflow stage definition not found', 409)
 
   const { data: stage } = await db
@@ -152,6 +156,13 @@ export async function executeWorkflowStage(input: {
     ? await db.from('agent_artifacts').select('id, artifact_type, title, content, status').in('id', artifactIds)
     : { data: [] as Array<{ id: string; artifact_type: string; title: string; content: unknown; status: string }> }
 
+  const boundedArtifacts = buildBoundedCommitteeContext({
+    agentId: stageDefinition.agentId,
+    stageIndex: effectiveStageIndex,
+    artifacts: artifacts || [],
+    workflowVersion,
+  })
+
   const caseRecord = Array.isArray(workflow.compliance_cases) ? workflow.compliance_cases[0] : workflow.compliance_cases
   const baseContext = serializeWorkflowContext({
     workflowType: workflow.workflow_type,
@@ -159,11 +170,11 @@ export async function executeWorkflowStage(input: {
     caseDescription: caseRecord?.description || null,
     originalContext: workflow.input_payload,
     retryInstructions,
-    priorArtifacts: (artifacts || []).map((artifact) => ({
-      agentId: artifact.artifact_type,
-      title: artifact.title,
+    priorArtifacts: boundedArtifacts.map((artifact) => ({
+      agentId: artifact.artifact_type || 'especialista',
+      title: artifact.title || 'Resultado previo',
       content: artifact.content,
-      status: artifact.status,
+      status: artifact.status || 'approved',
     })),
   })
 
@@ -177,7 +188,7 @@ export async function executeWorkflowStage(input: {
     status: 'running',
     attempt_count: attempt,
     source_artifact_ids: artifactIds,
-    context_snapshot: { ...stage.context_snapshot, artifactIds, attempt, retryInstructions },
+    context_snapshot: { ...stage.context_snapshot, artifactIds, attempt, retryInstructions, workflowVersion },
     started_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }).eq('id', stage.id).eq('organization_id', organizationId)
@@ -238,6 +249,7 @@ export async function executeWorkflowStage(input: {
     input_payload: {
       workflowId: workflow.id,
       workflowType: workflow.workflow_type,
+      workflowVersion,
       stageIndex: stageDefinition.index,
       attempt,
       retryInstructions,
@@ -262,6 +274,7 @@ export async function executeWorkflowStage(input: {
       artifactIds,
       attempt,
       retryInstructions,
+      workflowVersion,
       toolCallIds: retrieval.toolCallIds,
       toolWarnings: retrieval.warnings,
     },
