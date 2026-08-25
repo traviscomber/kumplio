@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Activity, AlertTriangle, ArrowRight, CheckCircle2, Clock3, FileCheck2, ShieldAlert } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import {
   getComplianceTimeline,
   refreshDailyComplianceSummary,
@@ -21,16 +22,9 @@ export async function DailyComplianceContent() {
   if (!user) redirect('/sign-in?next=/dashboard')
 
   const admin = createAdminClient()
-  const { data: membership } = await admin
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle()
-
-  if (!membership?.organization_id) redirect('/onboarding')
-
-  const organizationId = membership.organization_id
+  const access = await getWorkspaceAccess(admin, user.id)
+  if (!access) redirect('/onboarding')
+  const organizationId = access.organizationId
   const [{ data: organization }, dailySummary, timeline] = await Promise.all([
     admin.from('organizations').select('id,name').eq('id', organizationId).maybeSingle(),
     refreshDailyComplianceSummary(admin, organizationId),

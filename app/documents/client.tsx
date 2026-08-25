@@ -7,10 +7,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export const dynamic = 'force-dynamic'
 
-export default function DocumentsPageClient() {
+export default function DocumentsPageClient({ showTopNav = true }: { showTopNav?: boolean } = {}) {
   return (
     <div className="min-h-screen bg-background">
-      <TopNav />
+      {showTopNav ? <TopNav /> : null}
       <main className="container mx-auto px-6 py-8">
         <Suspense fallback={<DocumentsSkeleton />}>
           <DocumentsContent />

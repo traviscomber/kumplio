@@ -297,7 +297,7 @@ Todo lo demás queda fuera de alcance.
 
 ## 9. Próximos bloques de 3
 
-### Bloque 16 — Cierre técnico y evidencia externa — `NEXT`
+### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`
 
 **Subbloque A — Seguridad controlable**
 
@@ -317,7 +317,29 @@ Todo lo demás queda fuera de alcance.
 2. ejecutar eliminación operacional final aplicable 3/3;
 3. versionar lifecycle nuevamente solo cuando la nueva evidencia justifique cambiar estados.
 
-Después de esos tres subbloques, la única decisión permitida es evaluar formalmente si Kumplio puede pasar de **cierre técnico** a **beta privada supervisada**. No existe autorización automática para Bloque 17 ni 18.
+Estos gates conservan su autoridad sobre claims, seguridad y evidencia externa. La nueva fase de experiencia autenticada no permite promover estados no demostrados ni sustituir evidencia real.
+
+### Bloque 17 — Experiencia autenticada canónica — `NEXT`
+
+**Subbloque A — Entrada autenticada y orientación**
+
+1. establecer `/app/*` como superficie autenticada canónica protegida;
+2. alinear Inicio, navegación y retorno al contexto de trabajo;
+3. evolucionar onboarding hacia Persona, Profesional y Empresa con diagnóstico inicial persistente.
+
+**Subbloque B — Ejecución trazable**
+
+1. alinear expedientes, requisitos, acciones, evidencia y cierre sin duplicar el modelo existente;
+2. presentar la cadena Fuente → Fragmento → Obligación → Requisito → Caso → Acción → Evidencia → Revisión → Cierre;
+3. integrar resultados de especialistas en el flujo del usuario sin exponer ejecución técnica ni razonamiento interno.
+
+**Subbloque C — Operación continua y superficie pública**
+
+1. alinear Personas, Documentos, Alertas, Actividad y Configuración con divulgación progresiva;
+2. convertir cambios regulatorios y planes guiados en acciones verificables;
+3. completar páginas públicas profundas conservando la landing como capa de adquisición.
+
+Cada subbloque se entrega en cambios pequeños, reversibles y verificables. No se autorizan migraciones destructivas, relajación de RLS, cambios de infraestructura no relacionados ni claims que excedan la evidencia vigente.
 
 ---
 
@@ -369,12 +391,12 @@ El estado persistido en producción prevalece sobre cualquier documento históri
 
 ## 12. Congelamiento de alcance
 
-Desde esta revisión, Kumplio entra en **technical freeze**.
+El technical freeze del 16 de agosto de 2026 queda cerrado por decisión explícita del owner del 24 de agosto de 2026. Sus guardrails de seguridad, evidencia, aislamiento y claims permanecen vigentes.
 
 Reglas:
 
 - no crear módulos nuevos solo porque son atractivos;
-- no iniciar Bloque 17 o 18 por iniciativa propia;
+- no iniciar bloques o módulos fuera del bloque `NEXT` por iniciativa propia;
 - no reabrir PRs históricas cerradas como superseded sin decisión explícita del owner;
 - no fusionar la PR experimental Home/Demo 2.0 sin rebase y revalidación completa;
 - no cambiar modelos, permisos, RLS o infraestructura salvo seguridad, bug crítico o gate P0;
@@ -389,10 +411,10 @@ El freeze termina únicamente por una decisión explícita del owner registrada 
 
 ## 13. Decisión vigente
 
-**Decisión del owner — 16 de agosto de 2026:** cerrar el desarrollo de Kumplio y dejarlo operativo, estable y auditable; desde este punto solo se trabaja en cierre, seguridad, evidencia externa, bugs críticos y preparación de piloto supervisado.
+**Decisión del owner — 24 de agosto de 2026:** adoptar el brief “KUMPLIO — Product Workflows + Authenticated Experience” como dirección vigente, terminar el technical freeze de alcance e iniciar el Bloque 17 sin deshacer el cierre técnico ni debilitar sus gates de seguridad, evidencia y claims.
 
 Estado objetivo actual:
 
-> **Kumplio técnicamente cerrado y apto para demo/piloto supervisado; beta autoservicio todavía no habilitada.**
+> **Kumplio técnicamente cerrado y en evolución controlada hacia una experiencia autenticada canónica; beta autoservicio todavía no habilitada.**
 
-La ruta crítica restante no es “construir más Kumplio”. Es demostrar o resolver los gates externos que todavía están abiertos sin fabricar evidencia.
+La ruta crítica combina la resolución honesta de gates externos con la alineación progresiva del producto. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.

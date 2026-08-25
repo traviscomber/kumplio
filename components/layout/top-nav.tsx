@@ -2,11 +2,18 @@
 
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LogOut, Settings, Menu, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
-export function TopNav() {
+const productLinks = [
+  { href: '/app/inicio', label: 'Inicio' },
+  { href: '/app/casos', label: 'Casos' },
+  { href: '/app/documentos', label: 'Documentos' },
+] as const
+
+export function TopNav({ compact = false }: { compact?: boolean }) {
   const router = useRouter()
   const [supabase, setSupabase] = useState<ReturnType<typeof createClient> | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -22,51 +29,37 @@ export function TopNav() {
   }
 
   return (
-    <header className="border-b border-border bg-card fixed top-0 left-0 right-0 z-50">
-      <div className="flex items-center justify-between px-6 py-5">
-        <div className="flex-shrink-0">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-card/95 backdrop-blur-xl">
+      <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <Link href="/app/inicio" className="flex-shrink-0" aria-label="Ir al inicio de Kumplio">
           <Image 
             src="/logo-kumplio.svg" 
             alt="KUMPLIO" 
             width={100} 
             height={100}
-            className="w-24 h-24"
+            className="h-12 w-auto"
             priority
           />
-        </div>
+        </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <a href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-            Panel de Control
-          </a>
-          <a href="/dashboard/agents" className="text-sm text-muted-foreground hover:text-foreground">
-            Agentes
-          </a>
-          <a href="/dashboard/workflows" className="text-sm text-muted-foreground hover:text-foreground">
-            Flujos de Trabajo
-          </a>
-          <a href="/dashboard/monitoring" className="text-sm text-muted-foreground hover:text-foreground">
-            Monitoreo
-          </a>
-          <a href="/documents" className="text-sm text-muted-foreground hover:text-foreground">
-            Documentos
-          </a>
-          <a href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
-            Proyectos
-          </a>
-        </nav>
+        {!compact && <nav aria-label="Acceso al producto" className="hidden items-center gap-1 md:flex">
+          {productLinks.map((item) => (
+            <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
+              {item.label}
+            </Link>
+          ))}
+        </nav>}
 
-        <div className="hidden md:flex items-center gap-4">
-          <a href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
-            <Settings className="w-5 h-5" />
-          </a>
-          <button onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
-            <LogOut className="w-5 h-5" />
+        <div className="hidden items-center md:flex">
+          <button onClick={handleLogout} className="inline-flex min-h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
+            <LogOut className="h-4 w-4" />
+            Cerrar sesión
           </button>
         </div>
 
         <button
-          className="md:hidden"
+          className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+          aria-label={mobileMenuOpen ? 'Cerrar menú de cuenta' : 'Abrir menú de cuenta'}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? (
@@ -78,35 +71,16 @@ export function TopNav() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border px-6 py-4 space-y-3">
-          <a href="/dashboard" className="block text-sm text-muted-foreground hover:text-foreground">
-            Panel de Control
-          </a>
-          <a href="/dashboard/agents" className="block text-sm text-muted-foreground hover:text-foreground">
-            Agentes
-          </a>
-          <a href="/dashboard/workflows" className="block text-sm text-muted-foreground hover:text-foreground">
-            Flujos de Trabajo
-          </a>
-          <a href="/dashboard/monitoring" className="block text-sm text-muted-foreground hover:text-foreground">
-            Monitoreo
-          </a>
-          <a href="/documents" className="block text-sm text-muted-foreground hover:text-foreground">
-            Documentos
-          </a>
-          <a href="/projects" className="block text-sm text-muted-foreground hover:text-foreground">
-            Proyectos
-          </a>
-          <div className="border-t border-border pt-3 space-y-2">
-            <a href="/settings" className="block text-sm text-muted-foreground hover:text-foreground">
-              <Settings className="w-4 h-4 mr-2 inline" />
-              Configuración
-            </a>
-            <button onClick={handleLogout} className="block w-full text-left text-sm text-muted-foreground hover:text-foreground">
-              <LogOut className="w-4 h-4 mr-2 inline" />
-              Cerrar sesión
-            </button>
-          </div>
+        <div className="border-t border-border px-4 py-3 md:hidden">
+          {!compact && productLinks.map((item) => (
+            <Link key={item.href} href={item.href} className="block min-h-11 rounded-lg px-3 py-3 text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
+              {item.label}
+            </Link>
+          ))}
+          <button onClick={handleLogout} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm font-semibold text-muted-foreground hover:bg-muted hover:text-foreground">
+            <LogOut className="h-4 w-4" />
+            Cerrar sesión
+          </button>
         </div>
       )}
     </header>
