@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { execFileSync } from 'node:child_process'
 
 const required = {
-  'components/onboarding/workspace-onboarding-form.tsx': ["'persona'", "'profesional'", "'empresa'", '/app/inicio?case='],
+  'components/onboarding/workspace-onboarding-form.tsx': ["'persona'", "'profesional'", "'empresa'", 'buildActivationHandoff', 'Ir a mi siguiente acción', 'Ver mi inicio'],
   'lib/product/onboarding/contextual-diagnosis.ts': ['not_verified', 'complianceVerified: false'],
   'lib/product/onboarding/activation-handoff.ts': ['buildActivationHandoff'],
   'lib/product/home/authenticated-home.ts': ['slice(0, 3)', '/app/casos/'],
