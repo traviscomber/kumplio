@@ -11,7 +11,7 @@ const checks = [
 let failed = false
 for (const [name, path, accepted] of checks) {
   try {
-    const response = await fetch(`${baseUrl}${path}`, { redirect: 'manual' })
+    const response = await fetch(`${baseUrl}${path}`, { redirect: 'follow' })
     const ok = accepted.includes(response.status)
     console.log(`${ok ? 'PASS' : 'FAIL'} ${name}: ${response.status}`)
     if (!ok) failed = true
