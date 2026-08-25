@@ -35,4 +35,9 @@ assert.match(docs, /Volver al caso/)
 assert.match(docs, /requiere revisión humana/)
 assert.doesNotMatch(docs, /cumplimiento confirmado|evidencia verificada automáticamente/i)
 
+const evidencePage = fs.readFileSync('app/evidence/page.tsx', 'utf8')
+assert.match(evidencePage, /Pendiente de revisión|revisión/i)
+assert.doesNotMatch(evidencePage, /Biblioteca verificable/, 'Page metadata/copy must not imply all stored evidence is verified')
+assert.match(evidencePage, /px-4[^\n]*sm:px-6|px-4/)
+
 console.log('Product polish: PASS')
