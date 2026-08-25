@@ -4,5 +4,5 @@ export const dynamic = 'force-dynamic'
 
 export default async function LegacyBetaCasePage({ params }: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await params
-  redirect(`/cases/${caseId}`)
+  redirect(`/app/casos/${caseId}`)
 }
