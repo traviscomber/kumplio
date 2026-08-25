@@ -20,7 +20,7 @@ import { buildAuthenticatedHomeModel } from '@/lib/product/home/authenticated-ho
 export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseId?: string } = {}) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/sign-in?next=/dashboard')
+  if (!user) redirect('/sign-in?next=/app/inicio')
 
   const admin = createAdminClient()
   const access = await getWorkspaceAccess(admin, user.id)
@@ -111,7 +111,7 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
 }
 
 function PriorityCard({ priority, index }: { priority: ScoredPriority; index: number }) {
-  const href = priority.href || '/review-center'
+  const href = priority.href || '/app/inicio'
 
   return (
     <article className="rounded-2xl border bg-card p-5 sm:p-6">
