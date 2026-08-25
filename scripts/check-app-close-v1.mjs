@@ -19,6 +19,7 @@ const checks = [
   ['scripts/check-activation-first-action-v1.mjs'],
   ['scripts/check-product-polish-v1.mjs'],
   ['scripts/check-three-agent-core-v1.mjs'],
+  ['scripts/check-alerts-activity.mjs'],
 ]
 
 for (const args of checks) execFileSync(process.execPath, args, { stdio: 'inherit' })
