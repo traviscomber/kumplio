@@ -177,7 +177,7 @@ export function LiveWorkflowActions({
     try {
       await request(`/api/agents/workflows/${workflowId}/close-case`)
       setClosed(true)
-      router.refresh()
+      router.push('/app/inicio')
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'No fue posible cerrar el caso')
     } finally {
@@ -190,6 +190,11 @@ export function LiveWorkflowActions({
   return (
     <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
       <h2 className="font-black">{canClose ? 'Cierre del caso' : 'Siguiente decisión'}</h2>
+      {!canClose && (
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          El cierre permanece bloqueado mientras haya revisión, evidencia o una decisión pendiente.
+        </p>
+      )}
 
       {canRecoverStale ? (
         <>
