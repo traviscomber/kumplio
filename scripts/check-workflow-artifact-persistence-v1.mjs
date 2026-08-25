@@ -41,7 +41,7 @@ assert.match(executor, /WorkflowExecutionError/)
 assert.match(executor, /run_persistence_failed/)
 assert.match(executor, /workflow_persistence_failed/)
 
-assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.match(betaPage, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
 assert.doesNotMatch(betaPage, /agent_workflow_stages|getWorkflowStage/)
 
 for (const page of [livePage, agentsPage]) {
