@@ -148,11 +148,11 @@ function Timeline({ items }: { items: ComplianceTimelineItem[] }) {
       <div className="flex items-start gap-3">
         <Activity className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-primary">Cambios recientes</p>
-          <h2 className="mt-1 text-2xl font-bold">Qué cambió en los últimos días</h2>
+          <p className="text-sm font-semibold text-primary">Cambios relevantes</p>
+          <h2 className="mt-1 text-2xl font-bold">Cambios que afectan tu trabajo</h2>
           <div className="mt-5 divide-y">
             {items.length === 0 ? (
-              <p className="py-4 text-sm text-muted-foreground">Todavía no hay revisiones históricas suficientes.</p>
+              <p className="py-4 text-sm text-muted-foreground">No hay cambios relevantes que alteren tu siguiente paso.</p>
             ) : items.map((item) => (
               <div key={item.id} className="flex flex-col gap-2 py-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
