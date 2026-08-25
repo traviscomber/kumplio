@@ -1,18 +1,28 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { FileText, Shield, Zap } from 'lucide-react'
 import { DocumentUpload } from '@/components/documents/upload'
 import { DocumentsList } from '@/components/documents/list'
 import { UploadGuide } from '@/components/onboarding/upload-guide'
+import { Button } from '@/components/ui/button'
 
 export function DocumentsContent() {
+  const searchParams = useSearchParams()
+  const isActivation = searchParams.get('activation') === '1'
+  const activationCaseId = searchParams.get('case')
   const [refreshKey, setRefreshKey] = useState(0)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   function handleUploadSuccess() {
-    setSuccessMessage('Documento cargado y enviado a análisis.')
+    setSuccessMessage(
+      isActivation && activationCaseId
+        ? 'Primer antecedente agregado. El documento quedó cargado y enviado a análisis; todavía requiere revisión humana.'
+        : 'Documento cargado y enviado a análisis.',
+    )
     setErrorMessage(null)
     setRefreshKey((current) => current + 1)
     window.setTimeout(() => setSuccessMessage(null), 4000)
@@ -34,8 +44,15 @@ export function DocumentsContent() {
       </div>
 
       {successMessage && (
-        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-emerald-700 dark:text-emerald-400">
-          {successMessage}
+        <div className="space-y-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-emerald-700 dark:text-emerald-400">
+          <p>{successMessage}</p>
+          {isActivation && activationCaseId ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/app/inicio?case=${encodeURIComponent(activationCaseId)}`}>
+                Volver a Inicio y ver el siguiente paso
+              </Link>
+            </Button>
+          ) : null}
         </div>
       )}
 

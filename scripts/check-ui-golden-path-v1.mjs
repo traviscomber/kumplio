@@ -28,7 +28,9 @@ const required = [
   ]],
   ['components/onboarding/workspace-onboarding-form.tsx', [
     "const caseId = data.workspace?.caseId as string | undefined",
-    "router.replace(`/app/inicio?case=${encodeURIComponent(caseId || '')}`)",
+    'setActivationHandoff(buildActivationHandoff(diagnosis, caseId))',
+    'Ir a mi siguiente acción',
+    'Ver mi inicio',
   ]],
   ['lib/compliance/accountability/team.ts', [
     ".select('id,user_id,role,joined_at')",
@@ -97,7 +99,10 @@ for (const [file, markers] of required) {
 
 const onboarding = fs.readFileSync('components/onboarding/workspace-onboarding-form.tsx', 'utf8')
 if (onboarding.includes('router.refresh()')) {
-  throw new Error('Onboarding must not refresh the stale route immediately after router.replace')
+  throw new Error('Onboarding must not refresh the route after preparing the activation handoff')
+}
+if (onboarding.includes('router.replace(`/app/inicio?case=')) {
+  throw new Error('Onboarding must keep the persisted diagnosis visible and let the user choose the activation CTA')
 }
 
 const team = fs.readFileSync('lib/compliance/accountability/team.ts', 'utf8')
