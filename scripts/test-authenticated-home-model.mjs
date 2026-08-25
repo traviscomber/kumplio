@@ -18,6 +18,17 @@ assert.equal('score' in model.primaryStatus, false)
 assert.ok(model.priorities.every(item => item.href.startsWith('/app/')))
 assert.ok(model.cases.every(item => item.href.startsWith('/app/casos/')))
 
+const modelWithManyChanges = buildAuthenticatedHomeModel({
+  health: { status: 'attention', label: 'Atención', explanation: 'Pendiente.' },
+  priorities: [],
+  changes: [
+    { id: 'noise', headline: 'Sin cambios', changesFound: 0, criticalItems: 0 },
+    ...Array.from({ length: 7 }, (_, index) => ({ id: `change-${index}`, headline: `Cambio ${index}`, changesFound: 1, criticalItems: index === 0 ? 1 : 0 })),
+  ],
+})
+assert.equal(modelWithManyChanges.changes.length, 5)
+assert.ok(modelWithManyChanges.changes.every(item => item.changesFound > 0 || item.criticalItems > 0))
+
 const onboarding = buildAuthenticatedHomeModel({ health: { status: 'attention', label: 'Información incompleta', explanation: 'Completa el primer trabajo.' }, priorities: [], changes: [], initialNextAction: { title: 'Subir documento inicial', href: '/app/documentos' } })
 assert.deepEqual(onboarding.nextAction, { title: 'Subir documento inicial', href: '/app/documentos' })
 
