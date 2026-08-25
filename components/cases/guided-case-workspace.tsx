@@ -32,7 +32,7 @@ const statusLabels: Record<string, string> = {
 export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/sign-in?next=/cases/${caseId}`)
+  if (!user) redirect(`/sign-in?next=/app/casos/${caseId}`)
 
   const { data: membership } = await supabase
     .from('organization_members')
@@ -130,7 +130,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
       <WorkspaceNav />
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/cases" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
+          <Link href="/app/casos" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
             <ArrowLeft className="mr-2 h-4 w-4" /> Tus casos
           </Link>
           <div className="flex flex-wrap items-center gap-2">
