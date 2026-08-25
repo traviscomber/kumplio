@@ -37,6 +37,14 @@ const schemas = {
       requiresApplicabilityReview: z.boolean(),
     })),
     missingInformation: z.array(z.string()),
+    riskTriage: z.array(z.object({
+      topic: z.string(),
+      materiality: z.enum(['low', 'medium', 'high', 'critical', 'unknown']),
+      urgency: z.enum(['low', 'medium', 'high', 'critical', 'unknown']),
+      confidence,
+      assumptions: z.array(z.string()),
+      requiresDedicatedRiskAnalysis: z.boolean(),
+    })),
   }),
   rodrigo: z.object({
     ...common,
@@ -122,6 +130,15 @@ const schemas = {
       recommendation: z.string(),
       nonComplianceConfirmed: z.boolean(),
     })),
+    remediationActions: z.array(z.object({
+      title: z.string(),
+      description: z.string(),
+      ownerRole: z.string().nullable(),
+      dependencies: z.array(z.string()),
+      priority: z.enum(['low', 'medium', 'high', 'critical']),
+      closureCriteria: z.array(z.string()),
+      requiresDedicatedPlan: z.boolean(),
+    })),
   }),
   andres: z.object({
     ...common,
@@ -181,7 +198,7 @@ export function getAgentOutputSchema(agentId: AgentId) {
   return {
     name: `kumplio_${agentId}_output`,
     schema: jsonSchemas[agentId],
-    version: agentId === 'isidora' ? '1.1.0' : '1.0.0',
+    version: agentId === 'isidora' ? '1.2.0' : agentId === 'veronica' ? '1.1.0' : '1.0.0',
   }
 }
 

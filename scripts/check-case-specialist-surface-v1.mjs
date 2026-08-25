@@ -5,11 +5,10 @@ const guided = fs.readFileSync('components/cases/guided-case-workspace.tsx', 'ut
 const specialists = fs.readFileSync('components/cases/case-specialist-contributions.tsx', 'utf8')
 
 for (const marker of [
-  'Análisis normativo',
-  'Evaluación de riesgo',
-  'Controles y evidencia',
-  'Plan de acción',
-  'Revisión jurídica/calidad',
+  'Análisis',
+  'Resolución',
+  'Revisión',
+  'Apoyo especializado',
 ]) {
   assert.ok(specialists.includes(marker), `Specialist surface missing product label: ${marker}`)
 }
@@ -29,5 +28,6 @@ for (const forbidden of [
 
 assert.ok(guided.includes('CaseSpecialistContributions'), 'Guided case must render product-facing specialist contributions')
 assert.ok(specialists.includes('Revisión humana'), 'Specialist surface must keep the human review boundary visible')
+assert.ok(specialists.includes('supportByAgent'), 'Specialist surface must preserve optional specialist contributions')
 
 console.log('Case specialist surface: PASS')
