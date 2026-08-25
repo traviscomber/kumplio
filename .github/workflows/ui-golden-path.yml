@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/ui-golden-path.yml'
+      - 'app/api/onboarding/**'
       - 'app/api/internal/ui-golden-path/**'
       - 'lib/security/github-actions-ui-oidc.ts'
       - 'tests/e2e/ui-golden-path.spec.mjs'
       - 'playwright.ui-golden-path.config.mjs'
       - 'scripts/check-ui-golden-path-v1.mjs'
+      - 'supabase/migrations/**'
   workflow_dispatch:
 
 permissions:
