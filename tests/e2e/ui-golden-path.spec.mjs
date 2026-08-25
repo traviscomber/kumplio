@@ -16,23 +16,24 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.locator('input#password').fill(password)
     await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click()
     await expect(page).toHaveURL(/\/onboarding(?:\?|$)/, { timeout: 45_000 })
-    await expect(page.getByRole('heading', { name: /Quiero entender tu organización/ })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Persona, profesional o empresa/ })).toBeVisible()
   })
 
   await test.step('crear el workspace desde el onboarding visual', async () => {
-    await page.getByPlaceholder('Nombre').fill('UI Golden Path')
-    await page.getByPlaceholder('Apellido (opcional)').fill('E2E')
+    await page.getByRole('button', { name: /^Empresa/ }).click()
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByPlaceholder('Ej. Empresa Andes SpA').fill(organizationName)
+    await page.getByPlaceholder(/Necesito ordenar contratos/).fill(goal)
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByRole('button', { name: 'Servicios generales', exact: true }).click()
+    await page.getByLabel('Nombre').fill('UI Golden Path')
+    await page.getByLabel('Apellido (opcional)').fill('E2E')
+    await page.getByLabel('Organización').fill(organizationName)
+    await page.getByLabel('Trabajadores aproximados').fill('20')
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByRole('button', { name: '10–49 personas', exact: true }).click()
-    await page.getByRole('button', { name: 'Preparar mi diagnóstico', exact: true }).click()
-    await expect(page).toHaveURL(/\/cases\/[0-9a-f-]{36}(?:\?|$)/i, { timeout: 60_000 })
+    await page.getByRole('button', { name: 'Crear mi primer diagnóstico', exact: true }).click()
+    await expect(page).toHaveURL(/\/app\/inicio\?case=[0-9a-f-]{36}/i, { timeout: 60_000 })
   })
 
   await test.step('abrir un expediente guiado desde la UI', async () => {

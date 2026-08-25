@@ -27,8 +27,8 @@ const required = [
     'processingActivityReviewed',
   ]],
   ['components/onboarding/workspace-onboarding-form.tsx', [
-    "const caseId = data.workspace?.caseId as string | null | undefined",
-    "router.replace(caseId ? `/cases/${caseId}` : '/dashboard')",
+    "const caseId = data.workspace?.caseId as string | undefined",
+    "router.replace(`/app/inicio?case=${encodeURIComponent(caseId || '')}`)",
   ]],
   ['lib/compliance/accountability/team.ts', [
     ".select('id,user_id,role,joined_at')",
@@ -60,7 +60,7 @@ const required = [
   ['tests/e2e/ui-golden-path.spec.mjs', [
     "page.goto('/sign-in?next=/onboarding')",
     "name: 'Iniciar sesión', exact: true",
-    "name: 'Preparar mi diagnóstico', exact: true",
+    "name: 'Crear mi primer diagnóstico', exact: true",
     "page.goto('/cases/new')",
     "name: 'Empresa', exact: true",
     "name: 'Preparar mi caso', exact: true",
