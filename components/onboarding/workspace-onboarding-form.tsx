@@ -87,7 +87,7 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
             <Link href={activationHandoff.secondaryHref}>Ver mi inicio</Link>
           </Button>
         </div>
-        <p className="mt-5 text-sm text-muted-foreground">Este resultado organiza el trabajo inicial; no acredita cumplimiento ni evidencia verificada.</p>
+        <p className="mt-5 text-sm text-muted-foreground">Este resultado organiza el trabajo inicial; no acredita cumplimiento ni valida evidencia.</p>
       </section>
     )
   }
