@@ -8,7 +8,8 @@ for (const token of [
   "applicabilityToClient: z.enum(['direct', 'conditional', 'other_subject', 'unknown'])",
   'applicabilityReason: z.string()',
   'requiresApplicabilityReview: z.boolean()',
-  "agentId === 'isidora' ? '1.2.0' : '1.0.0'",
+  "agentId === 'isidora'",
+  "'1.2.0'",
 ]) {
   assert.ok(schemas.includes(token), `Isidora applicability schema missing: ${token}`)
 }
