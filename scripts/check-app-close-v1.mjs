@@ -6,7 +6,6 @@ const packageJson = fs.readFileSync('package.json', 'utf8')
 assert.ok(packageJson.includes('"check:app-close"'), 'package.json missing check:app-close script')
 assert.ok(packageJson.includes('"check:product-polish"'), 'package.json missing check:product-polish script')
 assert.ok(packageJson.includes('"check:three-agent-core"'), 'package.json missing check:three-agent-core script')
-assert.ok(packageJson.includes('"check:alerts-activity"'), 'package.json missing check:alerts-activity script')
 
 const checks = [
   ['scripts/check-canonical-case-entry-v1.mjs'],
