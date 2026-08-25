@@ -47,11 +47,18 @@ export function DocumentsContent() {
         <div className="space-y-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-4 text-emerald-700 dark:text-emerald-400">
           <p>{successMessage}</p>
           {isActivation && activationCaseId ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/app/inicio?case=${encodeURIComponent(activationCaseId)}`}>
-                Volver a Inicio y ver el siguiente paso
-              </Link>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm">
+                <Link href={`/app/casos/${encodeURIComponent(activationCaseId)}`}>
+                  Volver al caso
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/app/inicio?case=${encodeURIComponent(activationCaseId)}`}>
+                  Ir a Inicio y ver el siguiente paso
+                </Link>
+              </Button>
+            </div>
           ) : null}
         </div>
       )}
