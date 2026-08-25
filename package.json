@@ -65,6 +65,11 @@
     "check:tenant-assurance": "node scripts/check-tenant-assurance-v1.mjs",
     "check:ui-golden-path": "node scripts/check-ui-golden-path-v1.mjs",
     "check:product-workflows": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-authenticated-app-access.mjs && node scripts/check-product-workflows-phase-1.mjs",
+    "check:contextual-onboarding": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-contextual-onboarding-diagnosis.mjs",
+    "check:contextual-onboarding-persistence": "node scripts/check-contextual-onboarding-persistence-v1.mjs",
+    "check:contextual-onboarding-ui": "node scripts/check-contextual-onboarding-ui-v1.mjs",
+    "check:authenticated-home": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-authenticated-home-model.mjs && node scripts/check-authenticated-home-ui-v1.mjs",
+    "check:contextual-onboarding-home": "node scripts/check-contextual-onboarding-home-phase-v1.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
     "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs"
   },

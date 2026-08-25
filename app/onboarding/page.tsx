@@ -45,7 +45,7 @@ export default async function OnboardingPage() {
       <div className="mx-auto max-w-4xl">
         <header className="mb-8 max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Primeros minutos</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Quiero entender tu organización antes de pedirte trabajo.</h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Persona, profesional o empresa: empecemos por lo que necesitas resolver.</h1>
           <p className="mt-5 text-lg leading-8 text-muted-foreground">
             Responde una pregunta a la vez. Kumplio preparará internamente el primer ámbito, el expediente inicial y la trazabilidad necesaria.
           </p>

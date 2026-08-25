@@ -1,18 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { buildInitialDiagnosis } from '@/lib/product/onboarding/contextual-diagnosis'
 
 export const runtime = 'nodejs'
 
-const schema = z.object({
-  organizationName: z.string().trim().min(2).max(160),
-  industry: z.enum(['general', 'transport', 'agriculture', 'mining', 'health', 'finance', 'construction', 'other']),
-  organizationSize: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']),
+const base = z.object({
+  userType: z.enum(['persona', 'profesional', 'empresa']),
+  problem: z.string().trim().min(3).max(500),
+  intent: z.string().trim().max(160).optional().default(''),
+  urgency: z.enum(['low', 'medium', 'high', 'critical']),
+  documentsAvailable: z.enum(['none', 'some', 'most']),
+  region: z.string().trim().max(100).optional().default(''),
+  targetDate: z.string().trim().max(10).optional().nullable(),
   firstName: z.string().trim().max(80).optional().default(''),
   lastName: z.string().trim().max(80).optional().default(''),
-  projectName: z.string().trim().min(3).max(160),
-  firstCaseTitle: z.string().trim().min(3).max(160),
 })
+
+const schema = z.discriminatedUnion('userType', [
+  base.extend({ userType: z.literal('persona') }),
+  base.extend({
+    userType: z.literal('profesional'),
+    professionalActivity: z.string().trim().min(2).max(160),
+    industry: z.string().trim().max(80).optional().default('general'),
+    activeClients: z.number().int().min(0).max(100000).optional().nullable(),
+  }),
+  base.extend({
+    userType: z.literal('empresa'),
+    organizationName: z.string().trim().min(2).max(160),
+  industry: z.enum(['general', 'transport', 'agriculture', 'mining', 'health', 'finance', 'construction', 'other']),
+  organizationSize: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']),
+    workerCount: z.number().int().min(0).max(1000000).optional().nullable(),
+  }),
+])
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -37,25 +58,29 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { data, error } = await supabase.rpc('initialize_workspace', {
-    organization_name: parsed.data.organizationName,
-    industry_code: parsed.data.industry,
-    organization_size: parsed.data.organizationSize,
-    first_name: parsed.data.firstName || null,
-    last_name: parsed.data.lastName || null,
-    project_name: parsed.data.projectName,
-    first_case_title: parsed.data.firstCaseTitle,
+  const diagnosis = buildInitialDiagnosis(parsed.data)
+  const admin = createAdminClient()
+  const { data, error } = await admin.rpc('initialize_contextual_workspace_v2', {
+    p_actor_user_id: user.id,
+    p_user_type: parsed.data.userType,
+    p_problem: parsed.data.problem,
+    p_intent: parsed.data.intent || null,
+    p_urgency: parsed.data.urgency,
+    p_documents_available: parsed.data.documentsAvailable,
+    p_context: parsed.data,
+    p_diagnosis: diagnosis,
+    p_first_name: parsed.data.firstName || null,
+    p_last_name: parsed.data.lastName || null,
   })
 
   if (error) {
     console.error('[onboarding/initialize]', error.code)
-    const conflict = error.code === '23505'
     return NextResponse.json(
       {
-        error: conflict ? 'El workspace ya fue inicializado.' : 'No fue posible crear el workspace.',
-        code: conflict ? 'workspace_already_exists' : 'workspace_initialization_failed',
+        error: 'No fue posible preparar tu espacio.',
+        code: 'workspace_initialization_failed',
       },
-      { status: conflict ? 409 : 500 },
+      { status: 500 },
     )
   }
 
@@ -70,6 +95,7 @@ export async function POST(request: NextRequest) {
       projectId: workspace.project_id,
       caseId: workspace.case_id,
       initialized: workspace.initialized,
+      diagnosis,
     },
   })
 }

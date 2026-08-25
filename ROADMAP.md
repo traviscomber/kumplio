@@ -321,6 +321,15 @@ Estos gates conservan su autoridad sobre claims, seguridad y evidencia externa. 
 
 ### Bloque 17 — Experiencia autenticada canónica — `NEXT`
 
+#### Onboarding contextual + Inicio enfocado — `ACTIVE`
+
+- un único flujo persistente para Persona, Profesional y Empresa;
+- diagnóstico inicial determinístico, acotado y sin promover evidencia o cumplimiento;
+- creación atómica e idempotente de workspace, perfil, proyecto, caso y auditoría;
+- `/app/inicio` centrado en estado, una siguiente acción, hasta tres prioridades, cambios relevantes y casos activos.
+
+Esta entrega no completa Personas, Requisitos, Alertas, Actividad ni Configuración. Tampoco sustituye los gates de evidencia y revisión humana del Bloque 16.
+
 **Subbloque A — Entrada autenticada y orientación**
 
 1. establecer `/app/*` como superficie autenticada canónica protegida;

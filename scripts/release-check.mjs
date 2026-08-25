@@ -50,6 +50,11 @@ const checks = [
   ['check:tenant-assurance'],
   ['check:ui-golden-path'],
   ['check:e2e-data-lifecycle'],
+  ['check:contextual-onboarding'],
+  ['check:contextual-onboarding-persistence'],
+  ['check:contextual-onboarding-ui'],
+  ['check:authenticated-home'],
+  ['check:contextual-onboarding-home'],
   ['build'],
 ]
 
