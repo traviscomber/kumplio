@@ -10,7 +10,7 @@ const required = {
   'app/app/layout.tsx': ['x-kumplio-authenticated-path', '<AppNavigation />'],
   'proxy.ts': ['x-kumplio-authenticated-path', "pathname === '/app' || pathname.startsWith('/app/')", 'request.nextUrl.pathname', 'request.nextUrl.search'],
   'ROADMAP.md': ['Onboarding contextual + Inicio enfocado — `ACTIVE`'],
-  'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff', 'check:activation-document-progress'],
+  'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff', 'check:activation-document-progress', 'check:activation-case-context'],
   'scripts/release-check.mjs': ["['check:contextual-onboarding-home']"],
 }
 for (const [file, markers] of Object.entries(required)) {
@@ -25,5 +25,6 @@ for (const forbidden of ['const productLinks =', 'aria-label="Acceso al producto
 
 execFileSync(process.execPath, ['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', 'scripts/test-activation-handoff.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-activation-document-progress-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-activation-case-context-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
