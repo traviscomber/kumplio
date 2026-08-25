@@ -118,10 +118,34 @@ if (uiTest.includes("getByText('Actividad registrada y revisada.')")) {
 const route = fs.readFileSync('app/api/internal/ui-golden-path/route.ts', 'utf8')
 for (const forbidden of [
   /[.]from\([^)]*\)[\s\S]{0,240}[.]insert\(/,
+  /[.]from\([^)]*\)[\s\S]{0,240}[.]upsert\(/,
   /[.]from\([^)]*\)[\s\S]{0,240}[.]update\(/,
   /[.]from\([^)]*\)[\s\S]{0,240}[.]delete\(/,
 ]) {
-  if (forbidden.test(route)) throw new Error('UI golden path route must not mutate product tables directly')
+  if (forbidden.test(route)) throw new Error('The OIDC endpoint must not create or mutate business records')
+}
+if (route.includes('SUPABASE_SERVICE_ROLE_KEY') || route.includes('SUPABASE_SECRET_KEY')) {
+  throw new Error('The route must consume the server-only admin helper instead of reading privileged keys directly')
+}
+
+const workflow = fs.readFileSync('.github/workflows/ui-golden-path.yml', 'utf8')
+if (/\$\{\{\s*secrets[.]/.test(workflow)) throw new Error('The UI workflow must not depend on long-lived repository secrets')
+if (workflow.includes('SUPABASE_SERVICE_ROLE_KEY') || workflow.includes('SUPABASE_SECRET_KEY')) {
+  throw new Error('Supabase privileged keys must never enter GitHub Actions')
+}
+if (workflow.includes('continue-on-error: true') || workflow.includes('steps.browser.outcome')) {
+  throw new Error('The browser result must be routed through an explicit exit-code output')
+}
+if (!workflow.includes("if: ${{ steps.browser.outputs.exit_code == '0' }}") || !workflow.includes("if: ${{ steps.browser.outputs.exit_code != '0' }}")) {
+  throw new Error('The workflow must route success and failure from the explicit browser exit code')
+}
+
+const oidc = fs.readFileSync('lib/security/github-actions-ui-oidc.ts', 'utf8')
+for (const claim of ['iss', 'aud', 'sub', 'exp', 'iat', 'repository_id', 'repository_owner_id', 'event_name', 'ref', 'workflow_ref', 'workflow_sha', 'run_id', 'run_attempt']) {
+  if (!oidc.includes(`claims.${claim}`)) throw new Error(`OIDC verification does not enforce claim: ${claim}`)
+}
+if (!oidc.includes('legacySubject') || !oidc.includes('immutableSubject')) {
+  throw new Error('OIDC verifier must support GitHub legacy and immutable subject formats')
 }
 
 console.log('UI golden path v1 guardrail: PASS')
