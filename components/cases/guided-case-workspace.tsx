@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { ArrowLeft, FileCheck2, History } from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileCheck2, History } from 'lucide-react'
 import { ArtifactResultPreview } from '@/components/cases/artifact-result-preview'
 import { CaseSpecialistContributions } from '@/components/cases/case-specialist-contributions'
 import { FinalCaseSummary } from '@/components/cases/final-case-summary'
@@ -8,8 +8,9 @@ import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
 import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
 import { StartCaseResolution } from '@/components/cases/start-case-resolution'
 import { WorkspaceNav } from '@/components/workspace-nav'
-import { createClient } from '@/lib/supabase/server'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
+import { buildCaseWorkspaceModel } from '@/lib/product/cases/case-workspace-model'
+import { createClient } from '@/lib/supabase/server'
 
 const STALE_EXECUTION_MS = 7 * 60 * 1000
 
@@ -124,6 +125,22 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
     ? AGENT_CATALOG.find((item) => item.id === finalStage.agent_id) || null
     : null
   const approvedStages = stages.filter((stage) => stage.status === 'approved').length
+  const workspaceModel = buildCaseWorkspaceModel({
+    caseId,
+    caseStatus: String(complianceCase.status || 'active'),
+    summary: typeof complianceCase.description === 'string' ? complianceCase.description : null,
+    whyItMatters: workflow
+      ? currentDetail(workflow.status, actionableStage?.status || null)
+      : 'El expediente todavía necesita iniciar su resolución guiada.',
+    openAction: !workflow
+      ? { title: 'Iniciar resolución', href: `/app/casos/${caseId}#resolucion-caso` }
+      : workflow.status === 'completed' || actionableStage?.status === 'pending_review'
+        ? null
+        : { title: 'Continuar resolución', href: `/app/casos/${caseId}#siguiente-decision` },
+    humanReviewRequired: actionableStage?.status === 'pending_review',
+    closureEligible: workflow?.status === 'completed',
+    blockers: canRecoverStale ? ['Ejecución detenida pendiente de recuperación'] : [],
+  })
 
   return (
     <>
@@ -146,6 +163,27 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
           </div>
         </div>
 
+        <section className="mt-6 rounded-[28px] border border-primary/20 bg-primary/5 p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Estado del caso</p>
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-black">{workspaceModel.status.label}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{workspaceModel.status.explanation}</p>
+              {workspaceModel.blockers.length > 0 && (
+                <p className="mt-2 text-sm font-semibold text-amber-700 dark:text-amber-400">{workspaceModel.blockers[0]}</p>
+              )}
+            </div>
+            {workspaceModel.nextAction && (
+              <Link
+                href={workspaceModel.nextAction.href}
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground"
+              >
+                {workspaceModel.nextAction.title} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        </section>
+
         <header className="mt-6 overflow-hidden rounded-[30px] border bg-card shadow-sm">
           <div className="border-b bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_46%)] p-6 sm:p-10">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Qué necesitas resolver</p>
@@ -161,7 +199,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                 <Metric label="Resultados disponibles" value={String(artifacts.filter((artifact) => artifact.status !== 'superseded').length)} />
               </div>
             ) : (
-              <div className="mt-8 max-w-xl rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div id="resolucion-caso" className="mt-8 max-w-xl rounded-2xl border border-primary/20 bg-primary/5 p-5">
                 <h2 className="text-xl font-black">Este caso todavía no tiene trabajo guiado.</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Inicia la resolución para que Kumplio organice el análisis, prepare resultados revisables y deje evidencia de cada decisión.
@@ -231,7 +269,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                 </div>
               </section>
 
-              <aside className="space-y-6">
+              <aside id="siguiente-decision" className="space-y-6">
                 <LiveWorkflowActions
                   workflowId={workflow.id}
                   runId={actionableStage?.run_id || null}
