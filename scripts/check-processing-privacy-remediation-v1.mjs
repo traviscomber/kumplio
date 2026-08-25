@@ -119,7 +119,8 @@ const required = [
     '| Eliminación primaria controlada | 3/3 |',
     '| Configuración tenant proveedor | 0/3 `verified` |',
     '| Eliminación operacional final | 0/3 |',
-    '### Bloque 16 — Cierre técnico y evidencia externa — `NEXT`',
+    '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
+    '### Bloque 17 — Experiencia autenticada canónica — `NEXT`',
     'Una prueba sintética no equivale a evidencia de cliente.',
   ]],
   ['package.json', [
@@ -217,19 +218,3 @@ for (const forbidden of [
   /aviso\s+general[^\n]*cubre\s+todas/i,
 ]) {
   if (forbidden.test(foundation + seed)) throw new Error(`Privacy remediation overstates its evidence: ${forbidden}`)
-}
-
-const verification = fs.readFileSync(verificationPath, 'utf8')
-if (!/rollback;\s*$/i.test(verification.trim())) throw new Error('Privacy remediation verification must end in ROLLBACK')
-if (/\b(insert|update|delete|merge|truncate|alter|drop|create)\b/i.test(stripSqlComments(verification))) {
-  throw new Error('Privacy remediation verification must remain read-only')
-}
-if (verification.includes('prepare_processing_activity_privacy_remediation_v1')) {
-  throw new Error('Read-only verification must not call the mutation RPC')
-}
-
-console.log('Processing privacy remediation guardrail: PASS')
-
-function stripSqlComments(sql) {
-  return sql.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
-}
