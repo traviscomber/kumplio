@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AgentRuntimeError, runAgent } from './openai-runtime'
 import { buildBoundedCommitteeContext } from './committee'
-import { getWorkflowDefinition, getWorkflowStage, serializeWorkflowContext } from './orchestration'
+import { getWorkflowStage, resolveWorkflowVersion, serializeWorkflowContext } from './orchestration'
 import { retrieveAgentContext } from './tools'
 
 export class WorkflowExecutionError extends Error {
@@ -79,8 +79,7 @@ export async function executeWorkflowStage(input: {
     throw new WorkflowExecutionError('workflow_not_available', `Workflow is ${workflow.status}`, 409)
   }
 
-  const legacyStageCount = getWorkflowDefinition(workflow.workflow_type, 'v1')?.stages.length
-  const workflowVersion = legacyStageCount === workflow.total_stages ? 'v1' : 'v2'
+  const workflowVersion = resolveWorkflowVersion(workflow.workflow_type, workflow.total_stages)
 
   let effectiveStageIndex = workflow.current_stage
   if (workflow.status === 'pending_review') {
