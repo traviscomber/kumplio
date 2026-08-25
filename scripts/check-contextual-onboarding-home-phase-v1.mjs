@@ -17,7 +17,7 @@ for (const [file, markers] of Object.entries(required)) {
 }
 
 const topNav = fs.readFileSync('components/layout/top-nav.tsx', 'utf8')
-for (const forbidden of ['const productLinks =', "href: '/app/inicio'", "href: '/app/casos'", "href: '/app/documentos'"]) {
+for (const forbidden of ['const productLinks =', 'aria-label="Acceso al producto"', 'productLinks.map']) {
   if (topNav.includes(forbidden)) throw new Error(`TopNav duplicates authenticated product navigation: ${forbidden}`)
 }
 
