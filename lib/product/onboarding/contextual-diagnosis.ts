@@ -50,6 +50,7 @@ export function buildInitialDiagnosis(input: OnboardingContext): OnboardingDiagn
     { key: 'confirm_scope', title: 'Confirmar el alcance del diagnóstico', priority: critical ? 'high' as const : 'medium' as const, evidenceRequired: false },
   ].sort((a, b) => urgencyRank(b.priority) - urgencyRank(a.priority)).slice(0, 3)
 
+  const nextAction = actions[0]
   return {
     userType: input.userType,
     caseTitle: titleFor(input.userType, problem),
@@ -62,7 +63,10 @@ export function buildInitialDiagnosis(input: OnboardingContext): OnboardingDiagn
       : input.userType === 'profesional'
         ? ['Antecedentes profesionales', 'Documentos del caso', 'Registros de respaldo']
         : ['Documento principal', 'Comprobantes y registros', 'Antecedentes relacionados'],
-    nextAction: { title: actions[0]?.title || 'Confirmar el alcance del diagnóstico', href: '/app/documentos' },
+    nextAction: {
+      title: nextAction?.title || 'Confirmar el alcance del diagnóstico',
+      href: nextAction?.key === 'upload_document' ? '/app/documentos' : '/app/casos',
+    },
     evidenceStatus: 'not_verified',
     complianceVerified: false,
   }
