@@ -106,6 +106,16 @@ export function CaseBaselineAssuranceClient({
     && Boolean(control && evidence && missionResult)
   const design = evaluations.find((item) => item.type === 'design')
   const operating = evaluations.find((item) => item.type === 'operating')
+  const reviewState = request.status === 'accepted'
+    ? 'Revisión humana registrada'
+    : request.status === 'submitted'
+      ? 'Pendiente de revisión'
+      : 'Pendiente de entrega'
+  const evidenceState = !evidence || evidence.validationStatus === 'rejected'
+    ? 'Evidencia insuficiente'
+    : ['accepted', 'verified'].includes(evidence.validationStatus)
+      ? 'Evidencia revisada'
+      : 'Pendiente de revisión'
 
   async function closeBaseline(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -161,6 +171,21 @@ export function CaseBaselineAssuranceClient({
             <p className="mt-1 text-muted-foreground">Responsable: {mission.ownerName}</p>
             <p className="mt-1 text-muted-foreground">Estado: {statusLabel(mission.status)}</p>
           </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <ResultCard
+            label="Revisión humana"
+            value={reviewState}
+            detail={request.reviewComment || 'El estado proviene de la solicitud de evidencia persistida.'}
+            tone={request.status === 'accepted' ? 'default' : 'warning'}
+          />
+          <ResultCard
+            label="Evidencia"
+            value={evidenceState}
+            detail={evidence ? `Validación: ${statusLabel(evidence.validationStatus)}` : 'Todavía no existe evidencia vinculada suficiente para revisión.'}
+            tone={evidenceState === 'Evidencia revisada' ? 'default' : 'warning'}
+          />
         </div>
 
         {closed ? (
@@ -280,7 +305,7 @@ function ActionLink({ href, label }: { href: string; label: string }) {
 function statusLabel(value: string) {
   const labels: Record<string, string> = {
     ready: 'Lista para iniciar', active: 'En curso', completed: 'Completada',
-    open: 'Pendiente', submitted: 'Entregada', accepted: 'Aceptada',
+    open: 'Pendiente', submitted: 'Entregada', accepted: 'Aceptada', rejected: 'Rechazada',
     verified: 'Verificada', pending: 'Pendiente',
   }
   return labels[value] || value.replaceAll('_', ' ')
