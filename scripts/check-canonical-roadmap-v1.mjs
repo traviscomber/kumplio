@@ -39,6 +39,9 @@ if (nextBlocks.length !== 1) {
   throw new Error(`ROADMAP.md must contain exactly one NEXT block; found ${nextBlocks.length}`)
 }
 
+assertRoadmapMarker('### Bloque 17 — Experiencia autenticada canónica — `NEXT`')
+assertRoadmapMarker('**Decisión del owner — 24 de agosto de 2026:**')
+
 if (!roadmap.includes('- no crear módulos nuevos solo porque son atractivos;')) {
   throw new Error('ROADMAP.md must preserve the scope-freeze rule against attractive unprioritized modules')
 }
@@ -108,3 +111,7 @@ if (/\b(?:MASTER_ROADMAP|ROADMAP_MASTER|CANONICAL_ROADMAP)\.md\b/i.test(readme +
 }
 
 console.log(`Canonical roadmap contract: PASS (${nextBlocks[0]})`)
+
+function assertRoadmapMarker(marker) {
+  if (!roadmap.includes(marker)) throw new Error(`ROADMAP.md missing current owner decision marker: ${marker}`)
+}

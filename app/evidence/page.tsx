@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { EvidenceWorkspace, type EvidenceListItem } from '@/components/evidence/evidence-workspace'
 import { EvidenceRequestsPanel, type EvidenceRequestItem } from '@/components/evidence/evidence-requests-panel'
-import { WorkspaceNav } from '@/components/workspace-nav'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -13,19 +14,18 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function EvidencePage() {
+export default function LegacyEvidencePage() {
+  redirect('/app/evidencia')
+}
+
+export async function EvidencePageContent() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in?next=/evidence')
 
-  const { data: membership } = await supabase
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle()
-  if (!membership?.organization_id) redirect('/onboarding')
-  const organizationId = membership.organization_id
+  const access = await getWorkspaceAccess(createAdminClient(), user.id)
+  if (!access) redirect('/onboarding')
+  const organizationId = access.organizationId
 
   const [projectsResult, documentsResult, controlsResult, evidenceResult, linksResult, membersResult, casesResult, requestsResult] = await Promise.all([
     supabase.from('projects').select('id, name').eq('organization_id', organizationId).order('updated_at', { ascending: false }).limit(100),
@@ -79,9 +79,7 @@ export default async function EvidencePage() {
     reviewComment: item.review_comment, reviewedByName: item.reviewed_by ? names.get(item.reviewed_by) || null : null, reviewedAt: item.reviewed_at,
   }))
 
-  return <>
-    <WorkspaceNav />
-    <main className="container mx-auto px-6 py-8">
+  return <main className="container mx-auto px-6 py-8">
       <p className="text-sm font-medium text-primary">Respaldo verificable</p>
       <h1 className="mt-1 text-3xl font-bold">Evidencias</h1>
       <p className="mt-2 max-w-3xl text-muted-foreground">Pide lo que falta, centraliza el respaldo, vincúlalo al control correcto y deja registrada la revisión que permite cerrar una brecha.</p>
@@ -91,8 +89,7 @@ export default async function EvidencePage() {
           <EvidenceWorkspace projects={projects} documents={documents} controls={controls} evidence={evidence} />
         </>}
       </div>
-    </main>
-  </>
+  </main>
 }
 
 function SetupNotice() { return <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-10 text-center"><p className="font-semibold">El módulo está listo para activarse.</p><p className="mt-2 text-sm text-muted-foreground">Aplica las migraciones de Controls & Evidence Foundation en Supabase.</p></div> }

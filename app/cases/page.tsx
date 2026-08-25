@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { CasesWorkspace } from '@/components/cases-workspace'
-import { WorkspaceNav } from '@/components/workspace-nav'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { getWorkspaceAccess } from '@/lib/compliance/accountability/workspace-access'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -12,19 +13,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function CasesPage() {
+export default function LegacyCasesPage() {
+  redirect('/app/casos')
+}
+
+export async function CasesPageContent() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in?next=/cases')
 
-  const { data: membership } = await supabase
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle()
-
-  const organizationId = membership?.organization_id
+  const access = await getWorkspaceAccess(createAdminClient(), user.id)
+  const organizationId = access?.organizationId
   const [{ data: organization }, { data: projects }, { data: cases, error: casesError }, { data: workflows }] = organizationId
     ? await Promise.all([
         supabase.from('organizations').select('id, name').eq('id', organizationId).maybeSingle(),
@@ -64,9 +63,7 @@ export default async function CasesPage() {
   }))
 
   return (
-    <>
-      <WorkspaceNav />
-      <main className="container mx-auto px-4 py-8 sm:px-6">
+    <main className="container mx-auto px-4 py-8 sm:px-6">
         <div className="mb-8">
           <p className="text-sm font-bold text-primary">{organization?.name || 'Tu espacio de trabajo'}</p>
           <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Tus casos</h1>
@@ -88,7 +85,6 @@ export default async function CasesPage() {
         ) : (
           <CasesWorkspace cases={casesWithWorkflow as any} projects={(projects || []) as any} />
         )}
-      </main>
-    </>
+    </main>
   )
 }
