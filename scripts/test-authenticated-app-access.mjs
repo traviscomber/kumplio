@@ -16,6 +16,13 @@ const authenticationFailure = await resolveAuthenticatedAppAccess({
 })
 assert.deepEqual(authenticationFailure, { kind: 'redirect', href: '/sign-in?next=%2Fapp' })
 
+const queryContext = await resolveAuthenticatedAppAccess({
+  nextPath: '/app/inicio?case=case-123',
+  getUser: async () => ({ userId: null, failed: false }),
+  getWorkspace: async () => { throw new Error('workspace lookup must not run') },
+})
+assert.deepEqual(queryContext, { kind: 'redirect', href: '/sign-in?next=%2Fapp%2Finicio%3Fcase%3Dcase-123' })
+
 const missingWorkspace = await resolveAuthenticatedAppAccess({
   nextPath: '/app/inicio',
   getUser: async () => ({ userId: 'user-1', failed: false }),
@@ -45,6 +52,7 @@ assert.ok(
 
 const proxy = fs.readFileSync('proxy.ts', 'utf8')
 assert.ok(proxy.includes("x-kumplio-authenticated-path"), 'proxy must preserve the requested /app path for the auth guard')
-assert.ok(proxy.includes("'/app/:path*'"), 'proxy must be scoped to authenticated app routes')
+assert.ok(proxy.includes("pathname.startsWith('/app')"), 'proxy must scope return-context forwarding to authenticated app routes')
+assert.ok(proxy.includes('request.nextUrl.search'), 'proxy must preserve query-string context such as the active case')
 
 console.log('Authenticated app access behavior: PASS')
