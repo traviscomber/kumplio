@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 
 const source = fs.readFileSync('app/dashboard/daily-content.tsx', 'utf8')
-for (const marker of ['buildAuthenticatedHomeModel', 'selectedCaseId', 'initialDiagnosis', 'Siguiente acción', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes']) {
+for (const marker of ['buildAuthenticatedHomeModel', 'selectedCaseId', 'initialDiagnosis', 'Siguiente acción', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes', 'resolveInitialActionHref']) {
   if (!source.includes(marker)) throw new Error(`Authenticated home UI missing marker: ${marker}`)
 }
 for (const forbidden of ['Impacto máximo', 'escala interna 0–100', 'engineVersion', 'Score {priority.score}', '/sign-in?next=/dashboard', "'/review-center'", 'provider trace', 'token usage', 'queue job', 'agent prompt']) {
