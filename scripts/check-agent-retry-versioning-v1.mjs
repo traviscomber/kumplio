@@ -34,8 +34,8 @@ assert.match(workflowActions, /attemptCount >= maxAttempts/)
 assert.match(workflowActions, /Límite alcanzado/)
 assert.match(workflowActions, /retriesExhausted/)
 
-// La ruta beta ya no es una superficie activa.
-assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+// La ruta beta ya no es una superficie activa y vuelve al expediente canónico.
+assert.match(betaPage, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
 
 assert.match(livePage, /max_attempts/)
 assert.match(livePage, /attemptCount=\{actionableStage[?][.]attempt_count \?\? null\}/)
