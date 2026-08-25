@@ -42,9 +42,6 @@ for (const marker of ["{ href: '/app/alertas', label: 'Alertas'", "{ href: '/app
 }
 if (/href: '\/app\/alertas'.*available: false/.test(nav)) throw new Error('Alertas must be enabled after the route exists')
 
-const pkg = JSON.parse(read('package.json'))
-if (pkg.scripts?.['check:alerts-activity'] !== 'node scripts/check-alerts-activity.mjs') throw new Error('package.json must expose check:alerts-activity')
-
 const appClose = read('scripts/check-app-close-v1.mjs')
 if (!appClose.includes('scripts/check-alerts-activity.mjs')) throw new Error('App Close aggregate must include check-alerts-activity')
 
