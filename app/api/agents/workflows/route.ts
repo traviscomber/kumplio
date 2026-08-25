@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   if (caseId) query = query.eq('case_id', caseId)
   const { data, error } = await query
   if (error) return NextResponse.json({ error: 'Unable to list workflows' }, { status: 500 })
-  return NextResponse.json({ workflows: data || [], templates: getWorkflowTemplates() })
+  return NextResponse.json({ workflows: data || [], templates: getWorkflowTemplates('v2') })
 }
 
 export async function POST(req: NextRequest) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Invalid workflow request', details: parsed.error.flatten() }, { status: 400 })
 
-  const definition = getWorkflowDefinition(parsed.data.workflowType)
+  const definition = getWorkflowDefinition(parsed.data.workflowType, 'v2')
   if (!definition) return NextResponse.json({ error: 'Workflow template not found', code: 'workflow_template_not_found' }, { status: 404 })
 
   const { data: complianceCase } = await supabase
@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
   }, {})
   const inputPayload = {
     createdFrom: 'case',
+    workflowVersion: definition.version,
     userInstructions: parsed.data.instructions || null,
     caseTitle: complianceCase.title,
     projectId: complianceCase.project_id,
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({
       workflow: { id: workflowId, case_id: parsed.data.caseId, workflow_type: definition.type, status: 'draft', current_stage: 0, total_stages: definition.stages.length },
-      template: { type: definition.type, label: definition.label, description: definition.description, stages },
+      template: { type: definition.type, version: definition.version, label: definition.label, description: definition.description, stages },
       resourceManifest: inputPayload.resourceManifest,
       resumed: false,
     }, { status: 201 })
