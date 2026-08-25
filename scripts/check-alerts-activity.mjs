@@ -23,4 +23,19 @@ if (/Math\.random|Date\.now\(\).*severity|riskScore|complianceScore/.test(alerts
   throw new Error('Alert ordering/category must remain deterministic and must not add scoring')
 }
 
+const alertPage = read('app/app/alertas/page.tsx')
+for (const marker of [
+  'buildOperationalAlerts',
+  "redirect('/sign-in?next=/app/alertas')",
+  "from('organization_members')",
+  "eq('organization_id', organizationId)",
+  'Qué requiere tu atención',
+  'no significa que todas tus obligaciones estén cumplidas',
+]) {
+  if (!alertPage.includes(marker)) throw new Error(`Alertas surface missing: ${marker}`)
+}
+if (/createAdminClient|service_role|href=["'`]\/cases\//.test(alertPage)) {
+  throw new Error('Alertas must preserve authenticated tenant-scoped canonical boundaries')
+}
+
 console.log('Alerts + Activity contract: PASS')
