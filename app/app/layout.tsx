@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AppNavigation } from '@/components/app-navigation'
 import { TopNav } from '@/components/layout/top-nav'
@@ -15,10 +16,12 @@ export const metadata: Metadata = {
 }
 
 export default async function AuthenticatedAppLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers()
+  const nextPath = requestHeaders.get('x-kumplio-authenticated-path') || '/app'
   const supabase = await createClient()
   const admin = createAdminClient()
   const decision = await resolveAuthenticatedAppAccess({
-    nextPath: '/app',
+    nextPath,
     getUser: async () => {
       const { data: { user }, error } = await supabase.auth.getUser()
       return { userId: user?.id || null, failed: Boolean(error) }
