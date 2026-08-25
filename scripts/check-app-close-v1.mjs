@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process'
 
 const packageJson = fs.readFileSync('package.json', 'utf8')
 assert.ok(packageJson.includes('"check:app-close"'), 'package.json missing check:app-close script')
+assert.ok(packageJson.includes('"check:product-polish"'), 'package.json missing check:product-polish script')
 
 const checks = [
   ['scripts/check-canonical-case-entry-v1.mjs'],
@@ -15,6 +16,7 @@ const checks = [
   ['scripts/check-authenticated-cross-surface-close-v1.mjs'],
   ['scripts/check-daily-operations-close-v1.mjs'],
   ['scripts/check-activation-first-action-v1.mjs'],
+  ['scripts/check-product-polish-v1.mjs'],
 ]
 
 for (const args of checks) execFileSync(process.execPath, args, { stdio: 'inherit' })
