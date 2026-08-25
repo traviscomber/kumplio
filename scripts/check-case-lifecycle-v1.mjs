@@ -29,7 +29,7 @@ assert.match(closeMigration, /current_status <> 'approved'/)
 assert.match(closeMigration, /'status', 'archived'/)
 assert.match(closeMigration, /'case_archived'/)
 
-// La mesa en vivo se alimenta de estado persistido y expone la revisión final real.
+// La mesa en vivo legacy sigue preservando el estado persistido para compatibilidad histórica.
 assert.match(livePage, /from\('agent_workflows'\)/)
 assert.match(livePage, /from\('agent_workflow_stages'\)/)
 assert.match(livePage, /from\('agent_artifacts'\)/)
@@ -38,15 +38,17 @@ assert.match(livePage, /from\('compliance_case_events'\)/)
 assert.match(livePage, /FinalCaseSummary/)
 assert.doesNotMatch(livePage, /Math[.]random|progress\s*=|setTimeout/)
 
-// Una cuenta sin workspace debe completar onboarding antes de crear casos.
+// La ruta legacy de creación conserva la frontera de onboarding para enlaces históricos.
 assert.match(newCasePage, /from\('organization_members'\)/)
 assert.match(newCasePage, /eq\('user_id', user[.]id\)/)
 assert.match(newCasePage, /if \(!membership[?][.]organization_id\) redirect\('\/onboarding'\)/)
 
-// El usuario puede continuar desde el centro de casos sin confundir expediente y ejecución.
-assert.match(caseCenter, /\/cases\/\$\{item[.]id\}\/live/)
-assert.match(caseCenter, /\/cases\/new/)
-assert.match(caseCenter, /Requiere revisión|En ejecución|Resuelto/)
+// El centro canónico continúa el expediente sin exponer la ejecución técnica como navegación primaria.
+assert.match(caseCenter, /\/app\/casos\/\$\{item[.]id\}/)
+assert.match(caseCenter, /Nuevo caso/)
+assert.doesNotMatch(caseCenter, /\/cases\/\$\{item[.]id\}\/live/)
+assert.doesNotMatch(caseCenter, />Trazabilidad</)
+assert.match(caseCenter, /Necesita revisión|Trabajando|Resuelto/)
 
 // Una etapa en revisión debe aprobarse o pedir cambios antes de avanzar.
 assert.match(workflowActions, /stageStatus === 'pending_review'/)

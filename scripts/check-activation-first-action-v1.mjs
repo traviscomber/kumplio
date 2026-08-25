@@ -25,7 +25,7 @@ for (const marker of [
   'Primer antecedente agregado',
   'Volver al caso',
   '/app/casos/',
-  'Ir a Inicio y ver el siguiente paso',
+  'Ver siguiente paso',
   '/app/inicio?case=',
 ]) {
   assert.ok(documents.includes(marker), `activation document flow missing marker: ${marker}`)

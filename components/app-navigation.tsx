@@ -23,7 +23,7 @@ export function AppNavigation() {
 
   return (
     <nav aria-label="Navegación de producto" className="sticky top-20 z-40 border-b border-border/70 bg-background/95 backdrop-blur-xl">
-      <div className="container mx-auto flex max-w-7xl items-center justify-between gap-4 overflow-x-auto px-4 py-3 sm:px-6">
+      <div className="container mx-auto flex max-w-7xl items-center justify-between gap-3 overflow-x-auto px-4 py-3 sm:gap-4 sm:px-6">
         <div className="flex items-center gap-1">
           {primaryItems.map((item) => <NavigationLink key={item.href} item={item} pathname={pathname} />)}
         </div>
@@ -47,7 +47,8 @@ function NavigationLink({ item, pathname }: {
       href={item.href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+        'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         active ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
       )}
     >

@@ -10,18 +10,16 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Evidencias',
-  description: 'Biblioteca verificable y solicitudes de evidencia KUMPLIO.',
+  description: 'Evidencias, solicitudes y revisión asociadas al trabajo de cumplimiento en Kumplio.',
   robots: { index: false, follow: false },
 }
 
-export default function LegacyEvidencePage() {
-  redirect('/app/evidencia')
-}
+export default function LegacyEvidencePage() { redirect('/app/evidencia') }
 
 export async function EvidencePageContent() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/sign-in?next=/evidence')
+  if (!user) redirect('/sign-in?next=/app/evidencia')
 
   const access = await getWorkspaceAccess(createAdminClient(), user.id)
   if (!access) redirect('/onboarding')
@@ -79,18 +77,32 @@ export async function EvidencePageContent() {
     reviewComment: item.review_comment, reviewedByName: item.reviewed_by ? names.get(item.reviewed_by) || null : null, reviewedAt: item.reviewed_at,
   }))
 
-  return <main className="container mx-auto px-6 py-8">
-      <p className="text-sm font-medium text-primary">Respaldo verificable</p>
-      <h1 className="mt-1 text-3xl font-bold">Evidencias</h1>
-      <p className="mt-2 max-w-3xl text-muted-foreground">Pide lo que falta, centraliza el respaldo, vincúlalo al control correcto y deja registrada la revisión que permite cerrar una brecha.</p>
-      <div className="mt-8 space-y-6">
+  return (
+    <main className="container mx-auto px-4 py-8 sm:px-6">
+      <header className="mx-auto max-w-6xl border-b border-border/70 pb-7">
+        <p className="text-sm font-semibold text-primary">Respaldo y revisión</p>
+        <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Evidencias</h1>
+        <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">Gestiona lo que falta, revisa lo recibido y vincula el respaldo al trabajo correspondiente. Una carga pendiente de revisión no acredita cumplimiento.</p>
+      </header>
+      <div className="mx-auto mt-8 max-w-6xl space-y-8">
         {migrationPending ? <SetupNotice /> : !projects.length ? <NoProjectNotice /> : <>
-          <EvidenceRequestsPanel projects={projects} controls={controls} members={members} cases={cases} evidence={evidence.map((item) => ({ id: item.id, projectId: item.projectId, name: item.name }))} requests={requests} />
-          <EvidenceWorkspace projects={projects} documents={documents} controls={controls} evidence={evidence} />
+          <section aria-labelledby="evidence-review-heading">
+            <h2 id="evidence-review-heading" className="mb-4 text-xl font-bold">Pendiente de revisión y solicitudes</h2>
+            <EvidenceRequestsPanel projects={projects} controls={controls} members={members} cases={cases} evidence={evidence.map((item) => ({ id: item.id, projectId: item.projectId, name: item.name }))} requests={requests} />
+          </section>
+          <section className="border-t border-border/70 pt-7" aria-labelledby="evidence-library-heading">
+            <h2 id="evidence-library-heading" className="mb-4 text-xl font-bold">Respaldo disponible</h2>
+            <EvidenceWorkspace projects={projects} documents={documents} controls={controls} evidence={evidence} />
+          </section>
         </>}
       </div>
-  </main>
+    </main>
+  )
 }
 
-function SetupNotice() { return <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-10 text-center"><p className="font-semibold">El módulo está listo para activarse.</p><p className="mt-2 text-sm text-muted-foreground">Aplica las migraciones de Controls & Evidence Foundation en Supabase.</p></div> }
-function NoProjectNotice() { return <div className="rounded-2xl border border-border bg-card p-10 text-center"><p className="font-semibold">Crea un ámbito antes de registrar evidencias.</p><p className="mt-2 text-sm text-muted-foreground">El onboarding crea automáticamente el primer proyecto de cumplimiento.</p></div> }
+function SetupNotice() {
+  return <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-8 text-center"><p className="font-semibold">Evidencia todavía no disponible en este espacio.</p><p className="mt-2 text-sm text-muted-foreground">La configuración de datos necesaria aún no está activa.</p></div>
+}
+function NoProjectNotice() {
+  return <div className="rounded-2xl border border-dashed p-8 text-center"><p className="font-semibold">Todavía no hay un ámbito para organizar evidencia.</p><p className="mt-2 text-sm text-muted-foreground">Completa el contexto inicial para empezar a asociar respaldo al trabajo.</p></div>
+}

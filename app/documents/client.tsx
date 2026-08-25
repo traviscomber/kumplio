@@ -11,7 +11,7 @@ export default function DocumentsPageClient({ showTopNav = true }: { showTopNav?
   return (
     <div className="min-h-screen bg-background">
       {showTopNav ? <TopNav /> : null}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 py-8 sm:px-6">
         <Suspense fallback={<DocumentsSkeleton />}>
           <DocumentsContent />
         </Suspense>
@@ -22,13 +22,11 @@ export default function DocumentsPageClient({ showTopNav = true }: { showTopNav?
 
 function DocumentsSkeleton() {
   return (
-    <div className="space-y-8">
-      <Skeleton className="h-12 w-64" />
+    <div className="space-y-8" aria-busy="true" aria-label="Cargando documentos">
+      <Skeleton className="h-12 w-64 max-w-full" />
       <Skeleton className="h-48" />
       <div className="space-y-3">
-        {Array(3).fill(0).map((_, i) => (
-          <Skeleton key={i} className="h-24" />
-        ))}
+        {Array(3).fill(0).map((_, i) => <Skeleton key={i} className="h-24" />)}
       </div>
     </div>
   )
