@@ -38,4 +38,20 @@ if (/createAdminClient|service_role|href=["'`]\/cases\//.test(alertPage)) {
   throw new Error('Alertas must preserve authenticated tenant-scoped canonical boundaries')
 }
 
+const activity = read('lib/product/operations/activity.ts')
+for (const marker of [
+  'buildOperationalActivity',
+  'Caso creado',
+  'Análisis actualizado',
+  'Evidencia agregada',
+  'Revisión solicitada',
+  'Revisión completada',
+  'Acción actualizada',
+  'Caso cerrado',
+  '/app/casos/',
+  '/app/inicio',
+]) {
+  if (!activity.includes(marker)) throw new Error(`Activity model missing: ${marker}`)
+}
+
 console.log('Alerts + Activity contract: PASS')
