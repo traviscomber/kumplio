@@ -6,8 +6,11 @@ for (const marker of [
   '¿Qué necesitas proteger, ordenar o resolver?', 'No sé por dónde empezar',
   'professionalActivity', 'organizationName', 'documentsAvailable', 'targetDate', 'Trabajadores aproximados', 'Clientes activos aproximados',
   'Resultado inicial', 'Esto aún no acredita cumplimiento',
-  "router.replace(`/app/inicio?case=", 'disabled={loading',
+  'buildActivationHandoff', 'activationHandoff', 'Ir a mi siguiente acción', 'Ver mi inicio',
+  'disabled={loading',
 ]) if (!form.includes(marker)) throw new Error(`Onboarding form missing marker: ${marker}`)
+
+if (form.includes('router.replace(`/app/inicio?case=')) throw new Error('Onboarding form must not unconditionally redirect to Inicio after persistence')
 
 const page = fs.readFileSync('app/onboarding/page.tsx', 'utf8')
 if (!page.includes('Persona, profesional o empresa')) throw new Error('Onboarding page must introduce the three contexts')
