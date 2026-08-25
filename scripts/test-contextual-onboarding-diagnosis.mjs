@@ -9,11 +9,16 @@ for (const userType of ['persona', 'profesional', 'empresa']) {
   assert.ok(diagnosis.caseTitle.length > 3)
   assert.ok(['information_incomplete', 'attention_required', 'action_required'].includes(diagnosis.status))
   assert.ok(diagnosis.nextAction.title.length > 3)
+  assert.equal(diagnosis.nextAction.href, '/app/casos')
   assert.ok(diagnosis.gaps.length <= 3)
   assert.ok(diagnosis.actions.length <= 3)
   assert.equal(diagnosis.evidenceStatus, 'not_verified')
   assert.equal(diagnosis.complianceVerified, false)
 }
+
+const needsDocument = buildInitialDiagnosis({ ...common, userType: 'empresa', documentsAvailable: 'none' })
+assert.equal(needsDocument.actions[0].key, 'upload_document')
+assert.equal(needsDocument.nextAction.href, '/app/documentos')
 
 const urgent = buildInitialDiagnosis({ ...common, userType: 'empresa', urgency: 'critical', documentsAvailable: 'none' })
 assert.equal(urgent.status, 'action_required')
