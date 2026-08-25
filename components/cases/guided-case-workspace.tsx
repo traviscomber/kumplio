@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { ArrowLeft, ArrowRight, FileCheck2, History } from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileCheck2 } from 'lucide-react'
 import { ArtifactResultPreview } from '@/components/cases/artifact-result-preview'
 import { CaseSpecialistContributions } from '@/components/cases/case-specialist-contributions'
 import { FinalCaseSummary } from '@/components/cases/final-case-summary'
@@ -150,17 +150,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
           <Link href="/app/casos" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
             <ArrowLeft className="mr-2 h-4 w-4" /> Tus casos
           </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            {workflow && (
-              <Link
-                href={`/cases/${caseId}/live`}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border bg-background px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
-              >
-                <History className="mr-2 h-4 w-4" /> Ver trazabilidad
-              </Link>
-            )}
-            <LiveCaseRefresh active={active} />
-          </div>
+          <LiveCaseRefresh active={active} />
         </div>
 
         <section className="mt-6 rounded-[28px] border border-primary/20 bg-primary/5 p-5 shadow-sm sm:p-6">
