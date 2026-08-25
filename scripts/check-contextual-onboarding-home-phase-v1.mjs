@@ -28,5 +28,6 @@ execFileSync(process.execPath, ['scripts/check-activation-document-progress-v1.m
 execFileSync(process.execPath, ['scripts/check-activation-case-context-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-activation-first-action-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-daily-operations-close-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-canonical-case-entry-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
