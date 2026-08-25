@@ -1,10 +1,11 @@
 'use client'
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { buildInitialDiagnosis, type DocumentAvailability, type OnboardingUrgency, type UserContextType } from '@/lib/product/onboarding/contextual-diagnosis'
+import { buildActivationHandoff } from '@/lib/product/onboarding/activation-handoff'
 import { GUIDED_ONBOARDING_DRAFT_KEY, parseGuidedOnboardingDraft } from '@/lib/product/onboarding/guided-entry'
 
 type Props = { initialEmail: string; initialOrganizationName?: string | null; initialFirstName?: string | null; initialLastName?: string | null }
@@ -17,7 +18,6 @@ const intents = ['Prepararme para la Ley 21.719', 'Ordenar documentación labora
 const industries = ['general', 'transport', 'agriculture', 'mining', 'health', 'finance', 'construction', 'other'] as const
 
 export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName, initialFirstName, initialLastName }: Props) {
-  const router = useRouter()
   const [step, setStep] = useState(0)
   const [userType, setUserType] = useState<UserContextType>('persona')
   const [problem, setProblem] = useState('')
@@ -36,6 +36,7 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
   const [targetDate, setTargetDate] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [activationHandoff, setActivationHandoff] = useState<ReturnType<typeof buildActivationHandoff> | null>(null)
 
   useEffect(() => {
     const draft = parseGuidedOnboardingDraft(window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY))
@@ -61,9 +62,34 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
       if (!response.ok) throw new Error(data.error || 'No fue posible preparar tu espacio')
       const caseId = data.workspace?.caseId as string | undefined
       window.sessionStorage.removeItem(GUIDED_ONBOARDING_DRAFT_KEY)
-      router.replace(`/app/inicio?case=${encodeURIComponent(caseId || '')}`)
+      setActivationHandoff(buildActivationHandoff(diagnosis, caseId))
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No fue posible terminar la configuración') }
     finally { setLoading(false) }
+  }
+
+  if (activationHandoff) {
+    return (
+      <section className="mx-auto max-w-3xl rounded-2xl border border-primary/25 bg-primary/5 p-6 sm:p-8">
+        <ShieldCheck className="h-6 w-6 text-primary" />
+        <p className="mt-4 text-xs font-bold uppercase tracking-wider text-primary">Diagnóstico inicial preparado</p>
+        <h2 className="mt-2 text-3xl font-extrabold tracking-tight">Tu primer paso ya está claro</h2>
+        <h3 className="mt-5 text-xl font-bold">{activationHandoff.title}</h3>
+        <p className="mt-3 leading-7 text-muted-foreground">{activationHandoff.explanation}</p>
+        <div className="mt-6 rounded-xl border bg-background/80 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-primary">Siguiente acción recomendada</p>
+          <p className="mt-1 font-semibold">{activationHandoff.primaryLabel}</p>
+        </div>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Button asChild>
+            <Link href={activationHandoff.primaryHref}>Ir a mi siguiente acción</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={activationHandoff.secondaryHref}>Ver mi inicio</Link>
+          </Button>
+        </div>
+        <p className="mt-5 text-sm text-muted-foreground">Este resultado organiza el trabajo inicial; no acredita cumplimiento ni evidencia verificada.</p>
+      </section>
+    )
   }
 
   return <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
