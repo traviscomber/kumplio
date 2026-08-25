@@ -15,9 +15,19 @@ assert.deepEqual(model.changes.map(x => x.id), ['real'])
 assert.equal(model.cases[0].href, '/app/casos/c1')
 assert.equal(model.expirations.length, 0)
 assert.equal('score' in model.primaryStatus, false)
+assert.ok(model.priorities.every(item => item.href.startsWith('/app/')))
+assert.ok(model.cases.every(item => item.href.startsWith('/app/casos/')))
 
 const onboarding = buildAuthenticatedHomeModel({ health: { status: 'attention', label: 'Información incompleta', explanation: 'Completa el primer trabajo.' }, priorities: [], changes: [], initialNextAction: { title: 'Subir documento inicial', href: '/app/documentos' } })
 assert.deepEqual(onboarding.nextAction, { title: 'Subir documento inicial', href: '/app/documentos' })
+
+const invalidInitial = buildAuthenticatedHomeModel({
+  health: { status: 'attention', label: 'Atención', explanation: 'Pendiente.' },
+  priorities: [],
+  changes: [],
+  initialNextAction: { title: 'Continuar', href: '/review-center' },
+})
+assert.deepEqual(invalidInitial.nextAction, { title: 'Continuar', href: '/app/inicio' })
 
 const legacyPriority = buildAuthenticatedHomeModel({
   health: { status: 'attention', label: 'Requiere atención', explanation: 'Hay trabajo pendiente.' },
