@@ -12,6 +12,7 @@ const required = {
     'buildInitialDiagnosis', 'createAdminClient', 'z.discriminatedUnion', "rpc('initialize_contextual_workspace_v2'",
     'p_actor_user_id:', 'p_user_type:', 'p_problem:', 'p_intent:', 'p_urgency:',
     'p_documents_available:', 'p_context:', 'p_diagnosis:', 'p_first_name:', 'p_last_name:', "code: 'invalid_request'",
+    "error?.code === 'PGRST202'", "rpc('initialize_workspace'", 'legacyWorkspaceFallback',
   ],
 }
 

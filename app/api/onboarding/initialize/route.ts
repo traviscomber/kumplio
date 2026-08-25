@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
   const diagnosis = buildInitialDiagnosis(parsed.data)
   const admin = createAdminClient()
-  const { data, error } = await admin.rpc('initialize_contextual_workspace_v2', {
+  let { data, error } = await admin.rpc('initialize_contextual_workspace_v2', {
     p_actor_user_id: user.id,
     p_user_type: parsed.data.userType,
     p_problem: parsed.data.problem,
@@ -72,6 +72,24 @@ export async function POST(request: NextRequest) {
     p_first_name: parsed.data.firstName || null,
     p_last_name: parsed.data.lastName || null,
   })
+
+  const legacyWorkspaceFallback = error?.code === 'PGRST202' || error?.code === '42883'
+  if (legacyWorkspaceFallback) {
+    const organizationName = parsed.data.userType === 'empresa'
+      ? parsed.data.organizationName
+      : parsed.data.userType === 'profesional' ? 'Espacio profesional' : 'Espacio personal'
+    const legacy = await supabase.rpc('initialize_workspace', {
+      organization_name: organizationName,
+      industry_code: 'industry' in parsed.data ? parsed.data.industry : 'general',
+      organization_size: 'organizationSize' in parsed.data ? parsed.data.organizationSize : 'micro',
+      first_name: parsed.data.firstName || null,
+      last_name: parsed.data.lastName || null,
+      project_name: 'Primer diagnóstico Kumplio',
+      first_case_title: diagnosis.caseTitle,
+    })
+    data = legacy.data
+    error = legacy.error
+  }
 
   if (error) {
     console.error('[onboarding/initialize]', error.code)
