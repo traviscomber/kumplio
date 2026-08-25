@@ -87,6 +87,14 @@ export function getWorkflowTemplates(version: WorkflowVersion = 'v2') {
   return Object.values(catalog).map(({ type, label, description, stages }) => ({ type, label, description, totalStages: stages.length, agents: stages.map((stage) => stage.agentId) }))
 }
 
+export function resolveWorkflowVersion(type: string, totalStages: number): WorkflowVersion {
+  const v1 = getWorkflowDefinition(type, 'v1')
+  const v2 = getWorkflowDefinition(type, 'v2')
+  if (v1?.stages.length === totalStages) return 'v1'
+  if (v2?.stages.length === totalStages) return 'v2'
+  return 'v2'
+}
+
 export function serializeWorkflowContext(input: {
   workflowType: string
   caseTitle: string
