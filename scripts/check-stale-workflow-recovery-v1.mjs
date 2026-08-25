@@ -17,7 +17,7 @@ assert.match(actions, /Recuperar ejecución detenida/)
 assert.match(actions, /busy === 'recover'/)
 
 // Beta es una ruta legacy; la recuperación vive en la vista canónica.
-assert.match(betaPage, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.match(betaPage, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
 assert.match(livePage, /STALE_EXECUTION_MS = 7 \* 60 \* 1000/)
 assert.match(livePage, /actionableStage[.]started_at/)
 assert.match(livePage, /canRecoverStale=\{canRecoverStale\}/)
