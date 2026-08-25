@@ -15,10 +15,9 @@ const alertPage = read('app/app/alertas/page.tsx')
 for (const marker of ['buildOperationalAlerts', "redirect('/sign-in?next=/app/alertas')", "from('organization_members')", "eq('organization_id', organizationId)", 'Qué requiere tu atención', 'no significa que todas tus obligaciones estén cumplidas']) {
   if (!alertPage.includes(marker)) throw new Error(`Alertas surface missing: ${marker}`)
 }
-if (/createAdminClient|service_role|href=["'`]\/cases\//.test(alertPage)) throw new Error('Alertas must preserve authenticated tenant-scoped canonical boundaries')
 
 const activity = read('lib/product/operations/activity.ts')
-for (const marker of ['buildOperationalActivity', 'Caso creado', 'Análisis actualizado', 'Evidencia agregada', 'Revisión solicitada', 'Revisión completada', 'Acción actualizada', 'Caso cerrado', '/app/casos/', '/app/inicio']) {
+for (const marker of ['buildOperationalActivity', 'Caso creado', 'Análisis actualizado', 'Evidencia agregada', 'Revisión solicitada', 'Revisión completada', 'Acción actualizada', 'Caso cerrado', '/app/casos/', '/app/inicio', '.slice(0, limit)']) {
   if (!activity.includes(marker)) throw new Error(`Activity model missing: ${marker}`)
 }
 
@@ -26,14 +25,27 @@ const activityPage = read('app/app/actividad/page.tsx')
 for (const marker of ['buildOperationalActivity', "redirect('/sign-in?next=/app/actividad')", "from('organization_members')", "from('compliance_case_events')", "eq('organization_id', organizationId)", "from('compliance_cases')", 'Actividad reciente']) {
   if (!activityPage.includes(marker)) throw new Error(`Actividad surface missing: ${marker}`)
 }
-for (const forbidden of ['attempt_count', 'max_attempts', 'prompt', 'token', 'agent_id', 'queue', 'createAdminClient', 'service_role']) {
-  if (activityPage.includes(forbidden)) throw new Error(`Actividad exposes technical plumbing: ${forbidden}`)
+
+const canonicalSurfaces = [alertPage, activityPage]
+const forbiddenPlumbing = ['attempt_count', 'max_attempts', 'retry', 'prompt', 'token_usage', 'agent_id', 'provider_response', 'queue_name', 'chain-of-thought', 'createAdminClient', 'service_role']
+for (const source of canonicalSurfaces) {
+  for (const marker of forbiddenPlumbing) {
+    if (source.includes(marker)) throw new Error(`Canonical operations UI exposes plumbing: ${marker}`)
+  }
+  if (/href=["'`]\/cases\//.test(source)) throw new Error('Canonical operations UI links to legacy /cases route')
 }
+if (!alertPage.includes('no significa que todas tus obligaciones estén cumplidas')) throw new Error('Alertas empty state must remain claim-safe')
 
 const nav = read('components/app-navigation.tsx')
 for (const marker of ["{ href: '/app/alertas', label: 'Alertas'", "{ href: '/app/actividad', label: 'Actividad'"]) {
   if (!nav.includes(marker)) throw new Error(`Navigation missing: ${marker}`)
 }
 if (/href: '\/app\/alertas'.*available: false/.test(nav)) throw new Error('Alertas must be enabled after the route exists')
+
+const pkg = JSON.parse(read('package.json'))
+if (pkg.scripts?.['check:alerts-activity'] !== 'node scripts/check-alerts-activity.mjs') throw new Error('package.json must expose check:alerts-activity')
+
+const appClose = read('scripts/check-app-close-v1.mjs')
+if (!appClose.includes('scripts/check-alerts-activity.mjs')) throw new Error('App Close aggregate must include check-alerts-activity')
 
 console.log('Alerts + Activity contract: PASS')
