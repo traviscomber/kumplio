@@ -1,24 +1,16 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import {
-  ArrowLeft,
-  CheckCircle2,
-  CircleDashed,
-  FileCheck2,
-  History,
-  Loader2,
-  ShieldCheck,
-  TriangleAlert,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileCheck2 } from 'lucide-react'
 import { ArtifactResultPreview } from '@/components/cases/artifact-result-preview'
+import { CaseSpecialistContributions } from '@/components/cases/case-specialist-contributions'
 import { FinalCaseSummary } from '@/components/cases/final-case-summary'
 import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
 import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
 import { StartCaseResolution } from '@/components/cases/start-case-resolution'
 import { WorkspaceNav } from '@/components/workspace-nav'
-import { createClient } from '@/lib/supabase/server'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
-import { getWorkflowStage } from '@/lib/agents/orchestration'
+import { buildCaseWorkspaceModel } from '@/lib/product/cases/case-workspace-model'
+import { createClient } from '@/lib/supabase/server'
 
 const STALE_EXECUTION_MS = 7 * 60 * 1000
 
@@ -41,7 +33,7 @@ const statusLabels: Record<string, string> = {
 export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/sign-in?next=/cases/${caseId}`)
+  if (!user) redirect(`/sign-in?next=/app/casos/${caseId}`)
 
   const { data: membership } = await supabase
     .from('organization_members')
@@ -133,27 +125,54 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
     ? AGENT_CATALOG.find((item) => item.id === finalStage.agent_id) || null
     : null
   const approvedStages = stages.filter((stage) => stage.status === 'approved').length
+  const workspaceModel = buildCaseWorkspaceModel({
+    caseId,
+    caseStatus: String(complianceCase.status || 'active'),
+    summary: typeof complianceCase.description === 'string' ? complianceCase.description : null,
+    whyItMatters: workflow
+      ? currentDetail(workflow.status, actionableStage?.status || null)
+      : 'El expediente todavía necesita iniciar su resolución guiada.',
+    openAction: !workflow
+      ? { title: 'Iniciar resolución', href: `/app/casos/${caseId}#resolucion-caso` }
+      : workflow.status === 'completed' || actionableStage?.status === 'pending_review'
+        ? null
+        : { title: 'Continuar resolución', href: `/app/casos/${caseId}#siguiente-decision` },
+    humanReviewRequired: actionableStage?.status === 'pending_review',
+    closureEligible: workflow?.status === 'completed',
+    blockers: canRecoverStale ? ['Ejecución detenida pendiente de recuperación'] : [],
+  })
 
   return (
     <>
       <WorkspaceNav />
       <main className="container mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/cases" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
+          <Link href="/app/casos" className="inline-flex items-center text-sm font-semibold text-muted-foreground hover:text-foreground">
             <ArrowLeft className="mr-2 h-4 w-4" /> Tus casos
           </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            {workflow && (
+          <LiveCaseRefresh active={active} />
+        </div>
+
+        <section className="mt-6 rounded-[28px] border border-primary/20 bg-primary/5 p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Estado del caso</p>
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-black">{workspaceModel.status.label}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{workspaceModel.status.explanation}</p>
+              {workspaceModel.blockers.length > 0 && (
+                <p className="mt-2 text-sm font-semibold text-amber-700 dark:text-amber-400">{workspaceModel.blockers[0]}</p>
+              )}
+            </div>
+            {workspaceModel.nextAction && (
               <Link
-                href={`/cases/${caseId}/live`}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border bg-background px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                href={workspaceModel.nextAction.href}
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground"
               >
-                <History className="mr-2 h-4 w-4" /> Ver trazabilidad
+                {workspaceModel.nextAction.title} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             )}
-            <LiveCaseRefresh active={active} />
           </div>
-        </div>
+        </section>
 
         <header className="mt-6 overflow-hidden rounded-[30px] border bg-card shadow-sm">
           <div className="border-b bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.12),transparent_46%)] p-6 sm:p-10">
@@ -170,7 +189,7 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                 <Metric label="Resultados disponibles" value={String(artifacts.filter((artifact) => artifact.status !== 'superseded').length)} />
               </div>
             ) : (
-              <div className="mt-8 max-w-xl rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div id="resolucion-caso" className="mt-8 max-w-xl rounded-2xl border border-primary/20 bg-primary/5 p-5">
                 <h2 className="text-xl font-black">Este caso todavía no tiene trabajo guiado.</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Inicia la resolución para que Kumplio organice el análisis, prepare resultados revisables y deje evidencia de cada decisión.
@@ -217,55 +236,30 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
               reviewedAt={finalReview?.created_at || null}
             />
 
+            <CaseSpecialistContributions stages={stages} artifacts={artifacts} reviews={reviews} />
+
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_390px]">
               <section className="rounded-[28px] border bg-card p-6 shadow-sm sm:p-8">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Trabajo en curso</p>
-                <h2 className="mt-2 text-2xl font-black">Qué está haciendo Kumplio</h2>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Resultados persistidos</p>
+                <h2 className="mt-2 text-2xl font-black">Conclusiones y respaldo</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Cada especialista avanza sobre resultados ya guardados. Lo que ves aquí proviene del expediente, no de estados simulados.
+                  Aquí se muestran resultados guardados y revisables. Las versiones reemplazadas permanecen en la trazabilidad del expediente.
                 </p>
 
                 <div className="mt-6 space-y-4">
-                  {stages.map((stage) => {
-                    const agent = AGENT_CATALOG.find((item) => item.id === stage.agent_id)
-                    const stageLabel = getWorkflowStage(workflow.workflow_type, stage.stage_index)?.label || `Paso ${stage.stage_index + 1}`
-                    const isRunning = stage.status === 'running'
-                    const isDone = stage.status === 'approved'
-                    const needsReview = ['completed', 'pending_review', 'changes_requested'].includes(stage.status)
-                    const failed = stage.status === 'failed'
-
-                    return (
-                      <article key={stage.id} className={`rounded-2xl border p-5 ${isRunning ? 'border-primary/40 bg-primary/5' : 'bg-background/50'}`}>
-                        <div className="flex items-start gap-4">
-                          <div className={`mt-0.5 ${failed ? 'text-destructive' : 'text-primary'}`}>
-                            {isRunning
-                              ? <Loader2 className="h-5 w-5 animate-spin" />
-                              : isDone
-                                ? <CheckCircle2 className="h-5 w-5" />
-                                : needsReview
-                                  ? <ShieldCheck className="h-5 w-5" />
-                                  : failed
-                                    ? <TriangleAlert className="h-5 w-5" />
-                                    : <CircleDashed className="h-5 w-5" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <p className="font-black">{agent?.name || stage.agent_id}</p>
-                                <p className="mt-1 text-sm leading-6 text-muted-foreground">{valueMessage(stage.status, stageLabel)}</p>
-                              </div>
-                              <span className="rounded-full border px-3 py-1 text-xs font-semibold">{stageStatusLabel(stage.status)}</span>
-                            </div>
-                            <p className="mt-3 text-xs text-muted-foreground">Intentos utilizados: {stage.attempt_count} de {stage.max_attempts}</p>
-                          </div>
-                        </div>
-                      </article>
-                    )
-                  })}
+                  {artifacts.length === 0 ? (
+                    <p className="text-sm leading-6 text-muted-foreground">Los resultados aparecerán aquí cuando estén guardados.</p>
+                  ) : artifacts.map((artifact) => (
+                    <article key={artifact.id} className="rounded-xl border p-4">
+                      <p className="font-semibold">{artifact.title}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">{statusLabels[artifact.status] || artifact.status} · versión {artifact.version}</p>
+                      <ArtifactResultPreview content={artifact.content} />
+                    </article>
+                  ))}
                 </div>
               </section>
 
-              <aside className="space-y-6">
+              <aside id="siguiente-decision" className="space-y-6">
                 <LiveWorkflowActions
                   workflowId={workflow.id}
                   runId={actionableStage?.run_id || null}
@@ -279,27 +273,6 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                 <section className="rounded-[28px] border bg-card p-5 shadow-sm">
                   <div className="flex items-center gap-2">
                     <FileCheck2 className="h-5 w-5 text-primary" />
-                    <h2 className="font-black">Resultados y respaldo</h2>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                    Se muestran únicamente resultados persistidos. Las versiones reemplazadas permanecen en el historial.
-                  </p>
-                  <div className="mt-4 space-y-4">
-                    {artifacts.length === 0 ? (
-                      <p className="text-sm leading-6 text-muted-foreground">Los resultados aparecerán aquí cuando estén guardados.</p>
-                    ) : artifacts.map((artifact) => (
-                      <article key={artifact.id} className="rounded-xl border p-4">
-                        <p className="font-semibold">{artifact.title}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">{statusLabels[artifact.status] || artifact.status} · versión {artifact.version}</p>
-                        <ArtifactResultPreview content={artifact.content} />
-                      </article>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-[28px] border bg-card p-5 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <History className="h-5 w-5 text-primary" />
                     <h2 className="font-black">Últimos avances</h2>
                   </div>
                   <div className="mt-4 space-y-3">
@@ -335,7 +308,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function currentMessage(workflowStatus: string, stageStatus: string | null) {
   if (stageStatus === 'pending_review') return 'Hay un resultado esperando tu decisión.'
-  if (stageStatus === 'changes_requested') return 'El siguiente intento necesita instrucciones claras.'
+  if (stageStatus === 'changes_requested') return 'El siguiente resultado necesita instrucciones claras.'
   if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Una etapa no pudo terminar, pero el trabajo anterior está protegido.'
   if (stageStatus === 'running' || workflowStatus === 'running') return 'Kumplio está preparando el siguiente resultado.'
   if (workflowStatus === 'completed') return 'El análisis terminó y el caso está listo para cerrar.'
@@ -344,24 +317,9 @@ function currentMessage(workflowStatus: string, stageStatus: string | null) {
 
 function currentDetail(workflowStatus: string, stageStatus: string | null) {
   if (stageStatus === 'pending_review') return 'Revisa el contenido y decide si puede usarse como base para el siguiente paso.'
-  if (stageStatus === 'changes_requested') return 'Tus observaciones quedarán asociadas al reintento y a la nueva versión del resultado.'
-  if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Puedes reintentar la etapa sin perder resultados aprobados, fuentes ni trazabilidad.'
+  if (stageStatus === 'changes_requested') return 'Tus observaciones quedarán asociadas a la nueva versión del resultado.'
+  if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Puedes solicitar una nueva ejecución sin perder resultados aprobados, fuentes ni trazabilidad.'
   if (stageStatus === 'running' || workflowStatus === 'running') return 'La pantalla se actualizará cuando exista un resultado persistido o una falla concreta.'
   if (workflowStatus === 'completed') return 'Confirma el resultado final y registra el cierre cuando ya esté listo para llevarse a la práctica.'
   return 'El siguiente paso se habilitará cuando sus dependencias estén disponibles.'
-}
-
-function stageStatusLabel(status: string) {
-  if (status === 'completed') return 'Resultado generado'
-  return statusLabels[status] || status
-}
-
-function valueMessage(status: string, label: string) {
-  if (status === 'running') return `${label}. Está preparando un resultado verificable para este caso.`
-  if (status === 'completed') return `${label}. La ejecución terminó, pero todavía necesita aprobación humana.`
-  if (status === 'pending_review') return `${label}. El resultado está disponible y necesita una decisión antes de continuar.`
-  if (status === 'changes_requested') return `${label}. Debe incorporar los cambios solicitados antes de avanzar.`
-  if (status === 'approved') return `${label}. Su resultado fue aprobado y quedó guardado en el expediente.`
-  if (status === 'failed') return `${label}. No terminó; puedes reintentarlo sin perder el trabajo ya aprobado.`
-  return `${label}. Comenzará cuando estén disponibles los insumos necesarios.`
 }

@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [casePage, guidedWorkspace, legacyBeta, caseCenter, casesPage, navigation, advisor] = await Promise.all([
+const [canonicalEntry, canonicalCase, legacyCase, guidedWorkspace, specialistSurface, legacyBeta, caseCenter, casesPage, navigation, advisor] = await Promise.all([
+  readFile('app/app/casos/[id]/page.tsx', 'utf8'),
+  readFile('components/cases/canonical-case-page.tsx', 'utf8'),
   readFile('app/cases/[caseId]/page.tsx', 'utf8'),
   readFile('components/cases/guided-case-workspace.tsx', 'utf8'),
+  readFile('components/cases/case-specialist-contributions.tsx', 'utf8'),
   readFile('app/cases/[caseId]/beta/page.tsx', 'utf8'),
   readFile('components/cases-workspace.tsx', 'utf8'),
   readFile('app/cases/page.tsx', 'utf8'),
@@ -11,18 +14,24 @@ const [casePage, guidedWorkspace, legacyBeta, caseCenter, casesPage, navigation,
   readFile('app/advisor/page.tsx', 'utf8'),
 ])
 
-assert.match(casePage, /GuidedCaseWorkspace/)
-assert.match(casePage, /<GuidedCaseWorkspace caseId=\{caseId\} \/>/)
-assert.match(legacyBeta, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.match(canonicalEntry, /CanonicalCasePage/)
+assert.match(canonicalCase, /GuidedCaseWorkspace/)
+assert.match(canonicalCase, /<GuidedCaseWorkspace caseId=\{caseId\} \/>/)
+assert.match(legacyCase, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
+assert.match(legacyBeta, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
 
 assert.match(guidedWorkspace, /Qué necesitas resolver/)
 assert.match(guidedWorkspace, /Qué importa ahora/)
-assert.match(guidedWorkspace, /Qué está haciendo Kumplio/)
-assert.match(guidedWorkspace, /Resultados y respaldo/)
-assert.match(guidedWorkspace, /Ver trazabilidad/)
+assert.match(guidedWorkspace, /CaseSpecialistContributions/)
+assert.match(guidedWorkspace, /Conclusiones y respaldo/)
+assert.match(guidedWorkspace, /Últimos avances/)
 assert.match(guidedWorkspace, /StartCaseResolution/)
+assert.match(specialistSurface, /Contribuciones al expediente/)
+assert.match(specialistSurface, /Revisión humana/)
 assert.doesNotMatch(guidedWorkspace, /Ejecuciones IA/)
 assert.doesNotMatch(guidedWorkspace, /Workflow ·/)
+assert.doesNotMatch(guidedWorkspace, /Intentos utilizados/)
+assert.doesNotMatch(guidedWorkspace, /\/cases\/\$\{caseId\}\/live/)
 
 assert.match(caseCenter, /Resolver una situación/)
 assert.match(caseCenter, /Necesitan decisión/)

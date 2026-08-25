@@ -5,7 +5,7 @@ const migration = readFileSync('supabase/migrations/20260807040815_create_case_o
 const api = readFileSync('app/api/cases/[caseId]/operational-plan/route.ts', 'utf8')
 const serverComponent = readFileSync('components/cases/case-operational-plan.tsx', 'utf8')
 const clientComponent = readFileSync('components/cases/case-operational-plan-client.tsx', 'utf8')
-const casePage = readFileSync('app/cases/[caseId]/page.tsx', 'utf8')
+const casePage = readFileSync('components/cases/canonical-case-page.tsx', 'utf8')
 const verifier = readFileSync('scripts/56-verify-case-operational-plan.sql', 'utf8')
 
 for (const marker of [

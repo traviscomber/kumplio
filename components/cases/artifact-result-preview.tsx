@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, ChevronDown, FileText, Link2 } from 'lucide-react'
 import { CaseActionPlan } from '@/components/cases/case-action-plan'
+import { CaseGroundingChain } from '@/components/cases/case-grounding-chain'
 
 type JsonRecord = Record<string, unknown>
 
@@ -14,10 +15,11 @@ export function ArtifactResultPreview({ content }: { content: unknown }) {
   return (
     <div className="mt-4 space-y-3 sm:space-y-4">
       <CaseActionPlan content={content} />
+      <CaseGroundingChain content={content} />
 
       {!hasRecognizedSummary && (
         <p className="rounded-xl border bg-muted/30 p-4 text-sm leading-6 text-muted-foreground">
-          El resultado está guardado, pero todavía no tiene un formato resumible. Puedes revisarlo desde la trazabilidad técnica.
+          El resultado está guardado, pero todavía no tiene un formato resumible. La información pendiente permanece disponible para revisión.
         </p>
       )}
 

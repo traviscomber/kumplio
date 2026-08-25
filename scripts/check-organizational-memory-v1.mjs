@@ -2,7 +2,7 @@ import fs from 'node:fs'
 
 const memory = fs.readFileSync('lib/compliance/context/organizational-memory.ts', 'utf8')
 const tools = fs.readFileSync('lib/agents/tools.ts', 'utf8')
-const casePage = fs.readFileSync('app/cases/[caseId]/page.tsx', 'utf8')
+const casePage = fs.readFileSync('components/cases/canonical-case-page.tsx', 'utf8')
 const contextPage = fs.readFileSync('app/context/page.tsx', 'utf8')
 
 const checks = [

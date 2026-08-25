@@ -28,5 +28,13 @@ execFileSync(process.execPath, ['scripts/check-activation-document-progress-v1.m
 execFileSync(process.execPath, ['scripts/check-activation-case-context-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-activation-first-action-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-daily-operations-close-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-canonical-case-entry-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', 'scripts/test-case-workspace-model.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-case-grounding-chain-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-case-specialist-surface-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-case-evidence-review-surface-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-case-close-experience-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-authenticated-cross-surface-close-v1.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-app-close-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
