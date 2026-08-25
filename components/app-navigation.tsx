@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BriefcaseBusiness, FileCheck2, FolderKanban, Home, Settings } from 'lucide-react'
+import { Bell, BriefcaseBusiness, FileCheck2, FolderKanban, History, Home, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const primaryItems = [
@@ -13,7 +13,8 @@ const primaryItems = [
 
 const secondaryItems = [
   { href: '/app/evidencia', label: 'Evidencia', icon: BriefcaseBusiness, available: true },
-  { href: '/app/alertas', label: 'Alertas', icon: Bell, available: false },
+  { href: '/app/alertas', label: 'Alertas', icon: Bell, available: true },
+  { href: '/app/actividad', label: 'Actividad', icon: History, available: true },
   { href: '/app/configuracion', label: 'Configuración', icon: Settings, available: false },
 ] as const
 
