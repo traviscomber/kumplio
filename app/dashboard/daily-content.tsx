@@ -44,7 +44,7 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
     cases: activeCases || [],
     initialNextAction: initialDiagnosis?.nextAction?.title ? {
       title: initialDiagnosis.nextAction.title,
-      href: initialDiagnosis.nextAction.href || (selectedCase ? `/app/casos/${selectedCase.id}` : '/app/casos'),
+      href: resolveInitialActionHref(initialDiagnosis.nextAction.href, selectedCase?.id),
     } : null,
   })
 
@@ -108,6 +108,12 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
       </section>
     </div>
   )
+}
+
+function resolveInitialActionHref(href: string | undefined, selectedCaseId?: string) {
+  if (!href) return selectedCaseId ? `/app/casos/${selectedCaseId}` : '/app/casos'
+  if (href === '/app/casos' && selectedCaseId) return `/app/casos/${selectedCaseId}`
+  return href
 }
 
 function PriorityCard({ priority, index }: { priority: ScoredPriority; index: number }) {
