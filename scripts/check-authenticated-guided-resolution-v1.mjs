@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [casePage, guidedWorkspace, legacyBeta, caseCenter, casesPage, navigation, advisor] = await Promise.all([
+const [canonicalEntry, canonicalCase, legacyCase, guidedWorkspace, legacyBeta, caseCenter, casesPage, navigation, advisor] = await Promise.all([
+  readFile('app/app/casos/[id]/page.tsx', 'utf8'),
+  readFile('components/cases/canonical-case-page.tsx', 'utf8'),
   readFile('app/cases/[caseId]/page.tsx', 'utf8'),
   readFile('components/cases/guided-case-workspace.tsx', 'utf8'),
   readFile('app/cases/[caseId]/beta/page.tsx', 'utf8'),
@@ -11,9 +13,11 @@ const [casePage, guidedWorkspace, legacyBeta, caseCenter, casesPage, navigation,
   readFile('app/advisor/page.tsx', 'utf8'),
 ])
 
-assert.match(casePage, /GuidedCaseWorkspace/)
-assert.match(casePage, /<GuidedCaseWorkspace caseId=\{caseId\} \/>/)
-assert.match(legacyBeta, /redirect\(`\/cases\/\$\{caseId\}`\)/)
+assert.match(canonicalEntry, /CanonicalCasePage/)
+assert.match(canonicalCase, /GuidedCaseWorkspace/)
+assert.match(canonicalCase, /<GuidedCaseWorkspace caseId=\{caseId\} \/>/)
+assert.match(legacyCase, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
+assert.match(legacyBeta, /redirect\(`\/app\/casos\/\$\{caseId\}`\)/)
 
 assert.match(guidedWorkspace, /Qué necesitas resolver/)
 assert.match(guidedWorkspace, /Qué importa ahora/)
