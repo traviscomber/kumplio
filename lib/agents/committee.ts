@@ -1,8 +1,9 @@
 import 'server-only'
 
 import type { AgentId } from './catalog'
+import type { WorkflowVersion } from './orchestration'
 
-type ArtifactRecord = {
+export type ArtifactRecord = {
   artifact_type?: string | null
   title?: string | null
   content?: unknown
@@ -15,6 +16,9 @@ export type QualityGateReport = {
   warnings: string[]
 }
 
+export const MAX_COMMITTEE_ARTIFACTS = 4
+export const MAX_COMMITTEE_CHARS = 12000
+
 const SPECIALIST_FOCUS: Record<AgentId, string> = {
   isidora: 'obligaciones, fuentes, aplicabilidad y vacíos documentales',
   rodrigo: 'riesgo, materialidad, urgencia, escenarios y supuestos',
@@ -25,18 +29,50 @@ const SPECIALIST_FOCUS: Record<AgentId, string> = {
   catalina: 'contradicciones, sustento, reservas, decisión y escalamiento',
 }
 
-function compact(value: unknown, max = 5000) {
+function compact(value: unknown, max = 3000) {
   const text = typeof value === 'string' ? value : JSON.stringify(value)
   return text.length > max ? `${text.slice(0, max)}…` : text
 }
 
+export function buildBoundedCommitteeContext(input: {
+  agentId: AgentId
+  stageIndex: number
+  artifacts: ArtifactRecord[]
+  workflowVersion?: WorkflowVersion
+}) {
+  const workflowVersion = input.workflowVersion ?? 'v2'
+  const available = input.artifacts.filter((artifact) => artifact.status !== 'superseded')
+
+  if (workflowVersion === 'v2' && input.stageIndex === 0) return []
+
+  const selected = workflowVersion === 'v1'
+    ? available.slice(-Math.min(6, MAX_COMMITTEE_ARTIFACTS))
+    : available
+        .filter((artifact) => {
+          const author = artifact.artifact_type || ''
+          if (input.stageIndex === 1) return ['isidora', 'beatriz', 'rodrigo'].includes(author)
+          return ['isidora', 'veronica', 'beatriz', 'rodrigo', 'javier'].includes(author)
+        })
+        .slice(-MAX_COMMITTEE_ARTIFACTS)
+
+  let remaining = MAX_COMMITTEE_CHARS
+  return selected.map((artifact) => {
+    const content = compact(artifact.content, Math.max(0, Math.min(3000, remaining)))
+    remaining = Math.max(0, remaining - content.length)
+    return { ...artifact, content }
+  }).filter((artifact) => String(artifact.content || '').length > 0)
+}
+
 export function buildCommitteeContrast(agentId: AgentId, artifacts: ArtifactRecord[]) {
-  const prior = artifacts.filter((artifact) => artifact.status !== 'superseded')
+  const prior = artifacts.filter((artifact) => artifact.status !== 'superseded').slice(-MAX_COMMITTEE_ARTIFACTS)
   if (!prior.length) return ''
 
-  const summaries = prior.slice(-6).map((artifact, index) => {
+  let remaining = MAX_COMMITTEE_CHARS
+  const summaries = prior.map((artifact, index) => {
     const author = artifact.artifact_type || 'especialista'
-    return `APORTE ${index + 1} — ${author}\nTítulo: ${artifact.title || 'Resultado previo'}\nContenido: ${compact(artifact.content)}`
+    const content = compact(artifact.content, Math.max(0, Math.min(3000, remaining)))
+    remaining = Math.max(0, remaining - content.length)
+    return `APORTE ${index + 1} — ${author}\nTítulo: ${artifact.title || 'Resultado previo'}\nContenido: ${content}`
   })
 
   return [
