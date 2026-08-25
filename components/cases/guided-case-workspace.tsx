@@ -1,16 +1,8 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import {
-  ArrowLeft,
-  CheckCircle2,
-  CircleDashed,
-  FileCheck2,
-  History,
-  Loader2,
-  ShieldCheck,
-  TriangleAlert,
-} from 'lucide-react'
+import { ArrowLeft, FileCheck2, History } from 'lucide-react'
 import { ArtifactResultPreview } from '@/components/cases/artifact-result-preview'
+import { CaseSpecialistContributions } from '@/components/cases/case-specialist-contributions'
 import { FinalCaseSummary } from '@/components/cases/final-case-summary'
 import { LiveCaseRefresh } from '@/components/cases/live-case-refresh'
 import { LiveWorkflowActions } from '@/components/cases/live-workflow-actions'
@@ -18,7 +10,6 @@ import { StartCaseResolution } from '@/components/cases/start-case-resolution'
 import { WorkspaceNav } from '@/components/workspace-nav'
 import { createClient } from '@/lib/supabase/server'
 import { AGENT_CATALOG } from '@/lib/agents/catalog'
-import { getWorkflowStage } from '@/lib/agents/orchestration'
 
 const STALE_EXECUTION_MS = 7 * 60 * 1000
 
@@ -217,51 +208,26 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
               reviewedAt={finalReview?.created_at || null}
             />
 
+            <CaseSpecialistContributions stages={stages} artifacts={artifacts} reviews={reviews} />
+
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_390px]">
               <section className="rounded-[28px] border bg-card p-6 shadow-sm sm:p-8">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Trabajo en curso</p>
-                <h2 className="mt-2 text-2xl font-black">Qué está haciendo Kumplio</h2>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Resultados persistidos</p>
+                <h2 className="mt-2 text-2xl font-black">Conclusiones y respaldo</h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Cada especialista avanza sobre resultados ya guardados. Lo que ves aquí proviene del expediente, no de estados simulados.
+                  Aquí se muestran resultados guardados y revisables. Las versiones reemplazadas permanecen en la trazabilidad del expediente.
                 </p>
 
                 <div className="mt-6 space-y-4">
-                  {stages.map((stage) => {
-                    const agent = AGENT_CATALOG.find((item) => item.id === stage.agent_id)
-                    const stageLabel = getWorkflowStage(workflow.workflow_type, stage.stage_index)?.label || `Paso ${stage.stage_index + 1}`
-                    const isRunning = stage.status === 'running'
-                    const isDone = stage.status === 'approved'
-                    const needsReview = ['completed', 'pending_review', 'changes_requested'].includes(stage.status)
-                    const failed = stage.status === 'failed'
-
-                    return (
-                      <article key={stage.id} className={`rounded-2xl border p-5 ${isRunning ? 'border-primary/40 bg-primary/5' : 'bg-background/50'}`}>
-                        <div className="flex items-start gap-4">
-                          <div className={`mt-0.5 ${failed ? 'text-destructive' : 'text-primary'}`}>
-                            {isRunning
-                              ? <Loader2 className="h-5 w-5 animate-spin" />
-                              : isDone
-                                ? <CheckCircle2 className="h-5 w-5" />
-                                : needsReview
-                                  ? <ShieldCheck className="h-5 w-5" />
-                                  : failed
-                                    ? <TriangleAlert className="h-5 w-5" />
-                                    : <CircleDashed className="h-5 w-5" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <p className="font-black">{agent?.name || stage.agent_id}</p>
-                                <p className="mt-1 text-sm leading-6 text-muted-foreground">{valueMessage(stage.status, stageLabel)}</p>
-                              </div>
-                              <span className="rounded-full border px-3 py-1 text-xs font-semibold">{stageStatusLabel(stage.status)}</span>
-                            </div>
-                            <p className="mt-3 text-xs text-muted-foreground">Intentos utilizados: {stage.attempt_count} de {stage.max_attempts}</p>
-                          </div>
-                        </div>
-                      </article>
-                    )
-                  })}
+                  {artifacts.length === 0 ? (
+                    <p className="text-sm leading-6 text-muted-foreground">Los resultados aparecerán aquí cuando estén guardados.</p>
+                  ) : artifacts.map((artifact) => (
+                    <article key={artifact.id} className="rounded-xl border p-4">
+                      <p className="font-semibold">{artifact.title}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">{statusLabels[artifact.status] || artifact.status} · versión {artifact.version}</p>
+                      <ArtifactResultPreview content={artifact.content} />
+                    </article>
+                  ))}
                 </div>
               </section>
 
@@ -279,27 +245,6 @@ export async function GuidedCaseWorkspace({ caseId }: { caseId: string }) {
                 <section className="rounded-[28px] border bg-card p-5 shadow-sm">
                   <div className="flex items-center gap-2">
                     <FileCheck2 className="h-5 w-5 text-primary" />
-                    <h2 className="font-black">Resultados y respaldo</h2>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                    Se muestran únicamente resultados persistidos. Las versiones reemplazadas permanecen en el historial.
-                  </p>
-                  <div className="mt-4 space-y-4">
-                    {artifacts.length === 0 ? (
-                      <p className="text-sm leading-6 text-muted-foreground">Los resultados aparecerán aquí cuando estén guardados.</p>
-                    ) : artifacts.map((artifact) => (
-                      <article key={artifact.id} className="rounded-xl border p-4">
-                        <p className="font-semibold">{artifact.title}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">{statusLabels[artifact.status] || artifact.status} · versión {artifact.version}</p>
-                        <ArtifactResultPreview content={artifact.content} />
-                      </article>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-[28px] border bg-card p-5 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <History className="h-5 w-5 text-primary" />
                     <h2 className="font-black">Últimos avances</h2>
                   </div>
                   <div className="mt-4 space-y-3">
@@ -335,7 +280,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function currentMessage(workflowStatus: string, stageStatus: string | null) {
   if (stageStatus === 'pending_review') return 'Hay un resultado esperando tu decisión.'
-  if (stageStatus === 'changes_requested') return 'El siguiente intento necesita instrucciones claras.'
+  if (stageStatus === 'changes_requested') return 'El siguiente resultado necesita instrucciones claras.'
   if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Una etapa no pudo terminar, pero el trabajo anterior está protegido.'
   if (stageStatus === 'running' || workflowStatus === 'running') return 'Kumplio está preparando el siguiente resultado.'
   if (workflowStatus === 'completed') return 'El análisis terminó y el caso está listo para cerrar.'
@@ -344,24 +289,9 @@ function currentMessage(workflowStatus: string, stageStatus: string | null) {
 
 function currentDetail(workflowStatus: string, stageStatus: string | null) {
   if (stageStatus === 'pending_review') return 'Revisa el contenido y decide si puede usarse como base para el siguiente paso.'
-  if (stageStatus === 'changes_requested') return 'Tus observaciones quedarán asociadas al reintento y a la nueva versión del resultado.'
-  if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Puedes reintentar la etapa sin perder resultados aprobados, fuentes ni trazabilidad.'
+  if (stageStatus === 'changes_requested') return 'Tus observaciones quedarán asociadas a la nueva versión del resultado.'
+  if (stageStatus === 'failed' || workflowStatus === 'failed') return 'Puedes solicitar una nueva ejecución sin perder resultados aprobados, fuentes ni trazabilidad.'
   if (stageStatus === 'running' || workflowStatus === 'running') return 'La pantalla se actualizará cuando exista un resultado persistido o una falla concreta.'
   if (workflowStatus === 'completed') return 'Confirma el resultado final y registra el cierre cuando ya esté listo para llevarse a la práctica.'
   return 'El siguiente paso se habilitará cuando sus dependencias estén disponibles.'
-}
-
-function stageStatusLabel(status: string) {
-  if (status === 'completed') return 'Resultado generado'
-  return statusLabels[status] || status
-}
-
-function valueMessage(status: string, label: string) {
-  if (status === 'running') return `${label}. Está preparando un resultado verificable para este caso.`
-  if (status === 'completed') return `${label}. La ejecución terminó, pero todavía necesita aprobación humana.`
-  if (status === 'pending_review') return `${label}. El resultado está disponible y necesita una decisión antes de continuar.`
-  if (status === 'changes_requested') return `${label}. Debe incorporar los cambios solicitados antes de avanzar.`
-  if (status === 'approved') return `${label}. Su resultado fue aprobado y quedó guardado en el expediente.`
-  if (status === 'failed') return `${label}. No terminó; puedes reintentarlo sin perder el trabajo ya aprobado.`
-  return `${label}. Comenzará cuando estén disponibles los insumos necesarios.`
 }
