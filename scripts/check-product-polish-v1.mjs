@@ -40,4 +40,20 @@ assert.match(evidencePage, /Pendiente de revisión|revisión/i)
 assert.doesNotMatch(evidencePage, /Biblioteca verificable/, 'Page metadata/copy must not imply all stored evidence is verified')
 assert.match(evidencePage, /px-4[^\n]*sm:px-6|px-4/)
 
+const canonicalSources = [
+  'components/app-navigation.tsx',
+  'app/dashboard/daily-content.tsx',
+  'components/cases-workspace.tsx',
+  'components/cases/guided-case-workspace.tsx',
+  'app/documents/content.tsx',
+  'app/evidence/page.tsx',
+].map((file) => [file, fs.readFileSync(file, 'utf8')])
+
+for (const [file, source] of canonicalSources) {
+  assert.doesNotMatch(source, /href=["'{`]\/cases(?:\/|["'}`])/, `${file} exposes legacy cases route`)
+  assert.doesNotMatch(source, /Intentos utilizados|provider trace|token usage|agent prompt/i, `${file} exposes technical plumbing`)
+  assert.match(source, /sm:|flex-col|grid/, `${file} lacks mobile-first responsive structure marker`)
+}
+for (const source of [nav, cases, guided]) assert.match(source, /focus-visible:/)
+
 console.log('Product polish: PASS')
