@@ -73,6 +73,7 @@
     "check:activation-handoff": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-activation-handoff.mjs",
     "check:activation-document-progress": "node scripts/check-activation-document-progress-v1.mjs",
     "check:activation-case-context": "node scripts/check-activation-case-context-v1.mjs",
+    "check:activation-first-action": "node scripts/check-activation-first-action-v1.mjs",
     "check:guided-onboarding-entry": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-guided-onboarding-entry.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
     "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs"
