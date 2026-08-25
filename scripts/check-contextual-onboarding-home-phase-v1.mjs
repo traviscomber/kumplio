@@ -30,5 +30,6 @@ execFileSync(process.execPath, ['scripts/check-activation-first-action-v1.mjs'],
 execFileSync(process.execPath, ['scripts/check-daily-operations-close-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['scripts/check-canonical-case-entry-v1.mjs'], { stdio: 'inherit' })
 execFileSync(process.execPath, ['--disable-warning=MODULE_TYPELESS_PACKAGE_JSON', 'scripts/test-case-workspace-model.mjs'], { stdio: 'inherit' })
+execFileSync(process.execPath, ['scripts/check-case-grounding-chain-v1.mjs'], { stdio: 'inherit' })
 
 console.log('Contextual onboarding and home phase: PASS')
