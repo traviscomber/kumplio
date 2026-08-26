@@ -2,198 +2,89 @@ import type { PublicLocale } from '@/lib/i18n/public-routing'
 
 type Card = { title: string; description: string }
 type LegalSection = { title: string; body: string }
-
-type SecurityCopy = {
-  metadata: { title: string; description: string }
-  nav: { contact: string; switchLanguage: string }
-  hero: { eyebrow: string; title: string; description: string }
-  controls: Card[]
-  current: { title: string; description: string; reportTitle: string; reportTextBeforeSecurity: string; reportTextBetween: string; reportTextAfterInfo: string; securityTxt: string }
-  cta: { title: string; action: string }
-  graphName: string
-}
-
-type PrivacyCopy = {
-  metadata: { title: string; description: string }
-  nav: { contact: string; switchLanguage: string }
-  hero: { eyebrow: string; title: string; updatedLabel: string; updatedAt: string; versionLabel: string }
-  sections: LegalSection[]
-  securityLinkLabel: string
-  contactBefore: string
-  contactAfter: string
-}
-
-type TermsCopy = {
-  metadata: { title: string; description: string }
-  nav: { contact: string; switchLanguage: string }
-  hero: { eyebrow: string; title: string; updatedLabel: string; updatedAt: string }
-  sections: LegalSection[]
-  contactBefore: string
-}
+type SecurityCopy = { metadata: { title: string; description: string }; nav: { contact: string; switchLanguage: string }; hero: { eyebrow: string; title: string; description: string }; controls: Card[]; current: { title: string; description: string; reportTitle: string; reportTextBeforeSecurity: string; reportTextBetween: string; reportTextAfterInfo: string; securityTxt: string }; cta: { title: string; action: string }; graphName: string }
+type PrivacyCopy = { metadata: { title: string; description: string }; nav: { contact: string; switchLanguage: string }; hero: { eyebrow: string; title: string; updatedLabel: string; updatedAt: string; versionLabel: string }; sections: LegalSection[]; securityLinkLabel: string; contactBefore: string; contactAfter: string }
+type TermsCopy = { metadata: { title: string; description: string }; nav: { contact: string; switchLanguage: string }; hero: { eyebrow: string; title: string; updatedLabel: string; updatedAt: string }; sections: LegalSection[]; contactBefore: string }
 
 export const SECURITY_PUBLIC_COPY: Record<PublicLocale, SecurityCopy> = {
-  es: {
-    metadata: {
-      title: 'Seguridad y aislamiento de datos',
-      description: 'Enfoque de seguridad, aislamiento de organizaciones, trazabilidad y revisión humana en Kumplio.',
-    },
-    nav: { contact: 'Contactar', switchLanguage: 'English' },
-    hero: {
-      eyebrow: 'Seguridad y confianza',
-      title: 'Protegemos el contexto privado de cada organización.',
-      description: 'Kumplio separa el conocimiento público del contexto privado de cada empresa. La seguridad se diseña alrededor de autenticación, autorización, aislamiento de datos, trazabilidad y revisión humana.',
-    },
-    controls: [
-      { title: 'Aislamiento por organización', description: 'Los datos privados se relacionan con una organización y se protegen mediante permisos y políticas de acceso en la base de datos.' },
-      { title: 'Autenticación y membresías', description: 'El acceso al workspace requiere una cuenta autenticada y una membresía válida en la organización correspondiente.' },
-      { title: 'Persistencia trazable', description: 'Misiones, resultados, revisiones y eventos conservan identificadores y relaciones que permiten reconstruir el trabajo realizado.' },
-      { title: 'Revisión humana', description: 'Las propuestas generadas mediante inteligencia artificial requieren validación humana cuando afectan decisiones jurídicas, de riesgo o cumplimiento.' },
-      { title: 'Acceso restringido', description: 'Las funciones administrativas y los datos internos se limitan según el rol y el contexto de la organización.' },
-      { title: 'Desarrollo seguro', description: 'Kumplio aplica validación de entradas, controles de autorización y revisión de cambios antes de publicar funcionalidades sensibles.' },
-    ],
-    current: {
-      title: 'Alcance actual',
-      description: 'Esta página describe controles y principios actualmente aplicados por Kumplio. No afirma certificaciones externas, disponibilidad garantizada ni cumplimiento de estándares que todavía no hayan sido auditados formalmente.',
-      reportTitle: 'Reporte de seguridad',
-      reportTextBeforeSecurity: 'Para reportar una vulnerabilidad o incidente potencial, escribe a',
-      reportTextBetween: '. Para privacidad o evaluación de proveedores, utiliza',
-      reportTextAfterInfo: '.',
-      securityTxt: 'Ver security.txt',
-    },
-    cta: { title: '¿Necesitas revisar requisitos de seguridad o tratamiento de datos?', action: 'Conversar con Kumplio' },
-    graphName: 'Seguridad y aislamiento de datos en Kumplio',
-  },
-  en: {
-    metadata: {
-      title: 'Security and data isolation',
-      description: 'Kumplio’s approach to security, organization isolation, traceability and human review.',
-    },
-    nav: { contact: 'Contact', switchLanguage: 'Español' },
-    hero: {
-      eyebrow: 'Security and trust',
-      title: 'We protect each organization’s private context.',
-      description: 'Kumplio separates public knowledge from each company’s private context. Security is designed around authentication, authorization, data isolation, traceability and human review.',
-    },
-    controls: [
-      { title: 'Organization isolation', description: 'Private data is associated with an organization and protected through permissions and database access policies.' },
-      { title: 'Authentication and memberships', description: 'Workspace access requires an authenticated account and a valid membership in the corresponding organization.' },
-      { title: 'Traceable persistence', description: 'Missions, results, reviews and events preserve identifiers and relationships that allow work to be reconstructed.' },
-      { title: 'Human review', description: 'AI-generated proposals require human validation when they affect legal, risk or compliance decisions.' },
-      { title: 'Restricted access', description: 'Administrative functions and internal data are limited according to role and organization context.' },
-      { title: 'Secure development', description: 'Kumplio applies input validation, authorization controls and change review before sensitive functionality is released.' },
-    ],
-    current: {
-      title: 'Current scope',
-      description: 'This page describes controls and principles currently applied by Kumplio. It does not claim external certifications, guaranteed availability or compliance with standards that have not yet been formally audited.',
-      reportTitle: 'Security reporting',
-      reportTextBeforeSecurity: 'To report a vulnerability or potential incident, write to',
-      reportTextBetween: '. For privacy or vendor-assessment matters, use',
-      reportTextAfterInfo: '.',
-      securityTxt: 'View security.txt',
-    },
-    cta: { title: 'Do you need to review security or data-processing requirements?', action: 'Talk to Kumplio' },
-    graphName: 'Security and data isolation at Kumplio',
-  },
+  es: { metadata: { title: 'Seguridad y aislamiento de datos', description: 'Enfoque de seguridad, aislamiento de organizaciones, trazabilidad y revisión humana en Kumplio.' }, nav: { contact: 'Contactar', switchLanguage: 'English' }, hero: { eyebrow: 'Seguridad y confianza', title: 'Protegemos el contexto privado de cada organización.', description: 'Kumplio separa el conocimiento público del contexto privado de cada empresa. La seguridad se diseña alrededor de autenticación, autorización, aislamiento de datos, trazabilidad y revisión humana.' }, controls: [
+    { title: 'Aislamiento por organización', description: 'Los datos privados se relacionan con una organización y se protegen mediante permisos y políticas de acceso en la base de datos.' },
+    { title: 'Autenticación y membresías', description: 'El acceso al workspace requiere una cuenta autenticada y una membresía válida en la organización correspondiente.' },
+    { title: 'Persistencia trazable', description: 'Casos, resultados, revisiones y eventos conservan identificadores y relaciones que permiten reconstruir el trabajo realizado.' },
+    { title: 'Revisión humana', description: 'Las propuestas generadas mediante inteligencia artificial requieren validación humana cuando afectan decisiones jurídicas, de riesgo o cumplimiento.' },
+    { title: 'Acceso restringido', description: 'Las funciones administrativas y los datos internos se limitan según el rol y el contexto de la organización.' },
+    { title: 'Desarrollo seguro', description: 'Kumplio aplica validación de entradas, controles de autorización y revisión de cambios antes de publicar funcionalidades sensibles.' },
+  ], current: { title: 'Alcance actual', description: 'Esta página describe controles y principios actualmente aplicados por Kumplio. No afirma certificaciones externas, disponibilidad garantizada ni cumplimiento de estándares que todavía no hayan sido auditados formalmente.', reportTitle: 'Reporte de seguridad', reportTextBeforeSecurity: 'Para reportar una vulnerabilidad o incidente potencial, escribe a', reportTextBetween: '. Para privacidad o evaluación de proveedores, utiliza', reportTextAfterInfo: '.', securityTxt: 'Ver security.txt' }, cta: { title: '¿Necesitas revisar requisitos de seguridad o tratamiento de datos?', action: 'Conversar con Kumplio' }, graphName: 'Seguridad y aislamiento de datos en Kumplio' },
+  en: { metadata: { title: 'Security and data isolation', description: 'Kumplio’s approach to security, organization isolation, traceability and human review.' }, nav: { contact: 'Contact', switchLanguage: 'Español' }, hero: { eyebrow: 'Security and trust', title: 'We protect each organization’s private context.', description: 'Kumplio separates public knowledge from each company’s private context. Security is designed around authentication, authorization, data isolation, traceability and human review.' }, controls: [
+    { title: 'Organization isolation', description: 'Private data is associated with an organization and protected through permissions and database access policies.' },
+    { title: 'Authentication and memberships', description: 'Workspace access requires an authenticated account and a valid membership in the corresponding organization.' },
+    { title: 'Traceable persistence', description: 'Cases, results, reviews and events preserve identifiers and relationships that allow work to be reconstructed.' },
+    { title: 'Human review', description: 'AI-generated proposals require human validation when they affect legal, risk or compliance decisions.' },
+    { title: 'Restricted access', description: 'Administrative functions and internal data are limited according to role and organization context.' },
+    { title: 'Secure development', description: 'Kumplio applies input validation, authorization controls and change review before sensitive functionality is released.' },
+  ], current: { title: 'Current scope', description: 'This page describes controls and principles currently applied by Kumplio. It does not claim external certifications, guaranteed availability or compliance with standards that have not yet been formally audited.', reportTitle: 'Security reporting', reportTextBeforeSecurity: 'To report a vulnerability or potential incident, write to', reportTextBetween: '. For privacy or vendor-assessment matters, use', reportTextAfterInfo: '.', securityTxt: 'View security.txt' }, cta: { title: 'Do you need to review security or data-processing requirements?', action: 'Talk to Kumplio' }, graphName: 'Security and data isolation at Kumplio' },
 }
 
 export const PRIVACY_PUBLIC_COPY: Record<PublicLocale, PrivacyCopy> = {
-  es: {
-    metadata: {
-      title: 'Política de privacidad',
-      description: 'Cómo Kumplio trata y protege los datos personales y la información de las organizaciones usuarias.',
-    },
-    nav: { contact: 'Contacto', switchLanguage: 'English' },
-    hero: { eyebrow: 'Privacidad', title: 'Política de privacidad', updatedLabel: 'Última actualización', updatedAt: '3 de agosto de 2026', versionLabel: 'versión' },
-    sections: [
-      { title: '1. Alcance', body: 'Esta política explica cómo Kumplio by n3uralia trata datos personales asociados al sitio web, cuentas, contactos comerciales y uso de la plataforma. El tratamiento específico de información cargada por una organización también puede regirse por contratos y acuerdos de tratamiento de datos separados.' },
-      { title: '2. Datos que podemos tratar', body: 'Podemos tratar datos de cuenta y contacto, como nombre, correo electrónico, empresa, cargo y teléfono; datos de autenticación y seguridad; información de uso y registros técnicos; solicitudes comerciales o de soporte; y documentos, evidencias, decisiones o contenidos que una organización cargue voluntariamente en su workspace.' },
-      { title: '3. Finalidades', body: 'Utilizamos los datos para crear y administrar cuentas, prestar el servicio, mantener la seguridad, responder consultas, registrar solicitudes comerciales, mejorar la experiencia, cumplir obligaciones contractuales y legales, y mantener trazabilidad de acciones dentro de la plataforma.' },
-      { title: '4. Información de organizaciones', body: 'La información privada de una organización se mantiene separada del conocimiento regulatorio público y de los datos de otras organizaciones. Los usuarios deben contar con autorización suficiente para cargar y tratar información de terceros dentro de Kumplio.' },
-      { title: '5. Inteligencia artificial', body: 'Algunas funciones pueden utilizar proveedores de inteligencia artificial para procesar instrucciones o contenidos autorizados. Kumplio procura minimizar los datos enviados y aplicar controles de acceso y revisión humana. La información privada de una organización no se utiliza para entrenar modelos públicos por defecto.' },
-      { title: '6. Proveedores y transferencias', body: 'Podemos utilizar proveedores de infraestructura, autenticación, almacenamiento, analítica, correo e inteligencia artificial. Algunos pueden procesar datos fuera de Chile. Seleccionamos proveedores según necesidades operativas y de seguridad, y procuramos establecer condiciones contractuales apropiadas.' },
-      { title: '7. Conservación', body: 'Conservamos los datos durante el tiempo necesario para prestar el servicio, mantener seguridad y trazabilidad, cumplir contratos y atender obligaciones legales. Los plazos pueden variar según el tipo de dato, configuración contractual y necesidades de respaldo o auditoría.' },
-      { title: '8. Seguridad', body: 'Aplicamos controles razonables de autenticación, autorización, aislamiento por organización, validación de entradas, trazabilidad y revisión de cambios. Ningún sistema puede garantizar seguridad absoluta.' },
-      { title: '9. Derechos y solicitudes', body: 'Las personas pueden solicitar información, corrección, eliminación, oposición u otras acciones que correspondan conforme a la legislación aplicable y al contexto del tratamiento. Podemos solicitar antecedentes razonables para verificar identidad y autoridad.' },
-      { title: '10. Cookies y analítica', body: 'Utilizamos cookies necesarias para autenticación y funcionamiento. También podemos utilizar analítica para comprender el uso del sitio. La disponibilidad del servicio puede verse afectada si se bloquean cookies estrictamente necesarias.' },
-      { title: '11. Cambios', body: 'Podemos actualizar esta política cuando cambien el producto, los proveedores o la legislación. Publicaremos la versión vigente y su fecha de actualización en esta página.' },
-      { title: '12. Contacto', body: '' },
-    ],
-    securityLinkLabel: 'página de seguridad',
-    contactBefore: 'Para consultas o solicitudes de privacidad, escribe a',
-    contactAfter: '. Kumplio opera desde Santiago, Chile.',
-  },
-  en: {
-    metadata: {
-      title: 'Privacy Policy',
-      description: 'How Kumplio processes and protects personal data and information belonging to user organizations.',
-    },
-    nav: { contact: 'Contact', switchLanguage: 'Español' },
-    hero: { eyebrow: 'Privacy', title: 'Privacy Policy', updatedLabel: 'Last updated', updatedAt: 'August 3, 2026', versionLabel: 'version' },
-    sections: [
-      { title: '1. Scope', body: 'This policy explains how Kumplio by n3uralia processes personal data associated with the website, accounts, commercial contacts and use of the platform. Specific processing of information uploaded by an organization may also be governed by separate contracts and data-processing agreements.' },
-      { title: '2. Data we may process', body: 'We may process account and contact data such as name, email address, company, role and phone number; authentication and security data; usage information and technical logs; commercial or support requests; and documents, evidence, decisions or content that an organization voluntarily uploads to its workspace.' },
-      { title: '3. Purposes', body: 'We use data to create and administer accounts, provide the service, maintain security, respond to inquiries, record commercial requests, improve the experience, comply with contractual and legal obligations, and preserve traceability of actions within the platform.' },
-      { title: '4. Organization information', body: 'An organization’s private information is kept separate from public regulatory knowledge and from other organizations’ data. Users must have sufficient authorization to upload and process third-party information within Kumplio.' },
-      { title: '5. Artificial intelligence', body: 'Some functions may use artificial-intelligence providers to process authorized instructions or content. Kumplio seeks to minimize the data sent and apply access controls and human review. An organization’s private information is not used by default to train public models.' },
-      { title: '6. Providers and transfers', body: 'We may use infrastructure, authentication, storage, analytics, email and artificial-intelligence providers. Some may process data outside Chile. We select providers according to operational and security needs and seek to establish appropriate contractual conditions.' },
-      { title: '7. Retention', body: 'We retain data for as long as necessary to provide the service, maintain security and traceability, fulfill contracts and address legal obligations. Retention periods may vary depending on the type of data, contractual configuration and backup or audit needs.' },
-      { title: '8. Security', body: 'We apply reasonable authentication, authorization, organization-isolation, input-validation, traceability and change-review controls. No system can guarantee absolute security.' },
-      { title: '9. Rights and requests', body: 'Individuals may request information, correction, deletion, objection or other actions that apply under applicable law and the context of the processing. We may request reasonable information to verify identity and authority.' },
-      { title: '10. Cookies and analytics', body: 'We use cookies that are necessary for authentication and operation. We may also use analytics to understand use of the site. Service availability may be affected if strictly necessary cookies are blocked.' },
-      { title: '11. Changes', body: 'We may update this policy when the product, providers or legislation change. We will publish the current version and its update date on this page.' },
-      { title: '12. Contact', body: '' },
-    ],
-    securityLinkLabel: 'security page',
-    contactBefore: 'For privacy inquiries or requests, write to',
-    contactAfter: '. Kumplio operates from Santiago, Chile.',
-  },
+  es: { metadata: { title: 'Política de privacidad', description: 'Cómo Kumplio trata y protege los datos personales y la información de las organizaciones usuarias.' }, nav: { contact: 'Contacto', switchLanguage: 'English' }, hero: { eyebrow: 'Privacidad', title: 'Política de privacidad', updatedLabel: 'Última actualización', updatedAt: '3 de agosto de 2026', versionLabel: 'versión' }, sections: [
+    { title: '1. Alcance', body: 'Esta política explica cómo Kumplio by n3uralia trata datos personales asociados al sitio web, cuentas, contactos comerciales y uso de la plataforma. El tratamiento específico de información cargada por una organización también puede regirse por contratos y acuerdos de tratamiento de datos separados.' },
+    { title: '2. Datos que podemos tratar', body: 'Podemos tratar datos de cuenta y contacto, como nombre, correo electrónico, empresa, cargo y teléfono; datos de autenticación y seguridad; información de uso y registros técnicos; solicitudes comerciales o de soporte; y documentos, evidencias, decisiones o contenidos que una organización cargue voluntariamente en su workspace.' },
+    { title: '3. Finalidades', body: 'Utilizamos los datos para crear y administrar cuentas, prestar el servicio, mantener la seguridad, responder consultas, registrar solicitudes comerciales, mejorar la experiencia, cumplir obligaciones contractuales y legales, y mantener trazabilidad de acciones dentro de la plataforma.' },
+    { title: '4. Información de organizaciones', body: 'La información privada de una organización se mantiene separada del conocimiento regulatorio público y de los datos de otras organizaciones. Los usuarios deben contar con autorización suficiente para cargar y tratar información de terceros dentro de Kumplio.' },
+    { title: '5. Inteligencia artificial', body: 'Algunas funciones pueden utilizar proveedores de inteligencia artificial para procesar instrucciones o contenidos autorizados. Kumplio procura minimizar los datos enviados y aplicar controles de acceso y revisión humana. La información privada de una organización no se utiliza para entrenar modelos públicos por defecto.' },
+    { title: '6. Proveedores y transferencias', body: 'Podemos utilizar proveedores de infraestructura, autenticación, almacenamiento, analítica, correo e inteligencia artificial. Algunos pueden procesar datos fuera de Chile. Seleccionamos proveedores según necesidades operativas y de seguridad, y procuramos establecer condiciones contractuales apropiadas.' },
+    { title: '7. Conservación', body: 'Conservamos los datos durante el tiempo necesario para prestar el servicio, mantener seguridad y trazabilidad, cumplir contratos y atender obligaciones legales. Los plazos pueden variar según el tipo de dato, configuración contractual y necesidades de respaldo o auditoría.' },
+    { title: '8. Seguridad', body: 'Aplicamos controles razonables de autenticación, autorización, aislamiento por organización, validación de entradas, trazabilidad y revisión de cambios. Ningún sistema puede garantizar seguridad absoluta.' },
+    { title: '9. Derechos y solicitudes', body: 'Las personas pueden solicitar información, corrección, eliminación, oposición u otras acciones que correspondan conforme a la legislación aplicable y al contexto del tratamiento. Podemos solicitar antecedentes razonables para verificar identidad y autoridad.' },
+    { title: '10. Cookies y analítica', body: 'Utilizamos cookies necesarias para autenticación y funcionamiento. También podemos utilizar analítica para comprender el uso del sitio. La disponibilidad del servicio puede verse afectada si se bloquean cookies estrictamente necesarias.' },
+    { title: '11. Cambios', body: 'Podemos actualizar esta política cuando cambien el producto, los proveedores o la legislación. Publicaremos la versión vigente y su fecha de actualización en esta página.' }, { title: '12. Contacto', body: '' },
+  ], securityLinkLabel: 'página de seguridad', contactBefore: 'Para consultas o solicitudes de privacidad, escribe a', contactAfter: '. Kumplio opera desde Santiago, Chile.' },
+  en: { metadata: { title: 'Privacy Policy', description: 'How Kumplio processes and protects personal data and information belonging to user organizations.' }, nav: { contact: 'Contact', switchLanguage: 'Español' }, hero: { eyebrow: 'Privacy', title: 'Privacy Policy', updatedLabel: 'Last updated', updatedAt: 'August 3, 2026', versionLabel: 'version' }, sections: [
+    { title: '1. Scope', body: 'This policy explains how Kumplio by n3uralia processes personal data associated with the website, accounts, commercial contacts and use of the platform. Specific processing of information uploaded by an organization may also be governed by separate contracts and data-processing agreements.' },
+    { title: '2. Data we may process', body: 'We may process account and contact data such as name, email address, company, role and phone number; authentication and security data; usage information and technical logs; commercial or support requests; and documents, evidence, decisions or content that an organization voluntarily uploads to its workspace.' },
+    { title: '3. Purposes', body: 'We use data to create and administer accounts, provide the service, maintain security, respond to inquiries, record commercial requests, improve the experience, comply with contractual and legal obligations, and preserve traceability of actions within the platform.' },
+    { title: '4. Organization information', body: 'An organization’s private information is kept separate from public regulatory knowledge and from other organizations’ data. Users must have sufficient authorization to upload and process third-party information within Kumplio.' },
+    { title: '5. Artificial intelligence', body: 'Some functions may use artificial-intelligence providers to process authorized instructions or content. Kumplio seeks to minimize the data sent and apply access controls and human review. An organization’s private information is not used by default to train public models.' },
+    { title: '6. Providers and transfers', body: 'We may use infrastructure, authentication, storage, analytics, email and artificial-intelligence providers. Some may process data outside Chile. We select providers according to operational and security needs and seek to establish appropriate contractual conditions.' },
+    { title: '7. Retention', body: 'We retain data for as long as necessary to provide the service, maintain security and traceability, fulfill contracts and address legal obligations. Retention periods may vary depending on the type of data, contractual configuration and backup or audit needs.' },
+    { title: '8. Security', body: 'We apply reasonable authentication, authorization, organization-isolation, input-validation, traceability and change-review controls. No system can guarantee absolute security.' },
+    { title: '9. Rights and requests', body: 'Individuals may request information, correction, deletion, objection or other actions that apply under applicable law and the context of the processing. We may request reasonable information to verify identity and authority.' },
+    { title: '10. Cookies and analytics', body: 'We use cookies that are necessary for authentication and operation. We may also use analytics to understand use of the site. Service availability may be affected if strictly necessary cookies are blocked.' },
+    { title: '11. Changes', body: 'We may update this policy when the product, providers or legislation change. We will publish the current version and its update date on this page.' }, { title: '12. Contact', body: '' },
+  ], securityLinkLabel: 'security page', contactBefore: 'For privacy inquiries or requests, write to', contactAfter: '. Kumplio operates from Santiago, Chile.' },
 }
 
 export const TERMS_PUBLIC_COPY: Record<PublicLocale, TermsCopy> = {
-  es: {
-    metadata: { title: 'Términos de servicio', description: 'Condiciones de uso de Kumplio y límites de la plataforma.' },
-    nav: { contact: 'Contacto', switchLanguage: 'English' },
-    hero: { eyebrow: 'Condiciones de uso', title: 'Términos de servicio', updatedLabel: 'Última actualización', updatedAt: '3 de agosto de 2026' },
-    sections: [
-      { title: '1. Aceptación', body: 'Al crear una cuenta, contratar un servicio o utilizar Kumplio, aceptas estos términos y la política de privacidad vigente. Si utilizas Kumplio en nombre de una organización, declaras contar con autorización suficiente para obligarla.' },
-      { title: '2. Servicio', body: 'Kumplio es una plataforma para organizar conocimiento, obligaciones, controles, evidencia, decisiones, misiones y resultados verificables. Las funcionalidades disponibles pueden variar según el plan, estado del producto, configuración de la organización y contrato aplicable.' },
-      { title: '3. No reemplaza asesoría profesional', body: 'Kumplio ayuda a estructurar información y trabajo, pero no reemplaza asesoría jurídica, auditoría independiente, certificación, firma profesional ni decisiones de autoridades o responsables de cumplimiento. La organización conserva la responsabilidad de revisar aplicabilidad, exactitud y decisiones finales.' },
-      { title: '4. Cuentas y acceso', body: 'Debes proporcionar información correcta, mantener tus credenciales seguras y notificar accesos no autorizados. Las cuentas son personales. La organización puede administrar membresías y permisos dentro de su workspace.' },
-      { title: '5. Contenido de la organización', body: 'La organización conserva los derechos sobre la información que carga. Autoriza a Kumplio y a sus proveedores a procesarla únicamente para prestar, proteger y mantener el servicio conforme a los contratos aplicables. La organización debe contar con derechos y autorizaciones suficientes sobre el contenido cargado.' },
-      { title: '6. Inteligencia artificial y revisión humana', body: 'Las salidas de inteligencia artificial pueden contener errores, omisiones o interpretaciones discutibles. Deben revisarse antes de utilizarse para decisiones jurídicas, regulatorias, financieras, laborales, operacionales o de seguridad. Kumplio puede registrar fuentes, supuestos, versiones y revisiones para aumentar trazabilidad.' },
-      { title: '7. Uso aceptable', body: 'No puedes utilizar Kumplio para vulnerar derechos, acceder a datos sin autorización, distribuir malware, eludir controles de seguridad, realizar ingeniería inversa indebida, sobrecargar el servicio ni generar contenido ilícito o engañoso.' },
-      { title: '8. Planes, precios y contratación', body: 'Los precios públicos se expresan en pesos chilenos y no incluyen IVA, salvo indicación distinta. El alcance, límites, soporte, facturación, renovación y cancelación se regirán por la oferta o contrato aceptado. Los proyectos Enterprise requieren una propuesta específica.' },
-      { title: '9. Disponibilidad y cambios', body: 'Kumplio puede modificar, suspender o retirar funciones por mantenimiento, seguridad, evolución del producto o dependencias externas. Procuraremos comunicar cambios materiales cuando corresponda. No se garantiza disponibilidad ininterrumpida salvo que exista un acuerdo de nivel de servicio separado.' },
-      { title: '10. Seguridad y respaldo', body: 'Aplicamos medidas razonables para proteger el servicio, pero ningún sistema es infalible. La organización debe mantener sus propios procedimientos de continuidad, revisión y respaldo cuando la criticidad de su operación lo requiera.' },
-      { title: '11. Propiedad intelectual', body: 'Kumplio, su software, diseño, modelos operativos, marca y documentación pertenecen a n3uralia o a sus licenciantes. Estos términos no transfieren propiedad intelectual, salvo el derecho limitado de uso durante la vigencia del servicio contratado.' },
-      { title: '12. Terminación', body: 'El acceso puede suspenderse por incumplimiento grave, riesgo de seguridad, uso ilícito o falta de pago conforme al contrato. La exportación, conservación y eliminación de datos se manejarán según el plan, contrato, política de privacidad y obligaciones aplicables.' },
-      { title: '13. Responsabilidad', body: 'En la máxima medida permitida por la ley, Kumplio no responde por decisiones adoptadas sin revisión profesional, información incorrecta proporcionada por usuarios, pérdida indirecta, lucro cesante o actuaciones de terceros. Cualquier límite específico de responsabilidad deberá constar en el contrato aplicable.' },
-      { title: '14. Ley aplicable', body: 'Estos términos se rigen por las leyes de la República de Chile. Las controversias se resolverán conforme al contrato aplicable y, a falta de una regla especial, ante los tribunales competentes de Santiago de Chile.' },
-      { title: '15. Contacto', body: '' },
-    ],
-    contactBefore: 'Para consultas contractuales o sobre estos términos, escribe a',
-  },
-  en: {
-    metadata: { title: 'Terms of Service', description: 'Terms governing use of Kumplio and the platform’s limitations.' },
-    nav: { contact: 'Contact', switchLanguage: 'Español' },
-    hero: { eyebrow: 'Terms of use', title: 'Terms of Service', updatedLabel: 'Last updated', updatedAt: 'August 3, 2026' },
-    sections: [
-      { title: '1. Acceptance', body: 'By creating an account, contracting a service or using Kumplio, you accept these terms and the current privacy policy. If you use Kumplio on behalf of an organization, you represent that you have sufficient authority to bind that organization.' },
-      { title: '2. Service', body: 'Kumplio is a platform for organizing knowledge, obligations, controls, evidence, decisions, missions and verifiable results. Available functionality may vary according to plan, product status, organization configuration and the applicable contract.' },
-      { title: '3. Does not replace professional advice', body: 'Kumplio helps structure information and work, but it does not replace legal advice, independent audit, certification, professional signature or decisions by authorities or compliance owners. The organization remains responsible for reviewing applicability, accuracy and final decisions.' },
-      { title: '4. Accounts and access', body: 'You must provide accurate information, keep your credentials secure and report unauthorized access. Accounts are personal. The organization may manage memberships and permissions within its workspace.' },
-      { title: '5. Organization content', body: 'The organization retains rights to the information it uploads. It authorizes Kumplio and its providers to process that information only to provide, protect and maintain the service under applicable contracts. The organization must have sufficient rights and authorizations for the content it uploads.' },
-      { title: '6. Artificial intelligence and human review', body: 'Artificial-intelligence outputs may contain errors, omissions or debatable interpretations. They must be reviewed before being used for legal, regulatory, financial, employment, operational or security decisions. Kumplio may record sources, assumptions, versions and reviews to improve traceability.' },
-      { title: '7. Acceptable use', body: 'You may not use Kumplio to violate rights, access data without authorization, distribute malware, bypass security controls, conduct improper reverse engineering, overload the service or generate unlawful or deceptive content.' },
-      { title: '8. Plans, prices and contracting', body: 'Public prices are expressed in Chilean pesos and exclude VAT unless stated otherwise. Scope, limits, support, invoicing, renewal and cancellation are governed by the accepted offer or contract. Enterprise projects require a specific proposal.' },
-      { title: '9. Availability and changes', body: 'Kumplio may modify, suspend or remove functions because of maintenance, security, product evolution or external dependencies. We will seek to communicate material changes when appropriate. Uninterrupted availability is not guaranteed unless a separate service-level agreement exists.' },
-      { title: '10. Security and backup', body: 'We apply reasonable measures to protect the service, but no system is infallible. The organization must maintain its own continuity, review and backup procedures when the criticality of its operations requires them.' },
-      { title: '11. Intellectual property', body: 'Kumplio, its software, design, operating models, brand and documentation belong to n3uralia or its licensors. These terms do not transfer intellectual property, except for the limited right to use the service during the term of the contracted service.' },
-      { title: '12. Termination', body: 'Access may be suspended for material breach, security risk, unlawful use or non-payment under the applicable contract. Data export, retention and deletion will be handled according to the plan, contract, privacy policy and applicable obligations.' },
-      { title: '13. Liability', body: 'To the maximum extent permitted by law, Kumplio is not liable for decisions made without professional review, incorrect information supplied by users, indirect loss, lost profits or acts of third parties. Any specific limitation of liability must be stated in the applicable contract.' },
-      { title: '14. Governing law', body: 'These terms are governed by the laws of the Republic of Chile. Disputes will be resolved under the applicable contract and, if no special rule applies, before the competent courts of Santiago, Chile.' },
-      { title: '15. Contact', body: '' },
-    ],
-    contactBefore: 'For contractual inquiries or questions about these terms, write to',
-  },
+  es: { metadata: { title: 'Términos de servicio', description: 'Condiciones de uso de Kumplio y límites de la plataforma.' }, nav: { contact: 'Contacto', switchLanguage: 'English' }, hero: { eyebrow: 'Condiciones de uso', title: 'Términos de servicio', updatedLabel: 'Última actualización', updatedAt: '3 de agosto de 2026' }, sections: [
+    { title: '1. Aceptación', body: 'Al crear una cuenta, contratar un servicio o utilizar Kumplio, aceptas estos términos y la política de privacidad vigente. Si utilizas Kumplio en nombre de una organización, declaras contar con autorización suficiente para obligarla.' },
+    { title: '2. Servicio', body: 'Kumplio es una plataforma para organizar conocimiento, obligaciones, controles, evidencia, decisiones, casos, acciones y resultados verificables. Las funcionalidades disponibles pueden variar según el plan, estado del producto, configuración de la organización y contrato aplicable.' },
+    { title: '3. No reemplaza asesoría profesional', body: 'Kumplio ayuda a estructurar información y trabajo, pero no reemplaza asesoría jurídica, auditoría independiente, certificación, firma profesional ni decisiones de autoridades o responsables de cumplimiento. La organización conserva la responsabilidad de revisar aplicabilidad, exactitud y decisiones finales.' },
+    { title: '4. Cuentas y acceso', body: 'Debes proporcionar información correcta, mantener tus credenciales seguras y notificar accesos no autorizados. Las cuentas son personales. La organización puede administrar membresías y permisos dentro de su workspace.' },
+    { title: '5. Contenido de la organización', body: 'La organización conserva los derechos sobre la información que carga. Autoriza a Kumplio y a sus proveedores a procesarla únicamente para prestar, proteger y mantener el servicio conforme a los contratos aplicables. La organización debe contar con derechos y autorizaciones suficientes sobre el contenido cargado.' },
+    { title: '6. Inteligencia artificial y revisión humana', body: 'Las salidas de inteligencia artificial pueden contener errores, omisiones o interpretaciones discutibles. Deben revisarse antes de utilizarse para decisiones jurídicas, regulatorias, financieras, laborales, operacionales o de seguridad. Kumplio puede registrar fuentes, supuestos, versiones y revisiones para aumentar trazabilidad.' },
+    { title: '7. Uso aceptable', body: 'No puedes utilizar Kumplio para vulnerar derechos, acceder a datos sin autorización, distribuir malware, eludir controles de seguridad, realizar ingeniería inversa indebida, sobrecargar el servicio ni generar contenido ilícito o engañoso.' },
+    { title: '8. Planes, precios y contratación', body: 'Los precios públicos se expresan en pesos chilenos y no incluyen IVA, salvo indicación distinta. El alcance, límites, soporte, facturación, renovación y cancelación se regirán por la oferta o contrato aceptado. Los proyectos Enterprise requieren una propuesta específica.' },
+    { title: '9. Disponibilidad y cambios', body: 'Kumplio puede modificar, suspender o retirar funciones por mantenimiento, seguridad, evolución del producto o dependencias externas. Procuraremos comunicar cambios materiales cuando corresponda. No se garantiza disponibilidad ininterrumpida salvo que exista un acuerdo de nivel de servicio separado.' },
+    { title: '10. Seguridad y respaldo', body: 'Aplicamos medidas razonables para proteger el servicio, pero ningún sistema es infalible. La organización debe mantener sus propios procedimientos de continuidad, revisión y respaldo cuando la criticidad de su operación lo requiera.' },
+    { title: '11. Propiedad intelectual', body: 'Kumplio, su software, diseño, modelos operativos, marca y documentación pertenecen a n3uralia o a sus licenciantes. Estos términos no transfieren propiedad intelectual, salvo el derecho limitado de uso durante la vigencia del servicio contratado.' },
+    { title: '12. Terminación', body: 'El acceso puede suspenderse por incumplimiento grave, riesgo de seguridad, uso ilícito o falta de pago conforme al contrato. La exportación, conservación y eliminación de datos se manejarán según el plan, contrato, política de privacidad y obligaciones aplicables.' },
+    { title: '13. Responsabilidad', body: 'En la máxima medida permitida por la ley, Kumplio no responde por decisiones adoptadas sin revisión profesional, información incorrecta proporcionada por usuarios, pérdida indirecta, lucro cesante o actuaciones de terceros. Cualquier límite específico de responsabilidad deberá constar en el contrato aplicable.' },
+    { title: '14. Ley aplicable', body: 'Estos términos se rigen por las leyes de la República de Chile. Las controversias se resolverán conforme al contrato aplicable y, a falta de una regla especial, ante los tribunales competentes de Santiago de Chile.' }, { title: '15. Contacto', body: '' },
+  ], contactBefore: 'Para consultas contractuales o sobre estos términos, escribe a' },
+  en: { metadata: { title: 'Terms of Service', description: 'Terms governing use of Kumplio and the platform’s limitations.' }, nav: { contact: 'Contact', switchLanguage: 'Español' }, hero: { eyebrow: 'Terms of use', title: 'Terms of Service', updatedLabel: 'Last updated', updatedAt: 'August 3, 2026' }, sections: [
+    { title: '1. Acceptance', body: 'By creating an account, contracting a service or using Kumplio, you accept these terms and the current privacy policy. If you use Kumplio on behalf of an organization, you represent that you have sufficient authority to bind that organization.' },
+    { title: '2. Service', body: 'Kumplio is a platform for organizing knowledge, obligations, controls, evidence, decisions, cases, actions and verifiable results. Available functionality may vary according to plan, product status, organization configuration and the applicable contract.' },
+    { title: '3. Does not replace professional advice', body: 'Kumplio helps structure information and work, but it does not replace legal advice, independent audit, certification, professional signature or decisions by authorities or compliance owners. The organization remains responsible for reviewing applicability, accuracy and final decisions.' },
+    { title: '4. Accounts and access', body: 'You must provide accurate information, keep your credentials secure and report unauthorized access. Accounts are personal. The organization may manage memberships and permissions within its workspace.' },
+    { title: '5. Organization content', body: 'The organization retains rights to the information it uploads. It authorizes Kumplio and its providers to process that information only to provide, protect and maintain the service under applicable contracts. The organization must have sufficient rights and authorizations for the content it uploads.' },
+    { title: '6. Artificial intelligence and human review', body: 'Artificial-intelligence outputs may contain errors, omissions or debatable interpretations. They must be reviewed before being used for legal, regulatory, financial, employment, operational or security decisions. Kumplio may record sources, assumptions, versions and reviews to improve traceability.' },
+    { title: '7. Acceptable use', body: 'You may not use Kumplio to violate rights, access data without authorization, distribute malware, bypass security controls, conduct improper reverse engineering, overload the service or generate unlawful or deceptive content.' },
+    { title: '8. Plans, prices and contracting', body: 'Public prices are expressed in Chilean pesos and exclude VAT unless stated otherwise. Scope, limits, support, invoicing, renewal and cancellation are governed by the accepted offer or contract. Enterprise projects require a specific proposal.' },
+    { title: '9. Availability and changes', body: 'Kumplio may modify, suspend or remove functions because of maintenance, security, product evolution or external dependencies. We will seek to communicate material changes when appropriate. Uninterrupted availability is not guaranteed unless a separate service-level agreement exists.' },
+    { title: '10. Security and backup', body: 'We apply reasonable measures to protect the service, but no system is infallible. The organization must maintain its own continuity, review and backup procedures when the criticality of its operations requires them.' },
+    { title: '11. Intellectual property', body: 'Kumplio, its software, design, operating models, brand and documentation belong to n3uralia or its licensors. These terms do not transfer intellectual property, except for the limited right to use the service during the term of the contracted service.' },
+    { title: '12. Termination', body: 'Access may be suspended for material breach, security risk, unlawful use or non-payment under the applicable contract. Data export, retention and deletion will be handled according to the plan, contract, privacy policy and applicable obligations.' },
+    { title: '13. Liability', body: 'To the maximum extent permitted by law, Kumplio is not liable for decisions made without professional review, incorrect information supplied by users, indirect loss, lost profits or acts of third parties. Any specific limitation of liability must be stated in the applicable contract.' },
+    { title: '14. Governing law', body: 'These terms are governed by the laws of the Republic of Chile. Disputes will be resolved under the applicable contract and, if no special rule applies, before the competent courts of Santiago, Chile.' }, { title: '15. Contact', body: '' },
+  ], contactBefore: 'For contractual inquiries or questions about these terms, write to' },
 }
