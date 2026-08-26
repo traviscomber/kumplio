@@ -4,6 +4,10 @@ console.log('\n=== final brand system contract ===')
 const brandSystem = spawnSync(process.execPath, ['scripts/check-brand-system-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (brandSystem.status !== 0) process.exit(brandSystem.status || 1)
 
+console.log('\n=== authenticated brand surfaces ===')
+const authenticatedBrand = spawnSync(process.execPath, ['scripts/check-authenticated-brand-surfaces-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (authenticatedBrand.status !== 0) process.exit(authenticatedBrand.status || 1)
+
 console.log('\n=== landing clarity contract ===')
 const landingClarity = spawnSync(process.execPath, ['scripts/check-landing-clarity-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (landingClarity.status !== 0) process.exit(landingClarity.status || 1)
