@@ -9,7 +9,7 @@ const required = {
   'supabase/migrations/20260825010000_contextual_onboarding_v2.sql': ['initialize_contextual_workspace_v2', 'organization_audit_events'],
   'app/app/layout.tsx': ['x-kumplio-authenticated-path', '<AppNavigation />'],
   'proxy.ts': ['x-kumplio-authenticated-path', "pathname === '/app' || pathname.startsWith('/app/')", 'request.nextUrl.pathname', 'request.nextUrl.search'],
-  'ROADMAP.md': ['Onboarding contextual + Inicio enfocado — `ACTIVE`'],
+  'ROADMAP.md': ['Onboarding contextual + Inicio enfocado — `DONE`'],
   'package.json': ['check:contextual-onboarding-home', 'check:activation-handoff', 'check:activation-document-progress', 'check:activation-case-context', 'check:activation-first-action', 'check:daily-operations'],
   'scripts/release-check.mjs': ["['check:contextual-onboarding-home']"],
 }
