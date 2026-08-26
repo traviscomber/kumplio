@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BriefcaseBusiness, FileCheck2, FolderKanban, History, Home, Settings } from 'lucide-react'
+import { Bell, BriefcaseBusiness, FileCheck2, FolderKanban, History, Home, Settings, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const primaryItems = [
@@ -12,15 +12,15 @@ const primaryItems = [
 ] as const
 
 const secondaryItems = [
-  { href: '/app/evidencia', label: 'Evidencia', icon: BriefcaseBusiness, available: true },
-  { href: '/app/alertas', label: 'Alertas', icon: Bell, available: true },
-  { href: '/app/actividad', label: 'Actividad', icon: History, available: true },
-  { href: '/app/configuracion', label: 'Configuración', icon: Settings, available: false },
+  { href: '/app/evidencia', label: 'Evidencia', icon: BriefcaseBusiness },
+  { href: '/app/alertas', label: 'Alertas', icon: Bell },
+  { href: '/app/actividad', label: 'Actividad', icon: History },
+  { href: '/app/personas', label: 'Personas', icon: Users },
+  { href: '/app/configuracion', label: 'Configuración', icon: Settings },
 ] as const
 
 export function AppNavigation() {
   const pathname = usePathname()
-  const availableSecondaryItems = secondaryItems.filter((item) => item.available !== false)
 
   return (
     <nav aria-label="Navegación de producto" className="sticky top-20 z-40 border-b border-border/70 bg-background/95 backdrop-blur-xl">
@@ -29,7 +29,7 @@ export function AppNavigation() {
           {primaryItems.map((item) => <NavigationLink key={item.href} item={item} pathname={pathname} />)}
         </div>
         <div className="flex items-center gap-1 border-l border-border pl-3">
-          {availableSecondaryItems.map((item) => <NavigationLink key={item.href} item={item} pathname={pathname} />)}
+          {secondaryItems.map((item) => <NavigationLink key={item.href} item={item} pathname={pathname} />)}
         </div>
       </div>
     </nav>

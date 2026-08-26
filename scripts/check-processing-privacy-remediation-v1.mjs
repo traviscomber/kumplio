@@ -120,7 +120,7 @@ const required = [
     '| Configuración tenant proveedor | 0/3 `verified` |',
     '| Eliminación operacional final | 0/3 |',
     '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
-    '### Bloque 17 — Experiencia autenticada canónica — `NEXT`',
+    '### Bloque 17 — Experiencia autenticada canónica — `DONE`',
     'Una prueba sintética no equivale a evidencia de cliente.',
   ]],
   ['package.json', [

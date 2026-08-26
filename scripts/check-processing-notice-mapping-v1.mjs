@@ -102,7 +102,7 @@ const required = [
     '| Eliminación primaria controlada | 3/3 |',
     '| Eliminación operacional final | 0/3 |',
     '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
-    '### Bloque 17 — Experiencia autenticada canónica — `NEXT`',
+    '### Bloque 17 — Experiencia autenticada canónica — `DONE`',
     'aviso suficiente porque un mapeo fue aceptado con brechas',
     'No se validan base, retención, destinatarios, subencargados ni transferencias sin evidencia independiente suficiente.',
   ]],

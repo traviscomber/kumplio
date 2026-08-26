@@ -30,17 +30,19 @@ for (const marker of [
   '## 9. Próximos bloques de 3',
   '## 12. Congelamiento de alcance',
   '## 13. Decisión vigente',
+  '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
+  '### Bloque 17 — Experiencia autenticada canónica — `DONE`',
+  '**Decisión del owner — 24 de agosto de 2026:**',
+  '**Decisión del owner — 25 de agosto de 2026:**',
+  'functional freeze',
 ]) {
   if (!roadmap.includes(marker)) throw new Error(`ROADMAP.md missing canonical marker: ${marker}`)
 }
 
 const nextBlocks = roadmap.match(/^### Bloque \d+ — .+ — `NEXT`$/gm) || []
-if (nextBlocks.length !== 1) {
-  throw new Error(`ROADMAP.md must contain exactly one NEXT block; found ${nextBlocks.length}`)
+if (nextBlocks.length !== 0) {
+  throw new Error(`ROADMAP.md must have no NEXT feature block during functional freeze; found ${nextBlocks.length}`)
 }
-
-assertRoadmapMarker('### Bloque 17 — Experiencia autenticada canónica — `NEXT`')
-assertRoadmapMarker('**Decisión del owner — 24 de agosto de 2026:**')
 
 if (!roadmap.includes('- no crear módulos nuevos solo porque son atractivos;')) {
   throw new Error('ROADMAP.md must preserve the scope-freeze rule against attractive unprioritized modules')
@@ -90,28 +92,19 @@ for (const marker of [
 if (packageJson.scripts?.['check:canonical-roadmap'] !== 'node scripts/check-canonical-roadmap-v1.mjs') {
   throw new Error('package.json must expose check:canonical-roadmap')
 }
-
 if (!releaseCheck.includes("['check:canonical-roadmap']")) {
   throw new Error('Release Gate must execute check:canonical-roadmap')
 }
 
 const rootMarkdownFiles = fs.readdirSync('.')
   .filter((entry) => entry.endsWith('.md') && entry !== files.roadmap)
-
 const duplicateDeclaration = '**Documento canónico de producto, arquitectura, evidencia y prioridades**'
 for (const file of rootMarkdownFiles) {
   const content = fs.readFileSync(path.join('.', file), 'utf8')
-  if (content.includes(duplicateDeclaration)) {
-    throw new Error(`${file} duplicates the roadmap master declaration`)
-  }
+  if (content.includes(duplicateDeclaration)) throw new Error(`${file} duplicates the roadmap master declaration`)
 }
-
 if (/\b(?:MASTER_ROADMAP|ROADMAP_MASTER|CANONICAL_ROADMAP)\.md\b/i.test(readme + agents + governance)) {
   throw new Error('Do not introduce a second roadmap master file; ROADMAP.md is the only canonical roadmap')
 }
 
-console.log(`Canonical roadmap contract: PASS (${nextBlocks[0]})`)
-
-function assertRoadmapMarker(marker) {
-  if (!roadmap.includes(marker)) throw new Error(`ROADMAP.md missing current owner decision marker: ${marker}`)
-}
+console.log('Canonical roadmap contract: PASS (functional freeze; Block 16 external gates active)')

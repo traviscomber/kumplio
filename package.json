@@ -87,7 +87,8 @@
     "check:three-agent-core": "node scripts/check-three-agent-core-v1.mjs",
     "check:guided-onboarding-entry": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-guided-onboarding-entry.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
-    "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs"
+    "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs",
+    "check:final-app-closure": "node scripts/check-final-app-closure.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",

@@ -1,8 +1,8 @@
 # KUMPLIO — Roadmap Maestro de Producto y Ejecución
 
 > **Documento canónico de producto, arquitectura, evidencia y prioridades**  
-> Estado: **cierre técnico / freeze de alcance**  
-> Revisión: 16 de agosto de 2026  
+> Estado: **cierre funcional / external gates**  
+> Revisión: 25 de agosto de 2026  
 > Mercado principal: Chile  
 > Idioma visible: español primario; superficies públicas localizadas de forma controlada  
 > Repositorio: `traviscomber/kumplio`
@@ -54,6 +54,8 @@ Situación
 → evidencia del avance
 → conocimiento reutilizable aprobado
 ```
+
+La experiencia pública y autenticada quedó simplificada alrededor de **Analiza → Resuelve → Revisa**, con Isidora, Verónica y Julieta como capacidades principales y especialistas adicionales activables cuando el caso lo requiere.
 
 ### Principios no negociables
 
@@ -198,9 +200,11 @@ Kumplio ya posee, dentro del alcance comprobado:
 - mecanismos controlados de eliminación;
 - provider assurance;
 - intake tenant-specific con revisión humana y promoción protegida;
+- `/app/inicio`, Casos, Documentos, Evidencia, Alertas y Actividad como superficies canónicas;
+- Personas y Configuración como proyecciones acotadas del workspace, sin CRM ni administración paralela;
 - release gates y assurance reproducible.
 
-No se autoriza ampliar esta lista durante el cierre.
+No se autoriza ampliar esta lista durante el cierre funcional salvo bugs críticos, seguridad P0 o evidencia necesaria para los gates externos.
 
 ---
 
@@ -224,7 +228,7 @@ No se autoriza ampliar esta lista durante el cierre.
 | 14 | Inventario real | `VALIDATED INICIAL` |
 | 15 | Tenant assurance | `DONE EN ALCANCE INTERNO` |
 | 16 | Cierre técnico y evidencia real | `ACTIVE / EXTERNAL GATES` |
-| 17 | Aprendizaje organizacional adicional | `DEFERRED` |
+| 17 | Experiencia autenticada canónica | `DONE` |
 | 18 | Beta autoservicio / expansión | `DEFERRED` |
 
 ---
@@ -319,36 +323,36 @@ Todo lo demás queda fuera de alcance.
 
 Estos gates conservan su autoridad sobre claims, seguridad y evidencia externa. La nueva fase de experiencia autenticada no permite promover estados no demostrados ni sustituir evidencia real.
 
-### Bloque 17 — Experiencia autenticada canónica — `NEXT`
+### Bloque 17 — Experiencia autenticada canónica — `DONE`
 
-#### Onboarding contextual + Inicio enfocado — `ACTIVE`
+#### Onboarding contextual + Inicio enfocado — `DONE`
 
-- un único flujo persistente para Persona, Profesional y Empresa;
+- flujo persistente para Persona, Profesional y Empresa;
 - diagnóstico inicial determinístico, acotado y sin promover evidencia o cumplimiento;
 - creación atómica e idempotente de workspace, perfil, proyecto, caso y auditoría;
 - `/app/inicio` centrado en estado, una siguiente acción, hasta tres prioridades, cambios relevantes y casos activos.
 
-Esta entrega no completa Personas, Requisitos, Alertas, Actividad ni Configuración. Tampoco sustituye los gates de evidencia y revisión humana del Bloque 16.
+**Subbloque A — Entrada autenticada y orientación — `DONE`**
 
-**Subbloque A — Entrada autenticada y orientación**
+1. `/app/*` funciona como superficie autenticada canónica protegida;
+2. Inicio, navegación y retorno al contexto de trabajo están alineados;
+3. onboarding contextual está integrado sin debilitar los gates de evidencia.
 
-1. establecer `/app/*` como superficie autenticada canónica protegida;
-2. alinear Inicio, navegación y retorno al contexto de trabajo;
-3. evolucionar onboarding hacia Persona, Profesional y Empresa con diagnóstico inicial persistente.
+**Subbloque B — Ejecución trazable — `DONE`**
 
-**Subbloque B — Ejecución trazable**
+1. expedientes, requisitos, acciones, evidencia y cierre están alineados sin duplicar el modelo existente;
+2. la cadena Fuente → Fragmento → Obligación → Requisito → Caso → Acción → Evidencia → Revisión → Cierre se mantiene trazable;
+3. resultados de especialistas se integran sin exponer ejecución técnica ni razonamiento interno.
 
-1. alinear expedientes, requisitos, acciones, evidencia y cierre sin duplicar el modelo existente;
-2. presentar la cadena Fuente → Fragmento → Obligación → Requisito → Caso → Acción → Evidencia → Revisión → Cierre;
-3. integrar resultados de especialistas en el flujo del usuario sin exponer ejecución técnica ni razonamiento interno.
+**Subbloque C — Operación continua y superficie pública — `DONE`**
 
-**Subbloque C — Operación continua y superficie pública**
+1. Documentos, Alertas y Actividad están implementados; Personas y Configuración cierran la arquitectura autenticada como superficies acotadas;
+2. cambios relevantes y planes guiados se proyectan en la experiencia existente sin crear scoring nuevo;
+3. la superficie pública fue reconciliada con **Analiza → Resuelve → Revisa** y mantiene la landing como capa de adquisición.
 
-1. alinear Personas, Documentos, Alertas, Actividad y Configuración con divulgación progresiva;
-2. convertir cambios regulatorios y planes guiados en acciones verificables;
-3. completar páginas públicas profundas conservando la landing como capa de adquisición.
+Con este cierre comienza **functional freeze**: no se abren nuevos bloques funcionales hasta resolver los gates P0 externos y completar el piloto supervisado correspondiente.
 
-Cada subbloque se entrega en cambios pequeños, reversibles y verificables. No se autorizan migraciones destructivas, relajación de RLS, cambios de infraestructura no relacionados ni claims que excedan la evidencia vigente.
+Cada subbloque se entregó en cambios pequeños, reversibles y verificables. No se autorizan migraciones destructivas, relajación de RLS, cambios de infraestructura no relacionados ni claims que excedan la evidencia vigente.
 
 ---
 
@@ -414,6 +418,8 @@ Reglas:
 - no convertir un test sintético en claim comercial de cliente;
 - cualquier excepción debe quedar documentada en `ROADMAP.md` en la misma PR.
 
+El cierre de Bloque 17 inicia un **functional freeze** adicional: mientras Bloque 16 conserve gates P0 abiertos, solo se autoriza seguridad, evidencia externa, bugs críticos, documentación de assurance y preparación/ejecución del piloto supervisado.
+
 El freeze termina únicamente por una decisión explícita del owner registrada en este archivo.
 
 ---
@@ -422,8 +428,10 @@ El freeze termina únicamente por una decisión explícita del owner registrada 
 
 **Decisión del owner — 24 de agosto de 2026:** adoptar el brief “KUMPLIO — Product Workflows + Authenticated Experience” como dirección vigente, terminar el technical freeze de alcance e iniciar el Bloque 17 sin deshacer el cierre técnico ni debilitar sus gates de seguridad, evidencia y claims.
 
+**Decisión del owner — 25 de agosto de 2026:** cerrar la arquitectura funcional autenticada con Personas + Configuración acotadas, reconciliar Alertas/Actividad y la narrativa pública **Analiza → Resuelve → Revisa**, y entrar en functional freeze. Bloque 16 conserva autoridad completa sobre seguridad, evidencia externa y claims.
+
 Estado objetivo actual:
 
-> **Kumplio técnicamente cerrado y en evolución controlada hacia una experiencia autenticada canónica; beta autoservicio todavía no habilitada.**
+> **Kumplio funcionalmente cerrado y en cierre de seguridad/evidencia externa; beta autoservicio todavía no habilitada.**
 
-La ruta crítica combina la resolución honesta de gates externos con la alineación progresiva del producto. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.
+La ruta crítica pasa ahora por resolver honestamente los gates externos de Bloque 16. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.
