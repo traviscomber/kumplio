@@ -41,28 +41,28 @@ export default async function OnboardingPage() {
   const selectedPlan = planDetails[selectedPlanId]
 
   return (
-    <main className="min-h-screen bg-background px-6 py-10 text-foreground md:py-16">
-      <div className="mx-auto max-w-4xl">
-        <header className="mb-8 max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Primeros minutos</p>
-          <h1 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Persona, profesional o empresa: empecemos por lo que necesitas resolver.</h1>
-          <p className="mt-5 text-lg leading-8 text-muted-foreground">
+    <main className="min-h-screen bg-background px-5 py-16 text-foreground sm:px-8 md:py-24">
+      <div className="mx-auto max-w-5xl">
+        <header className="mb-14 max-w-3xl md:mb-20">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">Primeros minutos</p>
+          <h1 className="font-heading mt-4 text-4xl font-normal leading-[1.08] tracking-[-0.025em] md:text-6xl">Persona, profesional o empresa: empecemos por lo que necesitas resolver.</h1>
+          <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-[17px]">
             Responde una pregunta a la vez. Kumplio preparará internamente el primer ámbito, el expediente inicial y la trazabilidad necesaria.
           </p>
         </header>
 
         {selectedPlan && (
-          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-5">
+          <div className="mb-10 flex max-w-3xl items-start gap-4 border-y border-[rgba(194,168,135,0.14)] bg-primary/5 px-0 py-5">
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Interés comercial conservado</p>
-              <p className="mt-1 font-bold">Plan {selectedPlan.name} · {selectedPlan.price}</p>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">Interés comercial conservado</p>
+              <p className="mt-1 font-medium">Plan {selectedPlan.name} · {selectedPlan.price}</p>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">Esta configuración no inicia un cobro.</p>
             </div>
           </div>
         )}
 
-        <section className="rounded-3xl border bg-card p-6 shadow-xl shadow-black/5 md:p-10">
+        <section className="border-y border-[rgba(194,168,135,0.14)] bg-card/45 px-0 py-10 md:py-14">
           <WorkspaceOnboardingForm
             initialEmail={user.email || ''}
             initialOrganizationName={profile?.company_name || (user.user_metadata?.company_name as string | undefined) || null}
