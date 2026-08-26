@@ -5,6 +5,10 @@ const onboardingForm = fs.readFileSync('components/onboarding/workspace-onboardi
 const home = fs.readFileSync('app/app/inicio/page.tsx', 'utf8')
 const casesPage = fs.readFileSync('app/cases/page.tsx', 'utf8')
 const casesWorkspace = fs.readFileSync('components/cases-workspace.tsx', 'utf8')
+const documents = fs.readFileSync('app/app/documentos/page.tsx', 'utf8')
+const evidence = fs.readFileSync('app/app/evidencia/page.tsx', 'utf8')
+const canonicalCase = fs.readFileSync('components/cases/canonical-case-page.tsx', 'utf8')
+const globals = fs.readFileSync('app/globals.css', 'utf8')
 
 const required = [
   [onboardingPage, 'font-heading'],
@@ -16,6 +20,11 @@ const required = [
   [casesPage, 'font-heading'],
   [casesWorkspace, 'font-heading'],
   [casesWorkspace, 'rounded-[4px]'],
+  [documents, 'kumplio-work-surface'],
+  [evidence, 'kumplio-work-surface'],
+  [canonicalCase, 'kumplio-work-surface'],
+  [globals, '.kumplio-work-surface'],
+  [globals, 'border-radius: 4px'],
 ]
 
 for (const [source, fragment] of required) {
