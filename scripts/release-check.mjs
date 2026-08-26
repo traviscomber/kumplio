@@ -60,6 +60,10 @@ const checks = [
   ['build'],
 ]
 
+console.log('\n=== check:software-landing-alignment ===')
+const landingAlignment = spawnSync(process.execPath, ['scripts/check-software-landing-alignment-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (landingAlignment.status !== 0) process.exit(landingAlignment.status || 1)
+
 for (const [script] of checks) {
   console.log(`\n=== ${script} ===`)
   const result = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', script], { stdio: 'inherit', env: process.env })
