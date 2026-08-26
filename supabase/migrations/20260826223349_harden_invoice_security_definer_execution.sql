@@ -4,6 +4,7 @@
 -- Production contained these functions outside the current migration history.
 -- The existence guards keep cold-start/replay safe if those legacy functions
 -- are absent, while preserving the effective production boundary when present.
+-- Browser roles are intentionally denied; trusted server roles remain explicit.
 
 DO $$
 BEGIN
