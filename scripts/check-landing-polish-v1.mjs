@@ -2,17 +2,29 @@ import fs from 'node:fs'
 
 const page = fs.readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8')
 
-const requiredFragments = [
+for (const fragment of [
   'data-mobile-primary-cta',
-  'id="como-funciona" className="scroll-mt-20',
-  'id="producto" className="scroll-mt-20',
-  'id="para-quien" className="scroll-mt-20',
   'focus-visible:outline',
-]
-
-for (const fragment of requiredFragments) {
+]) {
   if (!page.includes(fragment)) {
     console.error(`Landing polish contract missing: ${fragment}`)
+    process.exit(1)
+  }
+}
+
+for (const id of ['como-funciona', 'producto', 'para-quien']) {
+  const marker = `id="${id}"`
+  const markerIndex = page.indexOf(marker)
+  if (markerIndex < 0) {
+    console.error(`Landing polish contract missing section anchor: ${marker}`)
+    process.exit(1)
+  }
+
+  const tagStart = page.lastIndexOf('<section', markerIndex)
+  const tagEnd = page.indexOf('>', markerIndex)
+  const openingTag = tagStart >= 0 && tagEnd >= 0 ? page.slice(tagStart, tagEnd + 1) : ''
+  if (!openingTag.includes('scroll-mt-20')) {
+    console.error(`Landing polish contract requires scroll offset on #${id}`)
     process.exit(1)
   }
 }
