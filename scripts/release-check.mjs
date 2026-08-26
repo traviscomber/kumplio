@@ -1,5 +1,9 @@
 import { spawnSync } from 'node:child_process'
 
+console.log('\n=== landing clarity contract ===')
+const landingClarity = spawnSync(process.execPath, ['scripts/check-landing-clarity-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (landingClarity.status !== 0) process.exit(landingClarity.status || 1)
+
 const checks = [
   ['typecheck'],
   ['check:canonical-roadmap'],
