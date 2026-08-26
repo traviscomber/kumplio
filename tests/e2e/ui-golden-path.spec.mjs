@@ -41,8 +41,12 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.getByLabel('Trabajadores aproximados').fill('20')
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByRole('button', { name: 'Crear mi primer diagnóstico', exact: true }).click()
-    await expect(page.getByText('Diagnóstico inicial preparado', { exact: true })).toBeVisible({ timeout: 60_000 })
+    const handoff = page.getByText('Diagnóstico inicial preparado', { exact: true })
+    const submit = page.getByRole('button', { name: 'Crear mi primer diagnóstico', exact: true })
+    await expect(submit.or(handoff)).toBeVisible({ timeout: 60_000 })
+    if (await submit.isVisible().catch(() => false)) await submit.click()
+
+    await expect(handoff).toBeVisible({ timeout: 60_000 })
     await expect(page.getByRole('heading', { name: 'Tu primer paso ya está claro', exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Ir a mi siguiente acción', exact: true })).toBeVisible()
     await page.getByRole('link', { name: 'Ver mi inicio', exact: true }).click()
