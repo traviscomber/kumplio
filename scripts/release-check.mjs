@@ -4,6 +4,10 @@ console.log('\n=== landing clarity contract ===')
 const landingClarity = spawnSync(process.execPath, ['scripts/check-landing-clarity-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (landingClarity.status !== 0) process.exit(landingClarity.status || 1)
 
+console.log('\n=== landing polish contract ===')
+const landingPolish = spawnSync(process.execPath, ['scripts/check-landing-polish-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (landingPolish.status !== 0) process.exit(landingPolish.status || 1)
+
 const checks = [
   ['typecheck'],
   ['check:canonical-roadmap'],
