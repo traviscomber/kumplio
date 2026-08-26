@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Montserrat } from 'next/font/google'
+import { Manrope, Montserrat } from 'next/font/google'
 import './globals.css'
 import { ClientProviders } from '@/app/providers'
 import { PUBLIC_SITE_METADATA } from '@/lib/i18n/public-copy'
@@ -14,11 +14,18 @@ import {
   SITE_URL,
 } from '@/lib/public-site'
 
+const manrope = Manrope({
+  variable: '--font-manrope',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['300', '400', '500'],
+})
+
 const montserrat = Montserrat({
   variable: '--font-montserrat',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '500'],
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -116,10 +123,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f7f7f2' },
-    { media: '(prefers-color-scheme: dark)', color: '#111723' },
-  ],
+  themeColor: '#171715',
 }
 
 function buildGraph(locale: 'es' | 'en') {
@@ -179,7 +183,7 @@ function buildGraph(locale: 'es' | 'en') {
         alternateName: 'Kumplio by n3uralia',
         url: localizedHome,
         slogan: copy.brandSlogan,
-        logo: `${SITE_URL}/logo-kumplio.svg`,
+        logo: `${SITE_URL}/kumplio-logo.png`,
       },
       {
         '@type': 'WebSite',
@@ -255,7 +259,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const graph = buildGraph(locale)
 
   return (
-    <html lang={copy.htmlLang} className={`${montserrat.variable} bg-background`}>
+    <html lang={copy.htmlLang} className={`${manrope.variable} ${montserrat.variable} bg-background`}>
       <head>
         <meta name="geo.placename" content="Santiago, Chile" />
         <meta name="geo.region" content="CL-RM" />
@@ -273,7 +277,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         />
         <link rel="sitemap" href="/sitemap.xml" />
       </head>
-      <body className="font-sans antialiased text-foreground" suppressHydrationWarning>
+      <body className="antialiased text-foreground" suppressHydrationWarning>
         <ClientProviders>{children}</ClientProviders>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
