@@ -62,8 +62,8 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await expect(page.getByRole('heading', { name: goal })).toBeVisible()
   })
 
-  for (let stageIndex = 0; stageIndex < 5; stageIndex += 1) {
-    await test.step(`revisar y aprobar la etapa ${stageIndex + 1} de 5`, async () => {
+  for (let stageIndex = 0; stageIndex < 3; stageIndex += 1) {
+    await test.step(`revisar y aprobar la etapa ${stageIndex + 1} de 3`, async () => {
       const review = page.getByRole('main')
       await waitForReview(page, stageIndex)
       await review.getByPlaceholder('Justifica la aprobación o explica qué debe corregirse...').fill(
@@ -183,12 +183,12 @@ async function waitForWorkflowCompletion(page) {
   const deadline = Date.now() + 2 * 60 * 1000
   while (Date.now() < deadline) {
     await page.reload({ waitUntil: 'domcontentloaded' })
-    const progress = page.getByText('5 de 5', { exact: true })
+    const progress = page.getByText('3 de 3', { exact: true })
     const close = page.getByRole('button', { name: 'Marcar como resuelto', exact: true })
     if (await progress.isVisible().catch(() => false) && await close.isVisible().catch(() => false)) return
     await page.waitForTimeout(5_000)
   }
-  throw new Error('El workflow no quedó visible como 5 de 5 aprobado.')
+  throw new Error('El workflow no quedó visible como 3 de 3 aprobado.')
 }
 
 function requiredEnv(name) {
