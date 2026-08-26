@@ -42,7 +42,11 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
     await page.getByRole('button', { name: 'Crear mi primer diagnóstico', exact: true }).click()
-    await expect(page).toHaveURL(/\/app\/inicio\?case=[0-9a-f-]{36}/i, { timeout: 60_000 })
+    await expect(page.getByText('Diagnóstico inicial preparado', { exact: true })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByRole('heading', { name: 'Tu primer paso ya está claro', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Ir a mi siguiente acción', exact: true })).toBeVisible()
+    await page.getByRole('link', { name: 'Ver mi inicio', exact: true }).click()
+    await expect(page).toHaveURL(/\/app\/inicio(?:\?|$)/, { timeout: 45_000 })
   })
 
   await test.step('abrir un expediente guiado desde la UI', async () => {
