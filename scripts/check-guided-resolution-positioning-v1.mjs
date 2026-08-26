@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [home, homeCopy, demo, layout, metadataCopy, publicSite, entry, caseEntry, footer, signUp] = await Promise.all([
+const [home, homeCopy, demo, layout, metadataCopy, publicSite, entry, caseEntry, footer, signUp, faqCopy, legalCopy, pricingCopy] = await Promise.all([
   readFile('app/page.tsx', 'utf8'),
   readFile('lib/i18n/home-public-copy.ts', 'utf8'),
   readFile('app/demo/page.tsx', 'utf8'),
@@ -12,6 +12,9 @@ const [home, homeCopy, demo, layout, metadataCopy, publicSite, entry, caseEntry,
   readFile('components/cases/beta-case-entry.tsx', 'utf8'),
   readFile('components/footer.tsx', 'utf8'),
   readFile('app/(auth)/sign-up/page.tsx', 'utf8'),
+  readFile('lib/i18n/faq-public-copy.ts', 'utf8'),
+  readFile('lib/i18n/legal-public-copy.ts', 'utf8'),
+  readFile('lib/i18n/pricing-public-copy.ts', 'utf8'),
 ])
 
 // Canonical public positioning: privacy first, secure centralization and expert guidance.
@@ -24,6 +27,15 @@ assert.match(home, /<ResolutionEntry locale=\{locale\} \/>/)
 assert.match(homeCopy, /Nueva Ley 21\.719/)
 assert.match(homeCopy, /Información y terceros/)
 assert.match(homeCopy, /Casos concretos/)
+
+// The public workflow is intentionally simpler than the internal specialist catalog.
+for (const marker of ['Analiza', 'Resuelve', 'Revisa', 'Analyze', 'Resolve', 'Review']) {
+  assert.match(homeCopy, new RegExp(marker))
+}
+for (const specialist of ['Isidora', 'Verónica', 'Julieta']) {
+  assert.match(home, new RegExp(specialist))
+}
+assert.doesNotMatch(home, /AGENT_CATALOG\.map/)
 
 // English must preserve the same product boundary rather than introduce stronger claims.
 assert.match(homeCopy, /Data protection \+ expert guidance to resolve real situations/)
@@ -55,7 +67,7 @@ assert.match(publicSite, /Preparar a organizaciones para la Ley 21\.719/)
 assert.match(footer, /Resolución guiada de situaciones regulatorias/)
 assert.match(footer, /Guided resolution for privacy, regulatory, contractual and compliance situations in Chile/)
 
-const publicCopy = [home, homeCopy, demo, layout, metadataCopy, publicSite, footer].join('\n')
+const publicCopy = [home, homeCopy, demo, layout, metadataCopy, publicSite, footer, faqCopy, legalCopy, pricingCopy].join('\n')
 const forbiddenClaims = [
   /diagnóstico gratis en 60 segundos/i,
   /brecha exacta/i,
@@ -70,5 +82,9 @@ const forbiddenClaims = [
 for (const claim of forbiddenClaims) {
   assert.doesNotMatch(publicCopy, claim)
 }
+
+// Legacy work-unit vocabulary must not return to the canonical public narrative.
+assert.doesNotMatch([homeCopy, faqCopy, legalCopy].join('\n'), /\bmisiones\b/i)
+assert.doesNotMatch([homeCopy, faqCopy, legalCopy].join('\n'), /\bmissions\b/i)
 
 console.log('Guided resolution positioning contract: OK')
