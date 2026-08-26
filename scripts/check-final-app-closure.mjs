@@ -32,7 +32,14 @@ assert.match(roadmap, /functional freeze/i)
 assert.match(roadmap, /\| 16 \| Cierre técnico y evidencia real \| `ACTIVE \/ EXTERNAL GATES` \|/)
 assert.match(roadmap, /P0-B — Configuración tenant Supabase — `BLOCKED EXTERNO`/)
 assert.match(roadmap, /P0-C — Configuración tenant OpenAI — `BLOCKED EXTERNO`/)
-assert.match(roadmap, /No se puede afirmar:.*PITR observado.*OpenAI Standard o MAM confirmado.*tenant configuration verified 3\/3.*eliminación operacional final 3\/3.*piloto externo.*beta autoservicio lista/is)
+for (const unresolvedClaim of [
+  /- PITR observado;/i,
+  /- OpenAI Standard o MAM confirmado;/i,
+  /- tenant configuration verified 3\/3;/i,
+  /- eliminación final 3\/3;/i,
+  /- piloto externo;/i,
+  /- beta autoservicio lista\./i,
+]) assert.match(roadmap, unresolvedClaim)
 for (const forbidden of [/PITR observado.*`DONE`/i,/eliminación operacional final.*3\/3.*`DONE`/i,/tenant configuration verified 3\/3.*`DONE`/i,/piloto externo.*`DONE`/i,/beta autoservicio.*`DONE`/i]) assert.doesNotMatch(roadmap, forbidden)
 
 const releaseCheck = await readFile('scripts/release-check.mjs', 'utf8')
