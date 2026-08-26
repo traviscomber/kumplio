@@ -134,9 +134,11 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
     await page.getByRole('button', { name: 'Registrar y revisar', exact: true }).click()
 
     const activityHeading = page.getByRole('heading', { name: activityName, exact: true })
-    await expect(activityHeading).toBeVisible({ timeout: 90_000 })
-
-    const activity = page.locator('article').filter({ has: activityHeading })
+    const activity = page
+      .getByRole('article')
+      .filter({ has: activityHeading })
+      .filter({ has: page.getByText('Parcial', { exact: true }) })
+    await expect(activity).toHaveCount(1, { timeout: 90_000 })
     await expect(activity).toBeVisible()
     await expect(activity.getByText('Parcial', { exact: true })).toBeVisible()
     await expect(activity.getByText('Portal Kumplio UI E2E', { exact: true })).toBeVisible()
