@@ -3,6 +3,8 @@ import fs from 'node:fs'
 const onboardingPage = fs.readFileSync('app/onboarding/page.tsx', 'utf8')
 const onboardingForm = fs.readFileSync('components/onboarding/workspace-onboarding-form.tsx', 'utf8')
 const home = fs.readFileSync('app/app/inicio/page.tsx', 'utf8')
+const casesPage = fs.readFileSync('app/cases/page.tsx', 'utf8')
+const casesWorkspace = fs.readFileSync('components/cases-workspace.tsx', 'utf8')
 
 const required = [
   [onboardingPage, 'font-heading'],
@@ -11,6 +13,9 @@ const required = [
   [onboardingForm, 'font-heading'],
   [home, 'font-heading'],
   [home, 'rounded-[4px]'],
+  [casesPage, 'font-heading'],
+  [casesWorkspace, 'font-heading'],
+  [casesWorkspace, 'rounded-[4px]'],
 ]
 
 for (const [source, fragment] of required) {
@@ -22,7 +27,7 @@ for (const [source, fragment] of required) {
 
 const forbidden = ['font-black', 'rounded-3xl', 'rounded-2xl', 'rounded-xl', 'rounded-full', 'shadow-xl', 'shadow-black']
 for (const token of forbidden) {
-  if (onboardingPage.includes(token) || onboardingForm.includes(token) || home.includes(token)) {
+  if ([onboardingPage, onboardingForm, home, casesPage, casesWorkspace].some((source) => source.includes(token))) {
     console.error(`Authenticated brand surface still uses legacy styling: ${token}`)
     process.exit(1)
   }
@@ -30,6 +35,10 @@ for (const token of forbidden) {
 
 if (!onboardingForm.includes('bg-primary/5')) {
   console.error('Onboarding must retain restrained green signal for selected/verified states')
+  process.exit(1)
+}
+if (!casesWorkspace.includes('border-primary bg-primary/5')) {
+  console.error('Cases workspace must use Kumplio green only as a restrained active signal')
   process.exit(1)
 }
 
