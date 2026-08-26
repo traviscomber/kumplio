@@ -148,6 +148,35 @@
   }
 }
 
+@layer components {
+  .kumplio-work-surface {
+    color: var(--kumplio-parchment);
+  }
+
+  .kumplio-work-surface :is(.rounded-3xl, .rounded-2xl, .rounded-xl, .rounded-lg, .rounded-full) {
+    border-radius: 4px;
+  }
+
+  .kumplio-work-surface :is(.font-black, .font-extrabold) {
+    font-family: var(--font-heading);
+    font-weight: 400;
+  }
+
+  .kumplio-work-surface :is(.shadow-xl, .shadow-lg, .shadow-md, .shadow-sm) {
+    box-shadow: none;
+  }
+
+  .kumplio-work-surface :is(.bg-card, .bg-card\/95) {
+    background-color: rgb(var(--card));
+  }
+
+  .kumplio-work-surface :is(h1, h2, h3, h4) {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+}
+
 @theme inline {
   --color-background: rgb(var(--background));
   --color-foreground: rgb(var(--foreground));
