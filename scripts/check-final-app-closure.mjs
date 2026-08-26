@@ -31,4 +31,7 @@ assert.match(roadmap, /functional freeze/i)
 assert.match(roadmap, /Bloque 16.*`ACTIVE \/ EXTERNAL GATES`/s)
 for (const forbidden of [/PITR observado.*DONE/i,/OpenAI Standard.*confirmado/i,/eliminación operacional final.*3\/3.*DONE/i,/tenant configuration verified 3\/3.*DONE/i,/piloto externo.*DONE/i,/beta autoservicio.*lista/i]) assert.doesNotMatch(roadmap, forbidden)
 
+const releaseCheck = await readFile('scripts/release-check.mjs', 'utf8')
+assert.match(releaseCheck, /\['check:final-app-closure'\]/)
+
 console.log('Final authenticated app closure contract: OK')
