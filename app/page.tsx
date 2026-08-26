@@ -5,18 +5,21 @@ import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 import { ResolutionEntry } from '@/components/marketing/resolution-entry'
 import { HOME_CLARITY_COPY } from '@/lib/i18n/home-clarity-copy'
+import { HOME_PUBLIC_COPY } from '@/lib/i18n/home-public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
 import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 
 const journeyIcons = [ArrowRight, SearchCheck, FileCheck2, Users, CheckCircle2] as const
 const workflowIcons = [SearchCheck, FileCheck2, Eye] as const
+const coreSpecialistNames = ['Isidora', 'Verónica', 'Julieta'] as const
 
 export default async function HomePage() {
   const { locale } = await getPublicRequestContext()
   const copy = HOME_CLARITY_COPY[locale]
+  const publicCopy = HOME_PUBLIC_COPY[locale]
   const homeHref = withPublicLocale('/', locale)
   const pricingHref = getPublicSiteHref('/pricing', locale)
-  const resourcesHref = getPublicSiteHref('/blog', locale)
+  const resourcesHref = getPublicSiteHref('/resources/ley-21719', locale)
   const alternateLocale = locale === 'es' ? 'en' : 'es'
   const alternateHomeHref = withPublicLocale('/', alternateLocale)
 
@@ -88,10 +91,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="border-b border-white/10 px-5 py-20 sm:px-8 md:py-28 lg:px-12">
+        <section aria-label={publicCopy.nav.specialists} className="border-b border-white/10 px-5 py-20 sm:px-8 md:py-28 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
             <div className="max-w-4xl"><p className="text-xs font-black uppercase tracking-[0.2em] text-primary">{copy.specialists.eyebrow}</p><h2 className="mt-4 text-balance text-4xl font-extrabold tracking-[-0.03em] md:text-5xl">{copy.specialists.title}</h2><p className="mt-6 max-w-3xl text-base leading-8 text-white/55">{copy.specialists.description}</p></div>
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">{copy.specialists.people.map((person) => <article key={person.name} className="rounded-[24px] border border-white/10 bg-card p-7"><div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-primary">{person.label}</p><h3 className="mt-3 text-2xl font-black">{person.name}</h3></div><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Users className="h-5 w-5" /></div></div><p className="mt-5 text-sm leading-7 text-white/50">{person.description}</p></article>)}</div>
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">{copy.specialists.people.map((person, index) => <article key={person.name} className="rounded-[24px] border border-white/10 bg-card p-7"><div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-primary">{person.label}</p><h3 className="mt-3 text-2xl font-black">{coreSpecialistNames[index]}</h3></div><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><Users className="h-5 w-5" /></div></div><p className="mt-5 text-sm leading-7 text-white/50">{person.description}</p></article>)}</div>
             <p className="mt-8 max-w-3xl text-sm leading-7 text-white/42">{copy.specialists.note}</p>
           </div>
         </section>
@@ -112,7 +115,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </div>
   )
 }
