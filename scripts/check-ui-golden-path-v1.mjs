@@ -22,7 +22,7 @@ const required = [
     'admin.auth.admin.createUser',
     'admin.auth.admin.updateUserById',
     'collectGoldenPathState',
-    'fiveApprovedStages',
+    'threeApprovedStages',
     'durableQueueCompleted',
     'processingActivityReviewed',
   ]],
