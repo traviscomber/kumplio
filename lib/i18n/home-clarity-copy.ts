@@ -1,7 +1,7 @@
 import type { PublicLocale } from '@/lib/i18n/public-routing'
 
 type Step = { title: string; description: string }
-type Scenario = { title: string; description: string }
+type Scenario = { title: string; description: string; slug: string; action: string }
 
 type HomeClarityCopy = {
   nav: { product: string; how: string; forWho: string; resources: string; pricing: string; signIn: string; try: string; switchLanguage: string }
@@ -72,9 +72,12 @@ export const HOME_CLARITY_COPY: Record<PublicLocale, HomeClarityCopy> = {
       eyebrow: 'Una plataforma, distintas realidades',
       title: 'Cumplimiento transversal, diseñado para la operación chilena.',
       items: [
-        { title: 'Protección de datos', description: 'La puerta de entrada: inventario, brechas y plan de preparación frente a la Ley 21.719.' },
-        { title: 'Minería', description: 'Contratistas, personas, controles y evidencia conectados con una operación exigente y distribuida.' },
-        { title: 'Transporte', description: 'Documentos, proveedores, flota y obligaciones coordinados sin perder trazabilidad. Laboral atraviesa ambas verticales.' },
+        { title: 'Protección de datos', description: 'La puerta de entrada: inventario, brechas y plan de preparación frente a la Ley 21.719.', slug: 'proteccion-de-datos', action: 'Ver detalles' },
+        { title: 'Minería', description: 'Contratistas, personas, controles y evidencia conectados con una operación exigente y distribuida.', slug: 'mineria', action: 'Ver detalles' },
+        { title: 'Transporte', description: 'Documentos, proveedores, flota y obligaciones coordinados sin perder trazabilidad.', slug: 'transporte', action: 'Ver detalles' },
+        { title: 'Construcción', description: 'Contratos, subcontratos, faenas, seguridad y evidencia organizados por proyecto y responsable.', slug: 'construccion', action: 'Ver detalles' },
+        { title: 'Salud', description: 'Datos sensibles, accesos, proveedores y protocolos trazables con revisión humana.', slug: 'salud', action: 'Ver detalles' },
+        { title: 'Agroindustria', description: 'Personas, proveedores, instalaciones y controles coordinados desde la operación hasta la evidencia.', slug: 'agroindustria', action: 'Ver detalles' },
       ],
     },
     security: {
@@ -151,9 +154,12 @@ export const HOME_CLARITY_COPY: Record<PublicLocale, HomeClarityCopy> = {
       eyebrow: 'One platform, different realities',
       title: 'Cross-cutting compliance, designed for Chilean operations.',
       items: [
-        { title: 'Data protection', description: 'The entry point: inventory, gaps and a preparation plan for Chilean Law 21.719.' },
-        { title: 'Mining', description: 'Contractors, people, controls and evidence connected to a demanding, distributed operation.' },
-        { title: 'Transport', description: 'Documents, vendors, fleet and obligations coordinated without losing traceability. Labor cuts across both verticals.' },
+        { title: 'Data protection', description: 'The entry point: inventory, gaps and a preparation plan for Chilean Law 21.719.', slug: 'proteccion-de-datos', action: 'View details' },
+        { title: 'Mining', description: 'Contractors, people, controls and evidence connected to a demanding, distributed operation.', slug: 'mineria', action: 'View details' },
+        { title: 'Transport', description: 'Documents, vendors, fleet and obligations coordinated without losing traceability.', slug: 'transporte', action: 'View details' },
+        { title: 'Construction', description: 'Contracts, subcontractors, sites, safety and evidence organized by project and owner.', slug: 'construccion', action: 'View details' },
+        { title: 'Healthcare', description: 'Sensitive data, access, vendors and protocols kept traceable with human review.', slug: 'salud', action: 'View details' },
+        { title: 'Agribusiness', description: 'People, vendors, facilities and controls coordinated from operations through evidence.', slug: 'agroindustria', action: 'View details' },
       ],
     },
     security: {
