@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import type { PublicLocale } from '@/lib/i18n/public-routing'
@@ -15,6 +15,9 @@ type ResolutionCopy = {
   placeholder: string
   action: string
   note: string
+  guidance: string
+  ready: string
+  error: string
 }
 
 const audienceOrder: Audience[] = ['company', 'professional', 'person']
@@ -47,6 +50,9 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
     placeholder: 'Describe la situación, los datos involucrados o lo que necesitas implementar...',
     action: 'Empezar con guía experta',
     note: 'Kumplio centraliza los antecedentes, activa los especialistas adecuados y conserva el respaldo de cada decisión.',
+    guidance: 'Escribe al menos 8 caracteres o elige una situación de ejemplo.',
+    ready: 'Situación lista. Puedes continuar.',
+    error: 'Cuéntanos un poco más para poder preparar tu guía.',
   },
   en: {
     audiences: {
@@ -75,6 +81,9 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
     placeholder: 'Describe the situation, the data involved or what you need to implement...',
     action: 'Start with expert guidance',
     note: 'Kumplio centralizes the context, activates the right specialists and preserves the evidence behind each decision.',
+    guidance: 'Write at least 8 characters or choose an example situation.',
+    ready: 'Your situation is ready. You can continue.',
+    error: 'Tell us a little more so we can prepare your guidance.',
   },
 }
 
@@ -82,11 +91,18 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
   const router = useRouter()
   const [audience, setAudience] = useState<Audience>('company')
   const [goal, setGoal] = useState('')
+  const [showError, setShowError] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const copy = COPY[locale]
+  const isReady = goal.trim().length >= 8
 
   function start() {
     const normalizedGoal = goal.trim()
-    if (normalizedGoal.length < 8) return
+    if (normalizedGoal.length < 8) {
+      setShowError(true)
+      textareaRef.current?.focus()
+      return
+    }
 
     window.sessionStorage.setItem(
       GUIDED_ONBOARDING_DRAFT_KEY,
@@ -118,21 +134,31 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
         {copy.question}
       </label>
       <textarea
+        ref={textareaRef}
         id="resolution-goal"
         value={goal}
-        onChange={(event) => setGoal(event.target.value)}
+        onChange={(event) => {
+          setGoal(event.target.value)
+          if (event.target.value.trim().length >= 8) setShowError(false)
+        }}
         rows={5}
         placeholder={copy.placeholder}
-        className="mt-3 w-full resize-none rounded-2xl border border-[#C2A887]/22 bg-[#151513] px-4 py-4 text-base leading-7 text-[#F0E2CE] outline-none transition placeholder:text-[#8F8678] focus:border-[#A7C63A]/75 focus:ring-2 focus:ring-[#A7C63A]/15"
+        aria-invalid={showError}
+        aria-describedby="resolution-guidance"
+        className={`mt-3 w-full resize-none rounded-2xl border bg-[#151513] px-4 py-4 text-base leading-7 text-[#F0E2CE] outline-none transition placeholder:text-[#8F8678] focus:ring-2 ${showError ? 'border-[#D58A62] focus:border-[#D58A62] focus:ring-[#D58A62]/15' : 'border-[#C2A887]/22 focus:border-[#A7C63A]/75 focus:ring-[#A7C63A]/15'}`}
       />
+      <p id="resolution-guidance" className={`mt-2 text-xs ${showError ? 'text-[#E2A37E]' : isReady ? 'text-[#C5E052]' : 'text-[#8F8678]'}`} aria-live="polite">
+        {showError ? copy.error : isReady ? copy.ready : copy.guidance}
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {copy.examples[audience].map((example) => (
           <button
             key={example}
             type="button"
-            onClick={() => setGoal(example)}
-            className="rounded-full border border-[#C2A887]/18 bg-[#151513]/35 px-3 py-2 text-left text-xs text-[#AAA08F] transition hover:border-[#A7C63A]/55 hover:bg-[#A7C63A]/8 hover:text-[#E0C5A1]"
+            onClick={() => { setGoal(example); setShowError(false) }}
+            aria-pressed={goal === example}
+            className={`rounded-full border px-3 py-2 text-left text-xs transition ${goal === example ? 'border-[#A7C63A]/70 bg-[#A7C63A]/12 text-[#D5EA7C]' : 'border-[#C2A887]/18 bg-[#151513]/35 text-[#AAA08F] hover:border-[#A7C63A]/55 hover:bg-[#A7C63A]/8 hover:text-[#E0C5A1]'}`}
           >
             {example}
           </button>
@@ -142,8 +168,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
       <button
         type="button"
         onClick={start}
-        disabled={goal.trim().length < 8}
-        className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-[#B7D83C] bg-[#A7C63A] px-6 py-3 font-black text-[#12140B] shadow-[0_10px_30px_rgba(167,198,58,0.16)] transition hover:bg-[#B7D83C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D5EA7C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#211F1B] disabled:cursor-not-allowed disabled:border-[#566132] disabled:bg-[#3E4828] disabled:text-[#AAB386] disabled:shadow-none"
+        className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-[#B7D83C] bg-[#A7C63A] px-6 py-3 font-black text-[#12140B] shadow-[0_10px_30px_rgba(167,198,58,0.16)] transition hover:bg-[#B7D83C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D5EA7C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#211F1B]"
       >
         {copy.action} <ArrowRight className="ml-2 h-4 w-4" />
       </button>
