@@ -39,7 +39,9 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
   const [activationHandoff, setActivationHandoff] = useState<ReturnType<typeof buildActivationHandoff> | null>(null)
 
   useEffect(() => {
-    const draft = parseGuidedOnboardingDraft(window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY))
+    const storedDraft = window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)
+      || window.localStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)
+    const draft = parseGuidedOnboardingDraft(storedDraft)
     if (!draft) return
     setUserType(draft.userType)
     setProblem(draft.problem)
@@ -62,6 +64,7 @@ export function WorkspaceOnboardingForm({ initialEmail, initialOrganizationName,
       if (!response.ok) throw new Error(data.error || 'No fue posible preparar tu espacio')
       const caseId = data.workspace?.caseId as string | undefined
       window.sessionStorage.removeItem(GUIDED_ONBOARDING_DRAFT_KEY)
+      window.localStorage.removeItem(GUIDED_ONBOARDING_DRAFT_KEY)
       setActivationHandoff(buildActivationHandoff(diagnosis, caseId))
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'No fue posible terminar la configuración') }
     finally { setLoading(false) }
