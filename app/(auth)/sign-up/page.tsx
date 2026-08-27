@@ -64,7 +64,6 @@ export default function SignUp() {
   const planKey = searchParams.get('plan') as PlanKey | null
   const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
   const next = safeInternalPath(searchParams.get('next'))
-  const hasGuidedHandoff = !selectedPlan && searchParams.get('next') === '/onboarding'
   const passwordReady = isStrongPassword(password)
 
   async function handleSignUp(event: FormEvent<HTMLFormElement>) {
@@ -139,7 +138,7 @@ export default function SignUp() {
             </p>
           )}
 
-          {hasGuidedHandoff && (
+          {!selectedPlan && (
             <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
               <div className="flex items-start gap-3">
                 <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
