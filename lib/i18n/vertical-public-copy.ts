@@ -3,6 +3,15 @@ import type { PublicLocale } from '@/lib/i18n/public-routing'
 export const VERTICAL_SLUGS = ['proteccion-de-datos', 'mineria', 'transporte', 'construccion', 'salud', 'agroindustria'] as const
 export type VerticalSlug = (typeof VERTICAL_SLUGS)[number]
 
+export const VERTICAL_IMAGES: Record<VerticalSlug, string> = {
+  'proteccion-de-datos': '/brand/kumplio-hero-compliance.webp',
+  mineria: '/brand/kumplio-mining-transport.webp',
+  transporte: '/brand/kumplio-mining-transport.webp',
+  construccion: '/brand/kumplio-construction.webp',
+  salud: '/brand/kumplio-healthcare.webp',
+  agroindustria: '/brand/kumplio-agribusiness.webp',
+}
+
 type VerticalCopy = {
   name: string
   eyebrow: string
