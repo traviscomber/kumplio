@@ -189,6 +189,23 @@ export default function SignUp() {
             </div>
           )}
 
+          {!selectedPlan && (
+            <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+              <div className="flex items-start gap-3">
+                <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Tu orientación está guardada</p>
+                  {guidedDraft ? (
+                    <p className="mt-2 text-sm font-semibold leading-6 text-foreground">“{guidedDraft.problem}”</p>
+                  ) : (
+                    <p className="mt-2 text-sm font-semibold leading-6 text-foreground">Tu registro continúa directamente con la configuración de tu primer diagnóstico.</p>
+                  )}
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">Después de verificar tu correo continuarás desde aquí; no tendrás que escribir nuevamente tu situación.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSignUp} className="space-y-4">
             {error && (
               <div className="flex items-start gap-3 rounded-xl border border-destructive/20 bg-destructive/10 p-3">
