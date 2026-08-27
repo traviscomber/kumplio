@@ -13,7 +13,8 @@ for (const slug of ['proteccion-de-datos', 'mineria', 'transporte', 'construccio
 
 assert.match(home, /\/verticales\/\$\{item\.slug\}/, 'Vertical cards must link to their detail page')
 assert.match(home, /focus-visible:ring/, 'Vertical cards must expose a keyboard focus state')
-assert.match(home, /VERTICAL_IMAGES\[item\.slug/, 'Vertical cards must render their sector image')
+assert.match(home, /VERTICAL_IMAGES\[slug\]/, 'Vertical cards must render their sector image')
+assert.match(home, /VERTICAL_IMAGE_POSITIONS\[slug\]/, 'Vertical cards must apply a sector-specific crop')
 assert.notEqual(
   verticalCopy.match(/mineria: '([^']+)'/)?.[1],
   verticalCopy.match(/transporte: '([^']+)'/)?.[1],

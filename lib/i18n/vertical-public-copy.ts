@@ -12,6 +12,15 @@ export const VERTICAL_IMAGES: Record<VerticalSlug, string> = {
   agroindustria: '/brand/kumplio-agribusiness.webp',
 }
 
+export const VERTICAL_IMAGE_POSITIONS: Record<VerticalSlug, string> = {
+  'proteccion-de-datos': '64% center',
+  mineria: '55% center',
+  transporte: '58% center',
+  construccion: '68% center',
+  salud: '72% center',
+  agroindustria: '58% center',
+}
+
 type VerticalCopy = {
   name: string
   eyebrow: string
