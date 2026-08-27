@@ -32,6 +32,7 @@ for (const marker of [
   '## 13. Decisión vigente',
   '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
   '### Bloque 17 — Experiencia autenticada canónica — `DONE`',
+  '### Bloque 18 — Desarrollo post-cierre y piloto supervisado — `ACTIVE / NEXT`',
   '**Decisión del owner — 24 de agosto de 2026:**',
   '**Decisión del owner — 25 de agosto de 2026:**',
   'functional freeze',
@@ -39,9 +40,9 @@ for (const marker of [
   if (!roadmap.includes(marker)) throw new Error(`ROADMAP.md missing canonical marker: ${marker}`)
 }
 
-const nextBlocks = roadmap.match(/^### Bloque \d+ — .+ — `NEXT`$/gm) || []
-if (nextBlocks.length !== 0) {
-  throw new Error(`ROADMAP.md must have no NEXT feature block during functional freeze; found ${nextBlocks.length}`)
+const nextBlocks = roadmap.match(/^### Bloque \d+ — .+ — `(?:ACTIVE \/ NEXT|NEXT)`$/gm) || []
+if (nextBlocks.length !== 1 || !nextBlocks[0].startsWith('### Bloque 18 ')) {
+  throw new Error(`ROADMAP.md must identify Block 18 as the single active NEXT feature block; found ${nextBlocks.length}`)
 }
 
 if (!roadmap.includes('- no crear módulos nuevos solo porque son atractivos;')) {
@@ -107,4 +108,4 @@ if (/\b(?:MASTER_ROADMAP|ROADMAP_MASTER|CANONICAL_ROADMAP)\.md\b/i.test(readme +
   throw new Error('Do not introduce a second roadmap master file; ROADMAP.md is the only canonical roadmap')
 }
 
-console.log('Canonical roadmap contract: PASS (functional freeze; Block 16 external gates active)')
+console.log('Canonical roadmap contract: PASS (Block 18 active; Block 16 external gates preserved)')
