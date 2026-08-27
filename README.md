@@ -207,6 +207,8 @@ Antes de modificar el producto:
 3. conserva los límites de seguridad, evidencia y revisión humana;
 4. actualiza el roadmap cuando cambie un estado o una prioridad.
 
+Contrato vinculante: [docs/governance/canonical-roadmap-contract.md](./docs/governance/canonical-roadmap-contract.md).
+
 Valida el contrato con:
 
 ~~~bash
