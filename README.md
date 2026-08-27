@@ -488,3 +488,7 @@ Santiago, Chile
 ```
 
 Ese es el producto: **un sistema que conecta protección de datos, personas, especialistas, evidencia y trabajo verificable sin convertir incertidumbre en falsa certeza**.
+
+## Documentación canónica del sistema
+
+La documentación integral vigente está en [`docs/system/README.md`](docs/system/README.md). Cubre producto, arquitectura, Supabase, API, seguridad, agentes, operación, pruebas y mantenimiento. `ROADMAP.md` continúa siendo la única fuente canónica de prioridad y secuencia.
