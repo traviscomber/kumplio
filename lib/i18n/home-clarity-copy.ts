@@ -9,7 +9,7 @@ type HomeClarityCopy = {
   journey: { eyebrow: string; title: string; steps: Step[] }
   example: { eyebrow: string; title: string; quote: string; outcomes: Step[] }
   workflow: { eyebrow: string; title: string; description: string; stages: Step[] }
-  specialists: { eyebrow: string; title: string; description: string; people: Array<{ name: string; label: string; description: string }>; note: string }
+  specialists: { eyebrow: string; title: string; description: string; people: Array<{ name: string; label: string; description: string }>; capabilities: string[]; note: string }
   scenarios: { eyebrow: string; title: string; items: Scenario[] }
   security: { eyebrow: string; title: string; description: string; points: Step[]; note: string }
   cta: { eyebrow: string; title: string; description: string; action: string }
@@ -64,11 +64,8 @@ export const HOME_CLARITY_COPY: Record<PublicLocale, HomeClarityCopy> = {
         { name: 'Isidora', label: 'Entiende', description: 'Identifica obligaciones y encuentra las fuentes que respaldan el análisis.' },
         { name: 'Verónica', label: 'Comprueba', description: 'Revisa controles y qué evidencia falta para sostenerlos.' },
         { name: 'Julieta', label: 'Revisa', description: 'Detecta contradicciones, reservas y decisiones que requieren criterio humano.' },
-        { name: 'Datos y privacidad', label: 'Capacidad', description: 'Ordena tratamientos, sistemas, terceros y responsabilidades.' },
-        { name: 'Cumplimiento laboral', label: 'Capacidad', description: 'Conecta personas, documentos y obligaciones transversales.' },
-        { name: 'Contratos y terceros', label: 'Capacidad', description: 'Relaciona compromisos contractuales, proveedores y evidencia.' },
-        { name: 'Operación sectorial', label: 'Capacidad', description: 'Aterriza los requisitos al trabajo real de cada industria.' },
       ],
+      capabilities: ['Datos y privacidad', 'Cumplimiento laboral', 'Contratos y terceros', 'Operación sectorial'],
       note: 'Kumplio coordina especialistas y capacidades sobre el mismo caso. La decisión final permanece bajo control humano.',
     },
     scenarios: {
@@ -146,11 +143,8 @@ export const HOME_CLARITY_COPY: Record<PublicLocale, HomeClarityCopy> = {
         { name: 'Isidora', label: 'Understands', description: 'Identifies obligations and finds the sources that support the analysis.' },
         { name: 'Verónica', label: 'Verifies', description: 'Reviews controls and the evidence still needed to support them.' },
         { name: 'Julieta', label: 'Reviews', description: 'Finds contradictions, reservations and decisions that require human judgment.' },
-        { name: 'Data and privacy', label: 'Capability', description: 'Organizes processing activities, systems, third parties and ownership.' },
-        { name: 'Labor compliance', label: 'Capability', description: 'Connects people, documents and cross-cutting obligations.' },
-        { name: 'Contracts and third parties', label: 'Capability', description: 'Connects contractual commitments, vendors and evidence.' },
-        { name: 'Sector operations', label: 'Capability', description: 'Grounds requirements in the real work of each industry.' },
       ],
+      capabilities: ['Data and privacy', 'Labor compliance', 'Contracts and third parties', 'Sector operations'],
       note: 'Kumplio coordinates specialists and capabilities on the same case. The final decision remains under human control.',
     },
     scenarios: {

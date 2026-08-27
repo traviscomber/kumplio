@@ -116,7 +116,7 @@ export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
       <div className="container mx-auto px-6 py-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_0.8fr_0.8fr_0.8fr_1fr]">
           <div>
-            <Image src="/logo-kumplio.svg" alt="Kumplio" width={120} height={48} className="h-12 w-auto" />
+            <Image src="/kumplio-logo-canonical.png" alt="Kumplio" width={455} height={171} className="h-auto w-[150px] object-contain" />
             <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">
               {copy.description}
             </p>
