@@ -56,7 +56,9 @@ export default function SignUp() {
   const [guidedDraft, setGuidedDraft] = useState<GuidedOnboardingDraft | null>(null)
 
   useEffect(() => {
-    setGuidedDraft(parseGuidedOnboardingDraft(window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)))
+    const storedDraft = window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)
+      || window.localStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)
+    setGuidedDraft(parseGuidedOnboardingDraft(storedDraft))
   }, [])
 
   const planKey = searchParams.get('plan') as PlanKey | null

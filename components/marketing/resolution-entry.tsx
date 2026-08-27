@@ -183,10 +183,9 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
   const isReady = goal.trim().length >= 8;
 
   function saveDraft(normalizedGoal: string) {
-    window.sessionStorage.setItem(
-      GUIDED_ONBOARDING_DRAFT_KEY,
-      JSON.stringify({ goal: normalizedGoal, audience }),
-    );
+    const serializedDraft = JSON.stringify({ goal: normalizedGoal, audience });
+    window.sessionStorage.setItem(GUIDED_ONBOARDING_DRAFT_KEY, serializedDraft);
+    window.localStorage.setItem(GUIDED_ONBOARDING_DRAFT_KEY, serializedDraft);
   }
 
   function showInitialGuidance() {
