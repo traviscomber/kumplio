@@ -196,6 +196,27 @@ La documentación integral está en [docs/system](./docs/system/README.md):
 
 ---
 
+## Roadmap canónico: trabajar sin desviaciones
+
+[`ROADMAP.md`](./ROADMAP.md) es la **única fuente canónica de prioridad, secuencia y estado**.
+
+Antes de modificar el producto:
+
+1. identifica el bloque, gate, defecto o decisión del owner que autoriza el cambio;
+2. implementa el alcance mínimo y verificable;
+3. conserva los límites de seguridad, evidencia y revisión humana;
+4. actualiza el roadmap cuando cambie un estado o una prioridad.
+
+Contrato vinculante: [docs/governance/canonical-roadmap-contract.md](./docs/governance/canonical-roadmap-contract.md).
+
+Valida el contrato con:
+
+~~~bash
+npm run check:canonical-roadmap
+~~~
+
+---
+
 ## Desarrollo local
 
 ~~~bash
