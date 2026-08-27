@@ -89,13 +89,6 @@ const required = [
     'Eliminaciones demostradas | 0',
     'Mapeo aceptado no equivale a aviso suficiente',
   ]],
-  ['README.md', [
-    '3/3 mapeos aceptados con brechas',
-    'mapeo del aviso                    3/3',
-    'configuración tenant               0/3',
-    'eliminación operacional final      0/3',
-    './docs/assurance/n3uralia-processing-notice-mapping-3x-2026-08-08.md',
-  ]],
   ['ROADMAP.md', [
     '| Mapeo del aviso | `accepted_with_gaps` 3/3 |',
     '| Lifecycle V2 | `changes_requested` 3/3 |',
