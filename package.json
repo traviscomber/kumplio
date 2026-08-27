@@ -11,6 +11,7 @@
     "release:check": "node scripts/release-check.mjs",
     "smoke": "node scripts/smoke-release.mjs",
     "check:discovery": "node scripts/check-public-discovery.mjs",
+    "check:public-verticals": "node scripts/check-public-verticals-v1.mjs",
     "check:boundaries": "node scripts/check-client-boundaries.mjs",
     "check:auth": "node scripts/check-auth-password-policy.mjs",
     "check:diario": "node scripts/test-diario-oficial-fixtures.mjs",
