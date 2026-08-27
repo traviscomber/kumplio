@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 import { ResolutionEntry } from '@/components/marketing/resolution-entry'
 import { HOME_CLARITY_COPY } from '@/lib/i18n/home-clarity-copy'
+import { HOME_PUBLIC_COPY } from '@/lib/i18n/home-public-copy'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
 import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
 
@@ -22,7 +23,9 @@ function CinematicImage({ src, position = 'center' }: { src: string; position?: 
 export default async function HomePage() {
   const { locale } = await getPublicRequestContext()
   const copy = HOME_CLARITY_COPY[locale]
+  const publicCopy = HOME_PUBLIC_COPY[locale]
   const alternateLocale = locale === 'es' ? 'en' : 'es'
+  const alternateHomeHref = withPublicLocale('/', alternateLocale)
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#151513] text-[#C2A887]">
@@ -58,7 +61,7 @@ export default async function HomePage() {
 
         <section id="resolver-form" className="scroll-mt-20 bg-[#1C1C19] px-5 py-24 sm:px-8 md:py-36 lg:px-12"><div className="mx-auto grid max-w-[1200px] gap-16 lg:grid-cols-[.8fr_1.2fr]"><div><p className={eyebrowClass}>{copy.cta.eyebrow}</p><h2 className={h2Class}>{copy.cta.title}</h2><p className="mt-6 text-base leading-8 text-[#AAA08F]">{copy.cta.description}</p></div><ResolutionEntry locale={locale} /></div></section>
       </main>
-      <Footer locale={locale}/>
+      <Footer locale={locale} />
     </div>
   )
 }

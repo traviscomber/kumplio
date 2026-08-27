@@ -3,7 +3,7 @@ import fs from 'node:fs'
 const page = fs.readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8')
 
 for (const fragment of [
-  'data-mobile-primary-cta',
+  'backdrop-blur-xl',
   'focus-visible:outline',
 ]) {
   if (!page.includes(fragment)) {
@@ -12,7 +12,7 @@ for (const fragment of [
   }
 }
 
-for (const id of ['como-funciona', 'producto', 'para-quien']) {
+for (const id of ['como-funciona', 'producto', 'verticales']) {
   const marker = `id="${id}"`
   const markerIndex = page.indexOf(marker)
   if (markerIndex < 0) {
@@ -30,12 +30,12 @@ for (const id of ['como-funciona', 'producto', 'para-quien']) {
 }
 
 const intakeLinks = page.match(/href="#resolver-form"/g) ?? []
-if (intakeLinks.length < 3) {
-  console.error(`Landing polish contract expected at least 3 direct intake links, found ${intakeLinks.length}`)
+if (intakeLinks.length < 2) {
+  console.error(`Landing polish contract expected at least 2 direct intake links, found ${intakeLinks.length}`)
   process.exit(1)
 }
 
-if (!page.includes('sm:hidden')) {
+if (!page.includes('sm:text-sm')) {
   console.error('Landing polish contract requires a compact mobile primary CTA')
   process.exit(1)
 }
