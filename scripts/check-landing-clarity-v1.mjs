@@ -6,11 +6,10 @@ const copy = fs.readFileSync(new URL('../lib/i18n/home-clarity-copy.ts', import.
 const required = [
   'Descubre qué datos personales usa tu empresa y qué debes corregir.',
   'Revisar mi empresa',
-  'Describe tu empresa',
-  'Kumplio ordena',
-  'Detecta lo que falta',
-  'Recibes tareas concretas',
-  'Demuestras el avance',
+  'Agrega',
+  'Relaciona tu realidad con las obligaciones aplicables',
+  'Decide',
+  'Demuestra',
   'Tenemos datos de clientes, trabajadores y postulantes',
   'Un mapa de sus datos',
   'Un diagnóstico accionable',
@@ -21,9 +20,9 @@ const required = [
   'Isidora',
   'Verónica',
   'Julieta',
-  'Prepararme para la Ley 21.719',
-  'Ordenar proveedores y terceros',
-  'Resolver una solicitud, incidente o auditoría',
+  'Protección de datos',
+  'Minería',
+  'Transporte',
   'Cuéntanos qué datos usa tu empresa.',
 ]
 
