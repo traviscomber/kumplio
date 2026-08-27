@@ -235,16 +235,18 @@ No se autoriza ampliar esta lista durante el cierre funcional salvo bugs crític
 
 ## 7. Gates P0 antes de beta privada autoservicio
 
-### P0-A — Leaked Password Protection — `BLOCKED`
+### P0-A — Leaked Password Protection — `BLOCKED / DEFERRED POR OWNER`
 
-Acción externa/configuración de Supabase Auth:
+La protección de contraseñas filtradas permanece desactivada por decisión explícita del owner del 27 de agosto de 2026. No se reintentará su activación durante el cierre vigente.
+
+Si el owner revierte esta decisión, el cierre del gate requerirá:
 
 1. activar protección de contraseñas filtradas;
 2. verificar Security Advisor;
 3. ejecutar registro, recuperación y cambio de contraseña;
 4. documentar evidencia.
 
-Hasta entonces, el producto puede permanecer en demo/piloto supervisado, pero **no se declara listo para beta autoservicio**.
+Mientras permanezca desactivada, el producto puede operar únicamente en demo/piloto supervisado y **no se declara listo para beta autoservicio**.
 
 ### P0-B — Configuración tenant Supabase — `BLOCKED EXTERNO`
 
@@ -430,7 +432,7 @@ El freeze termina únicamente por una decisión explícita del owner registrada 
 
 **Decisión del owner — 25 de agosto de 2026:** cerrar la arquitectura funcional autenticada con Personas + Configuración acotadas, reconciliar Alertas/Actividad y la narrativa pública **Analiza → Resuelve → Revisa**, y entrar en functional freeze. Bloque 16 conserva autoridad completa sobre seguridad, evidencia externa y claims.
 
-**Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
+**Decisión del owner — 27 de agosto de 2026:** mantener desactivada Leaked Password Protection en Supabase Auth. P0-A permanece bloqueado y diferido por decisión consciente; Kumplio no se declara listo para beta autoservicio mientras este control siga desactivado.\n\n**Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
 
 Estado objetivo actual:
 
