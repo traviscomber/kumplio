@@ -14,6 +14,11 @@ for (const slug of ['proteccion-de-datos', 'mineria', 'transporte', 'construccio
 assert.match(home, /\/verticales\/\$\{item\.slug\}/, 'Vertical cards must link to their detail page')
 assert.match(home, /focus-visible:ring/, 'Vertical cards must expose a keyboard focus state')
 assert.match(home, /VERTICAL_IMAGES\[item\.slug/, 'Vertical cards must render their sector image')
+assert.notEqual(
+  verticalCopy.match(/mineria: '([^']+)'/)?.[1],
+  verticalCopy.match(/transporte: '([^']+)'/)?.[1],
+  'Mining and transport must not share the same card image',
+)
 assert.match(detail, /generateStaticParams/, 'Vertical detail routes must be statically enumerated')
 assert.match(detail, /notFound\(\)/, 'Unknown vertical routes must return not found')
 
