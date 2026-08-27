@@ -33,7 +33,7 @@ export default async function VerticalPage({ params }: Props) {
     <div className="min-h-screen bg-[#151513] text-[#C2A887]">
       <header className="border-b border-white/10 bg-[#151513]/95">
         <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-5 sm:px-8">
-          <Link href={home} aria-label="Kumplio"><Image src="/kumplio-logo-canonical.png" alt="Kumplio" width={455} height={171} priority className="h-auto w-[145px]" /></Link>
+          <Link href={home} aria-label="Kumplio" className="shrink-0"><Image src="/kumplio-logo-canonical.png" alt="Kumplio" width={455} height={171} priority className="h-auto w-[154px] object-contain sm:w-[190px]" /></Link>
           <Button asChild><Link href={`${home}#resolver-form`}>{copy.cta}</Link></Button>
         </div>
       </header>
