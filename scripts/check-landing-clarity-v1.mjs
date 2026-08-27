@@ -4,17 +4,17 @@ const page = fs.readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8'
 const copy = fs.readFileSync(new URL('../lib/i18n/home-clarity-copy.ts', import.meta.url), 'utf8')
 
 const required = [
-  'Protege los datos de tu empresa sin perderte en la regulación.',
-  'Analizar mi situación',
-  'Cuéntanos qué está pasando',
-  'Kumplio analiza',
-  'Recibes un plan claro',
-  'Ejecutas las acciones',
-  'Dejas evidencia del cierre',
-  'Mi empresa usa datos de clientes y no sé si estamos preparados para la Ley 21.719.',
-  'Kumplio encuentra',
-  'Kumplio te dice qué hacer',
-  'Tú mantienes el control',
+  'Descubre qué datos personales usa tu empresa y qué debes corregir.',
+  'Revisar mi empresa',
+  'Describe tu empresa',
+  'Kumplio ordena',
+  'Detecta lo que falta',
+  'Recibes tareas concretas',
+  'Demuestras el avance',
+  'Tenemos datos de clientes, trabajadores y postulantes',
+  'Un mapa de sus datos',
+  'Un diagnóstico accionable',
+  'Un plan que se puede cerrar',
   'Analiza',
   'Resuelve',
   'Revisa',
@@ -24,7 +24,7 @@ const required = [
   'Prepararme para la Ley 21.719',
   'Ordenar proveedores y terceros',
   'Resolver una solicitud, incidente o auditoría',
-  'Empieza por la situación que necesitas resolver.',
+  'Cuéntanos qué datos usa tu empresa.',
 ]
 
 for (const phrase of required) {
