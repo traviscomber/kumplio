@@ -64,6 +64,7 @@ export default function SignUp() {
   const planKey = searchParams.get('plan') as PlanKey | null
   const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
   const next = safeInternalPath(searchParams.get('next'))
+  const hasGuidedHandoff = !selectedPlan && searchParams.get('next') === '/onboarding'
   const passwordReady = isStrongPassword(password)
 
   async function handleSignUp(event: FormEvent<HTMLFormElement>) {
@@ -138,13 +139,17 @@ export default function SignUp() {
             </p>
           )}
 
-          {!selectedPlan && guidedDraft && (
+          {hasGuidedHandoff && (
             <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
               <div className="flex items-start gap-3">
                 <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Tu orientación está guardada</p>
-                  <p className="mt-2 text-sm font-semibold leading-6 text-foreground">“{guidedDraft.problem}”</p>
+                  {guidedDraft ? (
+                    <p className="mt-2 text-sm font-semibold leading-6 text-foreground">“{guidedDraft.problem}”</p>
+                  ) : (
+                    <p className="mt-2 text-sm font-semibold leading-6 text-foreground">Tu registro continúa directamente con la configuración de tu primer diagnóstico.</p>
+                  )}
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">Después de verificar tu correo continuarás desde aquí; no tendrás que escribir nuevamente tu situación.</p>
                 </div>
               </div>
