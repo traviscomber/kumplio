@@ -35,7 +35,8 @@ if (!layout.includes("variable: '--font-montserrat'")) throw new Error('Montserr
 if (!layout.includes('className={`${manrope.variable} ${montserrat.variable} bg-background`}')) {
   throw new Error('Root html must expose both canonical font variables')
 }
-if (!page.includes('/logo-kumplio.svg')) throw new Error('Public landing must use the intact canonical Kumplio SVG logo')
+if (!page.includes('/kumplio-logo-canonical.png')) throw new Error('Public landing must use the supplied canonical Kumplio logo')
+if (!fs.existsSync('public/kumplio-logo-canonical.png')) throw new Error('Canonical public logo asset is missing')
 if (!topNav.includes('/kumplio-logo.png')) throw new Error('Authenticated top navigation must use the supplied canonical Kumplio logo')
 if (!fs.existsSync('public/kumplio-logo.png')) throw new Error('Canonical logo asset missing at public/kumplio-logo.png')
 
