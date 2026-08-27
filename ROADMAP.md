@@ -229,22 +229,24 @@ No se autoriza ampliar esta lista durante el cierre funcional salvo bugs crític
 | 15 | Tenant assurance | `DONE EN ALCANCE INTERNO` |
 | 16 | Cierre técnico y evidencia real | `ACTIVE / EXTERNAL GATES` |
 | 17 | Experiencia autenticada canónica | `DONE` |
-| 18 | Beta autoservicio / expansión | `DEFERRED` |
+| 18 | Desarrollo post-cierre y piloto supervisado | `ACTIVE / NEXT` |
 
 ---
 
 ## 7. Gates P0 antes de beta privada autoservicio
 
-### P0-A — Leaked Password Protection — `BLOCKED`
+### P0-A — Leaked Password Protection — `BLOCKED / DEFERRED POR OWNER`
 
-Acción externa/configuración de Supabase Auth:
+La protección de contraseñas filtradas permanece desactivada por decisión explícita del owner del 27 de agosto de 2026. No se reintentará su activación durante el cierre vigente.
+
+Si el owner revierte esta decisión, el cierre del gate requerirá:
 
 1. activar protección de contraseñas filtradas;
 2. verificar Security Advisor;
 3. ejecutar registro, recuperación y cambio de contraseña;
 4. documentar evidencia.
 
-Hasta entonces, el producto puede permanecer en demo/piloto supervisado, pero **no se declara listo para beta autoservicio**.
+Mientras permanezca desactivada, el producto puede operar únicamente en demo/piloto supervisado y **no se declara listo para beta autoservicio**.
 
 ### P0-B — Configuración tenant Supabase — `BLOCKED EXTERNO`
 
@@ -350,9 +352,31 @@ Estos gates conservan su autoridad sobre claims, seguridad y evidencia externa. 
 2. cambios relevantes y planes guiados se proyectan en la experiencia existente sin crear scoring nuevo;
 3. la superficie pública fue reconciliada con **Analiza → Resuelve → Revisa** y mantiene la landing como capa de adquisición.
 
-Con este cierre comienza **functional freeze**: no se abren nuevos bloques funcionales hasta resolver los gates P0 externos y completar el piloto supervisado correspondiente.
+Este cierre inició un **functional freeze** que el owner levantó explícitamente el 27 de agosto de 2026. El desarrollo funcional puede continuar mediante Bloque 18, sin reducir la autoridad de los gates P0 sobre seguridad, claims ni habilitación de beta autoservicio.
 
 Cada subbloque se entregó en cambios pequeños, reversibles y verificables. No se autorizan migraciones destructivas, relajación de RLS, cambios de infraestructura no relacionados ni claims que excedan la evidencia vigente.
+
+### Bloque 18 — Desarrollo post-cierre y piloto supervisado — `ACTIVE / NEXT`
+
+El functional freeze queda levantado por decisión explícita del owner. Kumplio puede continuar desarrollando experiencia, confiabilidad y preparación comercial bajo revisión humana. Este desbloqueo no cierra los gates P0, no habilita beta autoservicio y no autoriza claims que excedan la evidencia disponible.
+
+**Subbloque A — Continuidad completa de adquisición — `ACTIVE`**
+
+1. validar y endurecer el flujo público diagnóstico guiado → registro → verificación de correo → onboarding → Inicio conservando el contexto del usuario;
+2. corregir las regresiones encontradas y cubrir estados vacío, carga, error, reintento y éxito;
+3. incorporar una prueba E2E repetible que impida perder el diagnóstico durante autenticación.
+
+**Subbloque B — Piloto supervisado — `PLANNED`**
+
+1. preparar un protocolo de piloto con alcance, consentimiento, acompañamiento y criterios de salida;
+2. instrumentar activación, primera acción útil y continuidad sin convertir métricas en claims de cumplimiento;
+3. ejecutar el piloto únicamente con una organización real y supervisión humana documentada.
+
+**Subbloque C — Expansión controlada — `PLANNED`**
+
+1. consolidar Minería y Transporte sobre las capacidades existentes y fuentes oficiales verificables;
+2. mantener Laboral como capacidad transversal sin duplicar el modelo canónico;
+3. priorizar nuevas superficies solo con evidencia de uso del piloto y decisión registrada del owner.
 
 ---
 
@@ -418,9 +442,7 @@ Reglas:
 - no convertir un test sintético en claim comercial de cliente;
 - cualquier excepción debe quedar documentada en `ROADMAP.md` en la misma PR.
 
-El cierre de Bloque 17 inicia un **functional freeze** adicional: mientras Bloque 16 conserve gates P0 abiertos, solo se autoriza seguridad, evidencia externa, bugs críticos, documentación de assurance y preparación/ejecución del piloto supervisado.
-
-El freeze termina únicamente por una decisión explícita del owner registrada en este archivo.
+El functional freeze iniciado al cerrar Bloque 17 terminó por decisión explícita del owner del 27 de agosto de 2026. Bloque 18 habilita desarrollo controlado, pero Bloque 16 conserva autoridad sobre seguridad, evidencia externa, claims y beta autoservicio.
 
 ---
 
@@ -430,10 +452,14 @@ El freeze termina únicamente por una decisión explícita del owner registrada 
 
 **Decisión del owner — 25 de agosto de 2026:** cerrar la arquitectura funcional autenticada con Personas + Configuración acotadas, reconciliar Alertas/Actividad y la narrativa pública **Analiza → Resuelve → Revisa**, y entrar en functional freeze. Bloque 16 conserva autoridad completa sobre seguridad, evidencia externa y claims.
 
+**Decisión del owner — 27 de agosto de 2026:** mantener desactivada Leaked Password Protection en Supabase Auth. P0-A permanece bloqueado y diferido por decisión consciente; Kumplio no se declara listo para beta autoservicio mientras este control siga desactivado.
+
+**Decisión del owner — 27 de agosto de 2026:** levantar el functional freeze e iniciar Bloque 18 como bloque `ACTIVE / NEXT`. Se autoriza continuar el desarrollo del producto, comenzando por la continuidad E2E del funnel diagnóstico guiado → registro → onboarding → Inicio. Los gates P0 continúan gobernando seguridad, evidencia, claims y cualquier futura habilitación autoservicio.
+
 **Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
 
 Estado objetivo actual:
 
-> **Kumplio funcionalmente cerrado y en cierre de seguridad/evidencia externa; beta autoservicio todavía no habilitada.**
+> **Kumplio funcionalmente cerrado, nuevamente en desarrollo controlado mediante Bloque 18 y todavía sin beta autoservicio habilitada.**
 
 La ruta crítica pasa ahora por resolver honestamente los gates externos de Bloque 16. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.
