@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [home, homeCopy, demo, layout, metadataCopy, publicSite, entry, caseEntry, footer, signUp, faqCopy, legalCopy, pricingCopy] = await Promise.all([
-  readFile('app/page.tsx', 'utf8'), readFile('lib/i18n/home-public-copy.ts', 'utf8'), readFile('app/demo/page.tsx', 'utf8'), readFile('app/layout.tsx', 'utf8'), readFile('lib/i18n/public-copy.ts', 'utf8'), readFile('lib/public-site.ts', 'utf8'), readFile('components/marketing/resolution-entry.tsx', 'utf8'), readFile('components/cases/beta-case-entry.tsx', 'utf8'), readFile('components/footer.tsx', 'utf8'), readFile('app/(auth)/sign-up/page.tsx', 'utf8'), readFile('lib/i18n/faq-public-copy.ts', 'utf8'), readFile('lib/i18n/legal-public-copy.ts', 'utf8'), readFile('lib/i18n/pricing-public-copy.ts', 'utf8'),
+const [home, homeCopy, homeClarityCopy, demo, layout, metadataCopy, publicSite, entry, caseEntry, footer, signUp, faqCopy, legalCopy, pricingCopy] = await Promise.all([
+  readFile('app/page.tsx', 'utf8'), readFile('lib/i18n/home-public-copy.ts', 'utf8'), readFile('lib/i18n/home-clarity-copy.ts', 'utf8'), readFile('app/demo/page.tsx', 'utf8'), readFile('app/layout.tsx', 'utf8'), readFile('lib/i18n/public-copy.ts', 'utf8'), readFile('lib/public-site.ts', 'utf8'), readFile('components/marketing/resolution-entry.tsx', 'utf8'), readFile('components/cases/beta-case-entry.tsx', 'utf8'), readFile('components/footer.tsx', 'utf8'), readFile('app/(auth)/sign-up/page.tsx', 'utf8'), readFile('lib/i18n/faq-public-copy.ts', 'utf8'), readFile('lib/i18n/legal-public-copy.ts', 'utf8'), readFile('lib/i18n/pricing-public-copy.ts', 'utf8'),
 ])
 
 assert.match(homeCopy, /Protección de datos \+ guía experta para resolver/)
@@ -16,7 +16,7 @@ assert.match(homeCopy, /Información y terceros/)
 assert.match(homeCopy, /Casos concretos/)
 
 for (const marker of ['Analiza', 'Resuelve', 'Revisa', 'Analyze', 'Resolve', 'Review']) assert.match(homeCopy, new RegExp(marker))
-for (const specialist of ['Isidora', 'Verónica', 'Julieta']) assert.match(home, new RegExp(specialist))
+for (const specialist of ['Isidora', 'Verónica', 'Julieta']) assert.match(homeClarityCopy, new RegExp(specialist))
 assert.doesNotMatch(home, /AGENT_CATALOG\.map/)
 assert.match(homeCopy, /especialistas adicionales/)
 assert.match(homeCopy, /additional specialists/)
