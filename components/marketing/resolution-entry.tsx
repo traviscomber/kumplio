@@ -96,7 +96,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
   }
 
   return (
-    <div className="rounded-[28px] border border-white/12 bg-[#151c28] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.45)] sm:p-7">
+    <div className="rounded-[28px] border border-[#B17A4D]/35 bg-[#211F1B] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.5)] sm:p-7">
       <div className="flex flex-wrap gap-2">
         {audienceOrder.map((value) => (
           <button
@@ -105,8 +105,8 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
             onClick={() => setAudience(value)}
             className={`rounded-full border px-4 py-2 text-sm font-bold transition ${
               audience === value
-                ? 'border-primary/50 bg-primary/10 text-primary'
-                : 'border-white/10 text-white/55 hover:border-white/25 hover:text-white'
+                ? 'border-[#A7C63A] bg-[#A7C63A]/15 text-[#C5E052] shadow-[inset_0_0_0_1px_rgba(167,198,58,0.12)]'
+                : 'border-[#C2A887]/20 bg-[#151513]/45 text-[#C2A887] hover:border-[#B17A4D]/60 hover:bg-[#B17A4D]/10 hover:text-[#E0C5A1]'
             }`}
           >
             {copy.audiences[value]}
@@ -114,7 +114,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
         ))}
       </div>
 
-      <label htmlFor="resolution-goal" className="mt-6 block text-sm font-bold text-white">
+      <label htmlFor="resolution-goal" className="mt-6 block text-sm font-bold text-[#E0C5A1]">
         {copy.question}
       </label>
       <textarea
@@ -123,7 +123,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
         onChange={(event) => setGoal(event.target.value)}
         rows={5}
         placeholder={copy.placeholder}
-        className="mt-3 w-full resize-none rounded-2xl border border-white/12 bg-[#0f1520] px-4 py-4 text-base leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-primary/60"
+        className="mt-3 w-full resize-none rounded-2xl border border-[#C2A887]/22 bg-[#151513] px-4 py-4 text-base leading-7 text-[#F0E2CE] outline-none transition placeholder:text-[#8F8678] focus:border-[#A7C63A]/75 focus:ring-2 focus:ring-[#A7C63A]/15"
       />
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -132,7 +132,7 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
             key={example}
             type="button"
             onClick={() => setGoal(example)}
-            className="rounded-full border border-white/10 px-3 py-2 text-left text-xs text-white/48 transition hover:border-primary/35 hover:text-white/80"
+            className="rounded-full border border-[#C2A887]/18 bg-[#151513]/35 px-3 py-2 text-left text-xs text-[#AAA08F] transition hover:border-[#A7C63A]/55 hover:bg-[#A7C63A]/8 hover:text-[#E0C5A1]"
           >
             {example}
           </button>
@@ -143,12 +143,12 @@ export function ResolutionEntry({ locale = 'es' }: { locale?: PublicLocale }) {
         type="button"
         onClick={start}
         disabled={goal.trim().length < 8}
-        className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary px-6 py-3 font-black text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-[#B7D83C] bg-[#A7C63A] px-6 py-3 font-black text-[#12140B] shadow-[0_10px_30px_rgba(167,198,58,0.16)] transition hover:bg-[#B7D83C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D5EA7C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#211F1B] disabled:cursor-not-allowed disabled:border-[#566132] disabled:bg-[#3E4828] disabled:text-[#AAB386] disabled:shadow-none"
       >
         {copy.action} <ArrowRight className="ml-2 h-4 w-4" />
       </button>
 
-      <p className="mt-4 text-center text-xs leading-5 text-white/38">
+      <p className="mt-4 text-center text-xs leading-5 text-[#8F8678]">
         {copy.note}
       </p>
     </div>
