@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Footer } from '@/components/footer'
 import { getPublicRequestContext } from '@/lib/i18n/request-context'
 import { withPublicLocale } from '@/lib/i18n/public-routing'
-import { isVerticalSlug, VERTICAL_IMAGES, VERTICAL_PUBLIC_COPY, VERTICAL_SLUGS } from '@/lib/i18n/vertical-public-copy'
+import { isVerticalSlug, VERTICAL_IMAGES, VERTICAL_IMAGE_POSITIONS, VERTICAL_PUBLIC_COPY, VERTICAL_SLUGS } from '@/lib/i18n/vertical-public-copy'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -39,7 +39,7 @@ export default async function VerticalPage({ params }: Props) {
       </header>
       <main>
         <section className="relative overflow-hidden border-b border-white/10 px-5 py-24 sm:px-8 md:py-32">
-          <Image src={VERTICAL_IMAGES[slug]} alt="" fill priority sizes="100vw" className="object-cover opacity-35" />
+          <Image src={VERTICAL_IMAGES[slug]} alt="" fill priority sizes="100vw" style={{ objectPosition: VERTICAL_IMAGE_POSITIONS[slug] }} className="object-cover opacity-45" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#151513_5%,rgba(21,21,19,.88)_55%,#151513_100%)]" />
           <div className="relative mx-auto max-w-[1280px]">
             <Link href={`${home}#verticales`} className="inline-flex items-center gap-2 text-sm text-[#A7C63A] hover:underline"><ArrowLeft className="h-4 w-4" />{copy.back}</Link>
