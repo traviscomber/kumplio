@@ -6,17 +6,19 @@ const organizationName = requiredEnv('E2E_ORGANIZATION_NAME')
 const runId = requiredEnv('GITHUB_RUN_ID')
 const runAttempt = requiredEnv('GITHUB_RUN_ATTEMPT')
 const marker = `${runId}-${runAttempt}`
+const publicGoal = 'Necesito prepararme para la Ley 21.719'
 const goal = `UI E2E ${marker}: preparar una organización sintética para la Ley 21.719 con evidencia, responsables y límites explícitos`
 const activityName = `Gestión sintética de solicitudes de privacidad ${marker}`
 
 test('completa el tercer golden path usando únicamente la interfaz', async ({ page }, testInfo) => {
   await test.step('conservar el contexto desde la entrada pública', async () => {
     await page.goto('/es')
-    await page.getByRole('button', { name: 'Persona', exact: true }).click()
-    await page.getByRole('button', { name: 'Quiero entender cómo están usando mis datos', exact: true }).click()
+    await page.getByRole('button', { name: 'Empresa', exact: true }).click()
+    await page.getByRole('button', { name: publicGoal, exact: true }).click()
     await page.getByRole('button', { name: 'Empezar con guía experta', exact: true }).click()
     await expect(page).toHaveURL(/\/sign-up\?/, { timeout: 30_000 })
     expect(new URL(page.url()).searchParams.get('next')).toBe('/onboarding')
+    await expect(page.getByText(`“${publicGoal}”`, { exact: true })).toBeVisible()
   })
 
   await test.step('iniciar sesión con una cuenta E2E confirmada', async () => {
@@ -29,10 +31,12 @@ test('completa el tercer golden path usando únicamente la interfaz', async ({ p
   })
 
   await test.step('crear el workspace desde el onboarding visual', async () => {
-    await page.getByRole('button', { name: /^Empresa/ }).click()
+    await expect(page.getByRole('button', { name: /^Empresa/ })).toHaveAttribute('aria-pressed', 'true')
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
-    await page.getByPlaceholder(/Necesito ordenar contratos/).fill(goal)
+    const problemInput = page.getByPlaceholder(/Necesito ordenar contratos/)
+    await expect(problemInput).toHaveValue(publicGoal)
+    await problemInput.fill(goal)
     await page.getByRole('button', { name: 'Continuar', exact: true }).click()
 
     await page.getByLabel('Nombre').fill('UI Golden Path')
