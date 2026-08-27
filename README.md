@@ -198,7 +198,7 @@ La documentación integral está en [docs/system](./docs/system/README.md):
 
 ## Roadmap canónico: trabajar sin desviaciones
 
-[ROADMAP.md](./ROADMAP.md) es la única fuente canónica de prioridad, secuencia y estado futuro.
+[`ROADMAP.md`](./ROADMAP.md) es la **única fuente canónica de prioridad, secuencia y estado**.
 
 Antes de modificar el producto:
 
