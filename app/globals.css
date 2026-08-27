@@ -12,8 +12,8 @@
     --kumplio-deep: #10110F;
     --kumplio-parchment: #C2A887;
     --kumplio-text-secondary: #AAA08F;
-    --kumplio-text-muted: #746D62;
-    --kumplio-text-very-muted: #555149;
+    --kumplio-text-muted: #8F8678;
+    --kumplio-text-very-muted: #746D62;
     --kumplio-green: #A7C63A;
     --kumplio-green-olive: #7D873E;
     --kumplio-green-dark: #263528;
@@ -33,7 +33,7 @@
     --secondary: 57 56 51;
     --secondary-foreground: 194 168 135;
     --muted: 41 41 37;
-    --muted-foreground: 116 109 98;
+    --muted-foreground: 143 134 120;
     --accent: 163 108 66;
     --accent-foreground: 194 168 135;
     --destructive: 160 74 60;
@@ -69,7 +69,7 @@
     --secondary: 57 56 51;
     --secondary-foreground: 194 168 135;
     --muted: 41 41 37;
-    --muted-foreground: 116 109 98;
+    --muted-foreground: 143 134 120;
     --accent: 163 108 66;
     --accent-foreground: 194 168 135;
     --border: 72 54 45;

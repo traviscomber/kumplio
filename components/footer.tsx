@@ -38,7 +38,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
       productLinks: [
         ['Data protection software', publicHref(locale, '/software-cumplimiento-chile')],
         ['Law 21.719', publicHref(locale, '/features/ley-21719')],
-        ['Guided resolution', publicHref(locale, '/', '#resolver')],
+        ['Guided resolution', publicHref(locale, '/', '#resolver-form')],
         ['Public demo', publicHref(locale, '/demo')],
         ['Plans', publicHref(locale, '/pricing')],
       ],
@@ -78,7 +78,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
     productLinks: [
       ['Software de protección de datos', publicHref(locale, '/software-cumplimiento-chile')],
       ['Ley 21.719', publicHref(locale, '/features/ley-21719')],
-      ['Resolución guiada', publicHref(locale, '/', '#resolver')],
+      ['Resolución guiada', publicHref(locale, '/', '#resolver-form')],
       ['Demostración pública', publicHref(locale, '/demo')],
       ['Planes', publicHref(locale, '/pricing')],
     ],
