@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
+  FileCheck2,
   Lock,
   Mail,
   ShieldCheck,
@@ -21,6 +22,7 @@ import { safeInternalPath } from '@/lib/navigation/safe-internal-path'
 import { Button } from '@/components/ui/button'
 import { PasswordRequirements } from '@/components/auth/password-requirements'
 import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, authErrorMessage, isStrongPassword } from '@/lib/auth/password-policy'
+import { GUIDED_ONBOARDING_DRAFT_KEY, parseGuidedOnboardingDraft, type GuidedOnboardingDraft } from '@/lib/product/onboarding/guided-entry'
 
 const plans = {
   esencial: {
@@ -51,6 +53,11 @@ export default function SignUp() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [confirmationSent, setConfirmationSent] = useState(false)
+  const [guidedDraft, setGuidedDraft] = useState<GuidedOnboardingDraft | null>(null)
+
+  useEffect(() => {
+    setGuidedDraft(parseGuidedOnboardingDraft(window.sessionStorage.getItem(GUIDED_ONBOARDING_DRAFT_KEY)))
+  }, [])
 
   const planKey = searchParams.get('plan') as PlanKey | null
   const selectedPlan = planKey && planKey in plans ? plans[planKey] : null
@@ -127,6 +134,19 @@ export default function SignUp() {
             <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted-foreground">
               Conservamos tu interés en el plan <strong className="text-foreground">{selectedPlan.name}</strong> para continuar después de verificar tu correo.
             </p>
+          )}
+
+          {!selectedPlan && guidedDraft && (
+            <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+              <div className="flex items-start gap-3">
+                <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Tu orientación está guardada</p>
+                  <p className="mt-2 text-sm font-semibold leading-6 text-foreground">“{guidedDraft.problem}”</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">Después de verificar tu correo continuarás desde aquí; no tendrás que escribir nuevamente tu situación.</p>
+                </div>
+              </div>
+            </div>
           )}
           <p className="mt-4 text-xs leading-5 text-muted-foreground">El enlace puede tardar unos minutos. Revisa también la carpeta de correo no deseado.</p>
           <Button asChild variant="outline" className="mt-7 w-full">
