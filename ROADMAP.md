@@ -430,6 +430,8 @@ El freeze termina únicamente por una decisión explícita del owner registrada 
 
 **Decisión del owner — 25 de agosto de 2026:** cerrar la arquitectura funcional autenticada con Personas + Configuración acotadas, reconciliar Alertas/Actividad y la narrativa pública **Analiza → Resuelve → Revisa**, y entrar en functional freeze. Bloque 16 conserva autoridad completa sobre seguridad, evidencia externa y claims.
 
+**Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
+
 Estado objetivo actual:
 
 > **Kumplio funcionalmente cerrado y en cierre de seguridad/evidencia externa; beta autoservicio todavía no habilitada.**
