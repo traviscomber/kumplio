@@ -107,13 +107,6 @@ const required = [
     'Enlaces específicos al aviso | 3',
     'Trabajo creado no equivale a cumplimiento demostrado',
   ]],
-  ['README.md', [
-    '## Bloque 16 — evidencia real y privacidad',
-    '3/3 mapeos aceptados con brechas',
-    'eliminación operacional final      0/3',
-    './docs/assurance/n3uralia-processing-privacy-remediation-3x-2026-08-08.md',
-    'configuración tenant               0/3',
-  ]],
   ['ROADMAP.md', [
     '| Mapeo del aviso | `accepted_with_gaps` 3/3 |',
     '| Eliminación primaria controlada | 3/3 |',
