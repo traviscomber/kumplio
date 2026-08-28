@@ -250,7 +250,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
       />
       <p
         id="resolution-guidance"
-        className={`mt-2 text-xs ${showError ? "text-[#E2A37E]" : isReady ? "text-[#C5E052]" : "text-[#8F8678]"}`}
+        className={`mt-2 text-xs ${showError ? "text-[#E2A37E]" : isReady ? "text-[#C5E052]" : "text-[#B1A696]"}`}
         aria-live="polite"
       >
         {showError ? copy.error : isReady ? copy.ready : copy.guidance}
@@ -267,7 +267,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
               setShowPreview(false);
             }}
             aria-pressed={goal === example}
-            className={`rounded-full border px-3 py-2 text-left text-xs transition ${goal === example ? "border-[#A7C63A]/70 bg-[#A7C63A]/12 text-[#D5EA7C]" : "border-[#C2A887]/18 bg-[#151513]/35 text-[#AAA08F] hover:border-[#A7C63A]/55 hover:bg-[#A7C63A]/8 hover:text-[#E0C5A1]"}`}
+            className={`rounded-full border px-3 py-2 text-left text-xs transition ${goal === example ? "border-[#A7C63A]/70 bg-[#A7C63A]/12 text-[#D5EA7C]" : "border-[#C2A887]/28 bg-[#151513]/55 text-[#C2B6A4] hover:border-[#A7C63A]/65 hover:bg-[#A7C63A]/10 hover:text-[#F0D7B6]"}`}
           >
             {example}
           </button>

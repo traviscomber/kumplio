@@ -11,9 +11,9 @@
     --kumplio-graphite: #393833;
     --kumplio-deep: #10110F;
     --kumplio-parchment: #C2A887;
-    --kumplio-text-secondary: #AAA08F;
-    --kumplio-text-muted: #8F8678;
-    --kumplio-text-very-muted: #746D62;
+    --kumplio-text-secondary: #C4B7A5;
+    --kumplio-text-muted: #B1A696;
+    --kumplio-text-very-muted: #978E81;
     --kumplio-green: #A7C63A;
     --kumplio-green-olive: #7D873E;
     --kumplio-green-dark: #263528;
@@ -33,12 +33,12 @@
     --secondary: 57 56 51;
     --secondary-foreground: 194 168 135;
     --muted: 41 41 37;
-    --muted-foreground: 143 134 120;
+    --muted-foreground: 177 166 150;
     --accent: 163 108 66;
     --accent-foreground: 194 168 135;
     --destructive: 160 74 60;
     --destructive-foreground: 194 168 135;
-    --border: 72 54 45;
+    --border: 91 76 64;
     --input: 32 32 29;
     --ring: 167 198 58;
 
@@ -69,10 +69,10 @@
     --secondary: 57 56 51;
     --secondary-foreground: 194 168 135;
     --muted: 41 41 37;
-    --muted-foreground: 143 134 120;
+    --muted-foreground: 177 166 150;
     --accent: 163 108 66;
     --accent-foreground: 194 168 135;
-    --border: 72 54 45;
+    --border: 91 76 64;
     --input: 32 32 29;
     --ring: 167 198 58;
   }
