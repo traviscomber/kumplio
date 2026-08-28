@@ -120,11 +120,11 @@ export default function Ley21719ResourcesPage() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-5 lg:grid-cols-2">
+            <div className="mt-12 grid gap-5 lg:grid-cols-6">
               {chileComplianceGuides.map((guide, index) => (
-                <article key={guide.slug} className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_18px_60px_rgba(0,0,0,.22)] last:lg:col-span-2">
-                  <div className="relative h-56 overflow-hidden border-b border-border sm:h-64">
-                    <Image src={guideImages[index]} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover brightness-[1.12] contrast-[1.04] transition duration-500 group-hover:scale-[1.025]" />
+                <article key={guide.slug} className={`group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_18px_60px_rgba(0,0,0,.22)] ${index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+                  <div className="relative aspect-video overflow-hidden border-b border-border bg-[#11110f]">
+                    <Image src={guideImages[index]} alt="" fill sizes={index < 3 ? '(min-width: 1024px) 33vw, 100vw' : '(min-width: 1024px) 50vw, 100vw'} className="object-contain brightness-[1.12] contrast-[1.04] transition duration-500 group-hover:scale-[1.015]" />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(32,32,29,.82)_100%)]" />
                     <p className="absolute bottom-5 left-7 text-xs font-bold uppercase tracking-[0.18em] text-[#C5E052]">Guía {String(index + 1).padStart(2, '0')}</p>
                   </div>
