@@ -78,8 +78,8 @@ export default function Ley21719ResourcesPage() {
 
       <main>
         <section className="relative min-h-[720px] overflow-hidden border-b border-border px-6 py-24 md:py-32">
-          <Image src="/brand/law-21719-hero.webp" alt="" fill priority sizes="100vw" className="object-cover object-center" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,.96)_38%,rgba(23,23,21,.28)_76%),linear-gradient(0deg,#171715_0%,transparent_48%)]" />
+          <Image src="/brand/law-21719-hero.webp" alt="" fill priority sizes="100vw" className="object-cover object-center brightness-[1.22] contrast-[1.06]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,.82)_38%,rgba(23,23,21,.08)_78%),linear-gradient(0deg,rgba(23,23,21,.82)_0%,transparent_46%)]" />
           <div className="relative mx-auto max-w-[1440px] lg:px-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
               <BookOpen className="h-4 w-4" /> Centro de conocimiento · Chile
@@ -124,8 +124,8 @@ export default function Ley21719ResourcesPage() {
               {chileComplianceGuides.map((guide, index) => (
                 <article key={guide.slug} className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_18px_60px_rgba(0,0,0,.22)] last:lg:col-span-2">
                   <div className="relative h-56 overflow-hidden border-b border-border sm:h-64">
-                    <Image src={guideImages[index]} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.025]" />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(32,32,29,.9)_100%)]" />
+                    <Image src={guideImages[index]} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover brightness-[1.12] contrast-[1.04] transition duration-500 group-hover:scale-[1.025]" />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(32,32,29,.82)_100%)]" />
                     <p className="absolute bottom-5 left-7 text-xs font-bold uppercase tracking-[0.18em] text-[#C5E052]">Guía {String(index + 1).padStart(2, '0')}</p>
                   </div>
                   <div className="flex flex-1 flex-col p-7">
