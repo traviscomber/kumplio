@@ -1,0 +1,44 @@
+from pathlib import Path
+
+p = Path('app/page.tsx')
+text = p.read_text()
+start = text.index('        <section id="como-funciona" className="scroll-mt-20 border-b border-[#393833]">')
+end = text.index('        <section className="relative scroll-mt-20 border-b border-[#393833] bg-[#20201D]">', start)
+
+shared = '''        <section id="como-funciona" className="scroll-mt-20 border-b border-[#393833]">
+          <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden bg-[#10110F] lg:block">
+            <div className="absolute left-[6.2%] top-[8.5%]">
+              <h2 className="text-[clamp(44px,4.2vw,72px)] font-light leading-none tracking-[-.035em] text-[#C2A887]">
+                {locale === 'es' ? <>Así funciona <span className="text-[#B17A4D]">Kumplio.</span></> : <>How Kumplio <span className="text-[#B17A4D]">works.</span></>}
+              </h2>
+              <p className="mt-5 text-[clamp(15px,1.2vw,21px)] text-[#C8C3B8]">{locale === 'es' ? 'De la información a la acción, sin fricción.' : 'From information to action, without friction.'}</p>
+            </div>
+            <div className="absolute inset-x-[3.8%] top-[36.5%] grid grid-cols-3">
+              {[
+                ['/brand/kumplio-how-understand.webp', '01', c.how[0][0], c.how[0][1]],
+                ['/brand/kumplio-how-resolve.webp', '02', c.how[1][0], c.how[1][1]],
+                ['/brand/kumplio-how-demonstrate.webp', '03', c.how[2][0], c.how[2][1]],
+              ].map(([src, number, title, body], index) => <article key={number} className={`relative min-h-[360px] px-[5%] ${index > 0 ? 'border-l border-[#393833]' : ''}`}>
+                <span className="absolute -top-8 left-[1%] text-[clamp(58px,5vw,88px)] font-light leading-none text-[#242421]">{number}</span>
+                <div className="relative z-10 grid grid-cols-[42%_58%] items-center gap-[5%] pt-12">
+                  <div className="relative aspect-square w-full max-w-[205px] justify-self-center">
+                    <Image src={src} alt="" fill sizes="205px" className="object-contain mix-blend-lighten" />
+                  </div>
+                  <div className="pr-[4%]">
+                    <h3 className="text-[clamp(24px,1.8vw,34px)] font-light leading-tight text-[#C2A887]">{title}</h3>
+                    <span className="mt-5 block h-px w-12 bg-[#8D674C]" />
+                    <p className="mt-6 max-w-[275px] text-[clamp(12px,.92vw,16px)] leading-[1.55] text-[#C8C3B8]">{body}</p>
+                  </div>
+                </div>
+                {index < 2 && <ArrowRight className="absolute -right-[21px] top-[39%] z-20 h-10 w-10 text-[#9A7C61]" strokeWidth={1.1} />}
+              </article>)}
+            </div>
+          </div>
+          <div className={`relative overflow-hidden ${sections} lg:hidden`}>
+            <div className="relative mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#5A5045] bg-[#171715]/55 backdrop-blur-[2px] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#5A5045] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-base leading-7 text-[#C8C3B8]">{body}</p></article>)}</div></div>
+          </div>
+        </section>
+
+'''
+
+p.write_text(text[:start] + shared + text[end:])
