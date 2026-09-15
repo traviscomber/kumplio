@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getWorkflowDefinition } from '@/lib/agents/orchestration'
 import { buildComplianceOutcome } from '@/lib/agents/outcome-contract'
+import { evaluateComplianceOutcome } from '@/lib/agents/evaluator'
 
 export const runtime = 'nodejs'
 
@@ -69,6 +70,7 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     goal: caseRecord?.title || caseRecord?.description || null,
     artifacts,
   })
+  const outcomeQuality = evaluateComplianceOutcome(outcome)
 
   return NextResponse.json({
     workflow,
@@ -77,6 +79,7 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     artifacts,
     reviews: reviewsResult.data || [],
     outcome,
+    outcomeQuality,
   }, {
     headers: { 'Cache-Control': 'no-store' },
   })
