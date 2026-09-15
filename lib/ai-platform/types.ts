@@ -23,6 +23,16 @@ export type AIPlatformPlanStep = {
   purpose: string
 }
 
+export type AIPlatformRouting = {
+  track: 'fast_track' | 'full_agentic'
+  complexity: 'simple' | 'contextual' | 'multi_step'
+  confidence: number
+  reason: string
+  signals: string[]
+  escalated: boolean
+  retrievalHitCount: number
+}
+
 export type AIPlatformUsage = {
   inputTokens?: number | null
   outputTokens?: number | null
@@ -37,6 +47,7 @@ export type AIPlatformGroundedResponse = {
   sources: AIPlatformSource[]
   actions: AIPlatformAction[]
   plan: AIPlatformPlanStep[]
+  routing?: AIPlatformRouting
   caveats?: string[]
   generation?: {
     mode: 'deterministic' | 'llm_grounded'
