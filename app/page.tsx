@@ -96,10 +96,18 @@ export default async function HomePage() {
       </nav>
 
       <main>
-        <section className="relative min-h-[820px] border-b border-[#393833] pt-20">
-          <Image src="/brand/kumplio-hero-compliance.webp" alt="" fill priority sizes="100vw" className="object-cover object-[68%_center] opacity-30 grayscale-[30%]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#171715_4%,rgba(23,23,21,.93)_42%,rgba(23,23,21,.28)_100%)]" />
-          <div className="relative mx-auto flex min-h-[740px] max-w-[1440px] items-center px-5 py-24 sm:px-8 lg:px-12">
+        <section className="relative border-b border-[#393833] pt-20">
+          {locale === 'es' && <div className="relative mx-auto hidden aspect-[1600/611] w-full max-w-[1920px] lg:block">
+            <Image src="/brand/kumplio-master-hero.jpg" alt="Cumplir sin perseguir documentos: Kumplio conecta personas, documentos, requisitos y evidencia." fill priority sizes="100vw" className="object-contain" />
+            <h1 className="sr-only">Cumplir. Sin perseguir documentos.</h1>
+            <p className="sr-only">{c.heroSupport}</p>
+            <a href="#trabajador-desktop" aria-label="Soy trabajador: tus documentos listos para trabajar" className="absolute left-[7.7%] top-[61.5%] h-[10%] w-[14.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
+            <a href="#empresa-desktop" aria-label="Gestiono una empresa: controla el cumplimiento de tu equipo" className="absolute left-[26.1%] top-[61.5%] h-[10%] w-[15%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
+          </div>}
+          <div className={`relative min-h-[740px] overflow-hidden ${locale === 'es' ? 'lg:hidden' : ''}`}>
+            <Image src="/brand/kumplio-hero-compliance.webp" alt="" fill priority sizes="100vw" className="object-cover object-[68%_center] opacity-30 grayscale-[30%]" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,#171715_4%,rgba(23,23,21,.93)_42%,rgba(23,23,21,.28)_100%)]" />
+            <div className="relative mx-auto flex min-h-[740px] max-w-[1440px] items-center px-5 py-24 sm:px-8 lg:px-12">
             <div data-reveal className="max-w-[760px]">
               <p className={eyebrow}>{c.heroEyebrow}</p>
               <h1 className="mt-8 text-balance text-[52px] font-light leading-[1.01] tracking-[-.045em] text-[#C2A887] sm:text-[72px] lg:text-[84px]"><span>{c.heroTitleA}</span><br /><span className="text-[#B17A4D]">{c.heroTitleB}</span></h1>
@@ -107,15 +115,22 @@ export default async function HomePage() {
               <div className="mt-10 flex flex-wrap gap-3"><Button asChild className="h-12 rounded-[4px] px-6"><a href="#trabajador">{c.workerPath}</a></Button><Button asChild variant="outline" className="h-12 rounded-[4px] border-[#747169] bg-[#171715]/70 px-6 text-[#C2A887]"><a href="#empresa">{c.companyPath}</a></Button></div>
             </div>
           </div>
+          </div>
         </section>
 
         <section className={sections}><div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-2"><div data-reveal><p className={eyebrow}>{c.problemEyebrow}</p><h2 className={h2}>{c.problemTitle}</h2></div><p data-reveal className="self-end text-lg leading-9 text-[#AAA69C]">{c.problemBody}</p></div></section>
 
         <section id="resolver-form" className={`scroll-mt-20 bg-[#20201D] ${sections}`}><div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[.78fr_1.22fr]"><div><p className={eyebrow}>{c.startTitle}</p><h2 className={h2}>{c.startBody}</h2></div><ResolutionEntry locale={locale} /></div></section>
 
-        <section id="como-funciona" className={`scroll-mt-20 ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#393833] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#393833] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-sm leading-7">{body}</p></article>)}</div></div></section>
+        <section id="como-funciona" className="scroll-mt-20 border-b border-[#393833]">
+          {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-how.jpg" alt="Así funciona Kumplio: Entiende, Resuelve y Demuestra." fill sizes="100vw" className="object-contain" /><div className="sr-only"><h2>Así funciona Kumplio.</h2>{c.how.map(([title, body]) => <section key={title}><h3>{title}</h3><p>{body}</p></section>)}</div></div>}
+          <div className={`${sections} ${locale === 'es' ? 'lg:hidden' : ''}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#393833] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#393833] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-sm leading-7">{body}</p></article>)}</div></div></div>
+        </section>
 
-        <section className={`bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#393833] lg:grid-cols-2"><article id="trabajador" className="scroll-mt-24 py-12 lg:border-r lg:border-[#393833] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article id="empresa" className="scroll-mt-24 py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div></section>
+        <section className="border-b border-[#393833] bg-[#20201D]">
+          {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-paths.jpg" alt="Dos caminos, un mismo resultado: Kumplio para trabajadores y para empresas." fill sizes="100vw" className="object-contain" /><h2 className="sr-only">Dos caminos. Un mismo resultado.</h2><a id="trabajador-desktop" href="/sign-up?audience=person" aria-label="Crear mi perfil de trabajador" className="absolute left-[25%] top-[71%] h-[8%] w-[17.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /><a id="empresa-desktop" href="/sign-up?audience=company" aria-label="Gestionar mi empresa" className="absolute left-[54.2%] top-[71%] h-[8%] w-[19.5%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /></div>}
+          <div className={`${sections} ${locale === 'es' ? 'lg:hidden' : ''}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#393833] lg:grid-cols-2"><article id="trabajador" className="scroll-mt-24 py-12 lg:border-r lg:border-[#393833] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article id="empresa" className="scroll-mt-24 py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div></div>
+        </section>
 
         <section className={sections}><div className="mx-auto max-w-[1100px]"><p className={eyebrow}>{c.statusEyebrow}</p><h2 className={h2}>{c.statusTitle}</h2><div className="mt-14 grid border-y border-[#393833] sm:grid-cols-3">{[['92%', c.statusLabels[0]], ['9', c.statusLabels[1]], ['17', c.statusLabels[2]]].map(([value, label], index) => <div key={label} className="py-10 sm:border-r sm:border-[#393833] sm:px-8 last:border-r-0"><p className={`text-5xl font-light ${index === 0 ? 'text-[#A7C63A]' : 'text-[#C2A887]'}`}>{value}</p><p className="mt-3 text-sm">{label}</p></div>)}</div></div></section>
 
