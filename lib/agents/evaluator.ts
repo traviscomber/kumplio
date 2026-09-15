@@ -1,5 +1,6 @@
 import type { AgentOutput } from './schemas'
 import type { AgentEvalCase } from './eval-cases'
+import type { ComplianceOutcome } from './outcome-contract'
 
 export type AgentEvaluation = {
   passed: boolean
@@ -9,6 +10,15 @@ export type AgentEvaluation = {
     passed: boolean
     detail: string
   }>
+}
+
+export type OutcomeEvaluation = AgentEvaluation & {
+  dimensions: {
+    actionability: number
+    evidenceClarity: number
+    closureClarity: number
+    humanControl: number
+  }
 }
 
 function normalize(value: unknown) {
@@ -80,4 +90,81 @@ export function evaluateAgentOutput(testCase: AgentEvalCase, output: AgentOutput
     score,
     findings,
   }
+}
+
+export function evaluateComplianceOutcome(outcome: ComplianceOutcome): OutcomeEvaluation {
+  const findings: AgentEvaluation['findings'] = []
+  const add = (check: string, passed: boolean, detail: string) => findings.push({ check, passed, detail })
+
+  add(
+    'summary_present',
+    outcome.summary.trim().length >= 20,
+    outcome.summary.trim().length >= 20 ? 'Outcome has an executive summary.' : 'Outcome summary is missing or too short.',
+  )
+
+  const hasActionOrExplicitBlocker = Boolean(outcome.nextAction || outcome.blockers.length || outcome.missing.length)
+  add(
+    'action_or_blocker_explicit',
+    hasActionOrExplicitBlocker,
+    hasActionOrExplicitBlocker ? 'Next action or blocking condition is explicit.' : 'Outcome does not tell the user what happens next.',
+  )
+
+  const evidenceStateExplicit = outcome.evidenceCount > 0 || outcome.missing.length > 0 || outcome.blockers.length > 0
+  add(
+    'evidence_state_explicit',
+    evidenceStateExplicit,
+    evidenceStateExplicit ? 'Evidence availability or evidence gap is explicit.' : 'Evidence state is ambiguous.',
+  )
+
+  const closureExplicit = Boolean(
+    outcome.nextAction?.closureCriteria.length
+    || outcome.actions.some((action) => action.closureCriteria.length > 0)
+    || outcome.status === 'blocked',
+  )
+  add(
+    'closure_criteria_explicit',
+    closureExplicit,
+    closureExplicit ? 'Closure criteria or an explicit blocking state is present.' : 'No verifiable closure criteria are exposed.',
+  )
+
+  add(
+    'human_control_explicit',
+    outcome.humanReviewRequired,
+    outcome.humanReviewRequired ? 'Sensitive outcome remains under human review.' : 'Human review requirement is missing.',
+  )
+
+  const falseReady = outcome.status === 'ready' && (outcome.missing.length > 0 || outcome.blockers.length > 0)
+  add(
+    'no_false_ready_state',
+    !falseReady,
+    falseReady ? 'Outcome is marked ready despite unresolved missing information or blockers.' : 'Ready state is consistent with known gaps.',
+  )
+
+  const score = percent(findings.filter((finding) => finding.passed).length, findings.length)
+  const actionability = percent(
+    Number(Boolean(outcome.nextAction || outcome.blockers.length)) + Number(outcome.actions.length > 0 || outcome.status === 'blocked'),
+    2,
+  )
+  const evidenceClarity = percent(
+    Number(evidenceStateExplicit) + Number(outcome.evidenceCount > 0 || outcome.missing.length > 0),
+    2,
+  )
+  const closureClarity = percent(Number(closureExplicit) + Number(!falseReady), 2)
+  const humanControl = outcome.humanReviewRequired ? 100 : 0
+
+  return {
+    passed: findings.every((finding) => finding.passed),
+    score,
+    findings,
+    dimensions: {
+      actionability,
+      evidenceClarity,
+      closureClarity,
+      humanControl,
+    },
+  }
+}
+
+function percent(value: number, total: number) {
+  return total ? Math.round((value / total) * 1000) / 10 : 0
 }
