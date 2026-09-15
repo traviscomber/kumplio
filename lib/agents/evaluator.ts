@@ -102,11 +102,16 @@ export function evaluateComplianceOutcome(outcome: ComplianceOutcome): OutcomeEv
     outcome.summary.trim().length >= 20 ? 'Outcome has an executive summary.' : 'Outcome summary is missing or too short.',
   )
 
-  const hasActionOrExplicitBlocker = Boolean(outcome.nextAction || outcome.blockers.length || outcome.missing.length)
+  const hasActionOrExplicitState = Boolean(
+    outcome.nextAction
+    || outcome.blockers.length
+    || outcome.missing.length
+    || (outcome.status === 'ready' && outcome.resolved.length),
+  )
   add(
-    'action_or_blocker_explicit',
-    hasActionOrExplicitBlocker,
-    hasActionOrExplicitBlocker ? 'Next action or blocking condition is explicit.' : 'Outcome does not tell the user what happens next.',
+    'action_or_resolved_state_explicit',
+    hasActionOrExplicitState,
+    hasActionOrExplicitState ? 'Next action, resolved state or blocking condition is explicit.' : 'Outcome does not tell the user what happens next or what is already resolved.',
   )
 
   const evidenceStateExplicit = outcome.evidenceCount > 0 || outcome.missing.length > 0 || outcome.blockers.length > 0
@@ -119,30 +124,41 @@ export function evaluateComplianceOutcome(outcome: ComplianceOutcome): OutcomeEv
   const closureExplicit = Boolean(
     outcome.nextAction?.closureCriteria.length
     || outcome.actions.some((action) => action.closureCriteria.length > 0)
-    || outcome.status === 'blocked',
+    || outcome.status === 'blocked'
+    || (outcome.status === 'ready' && outcome.humanReviewStatus === 'approved'),
   )
   add(
     'closure_criteria_explicit',
     closureExplicit,
-    closureExplicit ? 'Closure criteria or an explicit blocking state is present.' : 'No verifiable closure criteria are exposed.',
+    closureExplicit ? 'Closure criteria, approved closure or an explicit blocking state is present.' : 'No verifiable closure criteria are exposed.',
   )
 
+  const humanControlExplicit = Boolean(
+    outcome.humanReviewRequired
+    && ['not_started', 'in_progress', 'approved', 'changes_requested', 'rejected'].includes(outcome.humanReviewStatus),
+  )
   add(
     'human_control_explicit',
-    outcome.humanReviewRequired,
-    outcome.humanReviewRequired ? 'Sensitive outcome remains under human review.' : 'Human review requirement is missing.',
+    humanControlExplicit,
+    humanControlExplicit ? `Human review state is explicit: ${outcome.humanReviewStatus}.` : 'Human review requirement or state is missing.',
   )
 
-  const falseReady = outcome.status === 'ready' && (outcome.missing.length > 0 || outcome.blockers.length > 0)
+  const falseReady = outcome.status === 'ready' && (
+    outcome.missing.length > 0
+    || outcome.blockers.length > 0
+    || outcome.humanReviewStatus !== 'approved'
+    || outcome.resolved.length === 0
+  )
   add(
     'no_false_ready_state',
     !falseReady,
-    falseReady ? 'Outcome is marked ready despite unresolved missing information or blockers.' : 'Ready state is consistent with known gaps.',
+    falseReady ? 'Outcome is marked ready without approved human closure or while known gaps remain.' : 'Ready state is consistent with known gaps and human review.',
   )
 
   const score = percent(findings.filter((finding) => finding.passed).length, findings.length)
   const actionability = percent(
-    Number(Boolean(outcome.nextAction || outcome.blockers.length)) + Number(outcome.actions.length > 0 || outcome.status === 'blocked'),
+    Number(Boolean(outcome.nextAction || outcome.blockers.length || outcome.resolved.length))
+      + Number(outcome.actions.length > 0 || outcome.status === 'blocked' || outcome.status === 'ready'),
     2,
   )
   const evidenceClarity = percent(
@@ -150,7 +166,7 @@ export function evaluateComplianceOutcome(outcome: ComplianceOutcome): OutcomeEv
     2,
   )
   const closureClarity = percent(Number(closureExplicit) + Number(!falseReady), 2)
-  const humanControl = outcome.humanReviewRequired ? 100 : 0
+  const humanControl = humanControlExplicit ? 100 : 0
 
   return {
     passed: findings.every((finding) => finding.passed),
