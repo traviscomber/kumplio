@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 
 const page = fs.readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8')
+const mobileNav = fs.readFileSync(new URL('../components/marketing/mobile-public-nav.tsx', import.meta.url), 'utf8')
 
 for (const fragment of [
   'backdrop-blur-md',
@@ -36,15 +37,17 @@ for (const id of ['empresa', 'trabajador']) {
   }
 }
 
-const intakeLinks = page.match(/href="#resolver-form"/g) ?? []
-if (intakeLinks.length < 2) {
-  console.error(`Landing polish contract expected at least 2 direct intake links, found ${intakeLinks.length}`)
+const desktopIntakeLinks = page.match(/href="#resolver-form"/g) ?? []
+if (desktopIntakeLinks.length < 2) {
+  console.error(`Landing polish contract expected at least 2 direct intake links, found ${desktopIntakeLinks.length}`)
   process.exit(1)
 }
 
-if (!page.includes('sm:text-sm')) {
-  console.error('Landing polish contract requires a compact mobile primary CTA')
-  process.exit(1)
+for (const fragment of ['backdrop-blur-xl', 'href="#resolver-form"', 'text-sm']) {
+  if (!mobileNav.includes(fragment)) {
+    console.error(`Landing polish contract missing mobile navigation polish: ${fragment}`)
+    process.exit(1)
+  }
 }
 
 console.log('Landing polish contract: PASS')
