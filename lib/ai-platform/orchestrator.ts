@@ -12,6 +12,8 @@ export async function orchestrateGroundedResponse(input: {
   actorUserId?: string | null
   organizationId?: string | null
   surface?: string
+  metadata?: Record<string, unknown>
+  skipGeneration?: boolean
 }) {
   const startedAt = performance.now()
 
@@ -25,6 +27,28 @@ export async function orchestrateGroundedResponse(input: {
     sources: compacted.sources,
     actions: compacted.allowed_actions,
     caveats: compacted.caveats,
+  }
+  const telemetryMetadata = {
+    ...input.metadata,
+    ...(input.deterministic.routing ? { routing: input.deterministic.routing } : {}),
+  }
+
+  if (input.skipGeneration) {
+    const response: AIPlatformGroundedResponse = {
+      ...normalized,
+      generation: { mode: 'deterministic' },
+    }
+    await recordAIPlatformTelemetry({
+      actorUserId: input.actorUserId,
+      organizationId: input.organizationId,
+      surface: input.surface,
+      userMessage: input.userMessage,
+      response,
+      latencyMs: performance.now() - startedAt,
+      success: true,
+      metadata: { ...telemetryMetadata, generationSkipped: true },
+    })
+    return response
   }
 
   try {
@@ -46,6 +70,7 @@ export async function orchestrateGroundedResponse(input: {
       outputTokens: usage?.outputTokens,
       totalTokens: usage?.totalTokens,
       estimatedCostUsd: usage?.estimatedCostUsd,
+      metadata: telemetryMetadata,
     })
 
     return response
@@ -68,6 +93,7 @@ export async function orchestrateGroundedResponse(input: {
       latencyMs: performance.now() - startedAt,
       success: false,
       errorCode: 'orchestration_failure',
+      metadata: telemetryMetadata,
     })
 
     return fallback

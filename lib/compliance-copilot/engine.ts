@@ -11,6 +11,16 @@ export type CopilotPlanStep = {
   purpose: string
 }
 
+export type CopilotRouting = {
+  track: 'fast_track' | 'full_agentic'
+  complexity: 'simple' | 'contextual' | 'multi_step'
+  confidence: number
+  reason: string
+  signals: string[]
+  escalated: boolean
+  retrievalHitCount: number
+}
+
 export type CopilotResponse = {
   intent: CopilotIntent
   answer: string
@@ -18,6 +28,7 @@ export type CopilotResponse = {
   sources: Array<{ type: string; id: string; label: string }>
   actions: Array<{ label: string; href: string }>
   plan: CopilotPlanStep[]
+  routing?: CopilotRouting
   generation?: {
     mode: 'deterministic' | 'llm_grounded'
     model?: string
