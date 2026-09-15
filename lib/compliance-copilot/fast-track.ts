@@ -8,6 +8,12 @@ const INTERNAL_CONTEXT_TERMS = [
   'vencida', 'vencidas', 'vencido', 'vencidos', 'pendiente', 'pendientes', 'abierto', 'abiertos', 'prioridad actual',
 ]
 
+const CURRENTNESS_TERMS = [
+  'vigente', 'vigencia', 'hoy', 'actualmente', 'a la fecha', 'desde cuando', 'desde cuándo', 'cuando entra', 'cuándo entra',
+  'entra en vigencia', 'fecha efectiva', 'ultima version', 'última versión', 'ultimo cambio', 'último cambio',
+  'que cambio', 'qué cambió', 'nueva ley', 'nueva norma', 'modificacion reciente', 'modificación reciente',
+]
+
 const TOPIC_TERMS: Record<string, string[]> = {
   'principios-proteccion-datos': [
     'principios de proteccion de datos', 'licitud', 'finalidad', 'proporcionalidad', 'calidad de datos',
@@ -39,7 +45,7 @@ export type FastTrackMatch = {
 
 export function buildOfficialFastTrackResponse(message: string): FastTrackMatch | null {
   const normalized = normalize(message)
-  if (!normalized || includesAny(normalized, INTERNAL_CONTEXT_TERMS)) return null
+  if (!normalized || includesAny(normalized, INTERNAL_CONTEXT_TERMS) || includesAny(normalized, CURRENTNESS_TERMS)) return null
 
   const ranked = chileComplianceGuides
     .map((guide) => ({ guide, score: scoreGuide(normalized, guide) }))
@@ -55,8 +61,8 @@ export function buildOfficialFastTrackResponse(message: string): FastTrackMatch 
     track: 'fast_track',
     complexity: 'simple',
     confidence: Math.round(confidence * 100) / 100,
-    reason: 'La consulta es conceptual, tiene una coincidencia clara en contenido oficial curado y no requiere datos internos de la organización.',
-    signals: [`guide:${best.guide.slug}`, 'official_curated_source', 'no_internal_context'],
+    reason: 'La consulta es conceptual, tiene una coincidencia clara en contenido oficial curado y no requiere datos internos ni verificación temporal.',
+    signals: [`guide:${best.guide.slug}`, 'official_curated_source', 'no_internal_context', 'not_time_sensitive'],
     escalated: false,
     retrievalHitCount: 1,
   }
@@ -75,7 +81,10 @@ export function buildOfficialFastTrackResponse(message: string): FastTrackMatch 
     }],
     actions: [],
     plan: [],
-    caveats: ['Esta orientación es general y no evalúa la situación particular de tu organización.'],
+    caveats: [
+      'Esta orientación es general y no evalúa la situación particular de tu organización.',
+      'Las preguntas sobre vigencia, cambios recientes o fechas efectivas se escalan fuera de FastTrack para verificación contextual.',
+    ],
     routing,
     generation: { mode: 'deterministic' },
   }
