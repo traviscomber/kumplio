@@ -66,9 +66,13 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     ? workflow.compliance_cases[0]
     : workflow.compliance_cases
   const artifacts = artifactsResult.data || []
+  const reviews = reviewsResult.data || []
   const outcome = buildComplianceOutcome({
     goal: caseRecord?.title || caseRecord?.description || null,
+    workflowStatus: workflow.status,
     artifacts,
+    stages: stages || [],
+    reviews,
   })
   const outcomeQuality = evaluateComplianceOutcome(outcome)
 
@@ -77,7 +81,7 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     template: getWorkflowDefinition(workflow.workflow_type),
     stages: stages || [],
     artifacts,
-    reviews: reviewsResult.data || [],
+    reviews,
     outcome,
     outcomeQuality,
   }, {
