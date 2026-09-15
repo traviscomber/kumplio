@@ -105,7 +105,6 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           caseId,
-          workflowType: 'compliance_assessment',
           instructions: context || null,
         }),
       })
