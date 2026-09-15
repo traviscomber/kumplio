@@ -1,7 +1,12 @@
 import { redirect } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
-import { Activity, Bot, CircleDollarSign, Clock3, Database, Gauge, RotateCcw, Zap } from 'lucide-react'
+import { Activity, Bot, CircleDollarSign, Clock3, Database, Gauge, RotateCcw, Route, Zap } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
+import {
+  summarizeRoutingTelemetry,
+  type RoutingTelemetryRow,
+  type TrackMetrics,
+} from '@/lib/compliance-copilot/routing-metrics'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -19,7 +24,7 @@ type TelemetryRun = {
   input_tokens: number | null
   output_tokens: number | null
   total_tokens: number | null
-  estimated_cost_usd: number | string | null
+  estimated_cost_usd: number | null
   success: boolean
   created_at: string
 }
@@ -38,13 +43,24 @@ function percentile(values: number[], target: number) {
   return sorted[index] ?? 0
 }
 
-function formatUsd(value: number) {
+function formatUsd(value: number | null) {
+  if (value == null) return '—'
   return new Intl.NumberFormat('es-CL', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 4,
     maximumFractionDigits: 6,
   }).format(value)
+}
+
+function formatPercent(value: number | null) {
+  if (value == null) return '—'
+  return `${Math.round(value * 1000) / 10}%`
+}
+
+function formatMetric(value: number | null, suffix = '') {
+  if (value == null) return '—'
+  return `${value.toLocaleString('es-CL', { maximumFractionDigits: 2 })}${suffix}`
 }
 
 function isAuthorized(input: {
@@ -61,6 +77,41 @@ function isAuthorized(input: {
   return Boolean(input.email && allowed.includes(input.email.toLowerCase()))
 }
 
+function RoutingColumn({ metrics }: { metrics: TrackMetrics }) {
+  const rows = [
+    ['Runs', metrics.count.toLocaleString('es-CL')],
+    ['Participación', formatPercent(metrics.share)],
+    ['Éxito', formatPercent(metrics.successRate)],
+    ['Fallback', formatPercent(metrics.fallbackRate)],
+    ['Generación omitida', formatPercent(metrics.generationSkippedRate)],
+    ['Latencia media', formatMetric(metrics.averageLatencyMs, ' ms')],
+    ['Latencia p50', formatMetric(metrics.p50LatencyMs, ' ms')],
+    ['Latencia p95', formatMetric(metrics.p95LatencyMs, ' ms')],
+    ['Costo medio estimado', formatUsd(metrics.averageEstimatedCostUsd)],
+    ['Fuentes medias', formatMetric(metrics.averageSources)],
+    ['Acciones medias', formatMetric(metrics.averageActions)],
+  ] as const
+
+  return (
+    <article className="rounded-2xl border bg-background/40 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-bold">{metrics.track === 'fast_track' ? 'FastTrack' : 'FullAgentic'}</h3>
+        <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {metrics.count} runs
+        </span>
+      </div>
+      <dl className="mt-5 divide-y">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between gap-4 py-2.5 text-sm">
+            <dt className="text-muted-foreground">{label}</dt>
+            <dd className="font-semibold tabular-nums">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </article>
+  )
+}
+
 export default async function AIPlatformDashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -72,6 +123,14 @@ export default async function AIPlatformDashboardPage() {
   })) {
     redirect('/dashboard')
   }
+
+  const { data: membership } = await supabase
+    .from('organization_members')
+    .select('organization_id')
+    .eq('user_id', user.id)
+    .limit(1)
+    .maybeSingle()
+  const currentOrganizationId = membership?.organization_id ? String(membership.organization_id) : null
 
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   const admin = createAdminClient()
@@ -96,13 +155,40 @@ export default async function AIPlatformDashboardPage() {
     input_tokens: row.input_tokens == null ? null : toNumber(row.input_tokens),
     output_tokens: row.output_tokens == null ? null : toNumber(row.output_tokens),
     total_tokens: row.total_tokens == null ? null : toNumber(row.total_tokens),
-    estimated_cost_usd: row.estimated_cost_usd == null ? null : String(row.estimated_cost_usd),
+    estimated_cost_usd: row.estimated_cost_usd == null ? null : toNumber(row.estimated_cost_usd),
     success: row.success === true,
     created_at: String(row.created_at),
   })) : []
 
+  let workspaceRoutingRows: RoutingTelemetryRow[] = []
+  if (currentOrganizationId) {
+    const { data: routingData, error: routingError } = await admin
+      .from('ai_platform_runs')
+      .select('generation_mode,fallback_reason,latency_ms,estimated_cost_usd,source_count,action_count,success,error_code,metadata,created_at')
+      .eq('organization_id', currentOrganizationId)
+      .eq('surface', 'copilot')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(1000)
+
+    if (routingError) throw new Error(`No fue posible cargar la telemetría tenant-scoped: ${routingError.message}`)
+
+    workspaceRoutingRows = Array.isArray(routingData) ? routingData.map((row) => ({
+      generation_mode: typeof row.generation_mode === 'string' ? row.generation_mode : null,
+      fallback_reason: typeof row.fallback_reason === 'string' ? row.fallback_reason : null,
+      latency_ms: row.latency_ms == null ? null : toNumber(row.latency_ms),
+      estimated_cost_usd: row.estimated_cost_usd == null ? null : toNumber(row.estimated_cost_usd),
+      source_count: row.source_count == null ? null : toNumber(row.source_count),
+      action_count: row.action_count == null ? null : toNumber(row.action_count),
+      success: typeof row.success === 'boolean' ? row.success : null,
+      error_code: typeof row.error_code === 'string' ? row.error_code : null,
+      metadata: row.metadata,
+      created_at: typeof row.created_at === 'string' ? row.created_at : null,
+    })) : []
+  }
+
   const llmRuns = runs.filter((run) => run.generation_mode === 'llm_grounded')
-  const fallbackRuns = runs.filter((run) => run.generation_mode === 'deterministic')
+  const fallbackRuns = runs.filter((run) => Boolean(run.fallback_reason))
   const latencies = runs.map((run) => toNumber(run.latency_ms))
   const totalTokens = runs.reduce((sum, run) => sum + toNumber(run.total_tokens), 0)
   const totalCost = runs.reduce((sum, run) => sum + toNumber(run.estimated_cost_usd), 0)
@@ -112,7 +198,7 @@ export default async function AIPlatformDashboardPage() {
     const current = acc[run.intent] ?? { count: 0, latency: 0, fallback: 0, tokens: 0, cost: 0 }
     current.count += 1
     current.latency += toNumber(run.latency_ms)
-    current.fallback += run.generation_mode === 'deterministic' ? 1 : 0
+    current.fallback += run.fallback_reason ? 1 : 0
     current.tokens += toNumber(run.total_tokens)
     current.cost += toNumber(run.estimated_cost_usd)
     acc[run.intent] = current
@@ -120,6 +206,7 @@ export default async function AIPlatformDashboardPage() {
   }, {})
 
   const byIntent = Object.entries(grouped).sort(([, left], [, right]) => right.count - left.count)
+  const routingSummary = summarizeRoutingTelemetry(workspaceRoutingRows)
 
   const cards: MetricCard[] = [
     ['Ejecuciones', runs.length, Activity],
@@ -157,6 +244,69 @@ export default async function AIPlatformDashboardPage() {
               <p className="mt-4 text-3xl font-extrabold">{String(value)}</p>
             </article>
           ))}
+        </section>
+
+        <section className="rounded-2xl border bg-card p-5 sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-primary">
+                <Route className="h-5 w-5" />
+                <p className="text-xs font-bold uppercase tracking-[0.18em]">Routing por workspace</p>
+              </div>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-tight">FastTrack vs FullAgentic</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                Sólo ejecuciones Copilot de tu workspace actual durante los últimos 30 días. La consulta de estas métricas se filtra por organización antes de agregarlas y no se usa como score de cumplimiento.
+              </p>
+            </div>
+            <span className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${routingSummary.comparisonReady ? 'bg-amber-500/10 text-amber-300' : 'bg-muted text-muted-foreground'}`}>
+              {routingSummary.comparisonReady
+                ? 'Muestra mínima alcanzada · revisar comparabilidad'
+                : `Comparación aún no lista · mínimo ${routingSummary.minimumSamplesPerTrack} por track`}
+            </span>
+          </div>
+
+          {!currentOrganizationId ? (
+            <div className="mt-6 rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
+              No hay un workspace activo asociado a este usuario; no se muestran métricas tenant-scoped.
+            </div>
+          ) : (
+            <>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <article className="rounded-xl border bg-background/40 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Muestra clasificada</p>
+                  <p className="mt-2 text-2xl font-extrabold">{routingSummary.classifiedSampleSize}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{routingSummary.unknownRouteCount} sin track clasificable</p>
+                </article>
+                <article className="rounded-xl border bg-background/40 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">FastTrack</p>
+                  <p className="mt-2 text-2xl font-extrabold">{routingSummary.fastTrack.count}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatPercent(routingSummary.fastTrack.share)} de rutas clasificadas</p>
+                </article>
+                <article className="rounded-xl border bg-background/40 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">FullAgentic</p>
+                  <p className="mt-2 text-2xl font-extrabold">{routingSummary.fullAgentic.count}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatPercent(routingSummary.fullAgentic.share)} de rutas clasificadas</p>
+                </article>
+                <article className="rounded-xl border bg-background/40 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Escalaciones</p>
+                  <p className="mt-2 text-2xl font-extrabold">{routingSummary.escalatedCount}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatPercent(routingSummary.escalatedRate)} de rutas clasificadas</p>
+                </article>
+              </div>
+
+              <div className="mt-5 grid gap-4 xl:grid-cols-2">
+                <RoutingColumn metrics={routingSummary.fastTrack} />
+                <RoutingColumn metrics={routingSummary.fullAgentic} />
+              </div>
+
+              <div className="mt-5 rounded-xl border border-dashed p-4">
+                <p className="text-sm font-semibold">Lectura responsable</p>
+                <ul className="mt-2 space-y-1 text-xs leading-5 text-muted-foreground">
+                  {routingSummary.caveats.map((caveat) => <li key={caveat}>• {caveat}</li>)}
+                </ul>
+              </div>
+            </>
+          )}
         </section>
 
         <section className="rounded-2xl border bg-card">
@@ -210,7 +360,7 @@ export default async function AIPlatformDashboardPage() {
                 <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                   <span>{run.latency_ms} ms</span>
                   <span>{toNumber(run.total_tokens).toLocaleString('es-CL')} tokens</span>
-                  <span>{formatUsd(toNumber(run.estimated_cost_usd))}</span>
+                  <span>{formatUsd(run.estimated_cost_usd)}</span>
                   <span>{run.model || 'determinístico'}</span>
                 </div>
               </article>
