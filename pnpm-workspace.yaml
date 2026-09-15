@@ -1,0 +1,14 @@
+packages:
+  - '.'
+
+onlyBuiltDependencies:
+  - core-js
+  - msw
+  - sharp
+  - unrs-resolver
+
+allowBuilds:
+  core-js: true
+  msw: true
+  sharp: true
+  unrs-resolver: true
