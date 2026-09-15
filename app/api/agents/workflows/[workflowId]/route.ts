@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getWorkflowDefinition } from '@/lib/agents/orchestration'
+import { buildComplianceOutcome } from '@/lib/agents/outcome-contract'
+import { evaluateComplianceOutcome } from '@/lib/agents/evaluator'
 
 export const runtime = 'nodejs'
 
@@ -60,12 +62,24 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
       : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
   ])
 
+  const caseRecord = Array.isArray(workflow.compliance_cases)
+    ? workflow.compliance_cases[0]
+    : workflow.compliance_cases
+  const artifacts = artifactsResult.data || []
+  const outcome = buildComplianceOutcome({
+    goal: caseRecord?.title || caseRecord?.description || null,
+    artifacts,
+  })
+  const outcomeQuality = evaluateComplianceOutcome(outcome)
+
   return NextResponse.json({
     workflow,
     template: getWorkflowDefinition(workflow.workflow_type),
     stages: stages || [],
-    artifacts: artifactsResult.data || [],
+    artifacts,
     reviews: reviewsResult.data || [],
+    outcome,
+    outcomeQuality,
   }, {
     headers: { 'Cache-Control': 'no-store' },
   })

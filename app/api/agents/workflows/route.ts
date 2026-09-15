@@ -3,13 +3,14 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { getWorkflowDefinition, getWorkflowTemplates, type WorkflowType } from '@/lib/agents/orchestration'
+import { buildOrchestrationPlan, workflowTypeForIntent } from '@/lib/agents/orchestrator'
 
 export const runtime = 'nodejs'
 
 const workflowTypeSchema = z.enum(['compliance_assessment', 'contract_review', 'control_assessment'])
 const createSchema = z.object({
   caseId: z.string().uuid(),
-  workflowType: workflowTypeSchema.default('compliance_assessment'),
+  workflowType: workflowTypeSchema.optional(),
   instructions: z.string().trim().max(2000).nullable().optional(),
 })
 
@@ -56,31 +57,13 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Invalid workflow request', details: parsed.error.flatten() }, { status: 400 })
 
-  const definition = getWorkflowDefinition(parsed.data.workflowType, 'v2')
-  if (!definition) return NextResponse.json({ error: 'Workflow template not found', code: 'workflow_template_not_found' }, { status: 404 })
-
   const { data: complianceCase } = await supabase
     .from('compliance_cases')
-    .select('id, title, project_id')
+    .select('id, title, description, project_id')
     .eq('id', parsed.data.caseId)
     .eq('organization_id', organizationId)
     .maybeSingle()
   if (!complianceCase) return NextResponse.json({ error: 'Compliance case not found' }, { status: 404 })
-
-  const { data: existingWorkflow } = await supabase
-    .from('agent_workflows')
-    .select('id, case_id, workflow_type, status, current_stage, total_stages, created_at')
-    .eq('organization_id', organizationId)
-    .eq('case_id', parsed.data.caseId)
-    .eq('workflow_type', parsed.data.workflowType)
-    .in('status', ['draft', 'running', 'paused', 'pending_review', 'failed'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  if (existingWorkflow) {
-    return NextResponse.json({ workflow: existingWorkflow, resumed: true, code: 'existing_workflow_resumed' }, { status: 200 })
-  }
 
   const { data: links, error: linksError } = await supabase
     .from('compliance_case_resource_links')
@@ -95,10 +78,58 @@ export async function POST(req: NextRequest) {
     counts[link.resource_type] = (counts[link.resource_type] || 0) + 1
     return counts
   }, {})
+  const hasDocuments = Object.entries(resourceCounts).some(([resourceType, count]) => {
+    return count > 0 && /document|evidence|file|source|artifact/i.test(resourceType)
+  })
+  const goal = [parsed.data.instructions, complianceCase.description, complianceCase.title]
+    .find((value): value is string => typeof value === 'string' && Boolean(value.trim()))
+    ?.trim() || complianceCase.title
+
+  const orchestration = buildOrchestrationPlan({
+    goal,
+    audience: 'company',
+    hasDocuments,
+    hasOrganizationContext: true,
+    hasCaseResources: Boolean(links?.length),
+    requiresAction: true,
+  })
+  const selectedWorkflowType = parsed.data.workflowType || workflowTypeForIntent(orchestration.intent)
+  const definition = getWorkflowDefinition(selectedWorkflowType, 'v2')
+  if (!definition) return NextResponse.json({ error: 'Workflow template not found', code: 'workflow_template_not_found' }, { status: 404 })
+
+  const { data: existingWorkflow } = await supabase
+    .from('agent_workflows')
+    .select('id, case_id, workflow_type, status, current_stage, total_stages, created_at')
+    .eq('organization_id', organizationId)
+    .eq('case_id', parsed.data.caseId)
+    .eq('workflow_type', selectedWorkflowType)
+    .in('status', ['draft', 'running', 'paused', 'pending_review', 'failed'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (existingWorkflow) {
+    return NextResponse.json({
+      workflow: existingWorkflow,
+      resumed: true,
+      code: 'existing_workflow_resumed',
+      routing: orchestration.route,
+      intent: orchestration.intent,
+    }, { status: 200 })
+  }
+
   const inputPayload = {
     createdFrom: 'case',
     workflowVersion: definition.version,
     userInstructions: parsed.data.instructions || null,
+    desiredOutcome: goal,
+    intent: orchestration.intent,
+    routing: orchestration.route,
+    specialistPlan: orchestration.specialists.map((specialist) => ({
+      agentId: specialist.agentId,
+      visibleOutcome: specialist.visibleOutcome,
+      asyncPreferred: Boolean(specialist.asyncPreferred),
+    })),
     caseTitle: complianceCase.title,
     projectId: complianceCase.project_id,
     resourceManifest: {
@@ -115,7 +146,7 @@ export async function POST(req: NextRequest) {
       p_actor_id: user.id,
       p_organization_id: organizationId,
       p_case_id: parsed.data.caseId,
-      p_workflow_type: parsed.data.workflowType as WorkflowType,
+      p_workflow_type: selectedWorkflowType as WorkflowType,
       p_input_payload: inputPayload,
       p_stages: stages,
     })
@@ -127,6 +158,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       workflow: { id: workflowId, case_id: parsed.data.caseId, workflow_type: definition.type, status: 'draft', current_stage: 0, total_stages: definition.stages.length },
       template: { type: definition.type, version: definition.version, label: definition.label, description: definition.description, stages },
+      routing: orchestration.route,
+      intent: orchestration.intent,
+      specialistPlan: inputPayload.specialistPlan,
       resourceManifest: inputPayload.resourceManifest,
       resumed: false,
     }, { status: 201 })

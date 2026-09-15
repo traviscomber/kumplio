@@ -1,8 +1,8 @@
 # KUMPLIO — Roadmap Maestro de Producto y Ejecución
 
 > **Documento canónico de producto, arquitectura, evidencia y prioridades**  
-> Estado: **cierre funcional / external gates**  
-> Revisión: 25 de agosto de 2026  
+> Estado: **desarrollo controlado / external gates**  
+> Revisión: 15 de septiembre de 2026  
 > Mercado principal: Chile  
 > Idioma visible: español primario; superficies públicas localizadas de forma controlada  
 > Repositorio: `traviscomber/kumplio`
@@ -47,15 +47,17 @@ Kumplio es un **sistema operativo de cumplimiento para Chile** que transforma un
 Situación
 → expediente
 → fuentes y evidencia
-→ especialistas
+→ routing según complejidad
+→ especialistas cuando aportan valor
 → reservas y contradicciones
 → revisión humana
 → acciones y controles
 → evidencia del avance
+→ outcome verificable
 → conocimiento reutilizable aprobado
 ```
 
-La experiencia pública y autenticada quedó simplificada alrededor de **Analiza → Resuelve → Revisa**, con Isidora, Verónica y Julieta como capacidades principales y especialistas adicionales activables cuando el caso lo requiere.
+La experiencia pública y autenticada se alinea alrededor de **Entiende → Resuelve → Demuestra**. El usuario interactúa con una sola experiencia Kumplio; Isidora, Verónica y Julieta forman el núcleo del camino agentic y Beatriz, Rodrigo, Javier y Andrés se activan únicamente cuando el caso lo requiere. La existencia de múltiples especialistas es una capacidad interna, no una obligación cognitiva para el usuario.
 
 ### Principios no negociables
 
@@ -68,6 +70,7 @@ La experiencia pública y autenticada quedó simplificada alrededor de **Analiza
 7. Versionar antes que sobrescribir.
 8. Los unknowns se conservan hasta resolverse.
 9. No se agregan módulos atractivos mientras un gate P0 siga abierto.
+10. La complejidad interna de agentes no debe trasladarse al usuario: Kumplio entrega un resultado consolidado.
 
 ### Lo que Kumplio no debe afirmar
 
@@ -229,7 +232,7 @@ No se autoriza ampliar esta lista durante el cierre funcional salvo bugs crític
 | 15 | Tenant assurance | `DONE EN ALCANCE INTERNO` |
 | 16 | Cierre técnico y evidencia real | `ACTIVE / EXTERNAL GATES` |
 | 17 | Experiencia autenticada canónica | `DONE` |
-| 18 | Desarrollo post-cierre y piloto supervisado | `ACTIVE / NEXT` |
+| 18 | Desarrollo post-cierre orientado a outcomes y piloto supervisado | `ACTIVE / NEXT` |
 
 ---
 
@@ -287,7 +290,7 @@ El protocolo puede prepararse, pero un piloto externo no se inventa ni se sustit
 
 ## 8. Backlog autorizado durante el freeze
 
-Solo se autoriza:
+El functional freeze está levantado. Mientras Bloque 18 se mantenga activo se autoriza desarrollo controlado que responda a una decisión explícita del owner, además de:
 
 1. seguridad P0;
 2. evidencia administrativa tenant-specific;
@@ -295,9 +298,8 @@ Solo se autoriza:
 4. eliminación operacional final cuando los prerequisitos estén cumplidos;
 5. corrección de bugs críticos o regresiones;
 6. documentación/assurance necesaria para reflejar hechos comprobados;
-7. preparación de piloto supervisado sin habilitar autoservicio.
-
-Todo lo demás queda fuera de alcance.
+7. preparación de piloto supervisado sin habilitar autoservicio;
+8. mejoras de experiencia, orquestación y outcomes que no debiliten aislamiento, evidencia, revisión humana ni gates P0.
 
 ---
 
@@ -350,33 +352,35 @@ Estos gates conservan su autoridad sobre claims, seguridad y evidencia externa. 
 
 1. Documentos, Alertas y Actividad están implementados; Personas y Configuración cierran la arquitectura autenticada como superficies acotadas;
 2. cambios relevantes y planes guiados se proyectan en la experiencia existente sin crear scoring nuevo;
-3. la superficie pública fue reconciliada con **Analiza → Resuelve → Revisa** y mantiene la landing como capa de adquisición.
+3. la superficie pública está reconciliada con **Entiende → Resuelve → Demuestra** y mantiene la landing como capa de adquisición.
 
 Este cierre inició un **functional freeze** que el owner levantó explícitamente el 27 de agosto de 2026. El desarrollo funcional puede continuar mediante Bloque 18, sin reducir la autoridad de los gates P0 sobre seguridad, claims ni habilitación de beta autoservicio.
 
 Cada subbloque se entregó en cambios pequeños, reversibles y verificables. No se autorizan migraciones destructivas, relajación de RLS, cambios de infraestructura no relacionados ni claims que excedan la evidencia vigente.
 
-### Bloque 18 — Desarrollo post-cierre y piloto supervisado — `ACTIVE / NEXT`
+### Bloque 18 — Desarrollo post-cierre orientado a outcomes y piloto supervisado — `ACTIVE / NEXT`
 
 El functional freeze queda levantado por decisión explícita del owner. Kumplio puede continuar desarrollando experiencia, confiabilidad y preparación comercial bajo revisión humana. Este desbloqueo no cierra los gates P0, no habilita beta autoservicio y no autoriza claims que excedan la evidencia disponible.
 
-**Subbloque A — Continuidad completa de adquisición — `ACTIVE`**
+**Subbloque A — Orquestación orientada a outcomes — `ACTIVE / NEXT`**
+
+1. implementar un router auditable que distinga FastTrack de FullAgentic según complejidad, necesidad de herramientas y dependencia de artefactos internos, evitando activar especialistas sin valor incremental;
+2. consolidar cualquier ejecución agentic en un contrato único de outcome que exponga estado, qué quedó resuelto, qué falta, bloqueos, próxima acción, responsable, criterios de cierre, evidencia y revisión humana;
+3. hacer que la experiencia muestre primero el outcome y deje agentes, etapas y artefactos técnicos como trazabilidad secundaria, incorporando evaluación y telemetría de calidad de routing/outcomes antes de declarar esta arquitectura validada.
+
+La referencia conceptual de este subbloque es el patrón Router → FastTrack / FullAgentic descrito en “Compliance Brain Assistant: Conversational Agentic AI for Assisting Compliance Tasks in Enterprise Environments” (arXiv:2507.17289). Kumplio adapta el patrón a sus propios controles, fuentes, contratos de salida, revisión humana y aislamiento tenant; no importa claims ni resultados experimentales del paper como evidencia propia.
+
+**Subbloque B — Continuidad completa de adquisición — `ACTIVE`**
 
 1. validar y endurecer el flujo público diagnóstico guiado → registro → verificación de correo → onboarding → Inicio conservando el contexto del usuario;
 2. corregir las regresiones encontradas y cubrir estados vacío, carga, error, reintento y éxito;
 3. incorporar una prueba E2E repetible que impida perder el diagnóstico durante autenticación.
 
-**Subbloque B — Piloto supervisado — `PLANNED`**
+**Subbloque C — Piloto supervisado y expansión condicionada — `PLANNED`**
 
-1. preparar un protocolo de piloto con alcance, consentimiento, acompañamiento y criterios de salida;
-2. instrumentar activación, primera acción útil y continuidad sin convertir métricas en claims de cumplimiento;
-3. ejecutar el piloto únicamente con una organización real y supervisión humana documentada.
-
-**Subbloque C — Expansión controlada — `PLANNED`**
-
-1. consolidar Minería y Transporte sobre las capacidades existentes y fuentes oficiales verificables;
-2. mantener Laboral como capacidad transversal sin duplicar el modelo canónico;
-3. priorizar nuevas superficies solo con evidencia de uso del piloto y decisión registrada del owner.
+1. preparar un protocolo de piloto con alcance, consentimiento, acompañamiento, medición de primera acción útil y criterios de salida;
+2. ejecutar el piloto únicamente con una organización real y supervisión humana documentada, sin convertir métricas en claims de cumplimiento;
+3. después de evidencia suficiente de uso, decidir si consolidar Minería y Transporte, manteniendo Laboral como capacidad transversal y evitando duplicar el modelo canónico.
 
 ---
 
@@ -403,7 +407,8 @@ No se puede afirmar:
 - OpenAI Standard o MAM confirmado;
 - tenant configuration verified 3/3;
 - piloto externo;
-- beta autoservicio lista.
+- beta autoservicio lista;
+- superioridad del routing de Kumplio antes de evaluarlo con evidencia propia.
 
 ---
 
@@ -436,7 +441,7 @@ Reglas:
 - no iniciar bloques o módulos fuera del bloque `NEXT` por iniciativa propia;
 - no reabrir PRs históricas cerradas como superseded sin decisión explícita del owner;
 - no fusionar la PR experimental Home/Demo 2.0 sin rebase y revalidación completa;
-- no cambiar modelos, permisos, RLS o infraestructura salvo seguridad, bug crítico o gate P0;
+- no cambiar modelos, permisos, RLS o infraestructura salvo seguridad, bug crítico, gate P0 o decisión explícita del owner documentada en este roadmap;
 - no usar evidencia parcial para promocionar un estado `verified`;
 - no ejecutar eliminación operacional final antes de cerrar el assurance tenant aplicable;
 - no convertir un test sintético en claim comercial de cliente;
@@ -456,12 +461,14 @@ El functional freeze iniciado al cerrar Bloque 17 terminó por decisión explíc
 
 **Decisión del owner — 27 de agosto de 2026:** levantar el functional freeze e iniciar Bloque 18 como bloque `ACTIVE / NEXT`. Se autoriza continuar el desarrollo del producto, comenzando por la continuidad E2E del funnel diagnóstico guiado → registro → onboarding → Inicio. Los gates P0 continúan gobernando seguridad, evidencia, claims y cualquier futura habilitación autoservicio.
 
-**Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
+**Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
 
-**Decisión del owner — 15 de septiembre de 2026:** reorganizar la superficie pública alrededor de Kumplio como sistema operativo transversal de cumplimiento, con la promesa “Cumplir. Sin perseguir documentos.” y el recorrido **Entiende → Resuelve → Demuestra**. Se incorporan como conceptos públicos Kumplio Core, Kumplio Areas, la separación Trabajador/Empresa y el sistema coordinado de siete especialistas usando el catálogo canónico. Protección de Datos conserva la urgencia de la Ley 21.719 dentro de su área, pero deja de definir la marca maestra. Esta decisión reemplaza la narrativa pública anterior sin rediseñar la aplicación autenticada, inventar capacidades, modificar gates P0 ni habilitar beta autoservicio.
+**Decisión del owner — 15 de septiembre de 2026:** reorganizar la superficie pública alrededor de Kumplio como sistema operativo transversal de cumplimiento, con la promesa “Cumplir. Sin perseguir documentos.” y el recorrido **Entiende → Resuelve → Demuestra**. Se incorporan como conceptos públicos Kumplio Core, Kumplio Areas, la separación Trabajador/Empresa y el sistema coordinado de siete especialistas usando el catálogo canónico. Protección de Datos conserva la urgencia de la Ley 21.719 dentro de su área, pero deja de definir la marca maestra. Esta decisión reemplaza la narrativa pública anterior sin inventar capacidades, modificar gates P0 ni habilitar beta autoservicio.
+
+**Decisión del owner — 15 de septiembre de 2026:** priorizar dentro de Bloque 18 el valor agregado observable y los outcomes por sobre la exposición de features o agentes. Se adopta como patrón de arquitectura el routing **Router → FastTrack / FullAgentic → evidencia → outcome verificable**, inspirado en arXiv:2507.17289 y adaptado a Kumplio. Los siete especialistas permanecen capacidades internas coordinadas; el usuario recibe una sola experiencia Kumplio. El sistema debe activar FullAgentic sólo cuando la complejidad, los artefactos internos o las acciones requeridas lo justifiquen, conservar revisión humana en decisiones sensibles y medir routing/outcome con evidencia propia antes de afirmar mejoras de calidad o eficiencia.
 
 Estado objetivo actual:
 
-> **Kumplio funcionalmente cerrado, nuevamente en desarrollo controlado mediante Bloque 18 y todavía sin beta autoservicio habilitada.**
+> **Kumplio en desarrollo controlado, orientado a outcomes mediante Bloque 18 y todavía sin beta autoservicio habilitada.**
 
-La ruta crítica pasa ahora por resolver honestamente los gates externos de Bloque 16. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.
+La ruta crítica de producto pasa por cerrar Subbloque 18-A sin debilitar los gates externos de Bloque 16. Construir experiencia no autoriza a fabricar evidencia, promover estados ni afirmar capacidades no verificadas.

@@ -1,5 +1,6 @@
 import type { AgentId } from './catalog'
 import type { WorkflowType } from './orchestration'
+import { routeComplianceRequest, type ComplianceRouteDecision } from './query-router'
 
 export type UserAudience = 'person' | 'company' | 'professional' | 'industry'
 
@@ -28,6 +29,7 @@ export type OrchestrationPlan = {
   intent: CaseIntent
   audience: UserAudience
   goal: string
+  route: ComplianceRouteDecision
   missingContext: string[]
   tasks: AgentTask[]
   specialists: SpecialistTask[]
@@ -66,18 +68,31 @@ export function buildOrchestrationPlan(input: {
   audience?: UserAudience
   hasDocuments?: boolean
   hasOrganizationContext?: boolean
+  hasCaseResources?: boolean
   hasDeadline?: boolean
+  requiresAction?: boolean
 }): OrchestrationPlan {
   const audience = input.audience ?? 'company'
   const intent = inferCaseIntent(input.goal)
-  const missingContext = collectMissingContext({ ...input, audience })
-  const tasks = buildCoreTasks(input.goal)
-  const specialists = buildSpecialists(intent, input.goal)
+  const route = routeComplianceRequest({
+    goal: input.goal,
+    intent,
+    audience,
+    hasDocuments: input.hasDocuments,
+    hasOrganizationContext: input.hasOrganizationContext,
+    hasCaseResources: input.hasCaseResources,
+    requiresAction: input.requiresAction,
+  })
+  const fullAgentic = route.track === 'full_agentic'
+  const missingContext = fullAgentic ? collectMissingContext({ ...input, audience }) : []
+  const tasks = fullAgentic ? buildCoreTasks(input.goal) : []
+  const specialists = fullAgentic ? buildSpecialists(intent, input.goal) : []
 
   return {
     intent,
     audience,
     goal: input.goal.trim(),
+    route,
     missingContext,
     tasks,
     specialists,
@@ -89,23 +104,23 @@ function buildCoreTasks(goal: string): AgentTask[] {
   return [
     {
       agentId: 'isidora',
-      title: 'Analizar',
+      title: 'Entender',
       description: `Identificar hechos, fuentes, obligaciones, aplicabilidad, información faltante y triage de riesgo acotado para: ${goal}`,
-      visibleOutcome: 'Análisis trazable y priorizado',
+      visibleOutcome: 'Qué aplica, qué sabemos y qué falta',
       order: 1,
     },
     {
       agentId: 'veronica',
       title: 'Resolver',
       description: 'Contrastar obligaciones con controles y evidencia, identificar brechas y proponer acciones correctivas con criterios de cierre.',
-      visibleOutcome: 'Resolución y siguientes acciones',
+      visibleOutcome: 'Qué hacer, quién debe hacerlo y cómo se demuestra el cierre',
       order: 2,
     },
     {
       agentId: 'catalina',
-      title: 'Revisar',
+      title: 'Demostrar',
       description: 'Revisar independientemente sustento, contradicciones, reservas y decisiones que requieren aprobación humana.',
-      visibleOutcome: 'Recomendación final revisada',
+      visibleOutcome: 'Resultado revisado, evidencia y decisión humana pendiente',
       order: 3,
     },
   ]
@@ -121,13 +136,13 @@ function buildSpecialists(intent: CaseIntent, goal: string): SpecialistTask[] {
   for (const agentId of ['beatriz', 'rodrigo', 'javier', 'andres'] as const) {
     if (!requiresSpecialist(agentId, intent, goal)) continue
     if (agentId === 'beatriz') {
-      add({ agentId, title: 'Cambio regulatorio', description: 'Comparar fuentes o versiones, vigencia y delta regulatorio cuando el caso depende de un cambio oficial.', visibleOutcome: 'Cambio y vigencia contextualizados' })
+      add({ agentId, title: 'Cambio regulatorio', description: 'Comparar fuentes o versiones, vigencia y delta regulatorio cuando el caso depende de un cambio oficial.', visibleOutcome: 'Qué cambió, desde cuándo y qué queda afectado' })
     } else if (agentId === 'rodrigo') {
-      add({ agentId, title: 'Análisis cuantitativo de riesgo', description: 'Modelar escenarios, sensibilidad o exposición cuantitativa que excede el triage rutinario.', visibleOutcome: 'Escenarios y supuestos de riesgo' })
+      add({ agentId, title: 'Riesgo y prioridad', description: 'Modelar escenarios, sensibilidad o exposición cuantitativa que excede el triage rutinario.', visibleOutcome: 'Qué importa primero y por qué' })
     } else if (agentId === 'javier') {
-      add({ agentId, title: 'Plan de ejecución', description: 'Construir RACI, rollout o roadmap multi-fase cuando la remediación requiere planificación dedicada.', visibleOutcome: 'Plan de ejecución estructurado' })
+      add({ agentId, title: 'Plan de ejecución', description: 'Construir RACI, rollout o roadmap multi-fase cuando la remediación requiere planificación dedicada.', visibleOutcome: 'Acciones, responsables, dependencias y criterios de cierre' })
     } else {
-      add({ agentId, title: 'Aprendizaje organizacional', description: 'Analizar recurrencias, tendencias y tiempos de ciclo fuera del camino crítico del caso.', visibleOutcome: 'Patrones y oportunidades de mejora', asyncPreferred: true })
+      add({ agentId, title: 'Aprendizaje organizacional', description: 'Analizar recurrencias, tendencias y tiempos de ciclo fuera del camino crítico del caso.', visibleOutcome: 'Qué aprender y reutilizar para evitar recurrencias', asyncPreferred: true })
     }
   }
 
