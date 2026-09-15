@@ -95,7 +95,7 @@ jobs:
             --data "{\"caseId\":\"$CASE_ID\"}" \
             "$BASE_URL/api/internal/e2e/session" > /tmp/kumplio-e2e-session.json
           chmod 600 /tmp/kumplio-e2e-cookies
-          SESSION_JSON=$(cat /tmp/kumplio-e2e-session.json) node -e "const p=JSON.parse(process.env.SESSION_JSON||'{}');if(!p.ok||!p.serviceUserId)process.exit(1);console.log('Temporary E2E session created.')"
+          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-e2e-session.json','utf8'));if(!p.ok||!p.serviceUserId)process.exit(1);console.log('Temporary E2E session created.')"
 
       - name: Execute and approve durable specialist stages
         shell: bash
@@ -103,16 +103,19 @@ jobs:
           set -euo pipefail
 
           get_workflow() {
-            curl --fail --silent --show-error --cookie /tmp/kumplio-e2e-cookies "$BASE_URL/api/agents/workflows/$WORKFLOW_ID"
+            curl --fail --silent --show-error \
+              --cookie /tmp/kumplio-e2e-cookies \
+              "$BASE_URL/api/agents/workflows/$WORKFLOW_ID" \
+              > /tmp/kumplio-workflow.json
           }
 
           read_stage() {
-            STATE="$1" STAGE_INDEX="$2" FIELD="$3" node -e "const p=JSON.parse(process.env.STATE||'{}');const s=(p.stages||[]).find(x=>x.stage_index===Number(process.env.STAGE_INDEX));if(!s)process.exit(2);const v=s[process.env.FIELD];if(v!==null&&v!==undefined)process.stdout.write(String(v))"
+            STAGE_INDEX="$1" FIELD="$2" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow.json','utf8'));const s=(p.stages||[]).find(x=>x.stage_index===Number(process.env.STAGE_INDEX));if(!s)process.exit(2);const v=s[process.env.FIELD];if(v!==null&&v!==undefined)process.stdout.write(String(v))"
           }
 
           for stage_index in 0 1 2 3 4; do
-            state=$(get_workflow)
-            stage_status=$(read_stage "$state" "$stage_index" status)
+            get_workflow
+            stage_status=$(read_stage "$stage_index" status)
 
             if [[ "$stage_status" == approved ]]; then
               echo "Stage $stage_index already approved."
@@ -139,8 +142,8 @@ jobs:
               reached_review=false
               for poll in {1..120}; do
                 sleep 15
-                state=$(get_workflow)
-                stage_status=$(read_stage "$state" "$stage_index" status)
+                get_workflow
+                stage_status=$(read_stage "$stage_index" status)
                 if [[ "$stage_status" == pending_review || "$stage_status" == approved ]]; then
                   reached_review=true
                   break
@@ -154,7 +157,7 @@ jobs:
             fi
 
             [[ "$stage_status" == approved ]] && continue
-            run_id=$(read_stage "$state" "$stage_index" run_id)
+            run_id=$(read_stage "$stage_index" run_id)
             [[ -n "$run_id" ]] || { echo "Stage $stage_index has no run id." >&2; exit 1; }
 
             review_payload=$(STAGE_INDEX="$stage_index" node -e "process.stdout.write(JSON.stringify({decision:'approved',comment:'Aprobación E2E controlada de la etapa '+process.env.STAGE_INDEX+'; evidencia, limitaciones y respaldo revisados por el runner de validación.',checklist:{evidence_reviewed:true,limitations_understood:true,outcome_supported:true}}))")
@@ -170,7 +173,7 @@ jobs:
               cat /tmp/kumplio-review.json >&2
               exit 1
             fi
-            REVIEW_JSON=$(cat /tmp/kumplio-review.json) STAGE_INDEX="$stage_index" node -e "const p=JSON.parse(process.env.REVIEW_JSON||'{}');if(p.status!=='approved')process.exit(1);console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
+            STAGE_INDEX="$stage_index" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-review.json','utf8'));if(p.status!=='approved')process.exit(1);console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
           done
 
       - name: Close and verify auditable case
@@ -184,9 +187,13 @@ jobs:
             -X POST "$BASE_URL/api/cases/$CASE_ID/close")
           [[ "$http_code" == 200 ]] || { echo "Case close failed with HTTP $http_code:" >&2; cat /tmp/kumplio-close.json >&2; exit 1; }
 
-          state=$(curl --fail --silent --show-error --cookie /tmp/kumplio-e2e-cookies "$BASE_URL/api/agents/workflows/$WORKFLOW_ID")
-          STATE="$state" node <<'NODE'
-          const p = JSON.parse(process.env.STATE || '{}')
+          curl --fail --silent --show-error \
+            --cookie /tmp/kumplio-e2e-cookies \
+            "$BASE_URL/api/agents/workflows/$WORKFLOW_ID" \
+            > /tmp/kumplio-workflow-final.json
+          node <<'NODE'
+          const fs = require('fs')
+          const p = JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-final.json', 'utf8'))
           if (p.workflow?.status !== 'completed') throw new Error(`Workflow status is ${p.workflow?.status}`)
           if ((p.stages || []).length !== 5 || p.stages.some((stage) => stage.status !== 'approved')) throw new Error('Not all five stages are approved')
           const c = Array.isArray(p.workflow?.compliance_cases) ? p.workflow.compliance_cases[0] : p.workflow?.compliance_cases
