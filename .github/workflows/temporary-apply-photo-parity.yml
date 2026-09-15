@@ -1,0 +1,81 @@
+name: Temporary exact photo parity patch
+
+on:
+  push:
+    branches:
+      - agent/en-exact-photo-parity
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/en-exact-photo-parity
+
+      - name: Apply exact ES photo parity to EN
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          page_path = Path('app/page.tsx')
+          text = page_path.read_text()
+
+          old_token = "${locale === 'es' ? 'lg:hidden' : ''}"
+          count = text.count(old_token)
+          if count != 3:
+              raise SystemExit(f'Expected 3 desktop fallback tokens, found {count}')
+          text = text.replace(old_token, 'lg:hidden')
+
+          text = text.replace(
+              '''            {locale === 'en' && <><Image src="/brand/kumplio-operating-model.webp" alt="" fill sizes="100vw" className="object-cover opacity-20" /><span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,23,21,.82),rgba(23,23,21,.94))]" /></>}\n''',
+              ''
+          )
+          text = text.replace(
+              '''            {locale === 'en' && <><Image src="/brand/kumplio-specialists.webp" alt="" fill sizes="100vw" className="object-cover object-center opacity-35" /><span className="absolute inset-0 bg-[linear-gradient(90deg,rgba(23,23,21,.93),rgba(23,23,21,.58)_50%,rgba(23,23,21,.93))]" /></>}\n''',
+              ''
+          )
+
+          hero_target = '''          <div className={`relative min-h-[740px] overflow-hidden lg:hidden`}>\n'''
+          hero_pos = text.index(hero_target, text.index('<section className="relative border-b border-[#393833] pt-20">'))
+          hero_block = '''          {locale === 'en' && <div className="relative mx-auto hidden aspect-[1600/611] w-full max-w-[1920px] overflow-hidden lg:block">\n            <Image src="/brand/kumplio-master-hero.jpg" alt="" fill priority sizes="100vw" className="object-contain" />\n            <div className="absolute inset-y-0 left-0 w-[28%] bg-[#171715]" />\n            <div className="absolute inset-y-0 left-[27%] w-[13%] bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,.94)_45%,rgba(23,23,21,0)_100%)]" />\n            <div className="absolute left-[3.6%] top-[7.5%] w-[30%]">\n              <h1 className="text-[clamp(34px,3.25vw,68px)] font-light leading-[1.02] tracking-[-.045em] text-[#C2A887]">Stay compliant.<br /><span className="text-[#B17A4D]">Without chasing documents.</span></h1>\n              <p className="mt-[5%] max-w-[470px] text-[clamp(12px,1vw,18px)] leading-[1.55] text-[#C8C3B8]">{c.heroSupport}</p>\n              <div className="mt-[6%] flex gap-3">\n                <a href="/sign-up?audience=person" className="inline-flex min-h-10 items-center justify-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.workerPath}<ArrowRight className="ml-2 h-4 w-4" /></a>\n                <a href="/sign-up?audience=company" className="inline-flex min-h-10 items-center justify-center rounded-[4px] border border-[#747169] bg-[#171715]/85 px-5 text-sm font-medium text-[#C2A887]">{c.companyPath}<ArrowRight className="ml-2 h-4 w-4" /></a>\n              </div>\n            </div>\n          </div>}\n'''
+          text = text[:hero_pos] + hero_block + text[hero_pos:]
+
+          how_section = text.index('<section id="como-funciona"')
+          how_target = '''          <div className={`relative overflow-hidden ${sections} lg:hidden`}>\n'''
+          how_pos = text.index(how_target, how_section)
+          how_block = '''          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden lg:block">\n            <Image src="/brand/kumplio-master-how.jpg" alt="" fill sizes="100vw" className="object-contain" />\n            <div className="absolute left-[7.5%] top-[15%] h-[18%] w-[68%] bg-[#171715]" />\n            <div className="absolute left-[8.6%] top-[17.2%]">\n              <h2 className="text-[clamp(28px,2.2vw,48px)] font-light text-[#C2A887]">How Kumplio works.</h2>\n              <p className="mt-2 text-[clamp(11px,.85vw,16px)] text-[#AAA69C]">From information to action, without friction.</p>\n            </div>\n            {[\n              ['21%', 'Understand', 'Kumplio identifies requirements, documents, gaps and changes.'],\n              ['48%', 'Resolve', 'Prioritize what matters and organize what to do, who should do it and when.'],\n              ['76%', 'Demonstrate', 'Preserve evidence, review and traceability for what was resolved.'],\n            ].map(([left, title, body]) => <div key={title} className="absolute top-[42%] h-[25%] w-[16%] bg-[#171715] px-2" style={{ left }}><h3 className="text-[clamp(15px,1.15vw,24px)] font-light text-[#C2A887]">{title}</h3><p className="mt-3 text-[clamp(9px,.72vw,14px)] leading-[1.55] text-[#C8C3B8]">{body}</p></div>)}\n          </div>}\n'''
+          text = text[:how_pos] + how_block + text[how_pos:]
+
+          paths_section = text.index('<section className="relative scroll-mt-20 border-b border-[#393833] bg-[#20201D]">', how_pos)
+          paths_pos = text.index(how_target, paths_section)
+          paths_block = '''          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden lg:block">\n            <Image src="/brand/kumplio-master-paths.jpg" alt="" fill sizes="100vw" className="object-contain" />\n            <div className="absolute left-[28.5%] top-[8%] h-[84%] w-[44%] bg-[#171715]/98" />\n            <div className="absolute left-[27%] top-[8%] h-[84%] w-[4%] bg-[linear-gradient(90deg,rgba(23,23,21,0),#171715_100%)]" />\n            <div className="absolute right-[27%] top-[8%] h-[84%] w-[4%] bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,0)_100%)]" />\n            <div className="absolute left-[29.5%] top-[12%] w-[42%] text-center">\n              <h2 className="text-[clamp(30px,2.5vw,52px)] font-light leading-[1.05] text-[#C2A887]">Two paths.<br /><span className="text-[#B17A4D]">One shared outcome.</span></h2>\n              <p className="mt-3 text-sm text-[#AAA69C]">Choose how you want to work with Kumplio.</p>\n              <div className="mt-[8%] grid grid-cols-2 gap-8 text-left">\n                <article className="border-r border-[#5A5045] pr-8"><p className="text-[10px] uppercase tracking-[.16em] text-[#B17A4D]">For workers</p><h3 className="mt-3 text-[clamp(22px,1.7vw,34px)] font-light leading-[1.08] text-[#C2A887]">{c.workerTitle}</h3><p className="mt-4 text-[clamp(10px,.76vw,14px)] leading-[1.55] text-[#C8C3B8]">{c.workerBody}</p><a href="/sign-up?audience=person" className="mt-6 inline-flex min-h-9 items-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.workerCta}<ArrowRight className="ml-2 h-4 w-4" /></a></article>\n                <article className="pl-1"><p className="text-[10px] uppercase tracking-[.16em] text-[#B17A4D]">For companies</p><h3 className="mt-3 text-[clamp(22px,1.7vw,34px)] font-light leading-[1.08] text-[#C2A887]">{c.companyTitle}</h3><p className="mt-4 text-[clamp(10px,.76vw,14px)] leading-[1.55] text-[#C8C3B8]">{c.companyBody}</p><a href="/sign-up?audience=company" className="mt-6 inline-flex min-h-9 items-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.companyCta}<ArrowRight className="ml-2 h-4 w-4" /></a></article>\n              </div>\n            </div>\n          </div>}\n'''
+          text = text[:paths_pos] + paths_block + text[paths_pos:]
+
+          page_path.write_text(text)
+
+          css_path = Path('app/globals.css')
+          css = css_path.read_text()
+          start = css.index('/* The Spanish desktop home uses supplied master JPGs with Spanish copy baked in.')
+          end_marker = '\n@layer components {'
+          end = css.index(end_marker, start)
+          css = css[:start] + css[end:]
+          css_path.write_text(css)
+          PY
+
+      - name: Verify intended asset parity in source
+        run: |
+          grep -n "kumplio-master-hero.jpg\|kumplio-master-how.jpg\|kumplio-master-paths.jpg" app/page.tsx
+          test "$(grep -c 'html\[lang="en"\]' app/globals.css || true)" = "0"
+
+      - name: Commit parity patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx app/globals.css
+          git commit -m "fix(public): mirror Spanish photography in English home"
+          git push origin HEAD:agent/en-exact-photo-parity
