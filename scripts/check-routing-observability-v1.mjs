@@ -14,9 +14,9 @@ assert.doesNotMatch(page, /workspaceCopilotRuns\s*=\s*currentOrganizationId\s*\?
 assert.match(page, /Boolean\(run\.fallback_reason\)/, 'intentional deterministic FastTrack runs must not be counted as fallback')
 assert.match(page, /no se usa como score de cumplimiento/, 'UI must explicitly avoid compliance-score framing')
 
+assert.match(metrics, /export type RoutingTrack = 'fast_track' \| 'full_agentic' \| 'unknown'/, 'metrics must keep FastTrack, FullAgentic and legacy unknown routes distinct')
 assert.match(metrics, /const MINIMUM_SAMPLES_PER_TRACK = 20/, 'track comparison must require a minimum sample')
 assert.match(metrics, /fast\.length >= MINIMUM_SAMPLES_PER_TRACK && full\.length >= MINIMUM_SAMPLES_PER_TRACK/, 'both tracks must meet the sample threshold')
-assert.match(metrics, /track: 'fast_track' \| 'full_agentic'/, 'metrics must keep FastTrack and FullAgentic distinct')
 assert.match(metrics, /unknownRouteCount/, 'legacy or unclassified routing events must remain visible')
 assert.match(metrics, /fallback_reason \|\| row\.error_code/, 'fallback rate must reflect actual fallback or error signals')
 assert.match(metrics, /generationSkippedRate/, 'generation avoidance must remain observable')
