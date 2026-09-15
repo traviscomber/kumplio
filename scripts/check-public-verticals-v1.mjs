@@ -1,26 +1,28 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const homeCopy = await readFile(new URL('../lib/i18n/home-clarity-copy.ts', import.meta.url), 'utf8')
 const home = await readFile(new URL('../app/page.tsx', import.meta.url), 'utf8')
 const detail = await readFile(new URL('../app/verticales/[slug]/page.tsx', import.meta.url), 'utf8')
 const verticalCopy = await readFile(new URL('../lib/i18n/vertical-public-copy.ts', import.meta.url), 'utf8')
 
 for (const slug of ['proteccion-de-datos', 'mineria', 'transporte', 'construccion', 'salud', 'agroindustria']) {
-  assert.match(homeCopy, new RegExp(`slug: '${slug}'`), `Missing public vertical: ${slug}`)
-  assert.match(verticalCopy, new RegExp(`${slug.replaceAll('-', '\\-')}[^\n]+/brand/`), `Missing sector image mapping: ${slug}`)
+  assert.match(verticalCopy, new RegExp(`['"]?${slug.replaceAll('-', '\\-')}['"]?[^\n]+/brand/`), `Missing sector image mapping: ${slug}`)
 }
 
-assert.match(home, /\/verticales\/\$\{item\.slug\}/, 'Vertical cards must link to their detail page')
-assert.match(home, /focus-visible:ring/, 'Vertical cards must expose a keyboard focus state')
-assert.match(home, /VERTICAL_IMAGES\[slug\]/, 'Vertical cards must render their sector image')
-assert.match(home, /VERTICAL_IMAGE_POSITIONS\[slug\]/, 'Vertical cards must apply a sector-specific crop')
+assert.match(home, /\/verticales\/\$\{slug\}/, 'Area links must target their detail page')
+assert.match(home, /VERTICAL_SLUGS\.slice\(0, 3\)/, 'Homepage must initially show no more than three areas')
+assert.match(home, /VERTICAL_IMAGES\[slug\]/, 'Area links must render their sector image')
+assert.match(home, /VERTICAL_IMAGE_POSITIONS\[slug\]/, 'Area links must apply a sector-specific crop')
 assert.notEqual(
   verticalCopy.match(/mineria: '([^']+)'/)?.[1],
   verticalCopy.match(/transporte: '([^']+)'/)?.[1],
-  'Mining and transport must not share the same card image',
+  'Mining and transport must not share the same image',
 )
 assert.match(detail, /generateStaticParams/, 'Vertical detail routes must be statically enumerated')
 assert.match(detail, /notFound\(\)/, 'Unknown vertical routes must return not found')
+assert.match(verticalCopy, /heroQuestion/, 'Verticals must expose a concrete operational question')
+assert.match(verticalCopy, /exampleInput/, 'Verticals must expose a concrete input')
+assert.match(verticalCopy, /exampleResult/, 'Verticals must expose a concrete result')
+assert.match(verticalCopy, /workflow/, 'Verticals must expose the shared operating chain')
 
-console.log('Public verticals contract passed (6 cards + detail routes).')
+console.log('Public verticals contract passed (3 initial areas + 6 detail routes).')

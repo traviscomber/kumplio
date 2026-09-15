@@ -1,476 +1,137 @@
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-  ClipboardCheck,
-  Database,
-  Eye,
-  FileCheck2,
-  SearchCheck,
-  ShieldCheck,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Footer } from "@/components/footer";
-import { ResolutionEntry } from "@/components/marketing/resolution-entry";
-import { LawCountdown } from "@/components/marketing/law-countdown";
-import { MobilePublicNav } from "@/components/marketing/mobile-public-nav";
-import { HomeMotionController } from "@/components/marketing/home-motion-controller";
-import { HOME_CLARITY_COPY } from "@/lib/i18n/home-clarity-copy";
-import { HOME_PUBLIC_COPY } from "@/lib/i18n/home-public-copy";
-import { getPublicRequestContext } from "@/lib/i18n/request-context";
-import { getPublicSiteHref, withPublicLocale } from "@/lib/i18n/public-routing";
-import {
-  VERTICAL_IMAGES,
-  VERTICAL_IMAGE_POSITIONS,
-  type VerticalSlug,
-} from "@/lib/i18n/vertical-public-copy";
+import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Footer } from '@/components/footer'
+import { ResolutionEntry } from '@/components/marketing/resolution-entry'
+import { MobilePublicNav } from '@/components/marketing/mobile-public-nav'
+import { HomeMotionController } from '@/components/marketing/home-motion-controller'
+import { AGENT_CATALOG } from '@/lib/agents/catalog'
+import { getPublicRequestContext } from '@/lib/i18n/request-context'
+import { getPublicSiteHref, withPublicLocale } from '@/lib/i18n/public-routing'
+import { VERTICAL_IMAGES, VERTICAL_IMAGE_POSITIONS, VERTICAL_PUBLIC_COPY, VERTICAL_SLUGS } from '@/lib/i18n/vertical-public-copy'
 
-const workflowIcons = [SearchCheck, FileCheck2, Eye] as const;
-const outcomeIcons = [Database, SearchCheck, ClipboardCheck] as const;
-const sectionClass =
-  "border-b border-white/10 px-5 py-20 sm:px-8 md:py-28 lg:px-12";
-const eyebrowClass =
-  "text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B17A4D]";
-const h2Class =
-  "mt-5 max-w-4xl text-balance text-[38px] font-light leading-[1.12] tracking-[-0.03em] text-[#D5B994] md:text-[52px]";
-const navClass =
-  "text-sm text-[#C2B6A4] transition-colors hover:text-[#F0D7B6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+const sections = 'border-b border-[#393833] px-5 py-20 sm:px-8 md:py-28 lg:px-12'
+const eyebrow = 'text-[11px] font-medium uppercase tracking-[.22em] text-[#B17A4D]'
+const h2 = 'mt-5 max-w-4xl text-balance text-[38px] font-light leading-[1.12] tracking-[-.03em] text-[#C2A887] md:text-[52px]'
+const navLink = 'text-sm text-[#AAA69C] transition hover:text-[#C2A887] focus-visible:outline-none'
 
-function CinematicImage({
-  src,
-  position = "center",
-  opacityClass = "opacity-60",
-}: {
-  src: string;
-  position?: string;
-  opacityClass?: string;
-}) {
-  return (
-    <Image
-      src={src}
-      alt=""
-      fill
-      sizes="100vw"
-      className={`object-cover ${opacityClass}`}
-      style={{ objectPosition: position }}
-    />
-  );
-}
+const copy = {
+  es: {
+    nav: ['Cómo funciona', 'Áreas', 'Para empresas', 'Para trabajadores', 'Precios'],
+    signIn: 'Ingresar', action: 'Comenzar', language: 'English',
+    heroEyebrow: 'El sistema operativo de cumplimiento',
+    heroTitleA: 'Cumplir.', heroTitleB: 'Sin perseguir documentos.',
+    heroSupport: 'Kumplio conecta personas, documentos, requisitos y evidencia para mostrarte qué está en regla, qué necesita atención y qué hacer después.',
+    workerPath: 'Soy trabajador', companyPath: 'Gestiono una empresa',
+    problemEyebrow: 'El problema', problemTitle: 'El cumplimiento se dispersa. La responsabilidad no.',
+    problemBody: 'Documentos en correos, vencimientos en planillas y requisitos que cambian según la persona, el proveedor o la operación. Kumplio convierte esas relaciones en una ruta visible y verificable.',
+    startTitle: '¿Qué necesitas tener en regla?', startBody: 'Describe una situación y recibe una orientación inicial antes de crear tu cuenta.',
+    howEyebrow: 'Cómo funciona', howTitle: 'Una sola ruta para entender, resolver y demostrar.',
+    how: [
+      ['Entiende', 'Kumplio identifica requisitos, documentos, brechas y cambios.'],
+      ['Resuelve', 'Prioriza lo importante y organiza qué hacer, quién debe hacerlo y cuándo.'],
+      ['Demuestra', 'Conserva evidencia, revisión y trazabilidad de lo que quedó resuelto.'],
+    ],
+    pathsEyebrow: 'Dos caminos, un mismo núcleo', workerTitle: 'Tus documentos listos para trabajar.', workerBody: 'Documentos, certificaciones, vencimientos, alertas e información verificada reutilizable.', workerCta: 'Crear mi perfil',
+    companyTitle: 'Controla el cumplimiento de tu equipo.', companyBody: 'Trabajadores, contratistas, requisitos, verificación, alertas, evidencia y estado.', companyCta: 'Gestionar mi empresa',
+    statusEyebrow: 'Resultado', statusTitle: 'Todo claro en una sola vista.', statusLabels: ['listos', 'necesitan atención', 'vencen pronto'],
+    areasEyebrow: 'Kumplio Areas', areasTitle: 'Activa el contexto que necesita tu operación.', allAreas: 'Ver todas las áreas',
+    agentsEyebrow: 'Kumplio Agents', agentsTitle: 'Un equipo coordinado. No siete herramientas separadas.', agentsBody: 'No necesitas saber qué agente usar. Kumplio coordina el equipo por ti.',
+    workflowTitle: 'Así trabaja Kumplio', changed: 'Cambió una norma', changedResult: 'Sabes qué cambió, qué hacer y qué falta.', team: '¿Mi equipo puede trabajar hoy?', teamResult: 'Sabes quién está listo y quién necesita atención.',
+    exampleEyebrow: 'Caso concreto', exampleTitle: 'Un proveedor crítico vence en 12 días y falta un certificado.', reviews: 'Kumplio revisa', result: 'Resultado',
+    exampleChain: 'Proveedor → requisito → certificado → vencimiento → responsable → acción.',
+    exampleResult: 'Renovar antes del 14/09. Responsable: Operaciones. 2 evidencias pendientes.',
+    pricingEyebrow: 'Kumplio Core', pricingTitle: 'La plataforma compartida para todas tus áreas de cumplimiento.', pricingBody: 'Comienza con Kumplio Core y activa las áreas que necesita tu operación.', pricingCta: 'Ver planes y precios',
+    finalEyebrow: 'Empieza con una situación real', finalTitle: 'Kumplio recomienda. Tú decides.', finalBody: 'La revisión humana permanece en las decisiones legales, de auditoría y de cierre.',
+  },
+  en: {
+    nav: ['How it works', 'Areas', 'For companies', 'For workers', 'Pricing'],
+    signIn: 'Sign in', action: 'Get started', language: 'Español',
+    heroEyebrow: 'The compliance operating system', heroTitleA: 'Stay compliant.', heroTitleB: 'Without chasing documents.',
+    heroSupport: 'Kumplio connects people, documents, requirements and evidence to show what is in order, what needs attention and what to do next.',
+    workerPath: 'I am a worker', companyPath: 'I manage a company',
+    problemEyebrow: 'The problem', problemTitle: 'Compliance gets scattered. Accountability does not.', problemBody: 'Documents in email, expirations in spreadsheets and requirements that change by person, vendor or operation. Kumplio turns those relationships into a visible, verifiable path.',
+    startTitle: 'What do you need to keep in order?', startBody: 'Describe a situation and receive initial guidance before creating an account.',
+    howEyebrow: 'How it works', howTitle: 'One path to understand, resolve and demonstrate.',
+    how: [['Understand', 'Kumplio identifies requirements, documents, gaps and changes.'], ['Resolve', 'Prioritize what matters and organize what to do, who should do it and when.'], ['Demonstrate', 'Preserve evidence, review and traceability for what was resolved.']],
+    pathsEyebrow: 'Two paths, one shared core', workerTitle: 'Your documents ready for work.', workerBody: 'Documents, certifications, expirations, alerts and reusable verified information.', workerCta: 'Create my profile',
+    companyTitle: 'Control your team’s compliance.', companyBody: 'Workers, contractors, requirements, verification, alerts, evidence and status.', companyCta: 'Manage my company',
+    statusEyebrow: 'Outcome', statusTitle: 'Everything clear in one view.', statusLabels: ['ready', 'need attention', 'expire soon'],
+    areasEyebrow: 'Kumplio Areas', areasTitle: 'Activate the context your operation needs.', allAreas: 'View all areas',
+    agentsEyebrow: 'Kumplio Agents', agentsTitle: 'One coordinated team. Not seven separate tools.', agentsBody: 'You do not need to choose an agent. Kumplio coordinates the team for you.',
+    workflowTitle: 'How Kumplio works', changed: 'A regulation changed', changedResult: 'Know what changed, what to do and what remains.', team: 'Can my team work today?', teamResult: 'Know who is ready and who needs attention.',
+    exampleEyebrow: 'Concrete situation', exampleTitle: 'A critical vendor expires in 12 days and one certificate is missing.', reviews: 'Kumplio reviews', result: 'Outcome',
+    exampleChain: 'Vendor → requirement → certificate → expiration → owner → action.', exampleResult: 'Renew before 14/09. Owner: Operations. 2 evidence items pending.',
+    pricingEyebrow: 'Kumplio Core', pricingTitle: 'The shared platform for every compliance area.', pricingBody: 'Start with Kumplio Core and activate the areas your operation needs.', pricingCta: 'View plans and pricing',
+    finalEyebrow: 'Start with a real situation', finalTitle: 'Kumplio recommends. You decide.', finalBody: 'Human review remains part of legal, audit and closure decisions.',
+  },
+} as const
 
 export default async function HomePage() {
-  const { locale } = await getPublicRequestContext();
-  const copy = HOME_CLARITY_COPY[locale];
-  const publicCopy = HOME_PUBLIC_COPY[locale];
-  const alternateLocale = locale === "es" ? "en" : "es";
-  const alternateHomeHref = withPublicLocale("/", alternateLocale);
+  const { locale } = await getPublicRequestContext()
+  const c = copy[locale]
+  const alternateLocale = locale === 'es' ? 'en' : 'es'
+  const areas = VERTICAL_SLUGS.slice(0, 3)
+  const agentRoles = locale === 'es'
+    ? ['Obligaciones y evidencia', 'Riesgo y prioridad', 'Planes guiados', 'Cambio regulatorio', 'Control y cierre', 'Desempeño y aprendizaje', 'Revisión legal y calidad']
+    : ['Obligations and evidence', 'Risk and priority', 'Guided plans', 'Regulatory change', 'Control and closure', 'Performance and learning', 'Legal and quality review']
+
+  const menuItems = [
+    { href: '#como-funciona', label: c.nav[0] }, { href: '#areas', label: c.nav[1] },
+    { href: '#empresa', label: c.nav[2] }, { href: '#trabajador', label: c.nav[3] },
+    { href: getPublicSiteHref('/pricing', locale), label: c.nav[4] },
+  ]
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#151513] text-[#C2A887]">
+    <div className="min-h-screen overflow-x-hidden bg-[#171715] text-[#AAA69C]">
       <HomeMotionController />
-      <nav
-        aria-label={locale === "es" ? "Principal" : "Primary"}
-        className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#151513]/90 backdrop-blur-xl"
-      >
+      <nav aria-label={locale === 'es' ? 'Principal' : 'Primary'} className="fixed inset-x-0 top-0 z-50 border-b border-[#393833] bg-[#171715]/95 backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <Link
-            href={withPublicLocale("/", locale)}
-            aria-label="Kumplio"
-            className="shrink-0"
-          >
-            <Image
-              src="/kumplio-logo-canonical.png"
-              alt="Kumplio"
-              width={455}
-              height={171}
-              priority
-              className="h-auto w-[154px] object-contain sm:w-[190px]"
-            />
-          </Link>
-          <div className="hidden items-center gap-7 lg:flex">
-            <a href="#producto" data-section-link className={navClass}>
-              {copy.nav.product}
-            </a>
-            <a href="#como-funciona" data-section-link className={navClass}>
-              {copy.nav.how}
-            </a>
-            <a href="#verticales" data-section-link className={navClass}>
-              {copy.nav.forWho}
-            </a>
-            <Link
-              href={getPublicSiteHref("/resources/ley-21719", locale)}
-              className={navClass}
-            >
-              {copy.nav.resources}
-            </Link>
-            <Link
-              href={getPublicSiteHref("/pricing", locale)}
-              className={navClass}
-            >
-              {copy.nav.pricing}
-            </Link>
-          </div>
-          <div className="hidden items-center gap-3 lg:flex">
-            <Link
-              href={withPublicLocale("/", alternateLocale)}
-              hrefLang={alternateLocale}
-              className="rounded border border-white/15 px-3 py-2 text-xs text-[#C2B6A4] transition-colors hover:text-[#F0D7B6]"
-            >
-              {copy.nav.switchLanguage}
-            </Link>
-            <Link
-              href="/sign-in"
-              className="text-sm text-[#C2B6A4] transition-colors hover:text-[#F0D7B6]"
-            >
-              {copy.nav.signIn}
-            </Link>
-            <Button asChild className="h-11 rounded px-4 text-sm">
-              <a href="#resolver-form">{copy.nav.try}</a>
-            </Button>
-          </div>
-          <MobilePublicNav
-            alternateHomeHref={alternateHomeHref}
-            switchLanguage={copy.nav.switchLanguage}
-            signIn={copy.nav.signIn}
-            tryLabel={copy.nav.try}
-            menuLabel={
-              locale === "es" ? "Abrir menú principal" : "Open main menu"
-            }
-            items={[
-              { href: "#producto", label: copy.nav.product },
-              { href: "#como-funciona", label: copy.nav.how },
-              { href: "#verticales", label: copy.nav.forWho },
-              {
-                href: getPublicSiteHref("/resources/ley-21719", locale),
-                label: copy.nav.resources,
-              },
-              {
-                href: getPublicSiteHref("/pricing", locale),
-                label: copy.nav.pricing,
-              },
-            ]}
-          />
+          <Link href={withPublicLocale('/', locale)} aria-label="Kumplio"><Image src="/kumplio-logo-canonical.png" alt="Kumplio" width={455} height={171} priority className="h-auto w-[154px] sm:w-[190px]" /></Link>
+          <div className="hidden items-center gap-7 lg:flex">{menuItems.map((item) => <a key={item.href} href={item.href} className={navLink}>{item.label}</a>)}</div>
+          <div className="hidden items-center gap-4 lg:flex"><Link href={withPublicLocale('/', alternateLocale)} className={navLink}>{c.language}</Link><Link href="/sign-in" className={navLink}>{c.signIn}</Link><Button asChild className="rounded-[4px]"><a href="#resolver-form">{c.action}</a></Button></div>
+          <MobilePublicNav alternateHomeHref={withPublicLocale('/', alternateLocale)} switchLanguage={c.language} signIn={c.signIn} tryLabel={c.action} menuLabel={locale === 'es' ? 'Abrir menú' : 'Open menu'} items={menuItems} />
         </div>
       </nav>
 
       <main>
-        <section className="relative min-h-[760px] border-b border-white/10 pt-20 md:min-h-[850px]">
-          <CinematicImage
-            src="/brand/kumplio-hero-compliance.webp"
-            position="68% center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#151513_2%,rgba(21,21,19,.95)_32%,rgba(21,21,19,.12)_78%),linear-gradient(0deg,#151513_0%,transparent_48%)]" />
-          <div className="relative mx-auto flex min-h-[770px] max-w-[1440px] items-center px-5 py-20 sm:px-8 lg:px-12">
-            <div data-reveal className="max-w-[700px]">
-              <p className={eyebrowClass}>{copy.hero.eyebrow}</p>
-              <h1 className="mt-7 text-balance text-[48px] font-light leading-[1.02] tracking-[-0.045em] text-[#E0C5A1] sm:text-[66px] lg:text-[78px]">
-                {copy.hero.title}
-              </h1>
-              <p className="mt-8 max-w-[620px] text-[17px] leading-8 text-[#C8BCAA]">
-                {copy.hero.description}
-              </p>
-              <LawCountdown locale={locale} />
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild className="h-12 rounded px-6">
-                  <a href="#resolver-form">{copy.hero.primary}</a>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-12 rounded border-white/25 bg-black/20 px-6 text-[#F0D7B6]"
-                >
-                  <a href="#como-funciona">{copy.hero.secondary}</a>
-                </Button>
-              </div>
-              <div className="mt-10 grid max-w-[650px] gap-4 border-t border-white/20 pt-6 text-xs text-[#C2B6A4] sm:grid-cols-3">
-                {copy.hero.proofs.map((item) => (
-                  <div key={item} className="flex gap-2">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#C5E052]" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
+        <section className="relative min-h-[820px] border-b border-[#393833] pt-20">
+          <Image src="/brand/kumplio-hero-compliance.webp" alt="" fill priority sizes="100vw" className="object-cover object-[68%_center] opacity-30 grayscale-[30%]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#171715_4%,rgba(23,23,21,.93)_42%,rgba(23,23,21,.28)_100%)]" />
+          <div className="relative mx-auto flex min-h-[740px] max-w-[1440px] items-center px-5 py-24 sm:px-8 lg:px-12">
+            <div data-reveal className="max-w-[760px]">
+              <p className={eyebrow}>{c.heroEyebrow}</p>
+              <h1 className="mt-8 text-balance text-[52px] font-light leading-[1.01] tracking-[-.045em] text-[#C2A887] sm:text-[72px] lg:text-[84px]"><span>{c.heroTitleA}</span><br /><span className="text-[#B17A4D]">{c.heroTitleB}</span></h1>
+              <p className="mt-8 max-w-[660px] text-[18px] leading-8 text-[#AAA69C]">{c.heroSupport}</p>
+              <div className="mt-10 flex flex-wrap gap-3"><Button asChild className="h-12 rounded-[4px] px-6"><a href="#trabajador">{c.workerPath}</a></Button><Button asChild variant="outline" className="h-12 rounded-[4px] border-[#747169] bg-[#171715]/70 px-6 text-[#C2A887]"><a href="#empresa">{c.companyPath}</a></Button></div>
             </div>
           </div>
         </section>
 
-        <section
-          id="como-funciona"
-          className="relative min-h-[720px] scroll-mt-20 border-b border-white/10 md:min-h-[800px]"
-        >
-          <CinematicImage
-            src="/brand/kumplio-transformation.webp"
-            position="center"
-            opacityClass="opacity-70"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,21,19,.78)_0%,rgba(21,21,19,.08)_45%,rgba(21,21,19,.9)_100%)]" />
-          <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
-            <div data-reveal>
-              <p className={eyebrowClass}>{copy.journey.eyebrow}</p>
-              <h2 className={h2Class}>{copy.journey.title}</h2>
-            </div>
-            <div className="mt-56 grid border-y border-white/16 bg-[#151513]/88 shadow-[0_20px_70px_rgba(0,0,0,.42)] backdrop-blur-md md:mt-[300px] md:grid-cols-4">
-              {copy.journey.steps.map((step, index) => (
-                <article
-                  key={step.title}
-                  data-reveal
-                  className="group border-b border-white/16 p-7 transition-colors duration-300 hover:bg-white/[.035] md:border-b-0 md:border-r last:md:border-r-0"
-                >
-                  <span className="inline-flex text-[11px] font-semibold text-[#C5E052] transition-transform duration-300 group-hover:translate-x-1">
-                    0{index + 1}
-                  </span>
-                  <h3 className="mt-6 text-2xl font-light text-[#E0C5A1]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-[#C8BCAA]">
-                    {step.description}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <section className={sections}><div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-2"><div data-reveal><p className={eyebrow}>{c.problemEyebrow}</p><h2 className={h2}>{c.problemTitle}</h2></div><p data-reveal className="self-end text-lg leading-9 text-[#AAA69C]">{c.problemBody}</p></div></section>
 
-        <section
-          id="verticales"
-          className="relative min-h-[900px] scroll-mt-20 border-b border-white/10"
-        >
-          <CinematicImage
-            src="/brand/kumplio-mining-transport.webp"
-            opacityClass="opacity-35"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,21,19,.76)_0%,rgba(21,21,19,.48)_30%,rgba(21,21,19,.95)_100%)]" />
-          <div className="relative w-full px-5 py-20 sm:px-10 md:py-28 lg:px-[clamp(3rem,5vw,6rem)]">
-            <div data-reveal>
-              <p className={eyebrowClass}>{copy.scenarios.eyebrow}</p>
-              <h2 className={h2Class}>{copy.scenarios.title}</h2>
-            </div>
-            <div className="mt-52 grid border-l border-t border-white/15 bg-black/35 shadow-[0_28px_90px_rgba(0,0,0,.55)] backdrop-blur-sm sm:grid-cols-2 md:mt-[260px] lg:grid-cols-3">
-              {copy.scenarios.items.map((item, index) => {
-                const slug = item.slug as VerticalSlug;
-                return (
-                  <Link
-                    key={item.slug}
-                    data-reveal
-                    href={getPublicSiteHref(`/verticales/${item.slug}`, locale)}
-                    className="group relative flex min-h-[370px] flex-col overflow-hidden border-b border-r border-white/15 p-8 transition duration-300 hover:z-10 hover:-translate-y-1 hover:border-[#A7C63A]/45 hover:shadow-[0_22px_60px_rgba(0,0,0,.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#A7C63A]"
-                  >
-                    <Image
-                      src={VERTICAL_IMAGES[slug]}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      style={{ objectPosition: VERTICAL_IMAGE_POSITIONS[slug] }}
-                      className="object-cover opacity-65 transition duration-500 group-hover:scale-[1.035] group-hover:opacity-[.78]"
-                    />
-                    <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,9,.12)_0%,rgba(10,10,9,.42)_48%,rgba(10,10,9,.95)_100%)] transition-colors group-hover:bg-[linear-gradient(180deg,rgba(10,10,9,.06)_0%,rgba(10,10,9,.32)_48%,rgba(10,10,9,.92)_100%)]" />
-                    <div className="relative flex h-full flex-1 flex-col">
-                      <p className="text-xs font-semibold text-[#C5E052]">
-                        {String(index + 1).padStart(2, "0")}
-                      </p>
-                      <div className="mt-auto pt-28">
-                        <h3 className="text-[27px] font-light text-[#F0D7B6]">
-                          {item.title}
-                        </h3>
-                        <p className="mt-4 text-[15px] leading-7 text-[#DDD1C0]">
-                          {item.description}
-                        </p>
-                        <span className="mt-6 inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[.14em] text-[#C5E052]">
-                          {item.action}
-                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <section id="resolver-form" className={`scroll-mt-20 bg-[#20201D] ${sections}`}><div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[.78fr_1.22fr]"><div><p className={eyebrow}>{c.startTitle}</p><h2 className={h2}>{c.startBody}</h2></div><ResolutionEntry locale={locale} /></div></section>
 
-        <section
-          id="producto"
-          className="relative min-h-[760px] scroll-mt-20 border-b border-white/10"
-        >
-          <CinematicImage
-            src="/brand/kumplio-operating-model.webp"
-            opacityClass="opacity-70"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(21,21,19,.82)_0%,rgba(21,21,19,.10)_38%,rgba(21,21,19,.9)_100%)]" />
-          <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
-            <div data-reveal>
-              <p className={eyebrowClass}>{copy.workflow.eyebrow}</p>
-              <h2 className={h2Class}>{copy.workflow.title}</h2>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-[#C8BCAA]">
-                {copy.workflow.description}
-              </p>
-            </div>
-            <div className="mt-52 grid border-y border-white/16 bg-[#151513]/72 shadow-[0_20px_70px_rgba(0,0,0,.32)] backdrop-blur-sm md:mt-[245px] md:grid-cols-3">
-              {copy.workflow.stages.map((stage, index) => {
-                const Icon = workflowIcons[index];
-                return (
-                  <article
-                    key={stage.title}
-                    data-reveal
-                    className="group p-7 transition-colors duration-300 hover:bg-white/[.04] md:border-r md:border-white/16 last:md:border-r-0"
-                  >
-                    <Icon className="h-6 w-6 text-[#C28A59] transition duration-300 group-hover:-translate-y-1 group-hover:text-[#C5E052]" />
-                    <h3 className="mt-7 text-3xl font-light text-[#E0C5A1]">
-                      {stage.title}
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[#C8BCAA]">
-                      {stage.description}
-                    </p>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <section id="como-funciona" className={`scroll-mt-20 ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#393833] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#393833] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-sm leading-7">{body}</p></article>)}</div></div></section>
 
-        <section className="relative min-h-[820px] overflow-hidden border-b border-white/10 bg-[#151513]">
-          <div className="absolute inset-x-0 top-0 h-[620px] overflow-hidden md:h-[760px]">
-            <Image
-              src="/brand/kumplio-specialists.webp"
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover opacity-75"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(21,21,19,.88)_0%,rgba(21,21,19,.62)_42%,rgba(21,21,19,.18)_78%),linear-gradient(180deg,rgba(21,21,19,.45)_0%,rgba(21,21,19,.02)_42%,rgba(21,21,19,.88)_100%)]" />
-          </div>
-          <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
-            <div data-reveal>
-              <p className={eyebrowClass}>{copy.specialists.eyebrow}</p>
-              <h2 className={h2Class}>{copy.specialists.title}</h2>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-[#C8BCAA]">
-                {copy.specialists.description}
-              </p>
-            </div>
-            <div className="mt-60 grid border-y border-white/18 bg-[#151513]/92 shadow-[0_24px_80px_rgba(0,0,0,.5)] backdrop-blur-md md:mt-[310px] md:grid-cols-3">
-              {copy.specialists.people.map((person) => (
-                <article
-                  key={person.name}
-                  data-reveal
-                  className="group border-b border-white/16 p-7 transition-colors duration-300 hover:bg-white/[.035] md:border-b-0 md:border-r last:md:border-r-0"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-[#C5E052]">
-                    {person.label}
-                  </p>
-                  <h3 className="mt-4 text-2xl font-light text-[#E0C5A1] transition-colors group-hover:text-[#F0D7B6]">
-                    {person.name}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-[#C8BCAA]">
-                    {person.description}
-                  </p>
-                </article>
-              ))}
-            </div>
-            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 border-b border-white/12 pb-6">
-              {copy.specialists.capabilities.map((capability) => (
-                <span
-                  key={capability}
-                  className="text-xs font-medium uppercase tracking-[.12em] text-[#C2B6A4]"
-                >
-                  {capability}
-                </span>
-              ))}
-            </div>
-            <p className="mt-6 max-w-3xl text-sm leading-7 text-[#C8BCAA]">
-              {copy.specialists.note}
-            </p>
-          </div>
-        </section>
+        <section className={`bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#393833] lg:grid-cols-2"><article id="trabajador" className="scroll-mt-24 py-12 lg:border-r lg:border-[#393833] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article id="empresa" className="scroll-mt-24 py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div></section>
 
-        <section className={`bg-[#1C1C19] ${sectionClass}`}>
-          <div data-reveal className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[.82fr_1.18fr] lg:gap-20">
-            <div>
-              <p className={eyebrowClass}>{copy.example.eyebrow}</p>
-              <h2 className={h2Class}>{copy.example.title}</h2>
-              <blockquote className="mt-10 border-l border-[#C28A59] pl-6 text-[23px] font-light leading-relaxed text-[#E0C5A1] md:text-[28px]">
-                “{copy.example.quote}”
-              </blockquote>
-            </div>
-            <div className="border border-white/16 bg-[#151513] p-6 shadow-[0_20px_60px_rgba(0,0,0,.3)] sm:p-8">
-              {copy.example.outcomes.map((item, index) => {
-                const Icon = outcomeIcons[index];
-                return (
-                  <article
-                    key={item.title}
-                    className="grid grid-cols-[auto_1fr] gap-5 border-b border-white/14 py-6 first:pt-0 last:border-b-0 last:pb-0"
-                  >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#C28A59]/55 bg-[#B17A4D]/12">
-                      <Icon className="h-5 w-5 text-[#C28A59]" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-[#C5E052]">
-                        0{index + 1}
-                      </p>
-                      <h3 className="mt-2 text-xl text-[#F0D7B6]">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-[#C8BCAA]">
-                        {item.description}
-                      </p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        <section className={sections}><div className="mx-auto max-w-[1100px]"><p className={eyebrow}>{c.statusEyebrow}</p><h2 className={h2}>{c.statusTitle}</h2><div className="mt-14 grid border-y border-[#393833] sm:grid-cols-3">{[['92%', c.statusLabels[0]], ['9', c.statusLabels[1]], ['17', c.statusLabels[2]]].map(([value, label], index) => <div key={label} className="py-10 sm:border-r sm:border-[#393833] sm:px-8 last:border-r-0"><p className={`text-5xl font-light ${index === 0 ? 'text-[#A7C63A]' : 'text-[#C2A887]'}`}>{value}</p><p className="mt-3 text-sm">{label}</p></div>)}</div></div></section>
 
-        <section className="relative min-h-[720px] border-b border-white/10">
-          <CinematicImage
-            src="/brand/kumplio-evidence-security.webp"
-            position="65% center"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#151513_5%,rgba(21,21,19,.94)_42%,rgba(21,21,19,.18)_82%),linear-gradient(0deg,#151513_0%,transparent_45%)]" />
-          <div className="relative mx-auto max-w-[1440px] px-5 py-20 sm:px-8 md:py-28 lg:px-12">
-            <div data-reveal className="max-w-xl">
-              <ShieldCheck className="h-7 w-7 text-[#C28A59]" />
-              <p className={`mt-7 ${eyebrowClass}`}>{copy.security.eyebrow}</p>
-              <h2 className={h2Class}>{copy.security.title}</h2>
-              <p className="mt-6 text-base leading-8 text-[#C8BCAA]">
-                {copy.security.description}
-              </p>
-              <div className="mt-10 grid gap-6">
-                {copy.security.points.map((point) => (
-                  <article
-                    key={point.title}
-                    className="group border-l border-white/22 pl-5 transition-colors duration-300 hover:border-[#C5E052]/70"
-                  >
-                    <h3 className="text-lg text-[#E0C5A1]">{point.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-[#C8BCAA]">
-                      {point.description}
-                    </p>
-                  </article>
-                ))}
-              </div>
-              <p className="mt-7 text-xs leading-6 text-[#BEB2A1]">
-                {copy.security.note}
-              </p>
-            </div>
-          </div>
-        </section>
+        <section id="areas" className={`scroll-mt-20 bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.areasEyebrow}</p><h2 className={h2}>{c.areasTitle}</h2><div className="mt-14 grid gap-0 border-y border-[#393833] lg:grid-cols-3">{areas.map((slug) => { const area = VERTICAL_PUBLIC_COPY[locale][slug]; return <Link key={slug} href={getPublicSiteHref(`/verticales/${slug}`, locale)} className="group relative min-h-[420px] overflow-hidden border-b border-[#393833] p-8 lg:border-b-0 lg:border-r last:border-r-0"><Image src={VERTICAL_IMAGES[slug]} alt="" fill sizes="(min-width:1024px) 33vw,100vw" style={{ objectPosition: VERTICAL_IMAGE_POSITIONS[slug] }} className="object-cover opacity-35 grayscale-[25%] transition group-hover:opacity-45" /><span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,23,21,.15),#171715_96%)]" /><div className="relative flex h-full flex-col"><h3 className="mt-auto text-3xl font-light text-[#C2A887]">{area.name}</h3><p className="mt-4 text-sm leading-7">{area.heroQuestion}</p><span className="mt-6 inline-flex items-center gap-2 text-sm text-[#A7C63A]">{locale === 'es' ? 'Explorar área' : 'Explore area'}<ArrowRight className="h-4 w-4" /></span></div></Link> })}</div><details className="mt-8 border-b border-[#393833] pb-8"><summary className="cursor-pointer list-none text-sm text-[#C2A887]">{c.allAreas} <span className="ml-2 text-[#A7C63A]">→</span></summary><div className="mt-6 grid gap-4 sm:grid-cols-3">{VERTICAL_SLUGS.slice(3).map((slug) => <Link key={slug} href={getPublicSiteHref(`/verticales/${slug}`, locale)} className="border-t border-[#393833] py-4 text-sm text-[#AAA69C] hover:text-[#C2A887]">{VERTICAL_PUBLIC_COPY[locale][slug].name}</Link>)}</div></details></div></section>
 
-        <section
-          id="resolver-form"
-          className="scroll-mt-20 bg-[#1C1C19] px-5 py-20 sm:px-8 md:py-28 lg:px-12"
-        >
-          <div className="mx-auto grid max-w-[1200px] gap-12 lg:grid-cols-[.8fr_1.2fr] lg:gap-16">
-            <div>
-              <p className={eyebrowClass}>{copy.cta.eyebrow}</p>
-              <h2 className={h2Class}>{copy.cta.title}</h2>
-              <p className="mt-6 text-base leading-8 text-[#C8BCAA]">
-                {copy.cta.description}
-              </p>
-            </div>
-            <ResolutionEntry locale={locale} />
-          </div>
-        </section>
+        <section className={sections}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.agentsEyebrow}</p><h2 className={h2}>{c.agentsTitle}</h2><p className="mt-6 max-w-2xl text-lg leading-8">{c.agentsBody}</p><div className="mt-14 grid gap-0 border-y border-[#393833] md:grid-cols-3">{AGENT_CATALOG.slice(0, 3).map((agent, index) => <article key={agent.id} className="py-8 md:border-r md:border-[#393833] md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-4 text-2xl font-light text-[#C2A887]">{agent.name}</h3><p className="mt-3 text-sm leading-7">{agentRoles[index]}</p></article>)}</div><div className="grid gap-0 border-b border-[#393833] sm:grid-cols-2 lg:grid-cols-4">{AGENT_CATALOG.slice(3).map((agent, offset) => <article key={agent.id} className="border-b border-[#393833] py-7 sm:border-r sm:px-6 lg:border-b-0 first:sm:pl-0 last:border-r-0"><h3 className="text-xl font-light text-[#C2A887]">{agent.name}</h3><p className="mt-3 text-sm leading-6">{agentRoles[offset + 3]}</p></article>)}</div></div></section>
+
+        <section className={`bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.workflowTitle}</p><div className="mt-10 grid gap-12 lg:grid-cols-2"><article><h2 className="text-3xl font-light text-[#C2A887]">{c.changed}</h2><p className="mt-6 text-sm leading-8 text-[#B17A4D]">Beatriz → Isidora → Rodrigo → Javier → Verónica → Julieta</p><p className="mt-5">{c.changedResult}</p></article><article className="border-t border-[#393833] pt-10 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0"><h2 className="text-3xl font-light text-[#C2A887]">{c.team}</h2><p className="mt-6 text-sm leading-8 text-[#B17A4D]">Isidora → Rodrigo → Javier → Verónica → Julieta</p><p className="mt-5">{c.teamResult}</p></article></div></div></section>
+
+        <section className={sections}><div className="mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className={eyebrow}>{c.exampleEyebrow}</p><h2 className={h2}>{c.exampleTitle}</h2></div><div className="border-y border-[#393833] py-8"><p className="text-[10px] uppercase tracking-[.18em] text-[#B17A4D]">{c.reviews}</p><p className="mt-4 leading-8 text-[#C2A887]">{c.exampleChain}</p><p className="mt-8 text-[10px] uppercase tracking-[.18em] text-[#B17A4D]">{c.result}</p><p className="mt-4 leading-8 text-[#C2A887]">{c.exampleResult}</p></div></div></section>
+
+        <section className={`bg-[#20201D] ${sections}`}><div className="mx-auto grid max-w-[1280px] gap-10 lg:grid-cols-[1fr_auto] lg:items-end"><div><p className={eyebrow}>{c.pricingEyebrow}</p><h2 className={h2}>{c.pricingTitle}</h2><p className="mt-6 max-w-2xl leading-8">{c.pricingBody}</p></div><Button asChild className="h-12 rounded-[4px] px-6"><Link href={getPublicSiteHref('/pricing', locale)}>{c.pricingCta}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div></section>
+
+        <section className={sections}><div className="mx-auto max-w-[1000px] text-center"><p className={eyebrow}>{c.finalEyebrow}</p><h2 className="mt-6 text-5xl font-light text-[#C2A887]">{c.finalTitle}</h2><p className="mx-auto mt-6 max-w-2xl leading-8">{c.finalBody}</p><div className="mt-8"><Button asChild className="h-12 rounded-[4px] px-7"><a href="#resolver-form">{c.action}<CheckCircle2 className="ml-2 h-4 w-4" /></a></Button></div></div></section>
       </main>
       <Footer locale={locale} />
     </div>
-  );
+  )
 }

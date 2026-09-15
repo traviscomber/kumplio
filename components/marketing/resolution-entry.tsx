@@ -9,7 +9,7 @@ import {
   GUIDED_ONBOARDING_DRAFT_KEY,
 } from "@/lib/product/onboarding/guided-entry";
 
-type Audience = "person" | "company" | "professional";
+type Audience = "person" | "company";
 
 type ResolutionCopy = {
   audiences: Record<Audience, string>;
@@ -29,30 +29,24 @@ type ResolutionCopy = {
   previewLocked: string;
 };
 
-const audienceOrder: Audience[] = ["company", "professional", "person"];
+const audienceOrder: Audience[] = ["company", "person"];
 
 const COPY: Record<PublicLocale, ResolutionCopy> = {
   es: {
     audiences: {
       company: "Empresa",
-      professional: "Profesional",
-      person: "Persona",
+      person: "Trabajador",
     },
     examples: {
       company: [
-        "Necesito prepararme para la Ley 21.719",
-        "No tengo claro dónde están nuestros datos personales",
-        "Debo responder una solicitud o posible incidente de privacidad",
-      ],
-      professional: [
-        "Debo levantar tratamientos y brechas de un cliente",
-        "Necesito revisar un contrato con un proveedor que trata datos",
-        "Quiero preparar un plan de implementación con evidencia",
+        "Quiero saber qué documentos están por vencer",
+        "Necesito revisar a mis contratistas",
+        "Debo prepararme para la Ley 21.719",
       ],
       person: [
-        "Quiero entender cómo están usando mis datos",
-        "Necesito saber qué puedo pedir sobre mis datos personales",
-        "Tengo una situación de privacidad y no sé cómo abordarla",
+        "Quiero ordenar mis documentos para trabajar",
+        "Necesito saber qué certificado está por vencer",
+        "Quiero reutilizar mi información verificada",
       ],
     },
     question: "¿Qué necesitas proteger o resolver?",
@@ -68,18 +62,14 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
     previewTitle: {
       company:
         "Tu primer paso es ordenar el contexto antes de implementar controles.",
-      professional:
-        "Tu primer paso es convertir los antecedentes en un alcance verificable.",
       person:
-        "Tu primer paso es identificar quién usa tus datos y con qué finalidad.",
+        "Tu primer paso es ordenar qué documentos tienes y cuáles necesita tu trabajo.",
     },
     previewSummary: {
       company:
         "Por lo que describes, conviene comenzar delimitando los datos, tratamientos, responsables y terceros involucrados. Eso permite distinguir brechas urgentes de tareas de implementación frente a la Ley 21.719.",
-      professional:
-        "Por lo que describes, conviene fijar el alcance, reunir las fuentes disponibles y separar hechos, vacíos y supuestos antes de recomendar medidas al cliente.",
       person:
-        "Por lo que describes, conviene reunir antecedentes sobre la organización, los datos involucrados y la respuesta recibida antes de definir una solicitud o acción.",
+        "Por lo que describes, conviene reunir tus documentos, certificaciones y fechas de vencimiento para identificar qué está listo y qué requiere atención.",
     },
     previewSignals: {
       company: [
@@ -87,15 +77,10 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
         "Identificar responsables, proveedores y evidencia disponible",
         "Priorizar brechas y próximos pasos",
       ],
-      professional: [
-        "Delimitar alcance y fuentes aplicables",
-        "Registrar vacíos y evidencia faltante",
-        "Preparar acciones revisables para el cliente",
-      ],
       person: [
-        "Identificar organización y datos involucrados",
-        "Ordenar comunicaciones y antecedentes",
-        "Definir la solicitud o siguiente acción",
+        "Ordenar documentos y certificaciones",
+        "Identificar vencimientos y requisitos",
+        "Definir la siguiente acción",
       ],
     },
     previewLocked:
@@ -104,24 +89,18 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
   en: {
     audiences: {
       company: "Company",
-      professional: "Professional",
-      person: "Individual",
+      person: "Worker",
     },
     examples: {
       company: [
+        "I want to know which documents are about to expire",
+        "I need to review my contractors",
         "I need to prepare for Chilean Law 21.719",
-        "I do not have a clear map of where our personal data is",
-        "I need to respond to a privacy request or possible incident",
-      ],
-      professional: [
-        "I need to map a client’s processing activities and gaps",
-        "I need to review a vendor contract involving personal data",
-        "I want to build an evidence-backed implementation plan",
       ],
       person: [
-        "I want to understand how my personal data is being used",
-        "I need to know what I can request about my personal data",
-        "I have a privacy situation and do not know how to approach it",
+        "I want to organize my documents for work",
+        "I need to know which certification expires next",
+        "I want to reuse my verified information",
       ],
     },
     question: "What do you need to protect or resolve?",
@@ -137,18 +116,14 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
     previewTitle: {
       company:
         "Your first step is to organize the context before implementing controls.",
-      professional:
-        "Your first step is to turn the available context into a verifiable scope.",
       person:
-        "Your first step is to identify who uses your data and for what purpose.",
+        "Your first step is to organize what documents you have and what your work requires.",
     },
     previewSummary: {
       company:
         "Based on what you described, start by defining the data, processing activities, owners and third parties involved. This helps separate urgent gaps from implementation work under Chilean Law 21.719.",
-      professional:
-        "Based on what you described, define the scope, gather available sources and separate facts, gaps and assumptions before recommending measures to the client.",
       person:
-        "Based on what you described, gather the organization, data and response details before deciding on a request or next action.",
+        "Based on what you described, gather documents, certifications and expiry dates to identify what is ready and what needs attention.",
     },
     previewSignals: {
       company: [
@@ -156,15 +131,10 @@ const COPY: Record<PublicLocale, ResolutionCopy> = {
         "Identify owners, vendors and available evidence",
         "Prioritize gaps and next steps",
       ],
-      professional: [
-        "Define the scope and applicable sources",
-        "Record gaps and missing evidence",
-        "Prepare reviewable actions for the client",
-      ],
       person: [
-        "Identify the organization and data involved",
-        "Organize communications and context",
-        "Define the request or next action",
+        "Organize documents and certifications",
+        "Identify expirations and requirements",
+        "Define the next action",
       ],
     },
     previewLocked:
@@ -206,7 +176,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
   }
 
   return (
-    <div className="rounded-[28px] border border-[#B17A4D]/35 bg-[#211F1B] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.5)] sm:p-7">
+    <div className="rounded-[4px] border border-[#B17A4D]/35 bg-[#211F1B] p-5 sm:p-7">
       <div className="flex flex-wrap gap-2">
         {audienceOrder.map((value) => (
           <button
@@ -216,7 +186,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
               setAudience(value);
               setShowPreview(false);
             }}
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition ${
+            className={`rounded-[4px] border px-4 py-2 text-sm font-medium transition ${
               audience === value
                 ? "border-[#A7C63A] bg-[#A7C63A]/15 text-[#C5E052] shadow-[inset_0_0_0_1px_rgba(167,198,58,0.12)]"
                 : "border-[#C2A887]/20 bg-[#151513]/45 text-[#C2A887] hover:border-[#B17A4D]/60 hover:bg-[#B17A4D]/10 hover:text-[#E0C5A1]"
@@ -246,7 +216,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
         placeholder={copy.placeholder}
         aria-invalid={showError}
         aria-describedby="resolution-guidance"
-        className={`mt-3 w-full resize-none rounded-2xl border bg-[#151513] px-4 py-4 text-base leading-7 text-[#F0E2CE] outline-none transition placeholder:text-[#8F8678] focus:ring-2 ${showError ? "border-[#D58A62] focus:border-[#D58A62] focus:ring-[#D58A62]/15" : "border-[#C2A887]/22 focus:border-[#A7C63A]/75 focus:ring-[#A7C63A]/15"}`}
+        className={`mt-3 w-full resize-none rounded-[4px] border bg-[#151513] px-4 py-4 text-base leading-7 text-[#C2A887] outline-none transition placeholder:text-[#8F8678] focus:ring-2 ${showError ? "border-[#D58A62] focus:border-[#D58A62] focus:ring-[#D58A62]/15" : "border-[#C2A887]/22 focus:border-[#A7C63A]/75 focus:ring-[#A7C63A]/15"}`}
       />
       <p
         id="resolution-guidance"
@@ -267,7 +237,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
               setShowPreview(false);
             }}
             aria-pressed={goal === example}
-            className={`rounded-full border px-3 py-2 text-left text-xs transition ${goal === example ? "border-[#A7C63A]/70 bg-[#A7C63A]/12 text-[#D5EA7C]" : "border-[#C2A887]/28 bg-[#151513]/55 text-[#C2B6A4] hover:border-[#A7C63A]/65 hover:bg-[#A7C63A]/10 hover:text-[#F0D7B6]"}`}
+            className={`rounded-[4px] border px-3 py-2 text-left text-xs transition ${goal === example ? "border-[#A7C63A]/70 bg-[#A7C63A]/12 text-[#D5EA7C]" : "border-[#C2A887]/28 bg-[#151513]/55 text-[#C2B6A4] hover:border-[#A7C63A]/65 hover:bg-[#A7C63A]/10 hover:text-[#C2A887]"}`}
           >
             {example}
           </button>
@@ -284,7 +254,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
 
       {showPreview && (
         <section
-          className="mt-6 rounded-2xl border border-[#A7C63A]/35 bg-[#171813] p-5"
+          className="mt-6 rounded-[4px] border border-[#A7C63A]/35 bg-[#171813] p-5"
           aria-live="polite"
         >
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#A7C63A]">
@@ -304,7 +274,7 @@ export function ResolutionEntry({ locale = "es" }: { locale?: PublicLocale }) {
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-xl border border-[#B17A4D]/30 bg-[#211F1B] p-4">
+          <div className="mt-5 rounded-[4px] border border-[#B17A4D]/30 bg-[#211F1B] p-4">
             <div className="flex gap-3">
               <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-[#B17A4D]" />
               <p className="text-xs leading-5 text-[#B8AD9C]">
