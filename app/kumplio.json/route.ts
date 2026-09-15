@@ -17,6 +17,15 @@ import {
 
 export const dynamic = 'force-static'
 
+const areas = [
+  { id: 'data_protection', name: 'Data Protection', url: `${SITE_URL}/verticales/proteccion-de-datos`, focus: 'Personal data, evidence, gaps and Chilean Law 21.719 preparation' },
+  { id: 'mining', name: 'Mining', url: `${SITE_URL}/verticales/mineria`, focus: 'People, contractors, site requirements, credentials, inductions and validity' },
+  { id: 'transport', name: 'Transport', url: `${SITE_URL}/verticales/transporte`, focus: 'Drivers, vehicles, licences, insurance, authorizations and expirations' },
+  { id: 'construction', name: 'Construction', url: `${SITE_URL}/verticales/construccion`, focus: 'People, contractors, worksites, project requirements and clearance evidence' },
+  { id: 'healthcare', name: 'Healthcare', url: `${SITE_URL}/verticales/salud`, focus: 'People, access, sensitive data, providers, requirements and evidence' },
+  { id: 'agribusiness', name: 'Agribusiness', url: `${SITE_URL}/verticales/agroindustria`, focus: 'People, vendors, facilities, certificates, validity and operating evidence' },
+] as const
+
 export function GET() {
   const payload = {
     schema_version: '1.3',
@@ -32,6 +41,7 @@ export function GET() {
       secondary_category: PUBLIC_DISCOVERY.secondaryCategory,
       primary_positioning: PUBLIC_POSITIONING,
       primary_regulatory_focus: PUBLIC_DISCOVERY.primaryRegulatoryFocus,
+      priority_areas: PUBLIC_DISCOVERY.priorityAreas,
       description: PUBLIC_DESCRIPTION,
       developed_by: {
         name: N3URALIA_NAME,
@@ -48,6 +58,12 @@ export function GET() {
       },
       capabilities: CORE_CAPABILITIES,
       limitations: PUBLIC_LIMITATIONS,
+    },
+    operating_model: {
+      core: 'Kumplio Core',
+      path: ['understand', 'resolve', 'demonstrate'],
+      principle: 'Connect the exact operating context to requirements, current evidence, accountable actions and human review.',
+      areas,
     },
     canonical_routing: {
       strategy: 'progressive_locale_migration',
@@ -83,6 +99,7 @@ export function GET() {
       note: 'Contracting and invoicing are confirmed separately.',
     },
     law_21719: {
+      role: 'specialized_data_protection_area',
       official_source: officialLey21719Reference,
       general_effective_date: '2026-12-01',
       guides: chileComplianceGuides.map((guide) => ({
@@ -101,7 +118,8 @@ export function GET() {
     public_pages: {
       home_es: `${SITE_URL}/es`,
       home_en: `${SITE_URL}/en`,
-      product: `${SITE_URL}/software-cumplimiento-chile`,
+      areas,
+      product_data_protection: `${SITE_URL}/software-cumplimiento-chile`,
       law_solution: `${SITE_URL}/features/ley-21719`,
       law_guides: `${SITE_URL}/resources/ley-21719`,
       compliance_resources: `${SITE_URL}/resources/cumplimiento-normativo`,

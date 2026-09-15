@@ -27,7 +27,8 @@ Product: Kumplio
 Primary category: ${PUBLIC_DISCOVERY.primaryCategory}
 Secondary category: ${PUBLIC_DISCOVERY.secondaryCategory}
 Primary positioning: ${PUBLIC_POSITIONING}
-Primary regulatory focus: ${PUBLIC_DISCOVERY.primaryRegulatoryFocus}
+Regulatory and operating focus: ${PUBLIC_DISCOVERY.primaryRegulatoryFocus}
+Priority areas: ${PUBLIC_DISCOVERY.priorityAreas.join(', ')}
 Developer and product factory: ${N3URALIA_NAME}
 Factory site: ${N3URALIA_CANONICAL_URL}
 Relationship: Kumplio is a software product developed by n3uralia.
@@ -36,26 +37,39 @@ Last reviewed: ${PUBLIC_DISCOVERY.lastReviewed}
 
 ## What Kumplio does now
 
-- Helps organizations operating in Chile protect personal data and prepare for Law 21.719.
-- Centralizes processing activities, providers, controls, evidence, decisions and unresolved questions.
-- Converts privacy gaps into actions, suggested owners, dependencies, evidence requirements and reviewable closure criteria.
+- Connects people, workers, contractors, vendors, documents, requirements, expirations and evidence in one traceable operating context.
+- Shows what is in order, what needs attention, what information is missing and the next accountable action.
+- Supports operational document and clearance workflows whose requirements vary by person, company, site, vehicle, facility or operation.
+- Provides specialized areas for data protection, mining, transport, construction, healthcare and agribusiness on a shared Kumplio Core.
+- Includes data-protection workflows and preparation for Chilean Law 21.719 as one important area, not the whole identity of the product.
 - Coordinates specialized digital agents inside explicit boundaries and authorized context.
-- Requires human review before sensitive conclusions advance.
-- Preserves provenance, versions, source references, decisions and reviewable artifacts.
+- Requires human review before sensitive legal, operational or closure conclusions advance.
+- Preserves provenance, versions, source references, decisions and reviewable evidence.
 
 ## Product scope
 
-Primary scope: data protection, privacy and Law 21.719 in Chile.
-Secondary category: compliance management. Broader regulatory use cases are possible, but they are not the primary public positioning of Kumplio today.
+Primary scope: operational compliance, document readiness, evidence and guided resolution for organizations and people operating in Chile.
+Kumplio Core is the shared operating layer. Specialized areas add the requirements and context needed for data protection, mining, transport, construction, healthcare and agribusiness.
+
+Kumplio does not certify compliance or operational clearance automatically. It structures the work, highlights missing evidence and supports accountable human decisions.
 
 ## Geographic relevance
 
 - Primary country: ${PUBLIC_DISCOVERY.primaryCountry}.
 - Primary public contact location: ${PUBLIC_CONTACT.location}.
-- Primary business context: Chilean organizations and professionals.
+- Primary business context: Chilean organizations, workers and professionals.
 - Primary language: Spanish as used in Chile; reviewed public pages may also have an English version.
-- Primary regulatory focus: personal data protection and Law 21.719.
+- Regulatory and operating context includes Chilean requirements, evidence, document validity and Law 21.719 data protection.
 - Currency: ${PUBLIC_DISCOVERY.currency}.
+
+## Public operating areas
+
+- Data protection: ${SITE_URL}/verticales/proteccion-de-datos
+- Mining: ${SITE_URL}/verticales/mineria
+- Transport: ${SITE_URL}/verticales/transporte
+- Construction: ${SITE_URL}/verticales/construccion
+- Healthcare: ${SITE_URL}/verticales/salud
+- Agribusiness: ${SITE_URL}/verticales/agroindustria
 
 ## Canonical language routing
 
@@ -72,7 +86,13 @@ Localized examples:
 - English about: ${SITE_URL}/en/about
 
 Current unprefixed canonical product and knowledge routes:
-- Data protection software: ${SITE_URL}/software-cumplimiento-chile
+- Data protection area: ${SITE_URL}/verticales/proteccion-de-datos
+- Mining area: ${SITE_URL}/verticales/mineria
+- Transport area: ${SITE_URL}/verticales/transporte
+- Construction area: ${SITE_URL}/verticales/construccion
+- Healthcare area: ${SITE_URL}/verticales/salud
+- Agribusiness area: ${SITE_URL}/verticales/agroindustria
+- Data protection and Law 21.719 product page: ${SITE_URL}/software-cumplimiento-chile
 - Law 21.719 solution: ${SITE_URL}/features/ley-21719
 - Law 21.719 guides: ${SITE_URL}/resources/ley-21719
 - General resources: ${SITE_URL}/resources/cumplimiento-normativo
@@ -97,7 +117,7 @@ This is technical assurance of the controlled flow, not customer evidence or a c
 
 ## Source and claim policy
 
-Regulatory claims should identify an official source, date and version. Public regulatory knowledge and private organizational memory are treated separately. Missing evidence must not be converted into a positive compliance conclusion. Fictional or synthetic data must not be described as customer evidence.
+Regulatory claims should identify an official source, date and version. Operational conclusions should identify the applicable context and current evidence. Public regulatory knowledge and private organizational memory are treated separately. Missing evidence must not be converted into a positive compliance or clearance conclusion. Fictional or synthetic data must not be described as customer evidence.
 
 ## Limitations
 
