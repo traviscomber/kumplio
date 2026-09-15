@@ -3,7 +3,7 @@ import fs from 'node:fs'
 const page = fs.readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8')
 
 for (const fragment of [
-  'backdrop-blur-xl',
+  'backdrop-blur-md',
   'focus-visible:outline',
 ]) {
   if (!page.includes(fragment)) {
@@ -12,7 +12,7 @@ for (const fragment of [
   }
 }
 
-for (const id of ['como-funciona', 'producto', 'verticales']) {
+for (const id of ['como-funciona', 'resolver-form', 'areas']) {
   const marker = `id="${id}"`
   const markerIndex = page.indexOf(marker)
   if (markerIndex < 0) {
@@ -25,6 +25,13 @@ for (const id of ['como-funciona', 'producto', 'verticales']) {
   const openingTag = tagStart >= 0 && tagEnd >= 0 ? page.slice(tagStart, tagEnd + 1) : ''
   if (!openingTag.includes('scroll-mt-20')) {
     console.error(`Landing polish contract requires scroll offset on #${id}`)
+    process.exit(1)
+  }
+}
+
+for (const id of ['empresa', 'trabajador']) {
+  if (!page.includes(`id="${id}"`)) {
+    console.error(`Landing polish contract missing audience anchor: #${id}`)
     process.exit(1)
   }
 }
