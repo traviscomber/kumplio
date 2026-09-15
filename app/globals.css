@@ -189,65 +189,6 @@
   transition: transform 300ms ease;
 }
 
-/* The Spanish desktop home uses supplied master JPGs with Spanish copy baked in.
-   English keeps live/localized HTML copy, but its photography must be unmistakably
-   visible rather than behaving like a faint texture. These selectors intentionally
-   target only the English public home; Spanish remains pixel-for-pixel unchanged. */
-@media (min-width: 1024px) {
-  html[lang="en"] main > section:first-child > div > img[data-nimg="fill"] {
-    opacity: 0.94 !important;
-    filter: grayscale(4%) saturate(1.02) contrast(1.05);
-    object-position: 78% center !important;
-  }
-
-  html[lang="en"] main > section:first-child > div > div.absolute.inset-0 {
-    background: linear-gradient(
-      90deg,
-      #171715 0%,
-      rgba(23, 23, 21, 0.97) 25%,
-      rgba(23, 23, 21, 0.72) 43%,
-      rgba(23, 23, 21, 0.18) 66%,
-      rgba(23, 23, 21, 0.02) 100%
-    );
-  }
-
-  html[lang="en"] #como-funciona > div > img[data-nimg="fill"] {
-    opacity: 0.84 !important;
-    filter: saturate(1.02) contrast(1.05);
-    object-position: 70% center !important;
-  }
-
-  html[lang="en"] #como-funciona > div > span.absolute.inset-0 {
-    background: linear-gradient(
-      90deg,
-      rgba(23, 23, 21, 0.91) 0%,
-      rgba(23, 23, 21, 0.65) 38%,
-      rgba(23, 23, 21, 0.22) 69%,
-      rgba(23, 23, 21, 0.34) 100%
-    );
-  }
-
-  html[lang="en"] main > section:nth-of-type(5) > div > img[data-nimg="fill"] {
-    opacity: 0.88 !important;
-    filter: saturate(1.02) contrast(1.05);
-    object-position: 53% center !important;
-  }
-
-  html[lang="en"] main > section:nth-of-type(5) > div > span.absolute.inset-0 {
-    background: linear-gradient(
-      90deg,
-      rgba(23, 23, 21, 0.72) 0%,
-      rgba(23, 23, 21, 0.18) 34%,
-      rgba(23, 23, 21, 0.18) 66%,
-      rgba(23, 23, 21, 0.72) 100%
-    );
-  }
-
-  html[lang="en"] #areas a img[data-nimg="fill"] {
-    opacity: 0.82 !important;
-    filter: grayscale(4%) saturate(1.02) contrast(1.04);
-  }
-}
 
 @layer components {
   .kumplio-work-surface {
