@@ -2,7 +2,11 @@ import { redirect } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
 import { Activity, Bot, CircleDollarSign, Clock3, Database, Gauge, RotateCcw, Route, Zap } from 'lucide-react'
 import { WorkspaceNav } from '@/components/workspace-nav'
-import { summarizeRoutingTelemetry, type TrackMetrics } from '@/lib/compliance-copilot/routing-metrics'
+import {
+  summarizeRoutingTelemetry,
+  type RoutingTelemetryRow,
+  type TrackMetrics,
+} from '@/lib/compliance-copilot/routing-metrics'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -10,8 +14,6 @@ export const dynamic = 'force-dynamic'
 
 type TelemetryRun = {
   id: string
-  organization_id: string | null
-  surface: string
   intent: string
   tool_names: string[] | null
   provider: string | null
@@ -23,10 +25,7 @@ type TelemetryRun = {
   output_tokens: number | null
   total_tokens: number | null
   estimated_cost_usd: number | null
-  source_count: number
-  action_count: number
   success: boolean
-  metadata: Record<string, unknown>
   created_at: string
 }
 
@@ -137,7 +136,7 @@ export default async function AIPlatformDashboardPage() {
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('ai_platform_runs')
-    .select('id,organization_id,surface,intent,tool_names,provider,model,generation_mode,fallback_reason,latency_ms,input_tokens,output_tokens,total_tokens,estimated_cost_usd,source_count,action_count,success,metadata,created_at')
+    .select('id,intent,tool_names,provider,model,generation_mode,fallback_reason,latency_ms,input_tokens,output_tokens,total_tokens,estimated_cost_usd,success,created_at')
     .gte('created_at', since)
     .order('created_at', { ascending: false })
     .limit(1000)
@@ -146,8 +145,6 @@ export default async function AIPlatformDashboardPage() {
 
   const runs: TelemetryRun[] = Array.isArray(data) ? data.map((row) => ({
     id: String(row.id),
-    organization_id: typeof row.organization_id === 'string' ? row.organization_id : null,
-    surface: typeof row.surface === 'string' ? row.surface : 'copilot',
     intent: String(row.intent),
     tool_names: Array.isArray(row.tool_names) ? row.tool_names.map(String) : [],
     provider: typeof row.provider === 'string' ? row.provider : null,
@@ -159,14 +156,36 @@ export default async function AIPlatformDashboardPage() {
     output_tokens: row.output_tokens == null ? null : toNumber(row.output_tokens),
     total_tokens: row.total_tokens == null ? null : toNumber(row.total_tokens),
     estimated_cost_usd: row.estimated_cost_usd == null ? null : toNumber(row.estimated_cost_usd),
-    source_count: toNumber(row.source_count),
-    action_count: toNumber(row.action_count),
     success: row.success === true,
-    metadata: row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
-      ? row.metadata as Record<string, unknown>
-      : {},
     created_at: String(row.created_at),
   })) : []
+
+  let workspaceRoutingRows: RoutingTelemetryRow[] = []
+  if (currentOrganizationId) {
+    const { data: routingData, error: routingError } = await admin
+      .from('ai_platform_runs')
+      .select('generation_mode,fallback_reason,latency_ms,estimated_cost_usd,source_count,action_count,success,error_code,metadata,created_at')
+      .eq('organization_id', currentOrganizationId)
+      .eq('surface', 'copilot')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(1000)
+
+    if (routingError) throw new Error(`No fue posible cargar la telemetría tenant-scoped: ${routingError.message}`)
+
+    workspaceRoutingRows = Array.isArray(routingData) ? routingData.map((row) => ({
+      generation_mode: typeof row.generation_mode === 'string' ? row.generation_mode : null,
+      fallback_reason: typeof row.fallback_reason === 'string' ? row.fallback_reason : null,
+      latency_ms: row.latency_ms == null ? null : toNumber(row.latency_ms),
+      estimated_cost_usd: row.estimated_cost_usd == null ? null : toNumber(row.estimated_cost_usd),
+      source_count: row.source_count == null ? null : toNumber(row.source_count),
+      action_count: row.action_count == null ? null : toNumber(row.action_count),
+      success: typeof row.success === 'boolean' ? row.success : null,
+      error_code: typeof row.error_code === 'string' ? row.error_code : null,
+      metadata: row.metadata,
+      created_at: typeof row.created_at === 'string' ? row.created_at : null,
+    })) : []
+  }
 
   const llmRuns = runs.filter((run) => run.generation_mode === 'llm_grounded')
   const fallbackRuns = runs.filter((run) => Boolean(run.fallback_reason))
@@ -187,10 +206,7 @@ export default async function AIPlatformDashboardPage() {
   }, {})
 
   const byIntent = Object.entries(grouped).sort(([, left], [, right]) => right.count - left.count)
-  const workspaceCopilotRuns = currentOrganizationId
-    ? runs.filter((run) => run.organization_id === currentOrganizationId && run.surface === 'copilot')
-    : []
-  const routingSummary = summarizeRoutingTelemetry(workspaceCopilotRuns)
+  const routingSummary = summarizeRoutingTelemetry(workspaceRoutingRows)
 
   const cards: MetricCard[] = [
     ['Ejecuciones', runs.length, Activity],
@@ -239,7 +255,7 @@ export default async function AIPlatformDashboardPage() {
               </div>
               <h2 className="mt-2 text-2xl font-extrabold tracking-tight">FastTrack vs FullAgentic</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                Sólo ejecuciones Copilot de tu workspace actual durante los últimos 30 días. Esta vista separa tenants y no usa estas métricas como score de cumplimiento.
+                Sólo ejecuciones Copilot de tu workspace actual durante los últimos 30 días. La consulta de estas métricas se filtra por organización antes de agregarlas y no se usa como score de cumplimiento.
               </p>
             </div>
             <span className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${routingSummary.comparisonReady ? 'bg-amber-500/10 text-amber-300' : 'bg-muted text-muted-foreground'}`}>
