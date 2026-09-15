@@ -92,8 +92,8 @@ export async function generateMetadata(): Promise<Metadata> {
           height: 630,
           alt:
             locale === 'es'
-              ? 'Kumplio, protección de datos y guía experta con evidencia y revisión humana'
-              : 'Kumplio, data protection and guided compliance with evidence and human review',
+              ? 'Kumplio, sistema operativo de cumplimiento con documentos, requisitos y evidencia'
+              : 'Kumplio, compliance operating system for documents, requirements and evidence',
         },
       ],
     },
@@ -204,7 +204,7 @@ function buildGraph(locale: 'es' | 'en') {
         url: localizedHome,
         description: copy.description,
         applicationCategory: 'BusinessApplication',
-        applicationSubCategory: 'Data protection, privacy and guided compliance resolution',
+        applicationSubCategory: 'Compliance, evidence and guided resolution',
         operatingSystem: 'Web',
         inLanguage: copy.htmlLang,
         areaServed: { '@type': 'Country', name: 'Chile' },

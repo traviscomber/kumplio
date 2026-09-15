@@ -16,6 +16,35 @@ const eyebrow = 'text-[11px] font-medium uppercase tracking-[.22em] text-[#B17A4
 const h2 = 'mt-5 max-w-4xl text-balance text-[38px] font-light leading-[1.12] tracking-[-.03em] text-[#C2A887] md:text-[52px]'
 const navLink = 'text-sm text-[#AAA69C] transition hover:text-[#C2A887] focus-visible:outline-none'
 
+function AreaCard({ slug, locale }: { slug: (typeof VERTICAL_SLUGS)[number]; locale: 'es' | 'en' }) {
+  const area = VERTICAL_PUBLIC_COPY[locale][slug]
+
+  return (
+    <Link
+      href={getPublicSiteHref(`/verticales/${slug}`, locale)}
+      className="group relative min-h-[420px] overflow-hidden border-b border-[#393833] p-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#A7C63A] lg:border-b-0 lg:border-r last:border-r-0"
+    >
+      <Image
+        src={VERTICAL_IMAGES[slug]}
+        alt=""
+        fill
+        sizes="(min-width:1024px) 33vw,100vw"
+        style={{ objectPosition: VERTICAL_IMAGE_POSITIONS[slug] }}
+        className="object-cover opacity-45 grayscale-[20%] transition duration-300 group-hover:scale-[1.015] group-hover:opacity-58"
+      />
+      <span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,23,21,.04),rgba(23,23,21,.97)_94%)]" />
+      <div className="relative flex h-full flex-col">
+        <h3 className="mt-auto text-3xl font-light text-[#C2A887]">{area.name}</h3>
+        <p className="mt-4 text-base leading-7 text-[#C8C3B8]">{area.heroQuestion}</p>
+        <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">
+          {locale === 'es' ? 'Explorar área' : 'Explore area'}
+          <ArrowRight className="h-4 w-4" />
+        </span>
+      </div>
+    </Link>
+  )
+}
+
 const copy = {
   es: {
     nav: ['Cómo funciona', 'Áreas', 'Para empresas', 'Para trabajadores', 'Precios'],
@@ -89,7 +118,17 @@ export default async function HomePage() {
       <nav aria-label={locale === 'es' ? 'Principal' : 'Primary'} className="fixed inset-x-0 top-0 z-50 border-b border-[#393833] bg-[#171715]/95 backdrop-blur-md">
         <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Link href={withPublicLocale('/', locale)} aria-label="Kumplio"><Image src="/kumplio-logo-canonical.png" alt="Kumplio" width={455} height={171} priority className="h-auto w-[154px] sm:w-[190px]" /></Link>
-          <div className="hidden items-center gap-7 lg:flex">{menuItems.map((item) => <a key={item.href} href={item.href} className={navLink}>{item.label}</a>)}</div>
+          <div className="hidden items-center gap-7 lg:flex">{menuItems.map((item) => item.href === '#areas' ? (
+            <details key={item.href} className="group relative">
+              <summary className={`${navLink} cursor-pointer list-none py-3`}>{item.label}<span className="ml-2 inline-block text-[#A7C63A] transition-transform group-open:rotate-90">→</span></summary>
+              <div className="absolute left-1/2 top-full w-[620px] -translate-x-1/2 border border-[#393833] bg-[#171715]/98 p-5 shadow-2xl">
+                <div className="grid grid-cols-2 gap-x-8">
+                  {VERTICAL_SLUGS.map((slug) => <Link key={slug} href={getPublicSiteHref(`/verticales/${slug}`, locale)} className="border-b border-[#393833] px-2 py-4 text-sm text-[#AAA69C] transition hover:text-[#C2A887] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C63A]"><span className="block text-[#C2A887]">{VERTICAL_PUBLIC_COPY[locale][slug].name}</span><span className="mt-1 block text-xs leading-5">{VERTICAL_PUBLIC_COPY[locale][slug].heroQuestion}</span></Link>)}
+                </div>
+                <a href="#areas" className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{locale === 'es' ? 'Ver sección de áreas' : 'View areas section'}<ArrowRight className="h-4 w-4" /></a>
+              </div>
+            </details>
+          ) : <a key={item.href} href={item.href} className={navLink}>{item.label}</a>)}</div>
           <div className="hidden items-center gap-4 lg:flex"><Link href={withPublicLocale('/', alternateLocale)} className={navLink}>{c.language}</Link><Link href="/sign-in" className={navLink}>{c.signIn}</Link><Button asChild className="rounded-[4px]"><a href="#resolver-form">{c.action}</a></Button></div>
           <MobilePublicNav alternateHomeHref={withPublicLocale('/', alternateLocale)} switchLanguage={c.language} signIn={c.signIn} tryLabel={c.action} menuLabel={locale === 'es' ? 'Abrir menú' : 'Open menu'} items={menuItems} />
         </div>
@@ -101,8 +140,8 @@ export default async function HomePage() {
             <Image src="/brand/kumplio-master-hero.jpg" alt="Cumplir sin perseguir documentos: Kumplio conecta personas, documentos, requisitos y evidencia." fill priority sizes="100vw" className="object-contain" />
             <h1 className="sr-only">Cumplir. Sin perseguir documentos.</h1>
             <p className="sr-only">{c.heroSupport}</p>
-            <a href="#trabajador-desktop" aria-label="Soy trabajador: tus documentos listos para trabajar" className="absolute left-[7.7%] top-[61.5%] h-[10%] w-[14.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
-            <a href="#empresa-desktop" aria-label="Gestiono una empresa: controla el cumplimiento de tu equipo" className="absolute left-[26.1%] top-[61.5%] h-[10%] w-[15%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
+            <a href="/sign-up?audience=person" aria-label="Soy trabajador: crear mi perfil" className="absolute left-[7.7%] top-[61.5%] h-[10%] w-[14.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
+            <a href="/sign-up?audience=company" aria-label="Gestiono una empresa: crear mi cuenta" className="absolute left-[26.1%] top-[61.5%] h-[10%] w-[15%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
           </div>}
           <div className={`relative min-h-[740px] overflow-hidden ${locale === 'es' ? 'lg:hidden' : ''}`}>
             <Image src="/brand/kumplio-hero-compliance.webp" alt="" fill priority sizes="100vw" className="object-cover object-[68%_center] opacity-30 grayscale-[30%]" />
@@ -127,14 +166,16 @@ export default async function HomePage() {
           <div className={`${sections} ${locale === 'es' ? 'lg:hidden' : ''}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#393833] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#393833] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-sm leading-7">{body}</p></article>)}</div></div></div>
         </section>
 
-        <section className="border-b border-[#393833] bg-[#20201D]">
-          {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-paths.jpg" alt="Dos caminos, un mismo resultado: Kumplio para trabajadores y para empresas." fill sizes="100vw" className="object-contain" /><h2 className="sr-only">Dos caminos. Un mismo resultado.</h2><a id="trabajador-desktop" href="/sign-up?audience=person" aria-label="Crear mi perfil de trabajador" className="absolute left-[25%] top-[71%] h-[8%] w-[17.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /><a id="empresa-desktop" href="/sign-up?audience=company" aria-label="Gestionar mi empresa" className="absolute left-[54.2%] top-[71%] h-[8%] w-[19.5%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /></div>}
-          <div className={`${sections} ${locale === 'es' ? 'lg:hidden' : ''}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#393833] lg:grid-cols-2"><article id="trabajador" className="scroll-mt-24 py-12 lg:border-r lg:border-[#393833] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article id="empresa" className="scroll-mt-24 py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div></div>
+        <section className="relative scroll-mt-20 border-b border-[#393833] bg-[#20201D]">
+          <span id="trabajador" className="absolute -top-20" aria-hidden="true" />
+          <span id="empresa" className="absolute -top-20" aria-hidden="true" />
+          {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-paths.jpg" alt="Dos caminos, un mismo resultado: Kumplio para trabajadores y para empresas." fill sizes="100vw" className="object-contain" /><h2 className="sr-only">Dos caminos. Un mismo resultado.</h2><p className="sr-only">{c.workerTitle} {c.workerBody} {c.companyTitle} {c.companyBody}</p><a href="/sign-up?audience=person" aria-label="Crear mi perfil de trabajador" className="absolute left-[25%] top-[71%] h-[8%] w-[17.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /><a href="/sign-up?audience=company" aria-label="Gestionar mi empresa" className="absolute left-[54.2%] top-[71%] h-[8%] w-[19.5%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /></div>}
+          <div className={`${sections} ${locale === 'es' ? 'lg:hidden' : ''}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#393833] lg:grid-cols-2"><article className="py-12 lg:border-r lg:border-[#393833] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article className="py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg leading-8">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div></div>
         </section>
 
         <section className={sections}><div className="mx-auto max-w-[1100px]"><p className={eyebrow}>{c.statusEyebrow}</p><h2 className={h2}>{c.statusTitle}</h2><div className="mt-14 grid border-y border-[#393833] sm:grid-cols-3">{[['92%', c.statusLabels[0]], ['9', c.statusLabels[1]], ['17', c.statusLabels[2]]].map(([value, label], index) => <div key={label} className="py-10 sm:border-r sm:border-[#393833] sm:px-8 last:border-r-0"><p className={`text-5xl font-light ${index === 0 ? 'text-[#A7C63A]' : 'text-[#C2A887]'}`}>{value}</p><p className="mt-3 text-sm">{label}</p></div>)}</div></div></section>
 
-        <section id="areas" className={`scroll-mt-20 bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.areasEyebrow}</p><h2 className={h2}>{c.areasTitle}</h2><div className="mt-14 grid gap-0 border-y border-[#393833] lg:grid-cols-3">{areas.map((slug) => { const area = VERTICAL_PUBLIC_COPY[locale][slug]; return <Link key={slug} href={getPublicSiteHref(`/verticales/${slug}`, locale)} className="group relative min-h-[420px] overflow-hidden border-b border-[#393833] p-8 lg:border-b-0 lg:border-r last:border-r-0"><Image src={VERTICAL_IMAGES[slug]} alt="" fill sizes="(min-width:1024px) 33vw,100vw" style={{ objectPosition: VERTICAL_IMAGE_POSITIONS[slug] }} className="object-cover opacity-35 grayscale-[25%] transition group-hover:opacity-45" /><span className="absolute inset-0 bg-[linear-gradient(180deg,rgba(23,23,21,.15),#171715_96%)]" /><div className="relative flex h-full flex-col"><h3 className="mt-auto text-3xl font-light text-[#C2A887]">{area.name}</h3><p className="mt-4 text-sm leading-7">{area.heroQuestion}</p><span className="mt-6 inline-flex items-center gap-2 text-sm text-[#A7C63A]">{locale === 'es' ? 'Explorar área' : 'Explore area'}<ArrowRight className="h-4 w-4" /></span></div></Link> })}</div><details className="mt-8 border-b border-[#393833] pb-8"><summary className="cursor-pointer list-none text-sm text-[#C2A887]">{c.allAreas} <span className="ml-2 text-[#A7C63A]">→</span></summary><div className="mt-6 grid gap-4 sm:grid-cols-3">{VERTICAL_SLUGS.slice(3).map((slug) => <Link key={slug} href={getPublicSiteHref(`/verticales/${slug}`, locale)} className="border-t border-[#393833] py-4 text-sm text-[#AAA69C] hover:text-[#C2A887]">{VERTICAL_PUBLIC_COPY[locale][slug].name}</Link>)}</div></details></div></section>
+        <section id="areas" className={`scroll-mt-20 bg-[#20201D] ${sections}`}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.areasEyebrow}</p><h2 className={h2}>{c.areasTitle}</h2><div className="mt-14 grid gap-0 border-y border-[#393833] lg:grid-cols-3">{areas.map((slug) => <AreaCard key={slug} slug={slug} locale={locale} />)}</div><details className="group mt-8 border-b border-[#393833] pb-8"><summary className="inline-flex cursor-pointer list-none items-center gap-2 rounded-[3px] py-2 text-base text-[#C2A887] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A7C63A]"><span className="group-open:hidden">{c.allAreas}</span><span className="hidden group-open:inline">{locale === 'es' ? 'Ocultar áreas' : 'Hide areas'}</span><span className="text-[#A7C63A] transition-transform group-open:rotate-90">→</span></summary><div className="mt-6 grid gap-0 border-y border-[#393833] lg:grid-cols-3">{VERTICAL_SLUGS.slice(3).map((slug) => <AreaCard key={slug} slug={slug} locale={locale} />)}</div></details></div></section>
 
         <section className={sections}><div className="mx-auto max-w-[1280px]"><p className={eyebrow}>{c.agentsEyebrow}</p><h2 className={h2}>{c.agentsTitle}</h2><p className="mt-6 max-w-2xl text-lg leading-8">{c.agentsBody}</p><div className="mt-14 grid gap-0 border-y border-[#393833] md:grid-cols-3">{AGENT_CATALOG.slice(0, 3).map((agent, index) => <article key={agent.id} className="py-8 md:border-r md:border-[#393833] md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-4 text-2xl font-light text-[#C2A887]">{agent.name}</h3><p className="mt-3 text-sm leading-7">{agentRoles[index]}</p></article>)}</div><div className="grid gap-0 border-b border-[#393833] sm:grid-cols-2 lg:grid-cols-4">{AGENT_CATALOG.slice(3).map((agent, offset) => <article key={agent.id} className="border-b border-[#393833] py-7 sm:border-r sm:px-6 lg:border-b-0 first:sm:pl-0 last:border-r-0"><h3 className="text-xl font-light text-[#C2A887]">{agent.name}</h3><p className="mt-3 text-sm leading-6">{agentRoles[offset + 3]}</p></article>)}</div></div></section>
 
