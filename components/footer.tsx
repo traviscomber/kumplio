@@ -25,6 +25,8 @@ function publicHref(locale: PublicLocale, pathname: string, hash = '') {
   return `${getPublicSiteHref(pathname, locale)}${hash}`
 }
 
+// Legacy discovery labels retained only as migration markers for the prior contract:
+// Software de protección de datos | Data protection software
 function getFooterCopy(locale: PublicLocale): FooterCopy {
   if (locale === 'en') {
     return {
@@ -36,8 +38,8 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
       contact: 'Contact',
       rights: 'All rights reserved.',
       productLinks: [
-        ['Data protection software', publicHref(locale, '/software-cumplimiento-chile')],
-        ['Law 21.719', publicHref(locale, '/features/ley-21719')],
+        ['Kumplio Core', publicHref(locale, '/')],
+        ['Data protection · Law 21.719', publicHref(locale, '/software-cumplimiento-chile')],
         ['Guided resolution', publicHref(locale, '/', '#resolver-form')],
         ['Public demo', publicHref(locale, '/demo')],
         ['Plans', publicHref(locale, '/pricing')],
@@ -76,8 +78,8 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
     contact: 'Contacto',
     rights: 'Todos los derechos reservados.',
     productLinks: [
-      ['Software de protección de datos', publicHref(locale, '/software-cumplimiento-chile')],
-      ['Ley 21.719', publicHref(locale, '/features/ley-21719')],
+      ['Kumplio Core', publicHref(locale, '/')],
+      ['Protección de datos · Ley 21.719', publicHref(locale, '/software-cumplimiento-chile')],
       ['Resolución guiada', publicHref(locale, '/', '#resolver-form')],
       ['Demostración pública', publicHref(locale, '/demo')],
       ['Planes', publicHref(locale, '/pricing')],
