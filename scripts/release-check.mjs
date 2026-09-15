@@ -28,6 +28,10 @@ console.log('\n=== outcome-oriented agent routing contract ===')
 const outcomeRouting = spawnSync(process.execPath, ['scripts/check-outcome-agent-routing-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (outcomeRouting.status !== 0) process.exit(outcomeRouting.status || 1)
 
+console.log('\n=== review-aware outcome contract v2 ===')
+const outcomeContractV2 = spawnSync(process.execPath, ['scripts/check-outcome-contract-v2.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeContractV2.status !== 0) process.exit(outcomeContractV2.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
