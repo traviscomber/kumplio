@@ -55,7 +55,7 @@ export function buildComplianceOutcome(input: {
   const missing = collectMissing(contents)
   const blockers = collectBlockers(contents)
   const review = collectHumanReview(contents)
-  const finalReview = contents.findLast((item) => item.agentId === 'catalina')?.content
+  const finalReview = findLatestAgentContent(contents, 'catalina')
   const decision = typeof finalReview?.decisionRecommendation === 'string'
     ? finalReview.decisionRecommendation
     : null
@@ -206,6 +206,16 @@ function deriveSummary(contents: Array<{ content: Record<string, unknown> }>, go
     if (summary) return summary
   }
   return goal?.trim() ? `Kumplio está procesando el resultado para: ${goal.trim()}` : 'Kumplio aún no tiene un resultado consolidado.'
+}
+
+function findLatestAgentContent(
+  contents: Array<{ agentId: string; content: Record<string, unknown> }>,
+  agentId: string,
+) {
+  for (let index = contents.length - 1; index >= 0; index -= 1) {
+    if (contents[index].agentId === agentId) return contents[index].content
+  }
+  return undefined
 }
 
 function headlineForStatus(status: ComplianceOutcomeStatus) {
