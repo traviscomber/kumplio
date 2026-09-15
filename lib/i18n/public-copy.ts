@@ -1,5 +1,5 @@
 import type { PublicLocale } from '@/lib/i18n/public-routing'
-import { CORE_CAPABILITIES, PUBLIC_DESCRIPTION } from '@/lib/public-site'
+import { CORE_CAPABILITIES } from '@/lib/public-site'
 
 type PublicMetadataCopy = {
   htmlLang: string
@@ -28,11 +28,11 @@ export const PUBLIC_SITE_METADATA: Record<PublicLocale, PublicMetadataCopy> = {
   es: {
     htmlLang: 'es-CL',
     openGraphLocale: 'es_CL',
-    title: 'Kumplio | Protección de datos y guía experta para resolver en Chile',
-    description: `${PUBLIC_DESCRIPTION} Producto desarrollado por n3uralia.`,
-    classification: 'Plataforma de protección de datos, privacidad y resolución guiada de obligaciones en Chile',
-    brandSlogan: 'Protege tus datos. Entiende qué hacer. Avanza con una guía clara.',
-    category: 'Protección de datos y resolución guiada',
+    title: 'Kumplio | Sistema operativo de cumplimiento para Chile',
+    description: 'Kumplio conecta personas, documentos, requisitos y evidencia para mostrar qué está en regla, qué necesita atención y qué hacer después. Producto desarrollado por n3uralia.',
+    classification: 'Sistema operativo de cumplimiento, documentos, requisitos y evidencia para organizaciones en Chile',
+    brandSlogan: 'Cumplir. Sin perseguir documentos.',
+    category: 'Gestión de cumplimiento y evidencia',
     keywords: [
       'protección de datos personales Chile',
       'Ley 21.719 Chile',
@@ -51,12 +51,12 @@ export const PUBLIC_SITE_METADATA: Record<PublicLocale, PublicMetadataCopy> = {
   en: {
     htmlLang: 'en',
     openGraphLocale: 'en_US',
-    title: 'Kumplio | Data protection and guided compliance for Chile',
+    title: 'Kumplio | Compliance operating system for Chile',
     description:
-      'Kumplio helps organizations in Chile protect personal data and resolve privacy obligations, with an initial focus on Law 21.719. It centralizes sensitive information, organizes processing activities and vendors, identifies gaps, and turns each situation into a clear path of actions, owners, evidence and human review. A product by n3uralia.',
-    classification: 'Data protection, privacy and guided compliance-resolution platform for organizations operating in Chile',
-    brandSlogan: 'Protect your data. Understand what to do. Move forward with a clear path.',
-    category: 'Data protection and guided compliance resolution',
+      'Kumplio connects people, documents, requirements and evidence to show what is in order, what needs attention and what to do next. A product by n3uralia.',
+    classification: 'Compliance operating system for documents, requirements and evidence in organizations operating in Chile',
+    brandSlogan: 'Stay compliant. Without chasing documents.',
+    category: 'Compliance and evidence management',
     keywords: [
       'Chile data protection',
       'Chile Law 21.719',
