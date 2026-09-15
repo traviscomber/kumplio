@@ -48,8 +48,9 @@ export function summarizeRoutingTelemetry(rows: RoutingTelemetryRow[]): RoutingM
   const fast = classified.filter((item) => item.route.track === 'fast_track')
   const full = classified.filter((item) => item.route.track === 'full_agentic')
   const unknown = classified.filter((item) => item.route.track === 'unknown')
-  const classifiedCount = fast.length + full.length
-  const escalatedCount = classified.filter((item) => item.route.escalated).length
+  const known = [...fast, ...full]
+  const classifiedCount = known.length
+  const escalatedCount = known.filter((item) => item.route.escalated).length
 
   return {
     sampleSize: rows.length,
