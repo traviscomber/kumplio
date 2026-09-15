@@ -38,7 +38,7 @@ for (const unresolvedClaim of [
   /- tenant configuration verified 3\/3;/i,
   /- eliminación final 3\/3;/i,
   /- piloto externo;/i,
-  /- beta autoservicio lista\./i,
+  /- beta autoservicio lista[.;]/i,
 ]) assert.match(roadmap, unresolvedClaim)
 for (const forbidden of [/PITR observado.*`DONE`/i,/eliminación operacional final.*3\/3.*`DONE`/i,/tenant configuration verified 3\/3.*`DONE`/i,/piloto externo.*`DONE`/i,/beta autoservicio.*`DONE`/i]) assert.doesNotMatch(roadmap, forbidden)
 
