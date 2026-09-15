@@ -24,7 +24,7 @@ const ui = fs.readFileSync('components/cases/case-specialist-contributions.tsx',
 assert.ok(orchestration.includes("agentId: 'isidora'"), 'analysis stage missing Isidora')
 assert.ok(orchestration.includes("agentId: 'veronica'"), 'resolution stage missing Veronica')
 assert.ok(orchestration.includes("agentId: 'catalina'"), 'review stage missing Julieta historical id')
-assert.ok(route.includes("getWorkflowDefinition(parsed.data.workflowType, 'v2')"), 'new workflow creation must stay on v2')
+assert.ok(route.includes("getWorkflowDefinition(selectedWorkflowType, 'v2')"), 'new routed workflow creation must stay on v2')
 assert.ok(ui.includes('Apoyo especializado'), 'optional specialist support surface missing')
 
 console.log('Three-agent core orchestration: PASS')
