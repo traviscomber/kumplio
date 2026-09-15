@@ -13,60 +13,107 @@ export const VERTICAL_IMAGES: Record<VerticalSlug, string> = {
 }
 
 export const VERTICAL_IMAGE_POSITIONS: Record<VerticalSlug, string> = {
-  'proteccion-de-datos': '64% center',
-  mineria: '55% center',
-  transporte: '58% center',
-  construccion: '68% center',
-  salud: '72% center',
-  agroindustria: '58% center',
+  'proteccion-de-datos': '64% center', mineria: '55% center', transporte: '58% center',
+  construccion: '68% center', salud: '72% center', agroindustria: '58% center',
 }
 
-type VerticalCopy = {
+export type VerticalCopy = {
   name: string
+  metadataTitle: string
+  metadataDescription: string
   eyebrow: string
-  title: string
-  description: string
-  prioritiesTitle: string
-  priorities: string[]
-  resultTitle: string
-  results: Array<{ title: string; description: string }>
+  heroQuestion: string
+  heroSupport: string
+  exampleInput: string
+  checks: string[]
+  exampleResult: string
+  workflow: string[]
+  outcomes: Array<{ title: string; description: string }>
   note: string
   back: string
   cta: string
 }
 
-const sharedResults = {
-  es: [
-    { title: 'Contexto ordenado', description: 'Documentos, responsables, proveedores y controles reunidos en un mismo caso.' },
-    { title: 'Brechas priorizadas', description: 'Pendientes e información faltante convertidos en una ruta de trabajo visible.' },
-    { title: 'Evidencia trazable', description: 'Cada corrección conserva responsable, plazo, revisión humana y respaldo.' },
-  ],
-  en: [
-    { title: 'Organized context', description: 'Documents, owners, vendors and controls gathered in one case.' },
-    { title: 'Prioritized gaps', description: 'Open items and missing information turned into a visible work path.' },
-    { title: 'Traceable evidence', description: 'Every correction retains its owner, deadline, human review and support.' },
-  ],
-} as const
-
-export const VERTICAL_PUBLIC_COPY: Record<PublicLocale, Record<VerticalSlug, VerticalCopy>> = {
-  es: {
-    'proteccion-de-datos': { name: 'Protección de datos', eyebrow: 'Ley 21.719 · Chile', title: 'Convierte tus tratamientos de datos en un plan que se puede ejecutar.', description: 'Identifica qué datos personales usa la empresa, para qué, dónde están y qué terceros participan antes de priorizar las brechas.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Inventario de datos, tratamientos y finalidades', 'Sistemas, proveedores y transferencias involucradas', 'Brechas, responsables, plazos y evidencia de cierre'], resultTitle: 'Una ruta verificable', results: [...sharedResults.es], note: 'Kumplio organiza el análisis y señala las decisiones que requieren validación profesional. No reemplaza asesoría legal ni certifica cumplimiento total.', back: 'Volver a verticales', cta: 'Revisar mi empresa' },
-    mineria: { name: 'Minería', eyebrow: 'Operación minera', title: 'Conecta contratistas, personas, controles y evidencia por operación.', description: 'Ordena el contexto distribuido de una faena para que obligaciones, hallazgos y responsables no queden separados entre documentos y equipos.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Contratistas, subcontratistas y responsables', 'Controles operacionales y documentación de respaldo', 'Hallazgos, acciones correctivas y evidencia por faena'], resultTitle: 'Una operación más trazable', results: [...sharedResults.es], note: 'La aplicabilidad de cada obligación depende del contexto real de la operación y debe ser revisada por una persona responsable.', back: 'Volver a verticales', cta: 'Revisar mi operación' },
-    transporte: { name: 'Transporte', eyebrow: 'Transporte y logística', title: 'Mantén documentos, flota, proveedores y obligaciones en una misma ruta.', description: 'Relaciona el trabajo de una operación móvil y distribuida con controles, responsables y evidencia sin perder el historial.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Documentación de flota, personas y terceros', 'Proveedores críticos y responsabilidades asociadas', 'Vencimientos, brechas y respaldos de corrección'], resultTitle: 'Continuidad con evidencia', results: [...sharedResults.es], note: 'Kumplio ayuda a estructurar el trabajo; la empresa conserva la decisión y la validación de cada control aplicable.', back: 'Volver a verticales', cta: 'Revisar mi operación' },
-    construccion: { name: 'Construcción', eyebrow: 'Proyectos y faenas', title: 'Ordena contratos, subcontratos, controles y evidencia por proyecto.', description: 'Reúne el contexto de cada obra para asignar acciones y comprobar correcciones aunque participen múltiples empresas y responsables.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Proyectos, faenas, contratistas y subcontratistas', 'Controles, documentos y responsables por frente de trabajo', 'Brechas y evidencia de cierre asociadas al proyecto'], resultTitle: 'Control por proyecto', results: [...sharedResults.es], note: 'La plataforma no sustituye la evaluación técnica, preventiva o legal que corresponda a cada faena.', back: 'Volver a verticales', cta: 'Revisar mi proyecto' },
-    salud: { name: 'Salud', eyebrow: 'Datos y servicios de salud', title: 'Haz trazable el cuidado de datos sensibles, accesos y proveedores.', description: 'Identifica dónde existe información sensible, quién interviene y qué controles o decisiones requieren evidencia y revisión humana.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Datos sensibles, finalidades y responsables', 'Accesos, sistemas y proveedores que participan', 'Protocolos, brechas y evidencia de corrección'], resultTitle: 'Contexto sensible bajo control', results: [...sharedResults.es], note: 'Kumplio no emite diagnósticos clínicos ni reemplaza la evaluación legal, sanitaria o de seguridad requerida.', back: 'Volver a verticales', cta: 'Revisar mi organización' },
-    agroindustria: { name: 'Agroindustria', eyebrow: 'Operación agroindustrial', title: 'Coordina personas, proveedores, instalaciones y controles de extremo a extremo.', description: 'Conecta el contexto del campo, plantas y terceros con acciones concretas, responsables y respaldo de cierre.', prioritiesTitle: 'Qué puedes ordenar', priorities: ['Instalaciones, procesos, personas y proveedores', 'Controles y documentación repartidos en la operación', 'Hallazgos, responsables y evidencia de corrección'], resultTitle: 'Una operación conectada', results: [...sharedResults.es], note: 'Las obligaciones aplicables varían según actividad, instalación y contexto; la revisión humana sigue siendo necesaria.', back: 'Volver a verticales', cta: 'Revisar mi operación' },
+const es: Record<VerticalSlug, VerticalCopy> = {
+  'proteccion-de-datos': {
+    name: 'Protección de Datos', metadataTitle: 'Kumplio Protección de Datos | Ley 21.719 y gestión de evidencia', metadataDescription: 'Organiza tratamientos, responsables, proveedores, brechas y evidencia para prepararte frente a la Ley 21.719 con revisión humana.', eyebrow: 'Kumplio Protección de Datos · Ley 21.719',
+    heroQuestion: '¿Sabes qué datos personales usa tu empresa, dónde están y qué debes corregir?', heroSupport: 'Relaciona tratamientos, sistemas, proveedores y responsables antes de priorizar brechas y preparar evidencia.',
+    exampleInput: 'Datos de clientes, trabajadores y postulantes repartidos entre sistemas internos y proveedores.', checks: ['Finalidad y base propuesta', 'Ubicación, acceso y responsable', 'Proveedores y transferencias', 'Brechas y evidencia disponible'], exampleResult: 'Un inventario verificable, brechas priorizadas y un plan de preparación frente a la Ley 21.719.',
+    workflow: ['Tratamiento', 'Requisito', 'Documento', 'Verificación', 'Estado', 'Acción'], outcomes: [{ title: 'Entiende el alcance', description: 'Visualiza qué datos se usan, para qué y quién participa.' }, { title: 'Prioriza brechas', description: 'Separa lo urgente de la información que todavía falta.' }, { title: 'Demuestra el avance', description: 'Conserva responsables, revisión y evidencia de cada corrección.' }],
+    note: 'Kumplio organiza el análisis y señala decisiones que requieren validación profesional. No reemplaza asesoría legal ni certifica cumplimiento total.', back: 'Volver a áreas', cta: 'Revisar mi empresa',
   },
-  en: {} as Record<VerticalSlug, VerticalCopy>,
+  mineria: {
+    name: 'Minería', metadataTitle: 'Kumplio Minería | Cumplimiento documental de personas y contratistas', metadataDescription: 'Relaciona personas, contratistas, credenciales, inducciones, vencimientos y evidencia específica de cada faena.', eyebrow: 'Kumplio Minería',
+    heroQuestion: '¿Puede esta persona entrar a esta faena hoy?', heroSupport: 'Conecta cada trabajador y contratista con las exigencias concretas de la faena, sus documentos y su vigencia.',
+    exampleInput: 'Trabajador de un contratista asignado a una faena con requisitos de ingreso propios.', checks: ['Credenciales e identidad', 'Certificaciones e inducción', 'Requisitos del contratista', 'Vencimientos y evidencia de faena'], exampleResult: 'Habilitación visible, requisitos faltantes y la próxima acción antes del ingreso.',
+    workflow: ['Persona', 'Requisito de faena', 'Credencial', 'Verificación', 'Habilitación', 'Acción'], outcomes: [{ title: 'Ingreso claro', description: 'Identifica quién está listo y quién necesita atención.' }, { title: 'Vigencia controlada', description: 'Anticipa certificados e inducciones próximos a vencer.' }, { title: 'Evidencia por faena', description: 'Mantiene el respaldo asociado a la operación correcta.' }],
+    note: 'La habilitación depende del contexto real y de la revisión de la persona responsable de la operación.', back: 'Volver a áreas', cta: 'Revisar mi operación',
+  },
+  transporte: {
+    name: 'Transporte', metadataTitle: 'Kumplio Transporte | Documentos, conductores y flota', metadataDescription: 'Relaciona conductores, vehículos, licencias, seguros, autorizaciones, requisitos y vencimientos en una ruta trazable.', eyebrow: 'Kumplio Transporte',
+    heroQuestion: '¿Puede este conductor operar este vehículo hoy?', heroSupport: 'Reúne la relación conductor–vehículo–servicio para comprobar documentos, autorizaciones y vencimientos antes de operar.',
+    exampleInput: 'Conductor asignado a un vehículo y servicio con documentación repartida entre distintas áreas.', checks: ['Licencia y habilitaciones', 'Documentos del vehículo', 'Seguro y autorizaciones', 'Requisitos y vencimientos'], exampleResult: 'Estado operacional visible y acciones concretas para resolver cada bloqueo.',
+    workflow: ['Conductor y vehículo', 'Requisito', 'Documento', 'Verificación', 'Estado', 'Acción'], outcomes: [{ title: 'Asignación clara', description: 'Comprueba la combinación concreta antes del servicio.' }, { title: 'Vencimientos visibles', description: 'Anticipa documentos que pueden detener la operación.' }, { title: 'Historial trazable', description: 'Conserva qué se revisó, cuándo y con qué respaldo.' }],
+    note: 'Kumplio estructura la revisión; la empresa mantiene la decisión operacional y la validación de cada requisito.', back: 'Volver a áreas', cta: 'Revisar mi operación',
+  },
+  construccion: {
+    name: 'Construcción', metadataTitle: 'Kumplio Construcción | Personas, contratistas y obras', metadataDescription: 'Organiza habilitaciones, contratistas, documentos y evidencia específica de cada obra.', eyebrow: 'Kumplio Construcción',
+    heroQuestion: '¿Quién está habilitado para entrar y trabajar en esta obra?', heroSupport: 'Relaciona personas, empresas y frentes de trabajo con los requisitos y respaldos que cada proyecto exige.',
+    exampleInput: 'Cuadrilla de un subcontratista que cambia de obra y debe acreditar requisitos distintos.', checks: ['Identidad y vínculo contractual', 'Inducciones y certificaciones', 'Requisitos de la obra', 'Documentos y vencimientos'], exampleResult: 'Lista de habilitados, bloqueos concretos y responsables de resolverlos.',
+    workflow: ['Persona o empresa', 'Requisito de obra', 'Documento', 'Verificación', 'Habilitación', 'Acción'], outcomes: [{ title: 'Control por obra', description: 'Evita asumir que una habilitación sirve en todos los proyectos.' }, { title: 'Responsables visibles', description: 'Asigna cada pendiente a quien puede resolverlo.' }, { title: 'Cierre respaldado', description: 'Conserva evidencia y revisión de cada corrección.' }],
+    note: 'La plataforma no sustituye la evaluación técnica, preventiva o legal aplicable a cada obra.', back: 'Volver a áreas', cta: 'Revisar mi proyecto',
+  },
+  salud: {
+    name: 'Salud', metadataTitle: 'Kumplio Salud | Accesos, datos sensibles y evidencia', metadataDescription: 'Relaciona personas, accesos, datos sensibles, proveedores, requisitos y evidencia con revisión humana.', eyebrow: 'Kumplio Salud',
+    heroQuestion: '¿Quién puede acceder a estos datos y qué evidencia lo respalda?', heroSupport: 'Ordena accesos, finalidades, sistemas y terceros para hacer visible qué está autorizado y qué requiere atención.',
+    exampleInput: 'Equipo interno y proveedor tecnológico con acceso a información sensible de pacientes.', checks: ['Rol y necesidad de acceso', 'Finalidad y autorización', 'Sistema y proveedor', 'Registro y evidencia vigente'], exampleResult: 'Accesos explicables, brechas visibles y acciones priorizadas con respaldo.',
+    workflow: ['Persona o proveedor', 'Requisito de acceso', 'Evidencia', 'Verificación', 'Estado', 'Acción'], outcomes: [{ title: 'Acceso explicable', description: 'Relaciona quién accede, por qué y bajo qué control.' }, { title: 'Brechas visibles', description: 'Detecta permisos o respaldos que necesitan revisión.' }, { title: 'Decisión trazable', description: 'Conserva evidencia sin reemplazar el criterio responsable.' }],
+    note: 'Kumplio no emite diagnósticos clínicos ni reemplaza evaluaciones legales, sanitarias o de seguridad.', back: 'Volver a áreas', cta: 'Revisar mi organización',
+  },
+  agroindustria: {
+    name: 'Agroindustria', metadataTitle: 'Kumplio Agroindustria | Personas, proveedores e instalaciones', metadataDescription: 'Coordina personas, proveedores, instalaciones, requisitos, documentos y evidencia antes de operar.', eyebrow: 'Kumplio Agroindustria',
+    heroQuestion: '¿Qué personas, proveedores o instalaciones necesitan atención antes de operar?', heroSupport: 'Conecta el trabajo de campo, plantas y terceros con requisitos concretos, vigencias y evidencia de resolución.',
+    exampleInput: 'Proveedor crítico que debe ingresar a una instalación con un certificado próximo a vencer.', checks: ['Persona, proveedor e instalación', 'Requisito aplicable', 'Certificado y vigencia', 'Responsable y evidencia'], exampleResult: 'Qué puede operar, qué está bloqueado y qué debe resolverse primero.',
+    workflow: ['Entidad', 'Requisito', 'Certificado', 'Verificación', 'Estado', 'Acción'], outcomes: [{ title: 'Operación conectada', description: 'Relaciona campo, planta y terceros sin perder contexto.' }, { title: 'Prioridad concreta', description: 'Distingue bloqueos operacionales de pendientes menores.' }, { title: 'Evidencia reutilizable', description: 'Evita solicitar otra vez respaldos vigentes y aprobados.' }],
+    note: 'Las obligaciones varían según actividad, instalación y contexto; la revisión humana sigue siendo necesaria.', back: 'Volver a áreas', cta: 'Revisar mi operación',
+  },
 }
 
-VERTICAL_PUBLIC_COPY.en = Object.fromEntries(
-  VERTICAL_SLUGS.map((slug) => {
-    const source = VERTICAL_PUBLIC_COPY.es[slug]
-    const names: Record<VerticalSlug, string> = { 'proteccion-de-datos': 'Data protection', mineria: 'Mining', transporte: 'Transport', construccion: 'Construction', salud: 'Healthcare', agroindustria: 'Agribusiness' }
-    return [slug, { ...source, name: names[slug], eyebrow: `${names[slug]} · Chile`, title: `Make ${names[slug].toLowerCase()} compliance work visible and executable.`, description: 'Bring operational context, responsibilities, gaps and evidence together before deciding what needs attention.', prioritiesTitle: 'What you can organize', priorities: ['People, processes, documents and vendors', 'Applicable controls and missing information', 'Actions, owners, deadlines and closure evidence'], resultTitle: 'A verifiable work path', results: [...sharedResults.en], note: 'Kumplio structures the analysis and flags decisions for human validation. It does not replace professional advice or certify total compliance.', back: 'Back to sectors', cta: 'Review my organization' }]
-  }),
-) as Record<VerticalSlug, VerticalCopy>
+const englishNames: Record<VerticalSlug, string> = { 'proteccion-de-datos': 'Data Protection', mineria: 'Mining', transporte: 'Transport', construccion: 'Construction', salud: 'Healthcare', agroindustria: 'Agribusiness' }
+const englishQuestions: Record<VerticalSlug, string> = {
+  'proteccion-de-datos': 'Do you know what personal data your company uses, where it lives and what needs fixing?',
+  mineria: 'Can this person enter this mining site today?',
+  transporte: 'Can this driver operate this vehicle today?',
+  construccion: 'Who is cleared to enter and work on this construction site?',
+  salud: 'Who can access this data and what evidence supports it?',
+  agroindustria: 'Which people, vendors or facilities need attention before operating?',
+}
+const englishSupport: Record<VerticalSlug, string> = {
+  'proteccion-de-datos': 'Connect processing activities, systems, vendors and owners before prioritizing gaps for Chilean Law 21.719.',
+  mineria: 'Connect each worker and contractor to site-specific requirements, documents, inductions and validity.',
+  transporte: 'Bring the driver–vehicle–service relationship together to check licences, insurance, authorizations and expirations.',
+  construccion: 'Connect people, companies and work fronts to the requirements and evidence each project demands.',
+  salud: 'Organize access, purposes, systems and third parties to show what is authorized and what needs attention.',
+  agroindustria: 'Connect field, plant and third-party work to concrete requirements, validity and resolution evidence.',
+}
+const en = Object.fromEntries(VERTICAL_SLUGS.map((slug) => [slug, {
+  name: englishNames[slug],
+  metadataTitle: `Kumplio ${englishNames[slug]} | Operational compliance and evidence`,
+  metadataDescription: englishSupport[slug],
+  eyebrow: `Kumplio ${englishNames[slug]}`,
+  heroQuestion: englishQuestions[slug],
+  heroSupport: englishSupport[slug],
+  exampleInput: 'A real operating situation with information distributed across people, documents and systems.',
+  checks: ['Entity and operating context', 'Applicable requirement', 'Current document or evidence', 'Validity, owner and missing information'],
+  exampleResult: 'A visible status, concrete blockers and the next accountable action.',
+  workflow: ['Entity', 'Requirement', 'Evidence', 'Verification', 'Status', 'Action'],
+  outcomes: [{ title: 'Understand', description: 'See the exact operating context and applicable requirements.' }, { title: 'Resolve', description: 'Prioritize missing information, blockers and accountable actions.' }, { title: 'Demonstrate', description: 'Preserve evidence, human review and the history of each correction.' }],
+  note: 'Kumplio structures the work and preserves human review. It does not certify compliance or replace professional judgment.',
+  back: 'Back to areas',
+  cta: 'Review my operation',
+}])) as Record<VerticalSlug, VerticalCopy>
+
+export const VERTICAL_PUBLIC_COPY: Record<PublicLocale, Record<VerticalSlug, VerticalCopy>> = { es, en }
 
 export function isVerticalSlug(value: string): value is VerticalSlug {
   return VERTICAL_SLUGS.includes(value as VerticalSlug)

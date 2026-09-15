@@ -55,8 +55,8 @@ assert.match(metadataCopy, /Plataforma de protección de datos, privacidad y res
 assert.match(metadataCopy, /Data protection and guided compliance for Chile/)
 assert.match(publicSite, /proteger datos y resolver obligaciones de privacidad/)
 assert.match(publicSite, /Preparar a organizaciones para la Ley 21\.719/)
-assert.match(footer, /Resolución guiada de situaciones regulatorias/)
-assert.match(footer, /Guided resolution for privacy, regulatory, contractual and compliance situations in Chile/)
+assert.match(footer, /El sistema operativo de cumplimiento que conecta personas, documentos, requisitos y evidencia/)
+assert.match(footer, /The compliance operating system for connecting people, documents, requirements and evidence/)
 
 assert.match(demo, /Isidora analiza obligaciones y contexto/)
 assert.match(demo, /Verónica convierte brechas/)

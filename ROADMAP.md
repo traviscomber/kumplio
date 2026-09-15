@@ -458,6 +458,8 @@ El functional freeze iniciado al cerrar Bloque 17 terminó por decisión explíc
 
 **Decisión del owner — 27 de agosto de 2026:** adoptar el sistema visual y el funnel final de marca para la superficie pública. Kumplio se presenta como plataforma transversal de cumplimiento empresarial; protección de datos y Ley 21.719 son la entrada comercial; Minería y Transporte son verticales; Laboral es una capacidad transversal. Se conserva **Analiza → Resuelve → Revisa**, la coordinación de especialistas y el control humano. Esta excepción es exclusivamente de adquisición, contenido y diseño: no añade capacidades, no habilita beta y no modifica los gates ni claims de Bloque 16.
 
+**Decisión del owner — 15 de septiembre de 2026:** reorganizar la superficie pública alrededor de Kumplio como sistema operativo transversal de cumplimiento, con la promesa “Cumplir. Sin perseguir documentos.” y el recorrido **Entiende → Resuelve → Demuestra**. Se incorporan como conceptos públicos Kumplio Core, Kumplio Areas, la separación Trabajador/Empresa y el sistema coordinado de siete especialistas usando el catálogo canónico. Protección de Datos conserva la urgencia de la Ley 21.719 dentro de su área, pero deja de definir la marca maestra. Esta decisión reemplaza la narrativa pública anterior sin rediseñar la aplicación autenticada, inventar capacidades, modificar gates P0 ni habilitar beta autoservicio.
+
 Estado objetivo actual:
 
 > **Kumplio funcionalmente cerrado, nuevamente en desarrollo controlado mediante Bloque 18 y todavía sin beta autoservicio habilitada.**

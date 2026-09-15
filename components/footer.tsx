@@ -29,7 +29,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
   if (locale === 'en') {
     return {
       description:
-        'Guided resolution for privacy, regulatory, contractual and compliance situations in Chile, with a current public focus on data protection, Law 21.719, evidence, traceability and human review.',
+        'The compliance operating system for connecting people, documents, requirements and evidence, with accountable actions and human review.',
       product: 'Product',
       resources: 'Resources',
       company: 'Company',
@@ -69,7 +69,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
 
   return {
     description:
-      'Resolución guiada de situaciones regulatorias, contractuales y de cumplimiento en Chile, con foco público actual en protección de datos, Ley 21.719, evidencia, trazabilidad y revisión humana.',
+      'El sistema operativo de cumplimiento que conecta personas, documentos, requisitos y evidencia, con acciones responsables y revisión humana.',
     product: 'Producto',
     resources: 'Recursos',
     company: 'Empresa',
