@@ -189,6 +189,71 @@
   transition: transform 300ms ease;
 }
 
+/* English home uses live English copy over the same branded photography instead of
+   the Spanish master JPGs, whose text is baked into the image. Keep the photography
+   intentionally visible so /en has the same visual weight as /es without mixing locales. */
+@media (min-width: 1024px) {
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    main > section:first-child > div > img[data-nimg="fill"] {
+    opacity: 0.72 !important;
+    filter: grayscale(8%) saturate(0.95) contrast(1.04);
+    object-position: 76% center !important;
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    main > section:first-child > div > div.absolute.inset-0 {
+    background: linear-gradient(
+      90deg,
+      #171715 2%,
+      rgba(23, 23, 21, 0.96) 31%,
+      rgba(23, 23, 21, 0.58) 55%,
+      rgba(23, 23, 21, 0.08) 100%
+    );
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    #como-funciona > div > img[data-nimg="fill"] {
+    opacity: 0.62 !important;
+    filter: saturate(0.9) contrast(1.03);
+    object-position: 68% center !important;
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    #como-funciona > div > span.absolute.inset-0 {
+    background: linear-gradient(
+      90deg,
+      rgba(23, 23, 21, 0.93) 0%,
+      rgba(23, 23, 21, 0.62) 43%,
+      rgba(23, 23, 21, 0.42) 74%,
+      rgba(23, 23, 21, 0.74) 100%
+    );
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    main > section:nth-of-type(5) > div > img[data-nimg="fill"] {
+    opacity: 0.68 !important;
+    filter: saturate(0.94) contrast(1.04);
+    object-position: 52% center !important;
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    main > section:nth-of-type(5) > div > span.absolute.inset-0 {
+    background: linear-gradient(
+      90deg,
+      rgba(23, 23, 21, 0.84) 0%,
+      rgba(23, 23, 21, 0.38) 32%,
+      rgba(23, 23, 21, 0.32) 68%,
+      rgba(23, 23, 21, 0.84) 100%
+    );
+  }
+
+  html[lang="en"] body:has(main #como-funciona):has(main #areas)
+    #areas a img[data-nimg="fill"] {
+    opacity: 0.6 !important;
+    filter: grayscale(8%) saturate(0.96) contrast(1.03);
+  }
+}
+
 @layer components {
   .kumplio-work-surface {
     color: var(--kumplio-parchment);
