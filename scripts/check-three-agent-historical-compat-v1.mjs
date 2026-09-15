@@ -15,8 +15,9 @@ for (const id of ['isidora', 'rodrigo', 'javier', 'beatriz', 'veronica', 'andres
 }
 
 assert.ok(executor.includes('resolveWorkflowVersion'), 'executor must resolve persisted workflow version')
-assert.ok(route.includes("getWorkflowDefinition(parsed.data.workflowType, 'v2')"), 'new workflow creation must explicitly use v2')
+assert.ok(route.includes("getWorkflowDefinition(selectedWorkflowType, 'v2')"), 'new routed workflow creation must explicitly use v2')
 assert.ok(route.includes("getWorkflowTemplates('v2')"), 'workflow template listing must explicitly use v2')
-assert.ok(!route.includes("getWorkflowDefinition(parsed.data.workflowType, 'v1')"), 'new workflow creation must never default to v1')
+assert.ok(!route.includes("getWorkflowDefinition(selectedWorkflowType, 'v1')"), 'new routed workflow creation must never default to v1')
+assert.ok(!route.includes("getWorkflowDefinition(parsed.data.workflowType, 'v1')"), 'legacy explicit workflow creation must never default to v1')
 
 console.log('Three-agent historical compatibility: PASS')
