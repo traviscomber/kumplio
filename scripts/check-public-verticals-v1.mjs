@@ -16,6 +16,8 @@ assert.match(home, /function AreaCard/, 'All public areas must share one visual 
 assert.match(home, /VERTICAL_SLUGS\.map\(\(slug\).*Ver sección de áreas/s, 'Desktop navigation must expose all six areas')
 assert.match(home, /VERTICAL_IMAGES\[slug\]/, 'Area links must render their sector image')
 assert.match(home, /VERTICAL_IMAGE_POSITIONS\[slug\]/, 'Area links must apply a sector-specific crop')
+assert.match(home, /locale === 'en'.*kumplio-operating-model\.webp/s, 'English how-it-works section must retain branded photography')
+assert.match(home, /locale === 'en'.*kumplio-specialists\.webp/s, 'English worker/company section must retain branded photography')
 assert.notEqual(
   verticalCopy.match(/mineria: '([^']+)'/)?.[1],
   verticalCopy.match(/transporte: '([^']+)'/)?.[1],
