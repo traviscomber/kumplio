@@ -28,7 +28,9 @@ assert.match(fastTrack, /chileComplianceGuides/, 'FastTrack must use the curated
 assert.match(fastTrack, /officialLey21719Reference/, 'FastTrack must expose an official-law source')
 assert.match(fastTrack, /evaluacion de impacto/, 'FastTrack must recognize evaluation-of-impact guidance')
 assert.match(fastTrack, /mi empresa/, 'FastTrack must reject internal-context language')
-assert.match(fastTrack, /if \(!normalized \|\| includesAny\(normalized, INTERNAL_CONTEXT_TERMS\)\) return null/, 'internal context must force FastTrack miss')
+assert.match(fastTrack, /CURRENTNESS_TERMS/, 'FastTrack must identify questions that need current regulatory verification')
+assert.match(fastTrack, /entra en vigencia/, 'vigency questions must be escalated instead of answered from static guidance')
+assert.match(fastTrack, /includesAny\(normalized, INTERNAL_CONTEXT_TERMS\).*includesAny\(normalized, CURRENTNESS_TERMS\)/, 'internal or time-sensitive context must force FastTrack miss')
 assert.match(fastTrack, /best\.score < 4/, 'FastTrack must use a conservative minimum relevance threshold')
 assert.match(fastTrack, /best\.score - second\.score < 2/, 'ambiguous curated matches must not use FastTrack')
 
