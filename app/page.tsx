@@ -143,17 +143,18 @@ export default async function HomePage() {
             <a href="/sign-up?audience=person" aria-label="Soy trabajador: crear mi perfil" className="absolute left-[7.7%] top-[61.5%] h-[10%] w-[14.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
             <a href="/sign-up?audience=company" aria-label="Gestiono una empresa: crear mi cuenta" className="absolute left-[26.1%] top-[61.5%] h-[10%] w-[15%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" />
           </div>}
-          {locale === 'en' && <div className="relative mx-auto hidden aspect-[1600/611] w-full max-w-[1920px] overflow-hidden lg:block">
-            <Image src="/brand/kumplio-master-hero.jpg" alt="" fill priority sizes="100vw" className="object-contain" />
-            <div className="absolute inset-y-0 left-0 w-[28%] bg-[#171715]" />
-            <div className="absolute inset-y-0 left-[27%] w-[13%] bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,.94)_45%,rgba(23,23,21,0)_100%)]" />
-            <div className="absolute left-[3.6%] top-[7.5%] w-[30%]">
-              <h1 className="text-[clamp(34px,3.25vw,68px)] font-light leading-[1.02] tracking-[-.045em] text-[#C2A887]">Stay compliant.<br /><span className="text-[#B17A4D]">Without chasing documents.</span></h1>
-              <p className="mt-[5%] max-w-[470px] text-[clamp(12px,1vw,18px)] leading-[1.55] text-[#C8C3B8]">{c.heroSupport}</p>
-              <div className="mt-[6%] flex gap-3">
-                <a href="/sign-up?audience=person" className="inline-flex min-h-10 items-center justify-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.workerPath}<ArrowRight className="ml-2 h-4 w-4" /></a>
-                <a href="/sign-up?audience=company" className="inline-flex min-h-10 items-center justify-center rounded-[4px] border border-[#747169] bg-[#171715]/85 px-5 text-sm font-medium text-[#C2A887]">{c.companyPath}<ArrowRight className="ml-2 h-4 w-4" /></a>
+          {locale === 'en' && <div className="relative mx-auto hidden aspect-[1600/611] w-full max-w-[1920px] overflow-hidden bg-[#10110F] lg:grid lg:grid-cols-[43%_57%]">
+            <div className="relative z-10 flex flex-col justify-center px-[11%] py-10">
+              <h1 className="text-[clamp(40px,3.7vw,70px)] font-light leading-[1.02] tracking-[-.045em] text-[#C2A887]">Stay compliant.<br /><span className="text-[#B17A4D]">Without chasing documents.</span></h1>
+              <p className="mt-[5%] max-w-[510px] text-[clamp(13px,1.05vw,18px)] leading-[1.55] text-[#C8C3B8]">{c.heroSupport}</p>
+              <div className="mt-[7%] grid max-w-[550px] grid-cols-2 gap-8">
+                <div><a href="/sign-up?audience=person" className="inline-flex min-h-12 w-full items-center justify-between rounded-[4px] bg-[#A7C63A] px-6 text-sm font-medium text-[#171715]">{c.workerPath}<ArrowRight className="h-4 w-4" /></a><p className="mt-4 text-sm leading-6 text-[#AAA69C]">Your documents ready for work.</p></div>
+                <div className="border-l border-[#5A5045] pl-8"><a href="/sign-up?audience=company" className="inline-flex min-h-12 w-full items-center justify-between rounded-[4px] border border-[#747169] px-6 text-sm font-medium text-[#C2A887]">{c.companyPath}<ArrowRight className="h-4 w-4" /></a><p className="mt-4 text-sm leading-6 text-[#AAA69C]">Control your team’s compliance.</p></div>
               </div>
+            </div>
+            <div className="relative min-h-full overflow-hidden">
+              <Image src="/brand/kumplio-hero-photo.webp" alt="" fill priority sizes="57vw" className="object-cover object-center" />
+              <span className="absolute inset-0 bg-[linear-gradient(90deg,#10110F_0%,rgba(16,17,15,.58)_10%,rgba(16,17,15,.10)_26%,rgba(16,17,15,0)_48%)]" />
             </div>
           </div>}
           <div className={`relative min-h-[740px] overflow-hidden lg:hidden`}>
@@ -176,18 +177,24 @@ export default async function HomePage() {
 
         <section id="como-funciona" className="scroll-mt-20 border-b border-[#393833]">
           {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-how.jpg" alt="Así funciona Kumplio: Entiende, Resuelve y Demuestra." fill sizes="100vw" className="object-contain" /><div className="sr-only"><h2>Así funciona Kumplio.</h2>{c.how.map(([title, body]) => <section key={title}><h3>{title}</h3><p>{body}</p></section>)}</div></div>}
-          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden lg:block">
-            <Image src="/brand/kumplio-master-how.jpg" alt="" fill sizes="100vw" className="object-contain" />
-            <div className="absolute left-[7.5%] top-[15%] h-[18%] w-[68%] bg-[#171715]" />
-            <div className="absolute left-[8.6%] top-[17.2%]">
-              <h2 className="text-[clamp(28px,2.2vw,48px)] font-light text-[#C2A887]">How Kumplio works.</h2>
-              <p className="mt-2 text-[clamp(11px,.85vw,16px)] text-[#AAA69C]">From information to action, without friction.</p>
+          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden bg-[#10110F] lg:block">
+            <div className="absolute left-[7.2%] top-[23%]">
+              <h2 className="text-[clamp(42px,4vw,68px)] font-light leading-none tracking-[-.035em] text-[#C2A887]">How Kumplio <span className="text-[#B17A4D]">works.</span></h2>
+              <p className="mt-5 text-[clamp(14px,1.15vw,20px)] text-[#C8C3B8]">From information to action, without friction.</p>
             </div>
-            {[
-              ['21%', 'Understand', 'Kumplio identifies requirements, documents, gaps and changes.'],
-              ['48%', 'Resolve', 'Prioritize what matters and organize what to do, who should do it and when.'],
-              ['76%', 'Demonstrate', 'Preserve evidence, review and traceability for what was resolved.'],
-            ].map(([left, title, body]) => <div key={title} className="absolute top-[42%] h-[25%] w-[16%] bg-[#171715] px-2" style={{ left }}><h3 className="text-[clamp(15px,1.15vw,24px)] font-light text-[#C2A887]">{title}</h3><p className="mt-3 text-[clamp(9px,.72vw,14px)] leading-[1.55] text-[#C8C3B8]">{body}</p></div>)}
+            <div className="absolute inset-x-[4.5%] top-[44%] grid grid-cols-3">
+              {[
+                ['/brand/kumplio-how-understand.webp', '01', 'Understand', 'Kumplio identifies requirements, documents, gaps and changes.'],
+                ['/brand/kumplio-how-resolve.webp', '02', 'Resolve', 'Prioritize what matters and organize what to do, who should do it and when.'],
+                ['/brand/kumplio-how-demonstrate.webp', '03', 'Demonstrate', 'Preserve evidence, review and traceability for what was resolved.'],
+              ].map(([src, number, title, body], index) => <article key={title} className={`relative min-h-[245px] px-7 ${index > 0 ? 'border-l border-[#393833]' : ''}`}>
+                <span className="absolute -top-10 left-3 text-[clamp(44px,4vw,72px)] font-light text-[#292925]">{number}</span>
+                <div className="relative grid grid-cols-[minmax(110px,36%)_1fr] items-center gap-6">
+                  <div className="relative aspect-square w-full max-w-[175px]"><Image src={src} alt="" fill sizes="175px" className="object-contain" /></div>
+                  <div><h3 className="text-[clamp(22px,1.7vw,32px)] font-light text-[#C2A887]">{title}</h3><span className="mt-4 block h-px w-12 bg-[#B17A4D]" /><p className="mt-5 max-w-[260px] text-[clamp(11px,.9vw,16px)] leading-[1.55] text-[#C8C3B8]">{body}</p></div>
+                </div>
+              </article>)}
+            </div>
           </div>}
           <div className={`relative overflow-hidden ${sections} lg:hidden`}>
             <div className="relative mx-auto max-w-[1280px]"><p className={eyebrow}>{c.howEyebrow}</p><h2 className={h2}>{c.howTitle}</h2><div className="mt-14 grid border-y border-[#5A5045] bg-[#171715]/55 backdrop-blur-[2px] md:grid-cols-3">{c.how.map(([title, body], index) => <article key={title} data-reveal className="border-b border-[#5A5045] py-9 md:border-b-0 md:border-r md:px-8 first:md:pl-0 last:md:border-r-0"><span className="text-[10px] text-[#B17A4D]">0{index + 1}</span><h3 className="mt-5 text-3xl font-light text-[#C2A887]">{title}</h3><p className="mt-4 text-base leading-7 text-[#C8C3B8]">{body}</p></article>)}</div></div>
@@ -198,19 +205,16 @@ export default async function HomePage() {
           <span id="trabajador" className="absolute -top-20" aria-hidden="true" />
           <span id="empresa" className="absolute -top-20" aria-hidden="true" />
           {locale === 'es' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] lg:block"><Image src="/brand/kumplio-master-paths.jpg" alt="Dos caminos, un mismo resultado: Kumplio para trabajadores y para empresas." fill sizes="100vw" className="object-contain" /><h2 className="sr-only">Dos caminos. Un mismo resultado.</h2><p className="sr-only">{c.workerTitle} {c.workerBody} {c.companyTitle} {c.companyBody}</p><a href="/sign-up?audience=person" aria-label="Crear mi perfil de trabajador" className="absolute left-[25%] top-[71%] h-[8%] w-[17.8%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /><a href="/sign-up?audience=company" aria-label="Gestionar mi empresa" className="absolute left-[54.2%] top-[71%] h-[8%] w-[19.5%] rounded-[4px] focus-visible:ring-2 focus-visible:ring-[#A7C63A]" /></div>}
-          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden lg:block">
-            <Image src="/brand/kumplio-master-paths.jpg" alt="" fill sizes="100vw" className="object-contain" />
-            <div className="absolute left-[28.5%] top-[8%] h-[84%] w-[44%] bg-[#171715]/98" />
-            <div className="absolute left-[27%] top-[8%] h-[84%] w-[4%] bg-[linear-gradient(90deg,rgba(23,23,21,0),#171715_100%)]" />
-            <div className="absolute right-[27%] top-[8%] h-[84%] w-[4%] bg-[linear-gradient(90deg,#171715_0%,rgba(23,23,21,0)_100%)]" />
-            <div className="absolute left-[29.5%] top-[12%] w-[42%] text-center">
-              <h2 className="text-[clamp(30px,2.5vw,52px)] font-light leading-[1.05] text-[#C2A887]">Two paths.<br /><span className="text-[#B17A4D]">One shared outcome.</span></h2>
-              <p className="mt-3 text-sm text-[#AAA69C]">Choose how you want to work with Kumplio.</p>
-              <div className="mt-[8%] grid grid-cols-2 gap-8 text-left">
-                <article className="border-r border-[#5A5045] pr-8"><p className="text-[10px] uppercase tracking-[.16em] text-[#B17A4D]">For workers</p><h3 className="mt-3 text-[clamp(22px,1.7vw,34px)] font-light leading-[1.08] text-[#C2A887]">{c.workerTitle}</h3><p className="mt-4 text-[clamp(10px,.76vw,14px)] leading-[1.55] text-[#C8C3B8]">{c.workerBody}</p><a href="/sign-up?audience=person" className="mt-6 inline-flex min-h-9 items-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.workerCta}<ArrowRight className="ml-2 h-4 w-4" /></a></article>
-                <article className="pl-1"><p className="text-[10px] uppercase tracking-[.16em] text-[#B17A4D]">For companies</p><h3 className="mt-3 text-[clamp(22px,1.7vw,34px)] font-light leading-[1.08] text-[#C2A887]">{c.companyTitle}</h3><p className="mt-4 text-[clamp(10px,.76vw,14px)] leading-[1.55] text-[#C8C3B8]">{c.companyBody}</p><a href="/sign-up?audience=company" className="mt-6 inline-flex min-h-9 items-center rounded-[4px] bg-[#A7C63A] px-5 text-sm font-medium text-[#171715]">{c.companyCta}<ArrowRight className="ml-2 h-4 w-4" /></a></article>
+          {locale === 'en' && <div className="relative mx-auto hidden aspect-video w-full max-w-[1920px] overflow-hidden bg-[#10110F] lg:grid lg:grid-cols-[24%_52%_24%]">
+            <div className="relative overflow-hidden"><Image src="/brand/kumplio-path-worker.webp" alt="" fill sizes="24vw" className="object-cover object-center" /><span className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,17,15,0)_55%,#10110F_100%)]" /></div>
+            <div className="relative z-10 flex flex-col px-9 pt-[9%]">
+              <div className="text-center"><h2 className="text-[clamp(40px,3.8vw,68px)] font-light leading-[1.02] tracking-[-.035em] text-[#C2A887]">Two paths.<br /><span className="text-[#B17A4D]">One shared outcome.</span></h2><p className="mt-4 text-[clamp(13px,1vw,18px)] text-[#AAA69C]">Choose how you want to work with Kumplio.</p></div>
+              <div className="mt-[8%] grid grid-cols-2 text-left">
+                <article className="border-r border-[#5A5045] pr-10"><p className="text-[10px] uppercase tracking-[.22em] text-[#B17A4D]">For workers</p><h3 className="mt-4 text-[clamp(24px,2vw,36px)] font-light leading-[1.08] text-[#C2A887]">{c.workerTitle}</h3><p className="mt-5 text-[clamp(11px,.82vw,15px)] leading-[1.6] text-[#C8C3B8]">{c.workerBody}</p><a href="/sign-up?audience=person" className="mt-7 inline-flex min-h-11 w-full items-center justify-between rounded-[4px] bg-[#A7C63A] px-6 text-sm font-medium text-[#171715]">{c.workerCta}<ArrowRight className="h-4 w-4" /></a></article>
+                <article className="pl-10"><p className="text-[10px] uppercase tracking-[.22em] text-[#B17A4D]">For companies</p><h3 className="mt-4 text-[clamp(24px,2vw,36px)] font-light leading-[1.08] text-[#C2A887]">{c.companyTitle}</h3><p className="mt-5 text-[clamp(11px,.82vw,15px)] leading-[1.6] text-[#C8C3B8]">{c.companyBody}</p><a href="/sign-up?audience=company" className="mt-7 inline-flex min-h-11 w-full items-center justify-between rounded-[4px] bg-[#A7C63A] px-6 text-sm font-medium text-[#171715]">{c.companyCta}<ArrowRight className="h-4 w-4" /></a></article>
               </div>
             </div>
+            <div className="relative overflow-hidden"><Image src="/brand/kumplio-path-company.webp" alt="" fill sizes="24vw" className="object-cover object-center" /><span className="absolute inset-0 bg-[linear-gradient(90deg,#10110F_0%,rgba(16,17,15,0)_45%)]" /></div>
           </div>}
           <div className={`relative overflow-hidden ${sections} lg:hidden`}>
             <div className="relative mx-auto max-w-[1280px]"><p className={eyebrow}>{c.pathsEyebrow}</p><div className="mt-12 grid gap-0 border-y border-[#5A5045] bg-[#171715]/55 backdrop-blur-[2px] lg:grid-cols-2"><article className="py-12 lg:border-r lg:border-[#5A5045] lg:pr-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.workerTitle}</h2><p className="mt-5 max-w-lg text-base leading-8 text-[#C8C3B8]">{c.workerBody}</p><Link href="/sign-up?audience=person" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.workerCta}<ArrowRight className="h-4 w-4" /></Link></article><article className="py-12 lg:pl-14"><h2 className="text-4xl font-light text-[#C2A887]">{c.companyTitle}</h2><p className="mt-5 max-w-lg text-base leading-8 text-[#C8C3B8]">{c.companyBody}</p><Link href="/sign-up?audience=company" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-[#A7C63A]">{c.companyCta}<ArrowRight className="h-4 w-4" /></Link></article></div></div>
