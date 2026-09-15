@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle2, Circle, Loader2, Play, RefreshCw, TriangleAlert } from 'lucide-react'
+import { CheckCircle2, Circle, FileCheck2, Loader2, Play, RefreshCw, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const STAGE_NAMES: Record<string, string> = {
@@ -19,6 +19,14 @@ const OUTCOME_LABELS: Record<string, string> = {
   needs_attention: 'Necesita atención',
   blocked: 'Bloqueado',
   review_required: 'Listo para revisión humana',
+}
+
+const REVIEW_LABELS: Record<string, string> = {
+  not_started: 'Pendiente',
+  in_progress: 'En revisión',
+  approved: 'Aprobada',
+  changes_requested: 'Cambios solicitados',
+  rejected: 'Rechazada',
 }
 
 type CaseOption = { id: string; title: string; status: string; priority: string }
@@ -39,18 +47,27 @@ type OutcomeAction = {
   dependencies: string[]
   closureCriteria: string[]
 }
+type OutcomeEvidence = {
+  label: string
+  location: string | null
+  supports: string | null
+}
 type WorkflowOutcome = {
   status: string
   headline: string
   summary: string
   decision: string | null
+  resolved: string[]
   nextAction: OutcomeAction | null
   actions: OutcomeAction[]
   missing: string[]
   blockers: string[]
+  evidence: OutcomeEvidence[]
   evidenceCount: number
   humanReviewRequired: boolean
+  humanReviewStatus: string
   humanReviewReasons: string[]
+  humanReviewComment: string | null
   specialistsUsed: string[]
 }
 type WorkflowDetail = {
@@ -189,10 +206,24 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
           {hasOutcome && outcome && <div className="mt-6 space-y-5">
             <div className="rounded-xl border border-border bg-background p-5">
               <p className="text-base leading-7 text-foreground">{outcome.summary}</p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div><p className="text-xs uppercase tracking-wide text-muted-foreground">Resuelto</p><p className="mt-1 text-2xl font-semibold">{outcome.resolved.length}</p></div>
                 <div><p className="text-xs uppercase tracking-wide text-muted-foreground">Evidencia</p><p className="mt-1 text-2xl font-semibold">{outcome.evidenceCount}</p></div>
                 <div><p className="text-xs uppercase tracking-wide text-muted-foreground">Acciones</p><p className="mt-1 text-2xl font-semibold">{outcome.actions.length}</p></div>
                 <div><p className="text-xs uppercase tracking-wide text-muted-foreground">Faltantes</p><p className="mt-1 text-2xl font-semibold">{outcome.missing.length}</p></div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,.6fr)]">
+              <div className="rounded-xl border border-border bg-background p-5">
+                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Qué quedó resuelto</p></div>
+                {outcome.resolved.length ? <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">{outcome.resolved.slice(0, 8).map((item) => <li key={item}>• {item}</li>)}</ul> : <p className="mt-3 text-sm leading-6 text-muted-foreground">Todavía no hay elementos confirmados como resueltos. Kumplio los mostrará aquí sólo cuando exista respaldo explícito.</p>}
+              </div>
+              <div className="rounded-xl border border-border bg-background p-5">
+                <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Revisión humana</p></div>
+                <p className="mt-3 text-lg font-semibold">{REVIEW_LABELS[outcome.humanReviewStatus] || outcome.humanReviewStatus}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Un resultado sólo pasa a “Resultado listo” después de aprobación humana final y sin faltantes o bloqueos conocidos.</p>
+                {outcome.humanReviewComment && <p className="mt-3 rounded-lg bg-muted p-3 text-xs leading-5 text-muted-foreground">{outcome.humanReviewComment}</p>}
               </div>
             </div>
 
@@ -214,9 +245,23 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
               </div>
             </div>}
 
+            <div className="rounded-xl border border-border bg-background p-5">
+              <div className="flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-primary" /><p className="text-sm font-semibold">Evidencia usada</p></div>
+              {outcome.evidence.length ? <div className="mt-3 grid gap-3 md:grid-cols-2">{outcome.evidence.slice(0, 8).map((item, index) => <div key={`${item.label}-${item.location || index}`} className="rounded-lg border border-border/70 p-3">
+                <p className="text-sm font-medium">{item.label}</p>
+                {item.supports && <p className="mt-1 text-xs leading-5 text-muted-foreground">Respalda: {item.supports}</p>}
+                {item.location && <p className="mt-1 break-all text-[11px] leading-4 text-muted-foreground">{item.location}</p>}
+              </div>)}</div> : <p className="mt-3 text-sm leading-6 text-muted-foreground">No hay referencias de evidencia disponibles todavía; el resultado no las presume.</p>}
+            </div>
+
+            {outcome.humanReviewReasons.length > 0 && <div className="rounded-xl border border-border bg-background p-5">
+              <p className="text-sm font-semibold">Por qué requiere revisión humana</p>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">{outcome.humanReviewReasons.slice(0, 8).map((item) => <li key={item}>• {item}</li>)}</ul>
+            </div>}
+
             <div className="text-xs leading-5 text-muted-foreground">
               Especialistas activados: {outcome.specialistsUsed.join(', ') || 'ninguno todavía'}.
-              {outcome.humanReviewRequired ? ' La decisión sensible permanece sujeta a revisión humana.' : ''}
+              {outcome.humanReviewRequired ? ' Las decisiones sensibles permanecen bajo control humano.' : ''}
             </div>
           </div>}
 
