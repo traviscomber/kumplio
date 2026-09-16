@@ -14,6 +14,9 @@ const createSchema = z.object({
   instructions: z.string().trim().max(2000).nullable().optional(),
 })
 
+const activeWorkflowStatuses = ['draft', 'running', 'paused', 'pending_review'] as const
+const recoveringJobStatuses = ['queued', 'leased', 'retry_wait'] as const
+
 async function getIdentity() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -97,16 +100,66 @@ export async function POST(req: NextRequest) {
   const definition = getWorkflowDefinition(selectedWorkflowType, 'v2')
   if (!definition) return NextResponse.json({ error: 'Workflow template not found', code: 'workflow_template_not_found' }, { status: 404 })
 
-  const { data: existingWorkflow } = await supabase
+  const admin = createAdminClient()
+  const workflowSelect = 'id, case_id, workflow_type, status, current_stage, total_stages, created_at'
+  const { data: activeWorkflow, error: activeWorkflowError } = await supabase
     .from('agent_workflows')
-    .select('id, case_id, workflow_type, status, current_stage, total_stages, created_at')
+    .select(workflowSelect)
     .eq('organization_id', organizationId)
     .eq('case_id', parsed.data.caseId)
     .eq('workflow_type', selectedWorkflowType)
-    .in('status', ['draft', 'running', 'paused', 'pending_review', 'failed'])
+    .in('status', [...activeWorkflowStatuses])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
+
+  if (activeWorkflowError) {
+    console.error('[agents/workflows/resume-active]', activeWorkflowError.code)
+    return NextResponse.json({ error: 'Unable to resolve workflow state', code: 'workflow_state_unavailable' }, { status: 500 })
+  }
+
+  let existingWorkflow = activeWorkflow
+  if (!existingWorkflow) {
+    const { data: failedWorkflow, error: failedWorkflowError } = await supabase
+      .from('agent_workflows')
+      .select(workflowSelect)
+      .eq('organization_id', organizationId)
+      .eq('case_id', parsed.data.caseId)
+      .eq('workflow_type', selectedWorkflowType)
+      .eq('status', 'failed')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (failedWorkflowError) {
+      console.error('[agents/workflows/resume-failed]', failedWorkflowError.code)
+      return NextResponse.json({ error: 'Unable to resolve workflow state', code: 'workflow_state_unavailable' }, { status: 500 })
+    }
+
+    if (failedWorkflow) {
+      const { data: recoveringJob, error: recoveringJobError } = await admin
+        .from('agent_jobs')
+        .select('id, status')
+        .eq('organization_id', organizationId)
+        .eq('workflow_id', failedWorkflow.id)
+        .eq('stage_index', failedWorkflow.current_stage)
+        .in('status', [...recoveringJobStatuses])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (recoveringJobError) {
+        console.error('[agents/workflows/recovery-job]', recoveringJobError.code)
+        return NextResponse.json({ error: 'Unable to resolve workflow recovery state', code: 'workflow_state_unavailable' }, { status: 500 })
+      }
+
+      // A failed workflow is resumable only while its durable job still owns a
+      // recovery path. Dead-letter and otherwise terminal failures must not trap
+      // the user in an impossible workflow; the partial unique index allows a
+      // fresh workflow once the old one is terminal.
+      if (recoveringJob) existingWorkflow = failedWorkflow
+    }
+  }
 
   if (existingWorkflow) {
     return NextResponse.json({
@@ -141,7 +194,6 @@ export async function POST(req: NextRequest) {
   const stages = definition.stages.map((stage) => ({ index: stage.index, agentId: stage.agentId, label: stage.label, task: stage.task, dependsOn: stage.dependsOn }))
 
   try {
-    const admin = createAdminClient()
     const { data: workflowId, error } = await admin.rpc('create_case_workflow_record', {
       p_actor_id: user.id,
       p_organization_id: organizationId,
