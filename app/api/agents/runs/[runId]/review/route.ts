@@ -205,10 +205,11 @@ export async function POST(req: NextRequest, context: { params: Promise<{ runId:
                   : message.includes('outcome_snapshot') ? 'outcome_snapshot_invalid'
                     : 'review_transaction_failed'
     const status = code === 'run_not_found' ? 404
-      : code === 'run_not_reviewable' || code === 'already_reviewed' || code === 'outcome_snapshot_stale' ? 409
-        : code === 'review_forbidden' ? 403
-          : code === 'review_comment_required' || code === 'approval_checklist_required' ? 400
-            : 500
+      : code === 'run_not_reviewable' || code === 'already_reviewed' ? 409
+        : code === 'outcome_snapshot_stale' ? 409
+          : code === 'review_forbidden' ? 403
+            : code === 'review_comment_required' || code === 'approval_checklist_required' ? 400
+              : 500
     const publicMessage = code === 'run_not_found' ? 'La ejecución no existe'
       : code === 'run_not_reviewable' ? 'La ejecución ya no admite esta revisión'
         : code === 'already_reviewed' ? 'Esta ejecución ya recibió una decisión final'
