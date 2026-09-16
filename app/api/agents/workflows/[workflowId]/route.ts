@@ -34,15 +34,26 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     .maybeSingle()
   if (error || !workflow) return NextResponse.json({ error: 'Workflow not found' }, { status: 404 })
 
-  const { data: stages } = await supabase
-    .from('agent_workflow_stages')
-    .select('id, stage_index, agent_id, status, run_id, source_artifact_ids, output_artifact_id, attempt_count, max_attempts, task_template, context_snapshot, started_at, completed_at, updated_at')
-    .eq('workflow_id', workflowId)
-    .eq('organization_id', organizationId)
-    .order('stage_index', { ascending: true })
+  const [stagesResult, snapshotResult] = await Promise.all([
+    supabase
+      .from('agent_workflow_stages')
+      .select('id, stage_index, agent_id, status, run_id, source_artifact_ids, output_artifact_id, attempt_count, max_attempts, task_template, context_snapshot, started_at, completed_at, updated_at')
+      .eq('workflow_id', workflowId)
+      .eq('organization_id', organizationId)
+      .order('stage_index', { ascending: true }),
+    supabase
+      .from('agent_workflow_outcome_snapshots')
+      .select('id, review_id, reviewer_id, contract_version, outcome, quality, content_hash, frozen_at')
+      .eq('workflow_id', workflowId)
+      .eq('organization_id', organizationId)
+      .order('frozen_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ])
 
-  const artifactIds = (stages || []).map((stage) => stage.output_artifact_id).filter((id): id is string => Boolean(id))
-  const runIds = (stages || []).map((stage) => stage.run_id).filter((id): id is string => Boolean(id))
+  const stages = stagesResult.data || []
+  const artifactIds = stages.map((stage) => stage.output_artifact_id).filter((id): id is string => Boolean(id))
+  const runIds = stages.map((stage) => stage.run_id).filter((id): id is string => Boolean(id))
 
   const [artifactsResult, reviewsResult] = await Promise.all([
     artifactIds.length
@@ -67,23 +78,42 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     : workflow.compliance_cases
   const artifacts = artifactsResult.data || []
   const reviews = reviewsResult.data || []
-  const outcome = buildComplianceOutcome({
+  const frozenSnapshot = snapshotResult.data || null
+  const liveOutcome = frozenSnapshot ? null : buildComplianceOutcome({
     goal: caseRecord?.title || caseRecord?.description || null,
     workflowStatus: workflow.status,
     artifacts,
-    stages: stages || [],
+    stages,
     reviews,
   })
-  const outcomeQuality = evaluateComplianceOutcome(outcome)
+  const outcome = frozenSnapshot?.outcome || liveOutcome
+  const outcomeQuality = frozenSnapshot?.quality || (liveOutcome ? evaluateComplianceOutcome(liveOutcome) : null)
 
   return NextResponse.json({
     workflow,
     template: getWorkflowDefinition(workflow.workflow_type),
-    stages: stages || [],
+    stages,
     artifacts,
     reviews,
     outcome,
     outcomeQuality,
+    outcomeSnapshot: frozenSnapshot ? {
+      id: frozenSnapshot.id,
+      frozen: true,
+      contractVersion: frozenSnapshot.contract_version,
+      reviewId: frozenSnapshot.review_id,
+      reviewerId: frozenSnapshot.reviewer_id,
+      frozenAt: frozenSnapshot.frozen_at,
+      contentHash: frozenSnapshot.content_hash,
+    } : {
+      frozen: false,
+      contractVersion: null,
+      reviewId: null,
+      reviewerId: null,
+      frozenAt: null,
+      contentHash: null,
+      legacyFallback: workflow.status === 'completed',
+    },
   }, {
     headers: { 'Cache-Control': 'no-store' },
   })
