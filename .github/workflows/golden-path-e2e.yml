@@ -10,6 +10,8 @@ on:
       - 'app/api/agents/workflows/**'
       - 'app/api/agents/runs/**'
       - 'lib/agents/workflow-stage-executor.ts'
+      - 'lib/agents/outcome-snapshot.ts'
+      - 'supabase/migrations/20260916102000_durable_agent_workflow_outcome_snapshots.sql'
       - 'scripts/53-advance-workflow-after-approval.sql'
   workflow_dispatch:
 
@@ -173,7 +175,7 @@ jobs:
               cat /tmp/kumplio-review.json >&2
               exit 1
             fi
-            STAGE_INDEX="$stage_index" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-review.json','utf8'));if(p.status!=='approved')process.exit(1);console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
+            STAGE_INDEX="$stage_index" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-review.json','utf8'));if(p.status!=='approved')process.exit(1);if(Number(process.env.STAGE_INDEX)===4&&p.outcomeSnapshot?.frozen!==true)throw new Error('Final approval did not return a frozen outcome snapshot');console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
           done
 
       - name: Close and verify auditable case
@@ -198,7 +200,11 @@ jobs:
           if ((p.stages || []).length !== 5 || p.stages.some((stage) => stage.status !== 'approved')) throw new Error('Not all five stages are approved')
           const c = Array.isArray(p.workflow?.compliance_cases) ? p.workflow.compliance_cases[0] : p.workflow?.compliance_cases
           if (c?.status !== 'approved') throw new Error(`Case status is ${c?.status}`)
-          console.log('Golden path complete: 5/5 stages approved, workflow completed, case resolved.')
+          if (p.outcomeSnapshot?.frozen !== true) throw new Error('Completed workflow is not backed by a frozen outcome snapshot')
+          if (p.outcomeSnapshot?.contractVersion !== 'outcome-v2') throw new Error(`Unexpected outcome contract ${p.outcomeSnapshot?.contractVersion}`)
+          if (p.outcome?.humanReviewStatus !== 'approved') throw new Error(`Frozen outcome review status is ${p.outcome?.humanReviewStatus}`)
+          if (!p.outcomeQuality || typeof p.outcomeQuality.score !== 'number') throw new Error('Frozen outcome quality evaluation is missing')
+          console.log('Golden path complete: 5/5 stages approved, workflow completed, case resolved, outcome snapshot frozen.')
           NODE
 
       - name: Revoke E2E organization membership
