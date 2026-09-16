@@ -77,19 +77,37 @@ declare
   v_source_review_ids uuid[] := '{}';
   v_contract_version text;
 begin
+  -- Match the lock order of the existing six-argument review RPC. This serializes
+  -- competing reviews before we compare the source set used to freeze the outcome.
+  perform 1
+  from public.agent_runs
+  where id = p_run_id
+    and organization_id = p_organization_id
+  for update;
+
+  perform 1
+  from public.agent_artifacts
+  where run_id = p_run_id
+    and organization_id = p_organization_id
+  order by version desc
+  limit 1
+  for update;
+
   select *
     into v_stage
   from public.agent_workflow_stages
   where run_id = p_run_id
     and organization_id = p_organization_id
-  limit 1;
+  limit 1
+  for update;
 
   if v_stage.id is not null then
     select *
       into v_workflow
     from public.agent_workflows
     where id = v_stage.workflow_id
-      and organization_id = p_organization_id;
+      and organization_id = p_organization_id
+    for update;
 
     if v_workflow.id is not null then
       v_is_final := v_stage.stage_index >= v_workflow.total_stages - 1;
