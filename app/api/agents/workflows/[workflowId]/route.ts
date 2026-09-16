@@ -83,7 +83,7 @@ export async function GET(_request: Request, context: { params: Promise<{ workfl
     goal: caseRecord?.title || caseRecord?.description || null,
     workflowStatus: workflow.status,
     artifacts,
-    stages,
+    stages: stages || [],
     reviews,
   })
   const outcome = frozenSnapshot?.outcome || liveOutcome
