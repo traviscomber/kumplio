@@ -29,6 +29,13 @@ const REVIEW_LABELS: Record<string, string> = {
   rejected: 'Rechazada',
 }
 
+const CLOSURE_LABELS: Record<string, string> = {
+  pending_evidence: 'Falta evidencia',
+  ready_for_review: 'Listo para verificar',
+  verified: 'Cierre verificado',
+  changes_requested: 'Cambios solicitados',
+}
+
 type CaseOption = { id: string; title: string; status: string; priority: string }
 type WorkflowSummary = {
   id: string
@@ -84,6 +91,47 @@ type WorkflowDetail = {
   artifacts: Array<{ id: string; artifact_type: string; title: string; content: unknown; status: string }>
   outcome?: WorkflowOutcome
 }
+type ClosurePlan = {
+  id: string
+  title: string
+  description: string | null
+  status: string
+  priority: string
+  source_snapshot_id: string
+  source_contract_version: string
+}
+type ClosureTask = {
+  id: string
+  title: string
+  description: string | null
+  status: string
+  priority: string
+  owner_role: string | null
+  target_label: string | null
+  sequence: number
+  dependencies: string[]
+  closure_criteria: string[]
+  evidence_requirements: string[]
+  verification_status: string
+  completion_note: string | null
+  verification_notes: string | null
+  verified_at: string | null
+  evidenceIds: string[]
+}
+type ClosureEvidenceOption = {
+  id: string
+  name: string
+  evidence_type: string
+  validation_status: string
+  integrity_status: string
+  created_at: string
+}
+type ClosurePlanDetail = {
+  plan: ClosurePlan | null
+  tasks: ClosureTask[]
+  availableEvidence: ClosureEvidenceOption[]
+  canMaterialize: boolean
+}
 
 export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
   const [caseId, setCaseId] = useState(cases[0]?.id || '')
@@ -91,7 +139,12 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([])
   const [selectedId, setSelectedId] = useState('')
   const [detail, setDetail] = useState<WorkflowDetail | null>(null)
+  const [closure, setClosure] = useState<ClosurePlanDetail | null>(null)
+  const [closureEvidence, setClosureEvidence] = useState<Record<string, string>>({})
+  const [closureNotes, setClosureNotes] = useState<Record<string, string>>({})
+  const [closureReviewNotes, setClosureReviewNotes] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
+  const [closureLoading, setClosureLoading] = useState(false)
   const [error, setError] = useState('')
 
   async function loadWorkflows() {
@@ -110,8 +163,19 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
     setDetail(data)
   }
 
+  async function loadClosurePlan(id: string) {
+    if (!id) return setClosure(null)
+    const response = await fetch(`/api/agents/workflows/${id}/closure-plan`, { cache: 'no-store' })
+    const data = await response.json()
+    if (!response.ok) throw new Error(data.error || 'No fue posible cargar el plan de cierre')
+    setClosure(data)
+  }
+
   useEffect(() => { loadWorkflows().catch((err) => setError(err.message)) }, [])
-  useEffect(() => { loadDetail(selectedId).catch((err) => setError(err.message)) }, [selectedId])
+  useEffect(() => {
+    if (!selectedId) return
+    Promise.all([loadDetail(selectedId), loadClosurePlan(selectedId)]).catch((err) => setError(err.message))
+  }, [selectedId])
 
   async function createWorkflow() {
     if (!caseId) return
@@ -130,7 +194,7 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
       setSelectedId(data.workflow.id)
       setContext('')
       await loadWorkflows()
-      await loadDetail(data.workflow.id)
+      await Promise.all([loadDetail(data.workflow.id), loadClosurePlan(data.workflow.id)])
     } catch (err) { setError(err instanceof Error ? err.message : 'Error desconocido') }
     finally { setLoading(false) }
   }
@@ -146,9 +210,56 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'No fue posible avanzar el workflow')
-      await Promise.all([loadWorkflows(), loadDetail(selectedId)])
+      await Promise.all([loadWorkflows(), loadDetail(selectedId), loadClosurePlan(selectedId)])
     } catch (err) { setError(err instanceof Error ? err.message : 'Error desconocido') }
     finally { setLoading(false) }
+  }
+
+  async function activateClosurePlan() {
+    if (!selectedId) return
+    setClosureLoading(true); setError('')
+    try {
+      const response = await fetch(`/api/agents/workflows/${selectedId}/closure-plan`, { method: 'POST' })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'No fue posible activar el plan de cierre')
+      await loadClosurePlan(selectedId)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Error desconocido') }
+    finally { setClosureLoading(false) }
+  }
+
+  async function submitClosureTask(taskId: string) {
+    const evidenceId = closureEvidence[taskId]
+    if (!selectedId || !evidenceId) return setError('Selecciona evidencia aceptada y con integridad verificada para esta acción.')
+    setClosureLoading(true); setError('')
+    try {
+      const response = await fetch(`/api/agents/workflows/${selectedId}/closure-plan/tasks/${taskId}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evidenceIds: [evidenceId], note: closureNotes[taskId] || null }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'No fue posible preparar el cierre')
+      await loadClosurePlan(selectedId)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Error desconocido') }
+    finally { setClosureLoading(false) }
+  }
+
+  async function reviewClosureTask(taskId: string, decision: 'verified' | 'changes_requested') {
+    if (!selectedId) return
+    const comment = (closureReviewNotes[taskId] || '').trim()
+    if (comment.length < 3) return setError('La revisión de cierre necesita un comentario breve y explícito.')
+    setClosureLoading(true); setError('')
+    try {
+      const response = await fetch(`/api/agents/workflows/${selectedId}/closure-plan/tasks/${taskId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, comment }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'No fue posible revisar el cierre')
+      await loadClosurePlan(selectedId)
+    } catch (err) { setError(err instanceof Error ? err.message : 'Error desconocido') }
+    finally { setClosureLoading(false) }
   }
 
   const currentStage = detail?.stages.find((stage) => stage.stage_index === detail.workflow.current_stage)
@@ -157,6 +268,9 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
     && (currentStage?.attempt_count || 0) < (currentStage?.max_attempts || 3)
   const outcome = detail?.outcome
   const hasOutcome = Boolean(outcome && detail?.artifacts.length)
+  const closureTasks = closure?.tasks || []
+  const verifiedClosureTasks = closureTasks.filter((task) => task.verification_status === 'verified').length
+  const nextClosureTask = closureTasks.find((task) => task.verification_status !== 'verified') || null
 
   return (
     <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
@@ -164,15 +278,15 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
         <section className="rounded-2xl border border-border bg-card p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Resultado primero</p>
           <h2 className="mt-2 font-semibold">Analizar una situación</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">Kumplio activa sólo los especialistas necesarios y consolida un único resultado verificable.</p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Describe qué necesitas resolver. Kumplio reúne contexto, especialistas y evidencia y te lleva desde la respuesta hasta un cierre verificable.</p>
           <label className="mt-4 block text-sm font-medium">Caso</label>
           <select value={caseId} onChange={(event) => setCaseId(event.target.value)} className="mt-2 w-full rounded-lg border border-border bg-background p-3 text-sm">
             {cases.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
           </select>
-          <label className="mt-4 block text-sm font-medium">Resultado que necesitas</label>
-          <textarea value={context} onChange={(event) => setContext(event.target.value)} rows={6} className="mt-2 w-full rounded-lg border border-border bg-background p-3 text-sm" placeholder="Ej.: necesito saber qué falta, qué debo hacer primero y qué evidencia demuestra el cierre..." />
+          <label className="mt-4 block text-sm font-medium">Qué necesitas resolver</label>
+          <textarea value={context} onChange={(event) => setContext(event.target.value)} rows={6} className="mt-2 w-full rounded-lg border border-border bg-background p-3 text-sm" placeholder="Ej.: dime qué falta, qué debo hacer primero y qué evidencia demuestra que realmente quedó cerrado..." />
           <Button onClick={createWorkflow} disabled={loading || !caseId} className="mt-4 w-full">
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />} Obtener resultado
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />} Resolver con Kumplio
           </Button>
         </section>
 
@@ -192,7 +306,7 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
         {!detail ? <p className="text-muted-foreground">Selecciona un análisis o inicia uno nuevo.</p> : <>
           <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Outcome del caso</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Resultado del caso</p>
               <h2 className="mt-2 text-2xl font-bold">{hasOutcome ? OUTCOME_LABELS[outcome?.status || ''] || outcome?.headline : 'Construyendo resultado'}</h2>
             </div>
             <Button onClick={advanceWorkflow} disabled={loading || !canAdvance}>
@@ -232,6 +346,72 @@ export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
               <p className="mt-2 font-semibold">{outcome.nextAction.title}</p>
               <p className="mt-2 text-sm text-muted-foreground">Responsable: {outcome.nextAction.ownerRole || 'por asignar'}{outcome.nextAction.target ? ` · objetivo ${outcome.nextAction.target}` : ''}</p>
               {outcome.nextAction.closureCriteria.length > 0 && <p className="mt-3 text-sm leading-6 text-muted-foreground">Cierre: {outcome.nextAction.closureCriteria.join(' · ')}</p>}
+            </div>}
+
+            {outcome.humanReviewStatus === 'approved' && outcome.actions.length > 0 && <div className="rounded-xl border border-primary/40 bg-primary/5 p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Del outcome al cierre</p>
+                  <h3 className="mt-2 text-lg font-semibold">Plan de cierre verificable</h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Kumplio convierte las acciones aprobadas en trabajo trazable. Una acción no cuenta como cerrada sólo por marcarla hecha: necesita evidencia aceptada, integridad verificada y una revisión humana del criterio de cierre.</p>
+                </div>
+                {!closure?.plan && <Button onClick={activateClosurePlan} disabled={closureLoading || !closure?.canMaterialize}>
+                  {closureLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />} Activar plan de cierre
+                </Button>}
+              </div>
+
+              {closure?.plan && <div className="mt-5 space-y-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Verificadas</p><p className="mt-1 text-xl font-semibold">{verifiedClosureTasks}/{closureTasks.length}</p></div>
+                  <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Estado del plan</p><p className="mt-1 text-sm font-semibold">{closure.plan.status}</p></div>
+                  <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Outcome congelado</p><p className="mt-1 text-sm font-semibold">{closure.plan.source_contract_version}</p></div>
+                </div>
+
+                {closure.plan.status === 'completed' ? <div className="rounded-lg border border-primary/30 bg-background p-4">
+                  <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-primary" /><p className="font-semibold">Cierre verificado</p></div>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">Todas las acciones del outcome quedaron verificadas contra evidencia aceptada y revisión humana. La trazabilidad permanece vinculada al snapshot aprobado.</p>
+                </div> : nextClosureTask && <div className="rounded-lg border border-border bg-background p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Siguiente paso de cierre</p>
+                      <p className="mt-1 font-semibold">{nextClosureTask.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{CLOSURE_LABELS[nextClosureTask.verification_status] || nextClosureTask.verification_status} · responsable {nextClosureTask.owner_role || 'por asignar'}{nextClosureTask.target_label ? ` · objetivo ${nextClosureTask.target_label}` : ''}</p>
+                    </div>
+                    <span className="rounded-full border border-border px-2.5 py-1 text-[11px] uppercase tracking-wide text-muted-foreground">{nextClosureTask.priority}</span>
+                  </div>
+
+                  {nextClosureTask.closure_criteria.length > 0 ? <div className="mt-3"><p className="text-xs font-medium">Criterios que deben quedar demostrados</p><ul className="mt-2 space-y-1 text-sm leading-6 text-muted-foreground">{nextClosureTask.closure_criteria.map((item) => <li key={item}>• {item}</li>)}</ul></div> : <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-xs leading-5 text-muted-foreground">Esta acción todavía no tiene un criterio de cierre verificable. Kumplio no permitirá declararla verificada sólo con una marca de completitud.</div>}
+
+                  {nextClosureTask.verification_status !== 'ready_for_review' && nextClosureTask.verification_status !== 'verified' && <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
+                    <label className="text-xs font-medium">Evidencia aceptada
+                      <select value={closureEvidence[nextClosureTask.id] || ''} onChange={(event) => setClosureEvidence((current) => ({ ...current, [nextClosureTask.id]: event.target.value }))} className="mt-1 block w-full rounded-lg border border-border bg-card p-2.5 text-sm">
+                        <option value="">Seleccionar evidencia...</option>
+                        {closure.availableEvidence.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.evidence_type}</option>)}
+                      </select>
+                    </label>
+                    <label className="text-xs font-medium">Nota de ejecución
+                      <input value={closureNotes[nextClosureTask.id] || ''} onChange={(event) => setClosureNotes((current) => ({ ...current, [nextClosureTask.id]: event.target.value }))} className="mt-1 block w-full rounded-lg border border-border bg-card p-2.5 text-sm" placeholder="Qué se hizo y qué demuestra la evidencia" />
+                    </label>
+                    <Button onClick={() => submitClosureTask(nextClosureTask.id)} disabled={closureLoading || !closureEvidence[nextClosureTask.id] || nextClosureTask.closure_criteria.length === 0}>{closureLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileCheck2 className="mr-2 h-4 w-4" />} Preparar cierre</Button>
+                  </div>}
+
+                  {closure.availableEvidence.length === 0 && nextClosureTask.verification_status !== 'ready_for_review' && <p className="mt-3 text-xs leading-5 text-muted-foreground">No hay evidencia aceptada con integridad verificada disponible en este proyecto todavía. El cierre permanece abierto.</p>}
+
+                  {nextClosureTask.verification_status === 'ready_for_review' && <div className="mt-4 space-y-3">
+                    <label className="block text-xs font-medium">Revisión humana del cierre
+                      <textarea value={closureReviewNotes[nextClosureTask.id] || ''} onChange={(event) => setClosureReviewNotes((current) => ({ ...current, [nextClosureTask.id]: event.target.value }))} rows={2} className="mt-1 block w-full rounded-lg border border-border bg-card p-2.5 text-sm" placeholder="Explica por qué la evidencia demuestra —o no demuestra— el criterio de cierre" />
+                    </label>
+                    <div className="flex flex-wrap gap-2"><Button onClick={() => reviewClosureTask(nextClosureTask.id, 'verified')} disabled={closureLoading}><ShieldCheck className="mr-2 h-4 w-4" /> Verificar cierre</Button><Button variant="outline" onClick={() => reviewClosureTask(nextClosureTask.id, 'changes_requested')} disabled={closureLoading}>Pedir cambios</Button></div>
+                  </div>}
+                </div>}
+
+                <details>
+                  <summary className="cursor-pointer text-xs font-medium text-muted-foreground">Ver plan completo ({closureTasks.length} acciones)</summary>
+                  <div className="mt-3 space-y-2">{closureTasks.map((task) => <div key={task.id} className="rounded-lg border border-border/70 bg-background p-3">
+                    <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-medium">{task.sequence}. {task.title}</p><p className="mt-1 text-xs text-muted-foreground">{CLOSURE_LABELS[task.verification_status] || task.verification_status}{task.evidenceIds.length ? ` · ${task.evidenceIds.length} evidencia(s)` : ''}</p></div>{task.verification_status === 'verified' && <CheckCircle2 className="h-4 w-4 text-primary" />}</div>
+                  </div>)}</div>
+                </details>
+              </div>}
             </div>}
 
             {(outcome.blockers.length > 0 || outcome.missing.length > 0) && <div className="grid gap-4 md:grid-cols-2">
