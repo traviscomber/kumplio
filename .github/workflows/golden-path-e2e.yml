@@ -115,7 +115,7 @@ jobs:
             cat /tmp/kumplio-workflow-create.json >&2
             exit 1
           fi
-          read -r WORKFLOW_ID TOTAL_STAGES < <(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-create.json','utf8'));const w=p.workflow;if(!w?.id)throw new Error('E2E workflow id missing');if(w.status==='completed')throw new Error('E2E workflow must not reuse a completed fixture');const n=Number(w.total_stages);if(!Number.isInteger(n)||n<1)throw new Error('E2E workflow has invalid stage count');process.stdout.write(w.id+' '+n)")
+          read -r WORKFLOW_ID TOTAL_STAGES < <(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-create.json','utf8'));const w=p.workflow;if(!w?.id)throw new Error('E2E workflow id missing');if(w.status==='completed')throw new Error('E2E workflow must not reuse a completed fixture');const n=Number(w.total_stages);if(!Number.isInteger(n)||n<1)throw new Error('E2E workflow has invalid stage count');console.log(w.id+' '+n)")
           echo "WORKFLOW_ID=$WORKFLOW_ID" >> "$GITHUB_ENV"
           echo "TOTAL_STAGES=$TOTAL_STAGES" >> "$GITHUB_ENV"
           echo "E2E workflow selected: $WORKFLOW_ID with $TOTAL_STAGES stages."
