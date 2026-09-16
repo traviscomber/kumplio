@@ -115,15 +115,17 @@ jobs:
             cat /tmp/kumplio-workflow-create.json >&2
             exit 1
           fi
-          WORKFLOW_ID=$(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-create.json','utf8'));const w=p.workflow;if(!w?.id)throw new Error('E2E workflow id missing');if(w.status==='completed')throw new Error('E2E workflow must not reuse a completed fixture');if(Number(w.total_stages)!==5)throw new Error('Expected a five-stage compliance workflow');process.stdout.write(w.id)")
+          read -r WORKFLOW_ID TOTAL_STAGES < <(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-create.json','utf8'));const w=p.workflow;if(!w?.id)throw new Error('E2E workflow id missing');if(w.status==='completed')throw new Error('E2E workflow must not reuse a completed fixture');const n=Number(w.total_stages);if(!Number.isInteger(n)||n<1)throw new Error('E2E workflow has invalid stage count');process.stdout.write(w.id+' '+n)")
           echo "WORKFLOW_ID=$WORKFLOW_ID" >> "$GITHUB_ENV"
-          echo "E2E workflow selected: $WORKFLOW_ID."
+          echo "TOTAL_STAGES=$TOTAL_STAGES" >> "$GITHUB_ENV"
+          echo "E2E workflow selected: $WORKFLOW_ID with $TOTAL_STAGES stages."
 
       - name: Execute and approve durable specialist stages
         shell: bash
         run: |
           set -euo pipefail
           : "${WORKFLOW_ID:?WORKFLOW_ID not initialized}"
+          : "${TOTAL_STAGES:?TOTAL_STAGES not initialized}"
 
           get_workflow() {
             curl --fail --silent --show-error \
@@ -136,7 +138,7 @@ jobs:
             STAGE_INDEX="$1" FIELD="$2" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow.json','utf8'));const s=(p.stages||[]).find(x=>x.stage_index===Number(process.env.STAGE_INDEX));if(!s)process.exit(2);const v=s[process.env.FIELD];if(v!==null&&v!==undefined)process.stdout.write(String(v))"
           }
 
-          for stage_index in 0 1 2 3 4; do
+          for ((stage_index=0; stage_index<TOTAL_STAGES; stage_index++)); do
             get_workflow
             stage_status=$(read_stage "$stage_index" status)
 
@@ -196,7 +198,7 @@ jobs:
               cat /tmp/kumplio-review.json >&2
               exit 1
             fi
-            STAGE_INDEX="$stage_index" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-review.json','utf8'));if(p.status!=='approved')process.exit(1);if(Number(process.env.STAGE_INDEX)===4&&p.outcomeSnapshot?.frozen!==true)throw new Error('Final approval did not return a frozen outcome snapshot');console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
+            STAGE_INDEX="$stage_index" TOTAL_STAGES="$TOTAL_STAGES" node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-review.json','utf8'));if(p.status!=='approved')process.exit(1);const isFinal=Number(process.env.STAGE_INDEX)===Number(process.env.TOTAL_STAGES)-1;if(isFinal&&p.outcomeSnapshot?.frozen!==true)throw new Error('Final approval did not return a frozen outcome snapshot');console.log('Stage '+process.env.STAGE_INDEX+' approved; workflow='+p.workflowStatus+', currentStage='+p.currentStage+'.')"
           done
 
       - name: Close and verify auditable case
@@ -204,6 +206,7 @@ jobs:
         run: |
           set -euo pipefail
           : "${WORKFLOW_ID:?WORKFLOW_ID not initialized}"
+          : "${TOTAL_STAGES:?TOTAL_STAGES not initialized}"
           http_code=$(curl --silent --show-error \
             --output /tmp/kumplio-close.json \
             --write-out '%{http_code}' \
@@ -215,18 +218,20 @@ jobs:
             --cookie /tmp/kumplio-e2e-cookies \
             "$BASE_URL/api/agents/workflows/$WORKFLOW_ID" \
             > /tmp/kumplio-workflow-final.json
-          node <<'NODE'
+          TOTAL_STAGES="$TOTAL_STAGES" node <<'NODE'
           const fs = require('fs')
           const p = JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-final.json', 'utf8'))
+          const expectedStages = Number(process.env.TOTAL_STAGES)
           if (p.workflow?.status !== 'completed') throw new Error(`Workflow status is ${p.workflow?.status}`)
-          if ((p.stages || []).length !== 5 || p.stages.some((stage) => stage.status !== 'approved')) throw new Error('Not all five stages are approved')
+          if ((p.stages || []).length !== expectedStages || p.stages.some((stage) => stage.status !== 'approved')) throw new Error(`Not all ${expectedStages} stages are approved`)
+          if (Number(p.workflow?.total_stages) !== expectedStages) throw new Error(`Workflow stage count changed from ${expectedStages} to ${p.workflow?.total_stages}`)
           const c = Array.isArray(p.workflow?.compliance_cases) ? p.workflow.compliance_cases[0] : p.workflow?.compliance_cases
           if (c?.status !== 'approved') throw new Error(`Case status is ${c?.status}`)
           if (p.outcomeSnapshot?.frozen !== true) throw new Error('Completed workflow is not backed by a frozen outcome snapshot')
           if (p.outcomeSnapshot?.contractVersion !== 'outcome-v2') throw new Error(`Unexpected outcome contract ${p.outcomeSnapshot?.contractVersion}`)
           if (p.outcome?.humanReviewStatus !== 'approved') throw new Error(`Frozen outcome review status is ${p.outcome?.humanReviewStatus}`)
           if (!p.outcomeQuality || typeof p.outcomeQuality.score !== 'number') throw new Error('Frozen outcome quality evaluation is missing')
-          console.log('Golden path complete: 5/5 stages approved, workflow completed, case resolved, outcome snapshot frozen.')
+          console.log(`Golden path complete: ${expectedStages}/${expectedStages} stages approved, workflow completed, case resolved, outcome snapshot frozen.`)
           NODE
 
       - name: Revoke E2E organization membership
