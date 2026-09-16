@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 
-const [oidc, sessionRoute, revokeRoute, workflow, progression, advance, worker] = await Promise.all([
+const [oidc, sessionRoute, revokeRoute, workflow, workflowCreation, progression, advance, worker] = await Promise.all([
   readFile('lib/security/github-actions-oidc.ts', 'utf8'),
   readFile('app/api/internal/e2e/session/route.ts', 'utf8'),
   readFile('app/api/internal/e2e/revoke/route.ts', 'utf8'),
   readFile('.github/workflows/golden-path-e2e.yml', 'utf8'),
+  readFile('app/api/agents/workflows/route.ts', 'utf8'),
   readFile('scripts/53-advance-workflow-after-approval.sql', 'utf8'),
   readFile('app/api/agents/workflows/[workflowId]/advance/route.ts', 'utf8'),
   readFile('app/api/internal/agent-worker/route.ts', 'utf8'),
@@ -35,6 +36,15 @@ assert.match(revokeRoute, /verifyGithubActionsE2ERequest/)
 assert.match(revokeRoute, /from\('organization_members'\)[\s\S]*?\.delete\(\)/)
 assert.match(revokeRoute, /organization_id: null/)
 assert.doesNotMatch(revokeRoute, /deleteUser/)
+
+assert.match(workflowCreation, /activeWorkflowStatuses = \['draft', 'running', 'paused', 'pending_review'\]/)
+assert.doesNotMatch(workflowCreation, /activeWorkflowStatuses = \[[^\]]*'failed'/)
+assert.match(workflowCreation, /recoveringJobStatuses = \['queued', 'leased', 'retry_wait'\]/)
+assert.match(workflowCreation, /\.eq\('status', 'failed'\)/)
+assert.match(workflowCreation, /\.from\('agent_jobs'\)[\s\S]*?\.eq\('workflow_id', failedWorkflow\.id\)[\s\S]*?\.eq\('stage_index', failedWorkflow\.current_stage\)/)
+assert.match(workflowCreation, /\.in\('status', \[\.\.\.recoveringJobStatuses\]\)/)
+assert.match(workflowCreation, /if \(recoveringJob\) existingWorkflow = failedWorkflow/)
+assert.match(workflowCreation, /Dead-letter and otherwise terminal failures must not trap/)
 
 assert.match(progression, /v_next_stage := least\(v_stage\.stage_index \+ 1/)
 assert.match(progression, /when p_decision = 'approved' and not v_is_final then v_next_stage/)
