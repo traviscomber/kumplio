@@ -31,7 +31,6 @@ jobs:
     env:
       BASE_URL: https://www.kumplio.app
       CASE_ID: 91ae9174-be4c-4ddd-8980-4a671571afdc
-      WORKFLOW_ID: dcd5d171-ce3d-4425-9b17-83d48bfbae71
       E2E_AUDIENCE: kumplio-golden-path-e2e
       E2E_MARKER: block02-golden-path
       STATUS_CONTEXT: Golden path E2E
@@ -99,10 +98,32 @@ jobs:
           chmod 600 /tmp/kumplio-e2e-cookies
           node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-e2e-session.json','utf8'));if(!p.ok||!p.serviceUserId)process.exit(1);console.log('Temporary E2E session created.')"
 
+      - name: Create or resume isolated E2E workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          create_payload=$(CASE_ID="$CASE_ID" node -e "process.stdout.write(JSON.stringify({caseId:process.env.CASE_ID,workflowType:'compliance_assessment',instructions:'Golden Path E2E controlado para validar ejecución durable, revisión humana final y snapshot Outcome v2.'}))")
+          http_code=$(curl --silent --show-error \
+            --output /tmp/kumplio-workflow-create.json \
+            --write-out '%{http_code}' \
+            --cookie /tmp/kumplio-e2e-cookies \
+            -H 'Content-Type: application/json' \
+            --data "$create_payload" \
+            "$BASE_URL/api/agents/workflows")
+          if [[ "$http_code" != 200 && "$http_code" != 201 ]]; then
+            echo "E2E workflow creation failed with HTTP $http_code:" >&2
+            cat /tmp/kumplio-workflow-create.json >&2
+            exit 1
+          fi
+          WORKFLOW_ID=$(node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('/tmp/kumplio-workflow-create.json','utf8'));const w=p.workflow;if(!w?.id)throw new Error('E2E workflow id missing');if(w.status==='completed')throw new Error('E2E workflow must not reuse a completed fixture');if(Number(w.total_stages)!==5)throw new Error('Expected a five-stage compliance workflow');process.stdout.write(w.id)")
+          echo "WORKFLOW_ID=$WORKFLOW_ID" >> "$GITHUB_ENV"
+          echo "E2E workflow selected: $WORKFLOW_ID."
+
       - name: Execute and approve durable specialist stages
         shell: bash
         run: |
           set -euo pipefail
+          : "${WORKFLOW_ID:?WORKFLOW_ID not initialized}"
 
           get_workflow() {
             curl --fail --silent --show-error \
@@ -182,6 +203,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          : "${WORKFLOW_ID:?WORKFLOW_ID not initialized}"
           http_code=$(curl --silent --show-error \
             --output /tmp/kumplio-close.json \
             --write-out '%{http_code}' \
