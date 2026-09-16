@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 
 const migration = fs.readFileSync('supabase/migrations/20260916102000_durable_agent_workflow_outcome_snapshots.sql', 'utf8')
+const indexMigration = fs.readFileSync('supabase/migrations/20260916103500_agent_workflow_outcome_snapshot_fk_indexes.sql', 'utf8')
 const snapshotBuilder = fs.readFileSync('lib/agents/outcome-snapshot.ts', 'utf8')
 const reviewRoute = fs.readFileSync('app/api/agents/runs/[runId]/review/route.ts', 'utf8')
 const workflowRoute = fs.readFileSync('app/api/agents/workflows/[workflowId]/route.ts', 'utf8')
@@ -20,6 +21,10 @@ assert.match(migration, /final_outcome_snapshot_required/, 'Final approval must 
 assert.match(migration, /outcome_snapshot_stale/, 'Snapshot persistence must reject stale source sets')
 assert.match(migration, /p_outcome_snapshot #>> '\{outcome,humanReviewStatus\}' <> 'approved'/, 'Frozen outcomes must represent an approved final human review')
 assert.match(migration, /extensions\.digest\(/, 'Snapshot content must be fingerprinted')
+
+assert.match(indexMigration, /agent_workflow_outcome_snapshots_case_idx/, 'Case foreign key must be indexed')
+assert.match(indexMigration, /agent_workflow_outcome_snapshots_review_idx/, 'Review foreign key must be indexed')
+assert.match(indexMigration, /agent_workflow_outcome_snapshots_reviewer_idx/, 'Reviewer foreign key must be indexed')
 
 assert.match(snapshotBuilder, /OUTCOME_SNAPSHOT_CONTRACT_VERSION = 'outcome-v2'/, 'Snapshot builder must pin the outcome contract version')
 assert.match(snapshotBuilder, /workflowStatus: 'completed'/, 'Snapshot builder must model the post-approval workflow state')
