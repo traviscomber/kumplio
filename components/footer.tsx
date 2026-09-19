@@ -54,7 +54,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
       companyLinks: [
         ['About Kumplio', publicHref(locale, '/about')],
         ['Enterprise Studio', publicHref(locale, '/enterprise')],
-        ['Kumplio and N3uralia', publicHref(locale, '/powered-by-N3uralia')],
+        ['Kumplio and N3uralia', publicHref(locale, '/powered-by-n3uralia')],
         ['Contact', publicHref(locale, '/contact')],
         ['Sign in', '/sign-in'],
       ],
@@ -94,7 +94,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
     companyLinks: [
       ['Sobre Kumplio', publicHref(locale, '/about')],
       ['Enterprise Studio', publicHref(locale, '/enterprise')],
-      ['Kumplio y N3uralia', publicHref(locale, '/powered-by-N3uralia')],
+      ['Kumplio y N3uralia', publicHref(locale, '/powered-by-n3uralia')],
       ['Contacto', publicHref(locale, '/contact')],
       ['Ingresar', '/sign-in'],
     ],
