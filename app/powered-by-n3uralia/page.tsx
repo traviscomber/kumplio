@@ -71,8 +71,7 @@ export default async function PoweredByN3uraliaPage() {
       {
         '@type': 'Organization',
         '@id': `${N3URALIA_CANONICAL_URL}/#organization`,
-        name: 'n3uralia',
-        alternateName: 'N3uralia',
+        name: 'N3uralia',
         url: N3URALIA_CANONICAL_URL,
         description: N3URALIA_FACTORY_DESCRIPTION,
         areaServed: [

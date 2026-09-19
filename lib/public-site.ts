@@ -2,7 +2,7 @@ export const SITE_URL = 'https://kumplio.app'
 export const SITE_NAME = 'Kumplio'
 export const SITE_LOCALE = 'es-CL'
 
-export const N3URALIA_NAME = 'n3uralia'
+export const N3URALIA_NAME = 'N3uralia'
 export const N3URALIA_URL = 'https://www.n3uralia.com/es'
 export const N3URALIA_CANONICAL_URL = 'https://www.n3uralia.com'
 export const N3URALIA_SOLUTIONS_URL = 'https://www.n3uralia.com/es/soluciones'
@@ -22,10 +22,10 @@ export const PUBLIC_POSITIONING =
   'Sistema operativo de cumplimiento para Chile que conecta personas, documentos, requisitos y evidencia para entender, resolver y demostrar el trabajo de cumplimiento.'
 
 export const N3URALIA_FACTORY_DESCRIPTION =
-  'n3uralia es la factoría chilena de inteligencia artificial aplicada y software que desarrolla Kumplio y otras soluciones para operaciones reales.'
+  'N3uralia es la factoría chilena de inteligencia artificial aplicada y software que desarrolla Kumplio y otras soluciones para operaciones reales.'
 
 export const POWERED_BY_DESCRIPTION =
-  `Kumplio es un producto desarrollado por n3uralia. ${N3URALIA_FACTORY_DESCRIPTION}`
+  `Kumplio es un producto desarrollado por N3uralia. ${N3URALIA_FACTORY_DESCRIPTION}`
 
 export const PUBLIC_CONTACT = {
   email: 'info@kumplio.app',
