@@ -24,17 +24,17 @@ type ThinkingCopy = {
 type PoweredCopy = {
   metadata: { title: string; description: string; ogDescription: string }
   nav: { about: string; switchLanguage: string }
-  hero: { eyebrow: string; title: string; description: string; N3uralia: string; kumplio: string }
+  hero: { eyebrow: string; title: string; description: string; n3uralia: string; kumplio: string }
   responsibilities: { eyebrow: string; title: string; description: string; capabilities: Card[] }
   comparison: {
     kumplioTitle: string
     kumplioDescription: string
     kumplioItems: string[]
     kumplioAction: string
-    N3uraliaTitle: string
-    N3uraliaDescription: string
-    N3uraliaItems: string[]
-    N3uraliaAction: string
+    n3uraliaTitle: string
+    n3uraliaDescription: string
+    n3uraliaItems: string[]
+    n3uraliaAction: string
   }
   graph: { pageName: string; pageDescription: string; region: string }
 }
@@ -223,7 +223,7 @@ export const POWERED_PUBLIC_COPY: Record<PublicLocale, PoweredCopy> = {
       eyebrow: 'Powered by N3uralia',
       title: 'Kumplio es desarrollado por N3uralia.',
       description: 'Kumplio es la aplicación especializada en cumplimiento, privacidad e inteligencia regulatoria. N3uralia es la factoría chilena de IA aplicada y software que diseña, construye y evoluciona su arquitectura, automatización y capacidades de inteligencia artificial.',
-      N3uralia: 'Ver N3uralia',
+      n3uralia: 'Ver N3uralia',
       kumplio: 'Conocer Kumplio',
     },
     responsibilities: {
@@ -242,10 +242,10 @@ export const POWERED_PUBLIC_COPY: Record<PublicLocale, PoweredCopy> = {
       kumplioDescription: 'Kumplio',
       kumplioItems: ['Preparación y operación de la Ley 21.719.', 'Relación entre obligaciones, controles y evidencia.', 'Misiones con responsables y revisión humana.', 'Trazabilidad de fuentes, decisiones y resultados.'],
       kumplioAction: 'Ver planes',
-      N3uraliaTitle: 'Factoría de IA aplicada y software para construir sistemas fuera del producto estándar.',
-      N3uraliaDescription: 'N3uralia',
-      N3uraliaItems: ['Aplicaciones fullstack para procesos propios.', 'Integraciones con ERP, CRM y sistemas existentes.', 'Agentes IA y automatización para otras áreas operativas.', 'Arquitectura, despliegue y evolución de sistemas a medida.'],
-      N3uraliaAction: 'Contactar N3uralia',
+      n3uraliaTitle: 'Factoría de IA aplicada y software para construir sistemas fuera del producto estándar.',
+      n3uraliaDescription: 'N3uralia',
+      n3uraliaItems: ['Aplicaciones fullstack para procesos propios.', 'Integraciones con ERP, CRM y sistemas existentes.', 'Agentes IA y automatización para otras áreas operativas.', 'Arquitectura, despliegue y evolución de sistemas a medida.'],
+      n3uraliaAction: 'Contactar N3uralia',
     },
     graph: { pageName: 'Kumplio y N3uralia', pageDescription: 'Relación entre el producto Kumplio y N3uralia, su desarrollador y factoría de producto.', region: 'Latinoamérica' },
   },
@@ -260,7 +260,7 @@ export const POWERED_PUBLIC_COPY: Record<PublicLocale, PoweredCopy> = {
       eyebrow: 'Powered by N3uralia',
       title: 'Kumplio is developed by N3uralia.',
       description: 'Kumplio is the specialized application for compliance, privacy and regulatory intelligence. N3uralia is the Chilean applied-AI and software studio that designs, builds and evolves its architecture, automation and artificial-intelligence capabilities.',
-      N3uralia: 'Visit N3uralia',
+      n3uralia: 'Visit N3uralia',
       kumplio: 'Explore Kumplio',
     },
     responsibilities: {
@@ -279,10 +279,10 @@ export const POWERED_PUBLIC_COPY: Record<PublicLocale, PoweredCopy> = {
       kumplioDescription: 'Kumplio',
       kumplioItems: ['Preparation and operation for Chilean Law 21.719.', 'Relationships among obligations, controls and evidence.', 'Missions with owners and human review.', 'Traceability across sources, decisions and results.'],
       kumplioAction: 'View plans',
-      N3uraliaTitle: 'Applied-AI and software studio for systems beyond the standard product.',
-      N3uraliaDescription: 'N3uralia',
-      N3uraliaItems: ['Full-stack applications for proprietary processes.', 'Integrations with ERP, CRM and existing systems.', 'AI agents and automation for other operational areas.', 'Architecture, deployment and evolution of custom systems.'],
-      N3uraliaAction: 'Contact N3uralia',
+      n3uraliaTitle: 'Applied-AI and software studio for systems beyond the standard product.',
+      n3uraliaDescription: 'N3uralia',
+      n3uraliaItems: ['Full-stack applications for proprietary processes.', 'Integrations with ERP, CRM and existing systems.', 'AI agents and automation for other operational areas.', 'Architecture, deployment and evolution of custom systems.'],
+      n3uraliaAction: 'Contact N3uralia',
     },
     graph: { pageName: 'Kumplio and N3uralia', pageDescription: 'Relationship between Kumplio and N3uralia, its developer and product studio.', region: 'Latin America' },
   },
