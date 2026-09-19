@@ -54,7 +54,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
       companyLinks: [
         ['About Kumplio', publicHref(locale, '/about')],
         ['Enterprise Studio', publicHref(locale, '/enterprise')],
-        ['Kumplio and n3uralia', publicHref(locale, '/powered-by-n3uralia')],
+        ['Kumplio and N3uralia', publicHref(locale, '/powered-by-N3uralia')],
         ['Contact', publicHref(locale, '/contact')],
         ['Sign in', '/sign-in'],
       ],
@@ -94,7 +94,7 @@ function getFooterCopy(locale: PublicLocale): FooterCopy {
     companyLinks: [
       ['Sobre Kumplio', publicHref(locale, '/about')],
       ['Enterprise Studio', publicHref(locale, '/enterprise')],
-      ['Kumplio y n3uralia', publicHref(locale, '/powered-by-n3uralia')],
+      ['Kumplio y N3uralia', publicHref(locale, '/powered-by-N3uralia')],
       ['Contacto', publicHref(locale, '/contact')],
       ['Ingresar', '/sign-in'],
     ],
@@ -128,7 +128,7 @@ export function Footer({ locale = 'es' }: { locale?: PublicLocale }) {
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
             >
-              Powered by n3uralia <ArrowUpRight className="h-3.5 w-3.5" />
+              Powered by N3uralia <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
 
