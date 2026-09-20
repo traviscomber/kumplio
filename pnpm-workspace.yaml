@@ -9,6 +9,11 @@ onlyBuiltDependencies:
 
 allowBuilds:
   core-js: true
+  esbuild: false
   msw: true
   sharp: true
   unrs-resolver: true
+  workerd: false
+
+minimumReleaseAgeExclude:
+  - '@cloudflare/workers-types@5.20260920.1'

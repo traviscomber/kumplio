@@ -92,8 +92,11 @@ revoke all on function public.enqueue_outcome_closure_preparation(uuid, uuid, uu
 grant execute on function public.enqueue_outcome_closure_preparation(uuid, uuid, uuid, text) to service_role;
 
 
+drop function if exists public.claim_outcome_closure_preparation(text);
+
 create or replace function public.claim_outcome_closure_preparation(
-  p_worker_id text
+  p_worker_id text,
+  p_queue_id uuid
 )
 returns jsonb
 language plpgsql
@@ -105,7 +108,10 @@ declare
 begin
   select q.* into v_item
   from public.outcome_closure_preparation_queue q
-  where q.status in ('queued','failed') and q.available_at <= now() and q.attempts < 5
+  where q.id = p_queue_id
+    and q.status in ('queued','failed')
+    and q.available_at <= now()
+    and q.attempts < 5
   order by q.created_at asc
   for update skip locked
   limit 1;
@@ -162,9 +168,9 @@ begin
 end;
 $$;
 
-revoke all on function public.claim_outcome_closure_preparation(text) from public, anon, authenticated;
+revoke all on function public.claim_outcome_closure_preparation(text, uuid) from public, anon, authenticated;
 revoke all on function public.complete_outcome_closure_preparation(uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.fail_outcome_closure_preparation(uuid, text) from public, anon, authenticated;
-grant execute on function public.claim_outcome_closure_preparation(text) to service_role;
+grant execute on function public.claim_outcome_closure_preparation(text, uuid) to service_role;
 grant execute on function public.complete_outcome_closure_preparation(uuid, jsonb) to service_role;
 grant execute on function public.fail_outcome_closure_preparation(uuid, text) to service_role;

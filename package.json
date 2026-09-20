@@ -89,7 +89,11 @@
     "check:guided-onboarding-entry": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-guided-onboarding-entry.mjs",
     "check:e2e-data-lifecycle": "node scripts/check-ui-golden-path-data-lifecycle-v1.mjs",
     "check:canonical-roadmap": "node scripts/check-canonical-roadmap-v1.mjs",
-    "check:final-app-closure": "node scripts/check-final-app-closure.mjs"
+    "check:final-app-closure": "node scripts/check-final-app-closure.mjs",
+    "check:outcome-ux-v4": "node scripts/check-next-best-action-v2.mjs && node scripts/check-executable-autopilot-v1.mjs && node scripts/check-outcome-preparation-queue-v1.mjs && node scripts/check-outcome-preparation-worker-v1.mjs && node scripts/check-outcome-execution-transport-v1.mjs",
+    "check:cloudflare-outcome-staging": "node scripts/check-cloudflare-outcome-staging-v1.mjs",
+    "check:cloudflare-outcome-worker-types": "tsc --noEmit --pretty false -p workers/outcome-preparations/tsconfig.json",
+    "check:cloudflare-outcome-worker-build": "wrangler deploy --dry-run --config workers/outcome-preparations/wrangler.toml --outdir .wrangler/outcome-preparations-staging"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.199",
@@ -120,6 +124,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20260920.1",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^24",
     "@types/react": "^19",
@@ -128,6 +133,7 @@
     "eslint-config-next": "16.3.5",
     "postcss": "^8.5",
     "tailwindcss": "^4.2.0",
-    "typescript": "5.7.3"
+    "typescript": "5.7.3",
+    "wrangler": "4.135.0"
   }
 }

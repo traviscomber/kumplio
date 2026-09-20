@@ -1,26 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual } from 'node:crypto'
+import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+const preparationMessageSchema = z.object({
+  queueId: z.string().uuid(),
+  organizationId: z.string().uuid(),
+  taskId: z.string().uuid(),
+  preparationType: z.literal('prepare_evidence_context'),
+}).strict()
+
 function authorized(request: NextRequest) {
   const expected = process.env.INTERNAL_RUNNER_SECRET
   if (!expected) return false
-  return request.headers.get('authorization') === `Bearer ${expected}`
+  const actual = request.headers.get('authorization') || ''
+  const expectedValue = `Bearer ${expected}`
+  const actualBuffer = Buffer.from(actual)
+  const expectedBuffer = Buffer.from(expectedValue)
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer)
 }
 
 export async function POST(request: NextRequest) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const decoded = preparationMessageSchema.safeParse(await request.json().catch(() => null))
+  if (!decoded.success) return NextResponse.json({ error: 'Invalid preparation message' }, { status: 400 })
+  const message = decoded.data
+  if (request.headers.get('x-kumplio-queue-id') !== message.queueId) {
+    return NextResponse.json({ error: 'Queue identity mismatch' }, { status: 400 })
+  }
+
   const admin = createAdminClient()
   const workerId = `closure-preparation:${crypto.randomUUID()}`
-  const { data: item, error: claimError } = await admin.rpc('claim_outcome_closure_preparation', { p_worker_id: workerId })
+  const { data: item, error: claimError } = await admin.rpc('claim_outcome_closure_preparation', {
+    p_worker_id: workerId,
+    p_queue_id: message.queueId,
+  })
   if (claimError) return NextResponse.json({ error: 'Unable to claim preparation' }, { status: 503 })
   if (!item) return NextResponse.json({ processed: false, reason: 'queue_empty' })
 
   try {
-    if (item.preparationType !== 'prepare_evidence_context') throw new Error('unsupported_preparation_type')
+    if (item.preparationType !== message.preparationType) throw new Error('preparation_type_mismatch')
+    if (item.organizationId !== message.organizationId) throw new Error('preparation_organization_mismatch')
+    if (item.taskId !== message.taskId) throw new Error('preparation_task_mismatch')
 
     const [{ data: task }, { data: links }] = await Promise.all([
       admin.from('compliance_action_plan_tasks')

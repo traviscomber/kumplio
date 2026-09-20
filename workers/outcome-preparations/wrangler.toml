@@ -1,10 +1,23 @@
-name = "kumplio-outcome-worker"
+name = "kumplio-outcome-worker-staging"
 main = "src/index.ts"
 compatibility_date = "2026-09-20"
+workers_dev = true
+preview_urls = true
+
+[vars]
+DEPLOYMENT_ENV = "staging"
+
+[[queues.producers]]
+binding = "OUTCOME_PREPARATIONS_QUEUE"
+queue = "kumplio-outcome-preparations-staging"
 
 [[queues.consumers]]
-queue = "kumplio-outcome-preparations"
+queue = "kumplio-outcome-preparations-staging"
 max_batch_size = 10
 max_batch_timeout = 5
 max_retries = 5
-dead_letter_queue = "kumplio-outcome-preparations-dlq"
+max_concurrency = 2
+dead_letter_queue = "kumplio-outcome-preparations-staging-dlq"
+
+[observability]
+enabled = true
