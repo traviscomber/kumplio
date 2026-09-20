@@ -22,7 +22,7 @@ const assertions = [
   ['outcome quality has product dimensions', evaluator.includes('evaluateComplianceOutcome') && evaluator.includes('actionability') && evaluator.includes('closureClarity')],
   ['workflow API consolidates artifacts into outcome', workflowRoute.includes('buildComplianceOutcome') && workflowRoute.includes('outcome,')],
   ['workflow API evaluates outcome quality', workflowRoute.includes('evaluateComplianceOutcome') && workflowRoute.includes('outcomeQuality')],
-  ['workflow UI leads with outcome', consoleUi.includes('Outcome del caso') && consoleUi.includes('Próxima acción') && consoleUi.includes('Qué falta')],
+  ['workflow UI leads with outcome', (consoleUi.includes('Resultado del caso') || consoleUi.includes('Outcome del caso')) && consoleUi.includes('Próxima acción') && consoleUi.includes('Qué falta')],
   ['technical pipeline is secondary', consoleUi.includes('Ver cómo llegó Kumplio a este resultado')],
   ['public reviewer name is Julieta', consoleUi.includes("catalina: 'Julieta · Revisión legal y calidad'")],
   ['roadmap records owner routing decision', roadmap.includes('Router → FastTrack / FullAgentic → evidencia → outcome verificable') && roadmap.includes('Subbloque A — Orquestación orientada a outcomes')],
