@@ -33,7 +33,7 @@ for (const marker of [
   '### Bloque 16 — Cierre técnico y evidencia externa — `ACTIVE`',
   '### Bloque 17 — Experiencia autenticada canónica — `DONE`',
   '### Bloque 18 — Desarrollo post-cierre orientado a outcomes y piloto supervisado — `ACTIVE / NEXT`',
-  '**Subbloque A — Orquestación orientada a outcomes — `ACTIVE / NEXT`**',
+  '**Subbloque A — Orquestación orientada a outcomes — `IMPLEMENTED / VALIDATION ACTIVE`**',
   '**Decisión del owner — 24 de agosto de 2026:**',
   '**Decisión del owner — 25 de agosto de 2026:**',
   '**Decisión del owner — 15 de septiembre de 2026:** priorizar dentro de Bloque 18 el valor agregado observable y los outcomes',
@@ -110,4 +110,4 @@ if (/\b(?:MASTER_ROADMAP|ROADMAP_MASTER|CANONICAL_ROADMAP)\.md\b/i.test(readme +
   throw new Error('Do not introduce a second roadmap master file; ROADMAP.md is the only canonical roadmap')
 }
 
-console.log('Canonical roadmap contract: PASS (Block 18 outcome routing active; Block 16 external gates preserved)')
+console.log('Canonical roadmap contract: PASS (Block 18 outcome routing implemented with validation active; Block 16 external gates preserved)')
