@@ -44,6 +44,10 @@ console.log('\n=== verified closure continuity from Inicio ===')
 const verifiedClosureContinuity = spawnSync(process.execPath, ['scripts/check-verified-closure-home-continuity-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (verifiedClosureContinuity.status !== 0) process.exit(verifiedClosureContinuity.status || 1)
 
+console.log('\n=== canonical case outcome-first surface ===')
+const canonicalCaseOutcome = spawnSync(process.execPath, ['scripts/check-canonical-case-outcome-first-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (canonicalCaseOutcome.status !== 0) process.exit(canonicalCaseOutcome.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
