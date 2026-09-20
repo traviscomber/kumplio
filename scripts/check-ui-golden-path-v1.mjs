@@ -61,7 +61,8 @@ const required = [
   ]],
   ['tests/e2e/ui-golden-path.spec.mjs', [
     "page.goto('/es')",
-    "name: 'Empezar con guía experta', exact: true",
+    "name: 'Ver orientación inicial', exact: true",
+    "name: 'Obtener diagnóstico completo', exact: true",
     "searchParams.get('next')).toBe('/onboarding')",
     'await expect(page.getByText(`“${publicGoal}”`, { exact: true })).toBeVisible()',
     "page.goto('/sign-in?next=/onboarding')",
