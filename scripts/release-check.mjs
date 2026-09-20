@@ -60,6 +60,10 @@ console.log('\n=== closure Autopilot v1 safety contract ===')
 const closureAutopilot = spawnSync(process.execPath, ['scripts/check-closure-autopilot-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (closureAutopilot.status !== 0) process.exit(closureAutopilot.status || 1)
 
+console.log('\n=== outcome value before/after v1 ===')
+const outcomeValue = spawnSync(process.execPath, ['scripts/check-outcome-value-before-after-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeValue.status !== 0) process.exit(outcomeValue.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
