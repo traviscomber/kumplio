@@ -70,6 +70,19 @@ export async function CaseOutcomeStatus({ caseId }: { caseId: string }) {
       </div>
 
       {plan && (
+        <div className="mt-5 grid gap-3 border-t border-primary/20 pt-5 md:grid-cols-2">
+          <div className="rounded-[4px] border bg-background/70 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Antes</p>
+            <p className="mt-2 text-sm leading-6">{activeTasks.length - verifiedCount} de {activeTasks.length} acciones todavía no tenían cierre verificado.</p>
+          </div>
+          <div className="rounded-[4px] border border-primary/25 bg-background/70 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">Ahora</p>
+            <p className="mt-2 text-sm leading-6">{completed ? `Las ${activeTasks.length} acciones activas tienen cierre verificado.` : `${verifiedCount} acciones ya tienen cierre verificado y ${activeTasks.length - verifiedCount} siguen abiertas.`}</p>
+          </div>
+        </div>
+      )}
+
+      {plan && (
         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-primary/20 pt-4 text-sm">
           <span><strong>{verifiedCount}/{activeTasks.length}</strong> acciones verificadas</span>
           {!completed && nextTask && <span className="text-muted-foreground">Siguiente estado: {closureLabel(nextTask.verification_status)}</span>}
