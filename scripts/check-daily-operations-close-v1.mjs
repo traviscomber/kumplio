@@ -4,7 +4,7 @@ import fs from 'node:fs'
 const ui = fs.readFileSync('app/dashboard/daily-content.tsx', 'utf8')
 const model = fs.readFileSync('lib/product/home/authenticated-home.ts', 'utf8')
 
-for (const marker of ['Estado actual', 'Siguiente acción', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes', '/app/inicio', '/app/casos/']) {
+for (const marker of ['Estado actual', 'Tu única decisión ahora', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes', '/app/inicio', '/app/casos/']) {
   assert.ok(ui.includes(marker) || model.includes(marker), `Daily operations missing marker: ${marker}`)
 }
 
@@ -15,6 +15,6 @@ for (const forbidden of ['/review-center', '/dashboard', 'provider trace', 'toke
 assert.ok(model.includes('slice(0, 3)'), 'Daily operations must cap priorities at three')
 assert.ok(model.includes('canonicalHref(input.initialNextAction.href)'), 'Initial next action must use canonical routing')
 assert.ok(model.includes("item.changesFound > 0 || item.criticalItems > 0"), 'Relevant changes must exclude zero-delta noise')
-assert.equal(ui.split('Siguiente acción').length - 1, 1, 'Daily operations must expose one dominant next action')
+assert.equal(ui.split('Tu única decisión ahora').length - 1, 1, 'Daily operations must expose one dominant next action')
 
 console.log('Daily operations close: PASS')
