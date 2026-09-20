@@ -14,7 +14,7 @@ export async function extractPDFText(buffer: Buffer): Promise<string> {
   }
 }
 
-export async function extractDOCXText(_buffer: Buffer): Promise<string> {
+export async function extractDOCXText(buffer: Buffer): Promise<string> {\n  void buffer
   throw new Error('DOCX extraction is not available yet. Upload a PDF or TXT file.')
 }
 
