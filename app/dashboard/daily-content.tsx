@@ -80,6 +80,8 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
   const waitingForHuman = closureTaskRows.filter(task => ['ready_for_review', 'changes_requested'].includes(task.verification_status)).length
   const kumplioWorking = closurePlanRows.filter(plan => !verifiedPlanIds.has(plan.id) && ['approved', 'in_progress', 'blocked'].includes(plan.status)).length
   const verifiedOutcomes = verifiedPlanIds.size
+  const verifiedActions = closureTaskRows.filter(task => task.verification_status === 'verified').length
+  const openActions = closureTaskRows.filter(task => task.verification_status !== 'verified').length
 
   const { data: openClosureTask } = openClosurePlan
     ? await admin
@@ -134,6 +136,16 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
         <OutcomeHomeMetric label="Necesitas decidir" value={waitingForHuman} detail={waitingForHuman === 1 ? 'decisión humana pendiente' : 'decisiones humanas pendientes'} />
         <OutcomeHomeMetric label="Kumplio está resolviendo" value={kumplioWorking} detail="cierres en progreso" />
         <OutcomeHomeMetric label="Resuelto" value={verifiedOutcomes} detail="resultados con cierre verificado" />
+      </section>
+
+      {(verifiedActions > 0 || openActions > 0) && <section className="rounded-2xl border bg-card p-5 sm:p-6">
+        <p className="text-sm font-semibold text-primary">Impacto verificable</p>
+        <h2 className="mt-1 text-2xl font-bold">Qué cambió con el trabajo realizado</h2>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border p-4"><p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pendiente</p><p className="mt-2 text-3xl font-extrabold">{openActions}</p><p className="mt-1 text-sm text-muted-foreground">acciones todavía sin cierre verificado</p></div>
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4"><p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Demostrado</p><p className="mt-2 text-3xl font-extrabold">{verifiedActions}</p><p className="mt-1 text-sm text-muted-foreground">acciones con cierre respaldado por evidencia y revisión</p></div>
+        </div>
+        <p className="mt-4 text-xs leading-5 text-muted-foreground">Estas cifras describen cierres verificables dentro de Kumplio; no constituyen una certificación general de cumplimiento.</p>
       </section>
 
       <section className="rounded-3xl border border-primary/30 bg-primary/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-8">
