@@ -43,6 +43,44 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
     .limit(1)
     .maybeSingle()
 
+  const { data: closurePlans } = await admin
+    .from('compliance_action_plans')
+    .select('id,case_id,status')
+    .eq('organization_id', organizationId)
+    .not('source_snapshot_id', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(24)
+
+  const { data: closureTasks } = closurePlans?.length
+    ? await admin
+        .from('compliance_action_plan_tasks')
+        .select('id,action_plan_id,status,verification_status')
+        .in('action_plan_id', closurePlans.map(plan => plan.id))
+        .neq('status', 'cancelled')
+    : { data: [] }
+
+  const { data: recentlyClosedCases } = await admin
+    .from('compliance_cases')
+    .select('id,title,status,updated_at')
+    .eq('organization_id', organizationId)
+    .eq('status', 'closed')
+    .order('updated_at', { ascending: false })
+    .limit(3)
+
+  const closureTaskRows = closureTasks || []
+  const closurePlanRows = closurePlans || []
+  const verifiedPlanIds = new Set(
+    closurePlanRows
+      .filter(plan => {
+        const planTasks = closureTaskRows.filter(task => task.action_plan_id === plan.id)
+        return planTasks.length > 0 && planTasks.every(task => task.verification_status === 'verified')
+      })
+      .map(plan => plan.id),
+  )
+  const waitingForHuman = closureTaskRows.filter(task => ['ready_for_review', 'changes_requested'].includes(task.verification_status)).length
+  const kumplioWorking = closurePlanRows.filter(plan => !verifiedPlanIds.has(plan.id) && ['approved', 'in_progress', 'blocked'].includes(plan.status)).length
+  const verifiedOutcomes = verifiedPlanIds.size
+
   const { data: openClosureTask } = openClosurePlan
     ? await admin
         .from('compliance_action_plan_tasks')
@@ -92,6 +130,12 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
         </div>
       </section>
 
+      <section className="grid gap-3 sm:grid-cols-3">
+        <OutcomeHomeMetric label="Necesitas decidir" value={waitingForHuman} detail={waitingForHuman === 1 ? 'decisión humana pendiente' : 'decisiones humanas pendientes'} />
+        <OutcomeHomeMetric label="Kumplio está resolviendo" value={kumplioWorking} detail="cierres en progreso" />
+        <OutcomeHomeMetric label="Resuelto" value={verifiedOutcomes} detail="resultados con cierre verificado" />
+      </section>
+
       <section className="rounded-3xl border border-primary/30 bg-primary/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-8">
         <div><p className="text-sm font-semibold text-primary">Siguiente acción</p><h2 className="mt-2 text-2xl font-bold">{home.nextAction.title}</h2><p className="mt-2 text-sm text-muted-foreground">Avanza una cosa a la vez. Kumplio conservará el contexto y la evidencia relacionada.</p></div>
         <Link href={home.nextAction.href} className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground sm:mt-0">Continuar <ArrowRight className="h-4 w-4" /></Link>
@@ -119,8 +163,34 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
         </div>
       </section>
 
+      {recentlyClosedCases?.length ? (
+        <section className="rounded-2xl border bg-card p-5 sm:p-6">
+          <p className="text-sm font-semibold text-primary">Valor conseguido</p>
+          <h2 className="mt-1 text-2xl font-bold">Resultados cerrados recientemente</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Trabajo que ya llegó a un resultado cerrado. El cierre verificable se demuestra con su evidencia y revisión asociadas.</p>
+          <div className="mt-5 divide-y">
+            {recentlyClosedCases.map(item => (
+              <Link key={item.id} href={`/app/casos/${item.id}`} className="flex items-center justify-between gap-4 py-4">
+                <div><p className="font-semibold">{item.title}</p><p className="mt-1 text-sm text-muted-foreground">Cerrado {formatReviewedAt(item.updated_at)}</p></div>
+                <ArrowRight className="h-4 w-4 text-primary" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <Cases items={home.cases} />
       <Timeline items={home.changes} />
+    </div>
+  )
+}
+
+function OutcomeHomeMetric({ label, value, detail }: { label: string; value: number; detail: string }) {
+  return (
+    <div className="rounded-2xl border bg-card p-5">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
+      <p className="mt-3 text-3xl font-extrabold tracking-tight">{value}</p>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">{detail}</p>
     </div>
   )
 }
