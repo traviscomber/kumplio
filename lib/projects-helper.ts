@@ -9,7 +9,7 @@ export async function ensureProjectsOrganizationId() {
 
   try {
     // Try to insert with organization_id to see if field exists
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('projects')
       .select('organization_id')
       .limit(1)
@@ -62,9 +62,9 @@ export async function createProjectWithOrganization(
     }
 
     return { success: true, data }
-  } catch (err: any) {
+  } catch (err: unknown) {
     // If organization_id doesn't exist, fall back to user_id only
-    if (err?.message?.includes('organization_id')) {
+    if (err instanceof Error && err.message.includes('organization_id')) {
       console.warn('[v0] organization_id field not available, using user_id fallback')
       
       try {
