@@ -29,6 +29,18 @@ const modelWithManyChanges = buildAuthenticatedHomeModel({
 assert.equal(modelWithManyChanges.changes.length, 5)
 assert.ok(modelWithManyChanges.changes.every(item => item.changesFound > 0 || item.criticalItems > 0))
 
+const closureFirst = buildAuthenticatedHomeModel({
+  health: { status: 'attention', label: 'Requiere atención', explanation: 'Hay trabajo pendiente.' },
+  priorities: [{ id: 'generic', title: 'Prioridad genérica', summary: 'Resumen', href: '/app/evidencia', severity: 'high' }],
+  changes: [],
+  closureNextAction: { title: 'Cerrar: acreditar medida correctiva', href: '/app/casos/c1/cierre' },
+  initialNextAction: { title: 'Completar onboarding', href: '/app/documentos' },
+})
+assert.deepEqual(closureFirst.nextAction, {
+  title: 'Cerrar: acreditar medida correctiva',
+  href: '/app/casos/c1/cierre',
+})
+
 const onboarding = buildAuthenticatedHomeModel({ health: { status: 'attention', label: 'Información incompleta', explanation: 'Completa el primer trabajo.' }, priorities: [], changes: [], initialNextAction: { title: 'Subir documento inicial', href: '/app/documentos' } })
 assert.deepEqual(onboarding.nextAction, { title: 'Subir documento inicial', href: '/app/documentos' })
 
