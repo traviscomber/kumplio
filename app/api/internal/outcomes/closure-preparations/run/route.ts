@@ -40,7 +40,38 @@ export async function POST(request: NextRequest) {
     p_queue_id: message.queueId,
   })
   if (claimError) return NextResponse.json({ error: 'Unable to claim preparation' }, { status: 503 })
-  if (!item) return NextResponse.json({ processed: false, reason: 'queue_empty' })
+  if (!item) {
+    const { data: current, error: lookupError } = await admin
+      .from('outcome_closure_preparation_queue')
+      .select('status,attempts,available_at')
+      .eq('id', message.queueId)
+      .maybeSingle()
+
+    if (lookupError) {
+      return NextResponse.json({ error: 'Unable to inspect preparation' }, { status: 503 })
+    }
+    if (!current) {
+      return NextResponse.json({ processed: false, deadLetter: true, reason: 'queue_item_not_found' }, { status: 404 })
+    }
+    if (current.status === 'completed') {
+      return NextResponse.json({ processed: false, reason: 'already_completed' })
+    }
+    if (current.status === 'failed' && current.attempts >= 5) {
+      return NextResponse.json(
+        { processed: false, deadLetter: true, reason: 'attempts_exhausted' },
+        { status: 503 },
+      )
+    }
+    return NextResponse.json(
+      {
+        processed: false,
+        retryable: true,
+        reason: current.status === 'running' ? 'already_running' : 'not_ready',
+        availableAt: current.available_at,
+      },
+      { status: 409 },
+    )
+  }
 
   try {
     if (item.preparationType !== message.preparationType) throw new Error('preparation_type_mismatch')
