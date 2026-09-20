@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
   ArrowRight,
-  Bot,
   Check,
   FileCheck2,
   SearchCheck,
@@ -74,6 +73,24 @@ const faqs = [
   },
 ]
 
+const coreCapabilities = [
+  {
+    name: 'Isidora',
+    stage: 'Analiza',
+    description: 'Relaciona antecedentes, fuentes y obligaciones para distinguir qué importa en tu situación.',
+  },
+  {
+    name: 'Verónica',
+    stage: 'Resuelve',
+    description: 'Convierte brechas en controles, evidencia esperada y acciones concretas con criterio de cierre.',
+  },
+  {
+    name: 'Julieta',
+    stage: 'Revisa',
+    description: 'Contrasta conclusiones y reservas antes de que una decisión sensible avance con respaldo suficiente.',
+  },
+]
+
 function Availability({ enabled }: { enabled: boolean }) {
   return enabled
     ? <Check className="mx-auto h-5 w-5 text-primary" aria-label="Disponible" />
@@ -125,7 +142,7 @@ export default function SoftwareCumplimientoChilePage() {
           <Link href="/" className="font-extrabold tracking-[0.18em]">KUMPLIO</Link>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild className="hidden sm:inline-flex"><Link href="/pricing">Planes</Link></Button>
-            <Button asChild><Link href="/sign-up">Comenzar</Link></Button>
+            <Button asChild><Link href="/#resolver">Describe tu situación</Link></Button>
           </div>
         </div>
       </header>
@@ -140,12 +157,15 @@ export default function SoftwareCumplimientoChilePage() {
               Protege tus datos y prepárate para la Ley 21.719 con una ruta clara.
             </h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
-              Kumplio centraliza información sensible, tratamientos, proveedores, controles y evidencia para ayudarte a entender qué debes proteger, qué brechas existen y qué acciones necesitas cerrar con responsables y revisión humana.
+              Kumplio reúne contexto, tratamientos, proveedores, controles y evidencia para ayudarte a entender qué debes proteger y convertir una brecha concreta en una resolución revisable y respaldada.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" asChild><Link href="/sign-up">Crear mi organización <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+              <Button size="lg" asChild><Link href="/#resolver">Describe tu situación <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
               <Button size="lg" variant="outline" asChild><Link href="/demo">Ver demo con datos ficticios</Link></Button>
             </div>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-muted-foreground">
+              No necesitas partir eligiendo un módulo. Empieza por el problema que necesitas resolver y conserva revisión humana en las decisiones relevantes.
+            </p>
           </div>
         </section>
 
@@ -155,16 +175,16 @@ export default function SoftwareCumplimientoChilePage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Respuesta directa</p>
               <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">¿Qué debe resolver una plataforma de protección de datos?</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                Debe ayudarte a saber qué datos tienes, cómo se usan, dónde están, quién accede, qué terceros participan y qué evidencia existe; después debe convertir las brechas en trabajo concreto, responsables, fechas y criterios de cierre.
+                Debe ayudarte a saber qué datos tienes, cómo se usan, quién participa y qué evidencia existe; después debe transformar ese contexto en acciones concretas y una decisión que pueda revisarse.
               </p>
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {[
-                [SearchCheck, 'Entender', 'Datos, tratamientos, terceros, finalidades y contexto disponible.'],
-                [FileCheck2, 'Demostrar', 'Controles, evidencia, responsables y revisiones.'],
-                [Workflow, 'Resolver', 'Acciones, dependencias, fechas y criterios de cierre.'],
-                [Bot, 'Acompañar', 'Especialistas digitales con contexto, fuentes y escalamiento humano.'],
+                [SearchCheck, 'Describe tu situación', 'Parte por una brecha, una solicitud, un tercero o una obligación concreta, no por un módulo.'],
+                [SearchCheck, 'Analiza', 'Relaciona datos, tratamientos, terceros, fuentes y obligaciones aplicables.'],
+                [Workflow, 'Resuelve', 'Convierte brechas en acciones, controles, responsables y evidencia esperada.'],
+                [FileCheck2, 'Revisa', 'Contrasta conclusiones y reservas antes de avanzar hacia Evidencia y cierre.'],
               ].map(([Icon, title, text]) => (
                 <article key={String(title)} className="rounded-2xl border border-border bg-card p-6">
                   <Icon className="h-7 w-7 text-primary" />
@@ -212,21 +232,44 @@ export default function SoftwareCumplimientoChilePage() {
         </section>
 
         <section className="px-6 py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="max-w-3xl">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Cómo trabaja Kumplio</p>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">Tres capacidades principales, una sola ruta de resolución.</h2>
+              <p className="mt-5 text-lg leading-8 text-muted-foreground">
+                El flujo principal separa análisis, resolución y revisión para reducir traspasos innecesarios y mantener una revisión independiente.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              {coreCapabilities.map((capability, index) => (
+                <article key={capability.name} className="rounded-2xl border border-border bg-card p-6">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">0{index + 1} · {capability.stage}</p>
+                  <h3 className="mt-4 text-2xl font-black">{capability.name}</h3>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{capability.description}</p>
+                </article>
+              ))}
+            </div>
+            <p className="mt-7 max-w-3xl text-sm leading-7 text-muted-foreground">
+              Cuando el caso lo requiere, Kumplio activa especialistas adicionales para riesgo cuantitativo, cambio regulatorio, planificación detallada o análisis histórico. La decisión final permanece bajo control humano.
+            </p>
+          </div>
+        </section>
+
+        <section className="border-y border-border bg-muted/30 px-6 py-24">
           <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Flujo de trabajo</p>
-              <h2 className="mt-4 text-4xl font-extrabold tracking-tight">De información dispersa a una decisión respaldada.</h2>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Del expediente al cierre</p>
+              <h2 className="mt-4 text-4xl font-extrabold tracking-tight">Una recomendación aislada no basta.</h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                El producto organiza un recorrido verificable en lugar de entregar una recomendación aislada.
+                Kumplio mantiene el contexto, las acciones y el respaldo relacionados para que puedas volver a la decisión y entender por qué avanzó.
               </p>
             </div>
             <ol className="space-y-3">
               {[
-                ['1', 'Centralizar el contexto', 'Datos, tratamientos, documentos, proveedores y antecedentes disponibles.'],
-                ['2', 'Entender qué importa', 'Finalidades, responsables, obligaciones, riesgos y preguntas abiertas.'],
-                ['3', 'Relacionar controles', 'Responsables, periodicidad, evidencia y estado observado.'],
-                ['4', 'Crear acciones', 'Trabajo, dependencias, criterios de éxito y puntos de revisión.'],
-                ['5', 'Revisar el resultado', 'Aprobar, solicitar cambios o rechazar con fundamento registrado.'],
+                ['1', 'Situación', 'Describe la brecha, solicitud, tercero o necesidad concreta.'],
+                ['2', 'Expediente', 'Antecedentes, documentos, fuentes y preguntas abiertas quedan relacionados.'],
+                ['3', 'Resolución', 'Acciones, controles, responsables sugeridos y criterios de cierre quedan explícitos.'],
+                ['4', 'Evidencia y cierre', 'Revisión humana, evidencia y decisiones quedan conectadas con el resultado.'],
               ].map(([number, title, text]) => (
                 <li key={number} className="grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[48px_1fr] sm:items-start">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 font-bold text-primary">{number}</span>
@@ -240,7 +283,7 @@ export default function SoftwareCumplimientoChilePage() {
           </div>
         </section>
 
-        <section className="border-y border-border bg-muted/30 px-6 py-24">
+        <section className="px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Chile primero</p>
@@ -250,20 +293,14 @@ export default function SoftwareCumplimientoChilePage() {
               </p>
             </div>
             <div className="mt-10 flex flex-wrap gap-3">
-              {[
-                'Ley 21.719',
-                'LeyChile / BCN',
-                'Diario Oficial',
-                'Inventario de tratamientos',
-                'Evidencia organizacional privada',
-                'Revisión humana',
-                'Precios en CLP',
-              ].map((item) => <span key={item} className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">{item}</span>)}
+              {['Ley 21.719','LeyChile / BCN','Diario Oficial','Inventario de tratamientos','Evidencia organizacional privada','Revisión humana','Precios en CLP'].map((item) => (
+                <span key={item} className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">{item}</span>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="px-6 py-24">
+        <section className="border-y border-border bg-muted/30 px-6 py-24">
           <div className="mx-auto max-w-5xl">
             <div className="text-center">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Preguntas frecuentes</p>
@@ -284,12 +321,12 @@ export default function SoftwareCumplimientoChilePage() {
         </section>
 
         <section className="border-t border-border bg-card px-6 py-24 text-center">
-          <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">Empieza ordenando tu información y tu primera brecha.</h2>
+          <h2 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">Empieza por la situación que necesitas resolver.</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Configura tu organización, centraliza el contexto inicial y comienza a preparar tu ruta para la Ley 21.719 sin activar cobros automáticos.
+            Kumplio organiza el contexto y te guía desde el análisis hasta una decisión respaldada por acciones, evidencia y revisión humana.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button size="lg" asChild><Link href="/sign-up">Comenzar <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            <Button size="lg" asChild><Link href="/#resolver">Describe tu situación <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             <Button size="lg" variant="outline" asChild><Link href="/pricing">Ver planes en CLP</Link></Button>
           </div>
         </section>
