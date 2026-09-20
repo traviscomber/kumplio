@@ -133,11 +133,11 @@ type ClosurePlanDetail = {
   canMaterialize: boolean
 }
 
-export function AgentWorkflowConsole({ cases }: { cases: CaseOption[] }) {
+export function AgentWorkflowConsole({ cases, initialWorkflowId = '' }: { cases: CaseOption[]; initialWorkflowId?: string }) {
   const [caseId, setCaseId] = useState(cases[0]?.id || '')
   const [context, setContext] = useState('')
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([])
-  const [selectedId, setSelectedId] = useState('')
+  const [selectedId, setSelectedId] = useState(initialWorkflowId)
   const [detail, setDetail] = useState<WorkflowDetail | null>(null)
   const [closure, setClosure] = useState<ClosurePlanDetail | null>(null)
   const [closureEvidence, setClosureEvidence] = useState<Record<string, string>>({})
