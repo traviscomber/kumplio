@@ -40,6 +40,10 @@ console.log('\n=== outcome to verified closure contract ===')
 const verifiedClosure = spawnSync(process.execPath, ['scripts/check-outcome-verified-closure-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (verifiedClosure.status !== 0) process.exit(verifiedClosure.status || 1)
 
+console.log('\n=== verified closure continuity from Inicio ===')
+const verifiedClosureContinuity = spawnSync(process.execPath, ['scripts/check-verified-closure-home-continuity-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (verifiedClosureContinuity.status !== 0) process.exit(verifiedClosureContinuity.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
