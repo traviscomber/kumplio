@@ -146,7 +146,7 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
           <div className="rounded-xl border border-primary/30 bg-primary/5 p-4"><p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Demostrado</p><p className="mt-2 text-3xl font-extrabold">{verifiedActions}</p><p className="mt-1 text-sm text-muted-foreground">acciones con cierre respaldado por evidencia y revisión</p></div>
         </div>
         <p className="mt-4 text-xs leading-5 text-muted-foreground">Estas cifras describen cierres verificables dentro de Kumplio; no constituyen una certificación general de cumplimiento.</p>
-      </section>
+      </section>}
 
       <section className="rounded-3xl border border-primary/30 bg-primary/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-8">
         <div><p className="text-sm font-semibold text-primary">Siguiente acción</p><h2 className="mt-2 text-2xl font-bold">{home.nextAction.title}</h2><p className="mt-2 text-sm text-muted-foreground">Avanza una cosa a la vez. Kumplio conservará el contexto y la evidencia relacionada.</p></div>
