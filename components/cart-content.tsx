@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Check, ArrowLeft, Lock, ShieldCheck, Loader2 } from 'lucide-react'
@@ -159,12 +160,12 @@ export function CartContent() {
       {/* Top bar */}
       <header className="border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground text-sm font-bold">K</span>
             </div>
             <span className="font-bold text-lg">KUMPLIO</span>
-          </a>
+          </Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Lock className="w-4 h-4" />
             Pago seguro
@@ -376,13 +377,13 @@ export function CartContent() {
             </Button>
             <p className="text-center text-xs text-muted-foreground">
               Al confirmar aceptas nuestros{' '}
-              <a href="/terms" className="underline hover:text-foreground">
+              <Link href="/terms" className="underline hover:text-foreground">
                 Términos
-              </a>{' '}
+              </Link>{' '}
               y{' '}
-              <a href="/privacy" className="underline hover:text-foreground">
+              <Link href="/privacy" className="underline hover:text-foreground">
                 Política de Privacidad
-              </a>
+              </Link>
               .
             </p>
           </form>
