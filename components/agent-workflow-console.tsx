@@ -385,7 +385,7 @@ export function AgentWorkflowConsole({ cases, initialWorkflowId = '' }: { cases:
                     <span>{closure.automation.needsHuman} requieren decisión</span>
                     <span>{closure.automation.waitingForEvidence} esperan evidencia</span>
                   </div>
-                </div>
+                </div>}
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Verificadas</p><p className="mt-1 text-xl font-semibold">{verifiedClosureTasks}/{closureTasks.length}</p></div>
                   <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Estado del plan</p><p className="mt-1 text-sm font-semibold">{closure.plan.status}</p></div>
