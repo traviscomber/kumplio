@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { getOutcomeExecutionTransport } from '@/lib/outcomes/execution-transport'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -123,7 +124,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
     const automation = buildClosureAutomationSummary(tasks, evidenceResult.data || [], evidenceByTask)
     const enqueuedPreparations: string[] = []
     for (const preparation of automation.safePreparations.filter((item) => item.executable)) {
-      const { error: enqueueError } = await admin.rpc('enqueue_outcome_closure_preparation', {
+      const { data: queued, error: enqueueError } = await admin.rpc('enqueue_outcome_closure_preparation', {
         p_actor_id: user.id,
         p_organization_id: organizationId,
         p_task_id: preparation.taskId,
@@ -134,6 +135,16 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
         continue
       }
       enqueuedPreparations.push(preparation.taskId)
+      if (queued?.queueId) {
+        const transport = getOutcomeExecutionTransport()
+        const published = await transport.publish({
+          queueId: queued.queueId,
+          organizationId,
+          taskId: preparation.taskId,
+          preparationType: 'prepare_evidence_context',
+        })
+        if (!published.accepted) console.warn('[agents/closure-plan/automation-publish]', published.provider)
+      }
     }
 
     return NextResponse.json({
