@@ -10,9 +10,10 @@ for (const marker of [
   "from('compliance_action_plans')",
   ".eq('organization_id', organizationId)",
   ".not('source_snapshot_id', 'is', null)",
-  ".neq('status', 'completed')",
+  ".in('status', ['approved', 'in_progress', 'blocked'])",
   "from('compliance_action_plan_tasks')",
   ".neq('verification_status', 'verified')",
+  ".neq('status', 'cancelled')",
   'closureNextAction',
   '/cierre',
 ]) {
