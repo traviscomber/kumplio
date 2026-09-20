@@ -42,7 +42,7 @@ export function ObligationsByTypeChart({ data }: ObligationsChartProps) {
               border: '1px solid var(--border)',
               color: 'var(--foreground)'
             }}
-            formatter={(value: number | string) => `${value} obligaciones`}
+            formatter={(value) => `${value ?? 0} obligaciones`}
           />
           <Bar dataKey="count" fill="var(--chart-1)" name="Cantidad" />
         </BarChart>
