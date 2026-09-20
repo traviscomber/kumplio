@@ -124,7 +124,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
       plan,
       tasks: tasks.map((task) => ({ ...task, evidenceIds: evidenceByTask[task.id] || [] })),
       availableEvidence: evidenceResult.data || [],
-      automation: buildClosureAutomationSummary(tasks),
+      automation: buildClosureAutomationSummary(tasks, evidenceResult.data || [], evidenceByTask),
       canMaterialize: false,
     })
   } catch (error) {
@@ -167,16 +167,34 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ w
 }
 
 
-function buildClosureAutomationSummary(tasks: Array<{ verification_status: string; status: string }>) {
+function buildClosureAutomationSummary(
+  tasks: Array<{ id: string; verification_status: string; status: string; closure_criteria?: unknown; evidence_requirements?: unknown }>,
+  evidence: Array<{ id: string; validation_status: string; integrity_status: string }>,
+  evidenceByTask: Record<string, string[]>,
+) {
   const active = tasks.filter((task) => task.status !== 'cancelled')
   const needsHuman = active.filter((task) => ['ready_for_review', 'changes_requested'].includes(task.verification_status)).length
   const waitingForEvidence = active.filter((task) => task.verification_status === 'pending_evidence').length
   const verified = active.filter((task) => task.verification_status === 'verified').length
+  const trustedEvidenceIds = new Set(evidence.filter((item) => item.validation_status === 'accepted' && item.integrity_status === 'verified').map((item) => item.id))
+  const preparedAutomatically = active.filter((task) => {
+    if (task.verification_status !== 'pending_evidence') return false
+    const linked = evidenceByTask[task.id] || []
+    return linked.some((id) => trustedEvidenceIds.has(id))
+  }).length
+  const safePreparations = active.filter((task) => task.verification_status === 'pending_evidence').map((task) => ({
+    taskId: task.id,
+    action: 'prepare_evidence_context',
+    executable: (evidenceByTask[task.id] || []).some((id) => trustedEvidenceIds.has(id)),
+    requiresHumanVerification: true,
+  }))
   return {
     mode: 'human_controlled_autopilot',
     verified,
     needsHuman,
     waitingForEvidence,
+    preparedAutomatically,
+    safePreparations,
     canContinueWithoutHuman: needsHuman === 0 && waitingForEvidence === 0 && verified < active.length,
     guardrail: 'No action is verified automatically. Evidence integrity and required human review remain mandatory.',
   }
