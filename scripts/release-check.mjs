@@ -36,6 +36,10 @@ console.log('\n=== durable outcome snapshot contract ===')
 const durableOutcomeSnapshot = spawnSync(process.execPath, ['scripts/check-durable-outcome-snapshot-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (durableOutcomeSnapshot.status !== 0) process.exit(durableOutcomeSnapshot.status || 1)
 
+console.log('\n=== outcome to verified closure contract ===')
+const verifiedClosure = spawnSync(process.execPath, ['scripts/check-outcome-verified-closure-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (verifiedClosure.status !== 0) process.exit(verifiedClosure.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)

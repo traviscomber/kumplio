@@ -362,13 +362,16 @@ Cada subbloque se entregó en cambios pequeños, reversibles y verificables. No 
 
 El functional freeze queda levantado por decisión explícita del owner. Kumplio puede continuar desarrollando experiencia, confiabilidad y preparación comercial bajo revisión humana. Este desbloqueo no cierra los gates P0, no habilita beta autoservicio y no autoriza claims que excedan la evidencia disponible.
 
-**Subbloque A — Orquestación orientada a outcomes — `ACTIVE / NEXT`**
+**Subbloque A — Orquestación orientada a outcomes — `IMPLEMENTED / VALIDATION ACTIVE`**
 
-1. implementar un router auditable que distinga FastTrack de FullAgentic según complejidad, necesidad de herramientas y dependencia de artefactos internos, evitando activar especialistas sin valor incremental;
-2. consolidar cualquier ejecución agentic en un contrato único de outcome que exponga estado, qué quedó resuelto, qué falta, bloqueos, próxima acción, responsable, criterios de cierre, evidencia y revisión humana;
-3. hacer que la experiencia muestre primero el outcome y deje agentes, etapas y artefactos técnicos como trazabilidad secundaria, incorporando evaluación y telemetría de calidad de routing/outcomes antes de declarar esta arquitectura validada.
+1. router auditable FastTrack / FullAgentic implementado según complejidad, necesidad de herramientas y dependencia de artefactos internos, evitando activar especialistas sin valor incremental;
+2. Outcome Contract v2 implementado con estado, resuelto, faltantes, bloqueos, próxima acción, responsable, criterios de cierre, evidencia y revisión humana; el resultado aprobado se congela con snapshot durable y procedencia;
+3. experiencia outcome-first implementada con agentes, etapas y artefactos técnicos como trazabilidad secundaria, más telemetría tenant-scoped de routing/outcomes;
+4. **Outcome → Action → Verified Closure v1** implementado: un outcome aprobado puede materializar un plan de cierre idempotente y cada acción sólo llega a cierre verificado con criterios explícitos, evidencia `accepted` + integridad `verified` y revisión humana autorizada. Este estado no equivale a una declaración de cumplimiento ni sustituye evidencia externa.
 
 La referencia conceptual de este subbloque es el patrón Router → FastTrack / FullAgentic descrito en “Compliance Brain Assistant: Conversational Agentic AI for Assisting Compliance Tasks in Enterprise Environments” (arXiv:2507.17289). Kumplio adapta el patrón a sus propios controles, fuentes, contratos de salida, revisión humana y aislamiento tenant; no importa claims ni resultados experimentales del paper como evidencia propia.
+
+Estado de validación: la arquitectura ya está implementada, pero permanece en validación hasta acumular evidencia productiva suficiente de routing, outcomes y cierres verificables. No se afirma superioridad, ahorro, cumplimiento ni efectividad regulatoria a partir de tests sintéticos o métricas técnicas aisladas.
 
 **Subbloque B — Continuidad completa de adquisición — `ACTIVE`**
 
