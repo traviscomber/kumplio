@@ -10,7 +10,7 @@ assert.doesNotMatch(nav, /href:\s*['"]\/(advisor|cases|documents|evidence)['"]/)
 
 const homePage = fs.readFileSync('app/app/inicio/page.tsx', 'utf8')
 const daily = fs.readFileSync('app/dashboard/daily-content.tsx', 'utf8')
-for (const marker of ['Estado actual', 'Tu única decisión ahora', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes']) assert.ok(`${homePage}\\n${daily}`.includes(marker), `Missing Inicio marker: ${marker}`)
+for (const marker of ['Estado actual', 'Tu única decisión ahora', 'Prioridades actuales', 'Casos activos', 'Cambios relevantes']) assert.ok(`${homePage}\n${daily}`.includes(marker), `Missing Inicio marker: ${marker}`)
 assert.equal((daily.match(/Tu única decisión ahora/g) || []).length, 1, 'Inicio must expose one dominant next-action section')
 assert.doesNotMatch(homePage, /Tu situación hoy[\s\S]*Qué necesita tu atención[\s\S]*Kumplio ordena lo importante/, 'Inicio intro remains overly layered')
 
