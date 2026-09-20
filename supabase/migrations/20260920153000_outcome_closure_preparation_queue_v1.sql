@@ -90,3 +90,81 @@ $$;
 
 revoke all on function public.enqueue_outcome_closure_preparation(uuid, uuid, uuid, text) from public, anon, authenticated;
 grant execute on function public.enqueue_outcome_closure_preparation(uuid, uuid, uuid, text) to service_role;
+
+
+create or replace function public.claim_outcome_closure_preparation(
+  p_worker_id text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_item public.outcome_closure_preparation_queue%rowtype;
+begin
+  select q.* into v_item
+  from public.outcome_closure_preparation_queue q
+  where q.status in ('queued','failed') and q.available_at <= now() and q.attempts < 5
+  order by q.created_at asc
+  for update skip locked
+  limit 1;
+
+  if not found then return null; end if;
+
+  update public.outcome_closure_preparation_queue
+  set status = 'running', claimed_at = now(), attempts = attempts + 1, updated_at = now(),
+      payload = payload || jsonb_build_object('workerId', p_worker_id)
+  where id = v_item.id;
+
+  return jsonb_build_object(
+    'id', v_item.id,
+    'organizationId', v_item.organization_id,
+    'actionPlanId', v_item.action_plan_id,
+    'taskId', v_item.task_id,
+    'preparationType', v_item.preparation_type
+  );
+end;
+$$;
+
+create or replace function public.complete_outcome_closure_preparation(
+  p_queue_id uuid,
+  p_result jsonb
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.outcome_closure_preparation_queue
+  set status = 'completed', result = coalesce(p_result, '{}'::jsonb),
+      completed_at = now(), updated_at = now(), last_error = null
+  where id = p_queue_id and status = 'running';
+end;
+$$;
+
+create or replace function public.fail_outcome_closure_preparation(
+  p_queue_id uuid,
+  p_error text
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.outcome_closure_preparation_queue
+  set status = case when attempts >= 5 then 'failed' else 'queued' end,
+      available_at = now() + make_interval(secs => least(300, 15 * greatest(attempts, 1))),
+      updated_at = now(), last_error = left(coalesce(p_error, 'unknown_error'), 1000)
+  where id = p_queue_id and status = 'running';
+end;
+$$;
+
+revoke all on function public.claim_outcome_closure_preparation(text) from public, anon, authenticated;
+revoke all on function public.complete_outcome_closure_preparation(uuid, jsonb) from public, anon, authenticated;
+revoke all on function public.fail_outcome_closure_preparation(uuid, text) from public, anon, authenticated;
+grant execute on function public.claim_outcome_closure_preparation(text) to service_role;
+grant execute on function public.complete_outcome_closure_preparation(uuid, jsonb) to service_role;
+grant execute on function public.fail_outcome_closure_preparation(uuid, text) to service_role;
