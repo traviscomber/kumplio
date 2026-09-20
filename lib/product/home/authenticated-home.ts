@@ -2,6 +2,7 @@ type PriorityInput = { id: string; title: string; summary: string; href?: string
 type ChangeInput = { id: string; headline: string; changesFound: number; criticalItems: number }
 type CaseInput = { id: string; title: string; status: string }
 type ExpirationInput = { id: string; title: string; expiresAt: string | null }
+type NextActionInput = { title: string; href: string }
 
 export function buildAuthenticatedHomeModel<P extends PriorityInput, C extends ChangeInput>(input: {
   health: { status: string; label: string; explanation: string }
@@ -9,15 +10,24 @@ export function buildAuthenticatedHomeModel<P extends PriorityInput, C extends C
   changes: C[]
   cases?: CaseInput[]
   expirations?: ExpirationInput[]
-  initialNextAction?: { title: string; href: string } | null
+  closureNextAction?: NextActionInput | null
+  initialNextAction?: NextActionInput | null
 }) {
   const priorities = input.priorities.slice(0, 3).map(item => ({ ...item, href: canonicalHref(item.href) }))
+  const closureNextAction = input.closureNextAction
+    ? { ...input.closureNextAction, href: canonicalHref(input.closureNextAction.href) }
+    : null
   const initialNextAction = input.initialNextAction
     ? { ...input.initialNextAction, href: canonicalHref(input.initialNextAction.href) }
     : null
-  const nextAction = priorities[0]
-    ? { title: priorities[0].title, href: priorities[0].href }
-    : initialNextAction || { title: 'Crear o revisar un caso', href: '/app/casos' }
+
+  // An already-approved closure action is the strongest operational signal:
+  // it represents work explicitly derived from a human-reviewed frozen outcome.
+  const nextAction = closureNextAction
+    || (priorities[0] ? { title: priorities[0].title, href: priorities[0].href } : null)
+    || initialNextAction
+    || { title: 'Crear o revisar un caso', href: '/app/casos' }
+
   return {
     primaryStatus: { status: input.health.status, label: input.health.label, explanation: input.health.explanation },
     nextAction,
