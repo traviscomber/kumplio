@@ -52,6 +52,10 @@ console.log('\n=== outcome UX v3 user-first contract ===')
 const outcomeUxV3 = spawnSync(process.execPath, ['scripts/check-outcome-ux-v3.mjs'], { stdio: 'inherit', env: process.env })
 if (outcomeUxV3.status !== 0) process.exit(outcomeUxV3.status || 1)
 
+console.log('\n=== outcome Home v3 contract ===')
+const outcomeHomeV3 = spawnSync(process.execPath, ['scripts/check-outcome-home-v3.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeHomeV3.status !== 0) process.exit(outcomeHomeV3.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
