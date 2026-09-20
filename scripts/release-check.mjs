@@ -48,6 +48,26 @@ console.log('\n=== canonical case outcome-first surface ===')
 const canonicalCaseOutcome = spawnSync(process.execPath, ['scripts/check-canonical-case-outcome-first-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (canonicalCaseOutcome.status !== 0) process.exit(canonicalCaseOutcome.status || 1)
 
+console.log('\n=== outcome UX v3 user-first contract ===')
+const outcomeUxV3 = spawnSync(process.execPath, ['scripts/check-outcome-ux-v3.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeUxV3.status !== 0) process.exit(outcomeUxV3.status || 1)
+
+console.log('\n=== outcome Home v3 contract ===')
+const outcomeHomeV3 = spawnSync(process.execPath, ['scripts/check-outcome-home-v3.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeHomeV3.status !== 0) process.exit(outcomeHomeV3.status || 1)
+
+console.log('\n=== closure Autopilot v1 safety contract ===')
+const closureAutopilot = spawnSync(process.execPath, ['scripts/check-closure-autopilot-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (closureAutopilot.status !== 0) process.exit(closureAutopilot.status || 1)
+
+console.log('\n=== outcome value before/after v1 ===')
+const outcomeValue = spawnSync(process.execPath, ['scripts/check-outcome-value-before-after-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeValue.status !== 0) process.exit(outcomeValue.status || 1)
+
+console.log('\n=== outcome intelligence foundation v1 ===')
+const outcomeIntelligence = spawnSync(process.execPath, ['scripts/check-outcome-intelligence-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeIntelligence.status !== 0) process.exit(outcomeIntelligence.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)

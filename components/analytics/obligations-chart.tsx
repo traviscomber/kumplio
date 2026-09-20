@@ -2,7 +2,7 @@
 
 'use client';
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ObligationTypeData {
   type: string;
@@ -42,7 +42,7 @@ export function ObligationsByTypeChart({ data }: ObligationsChartProps) {
               border: '1px solid var(--border)',
               color: 'var(--foreground)'
             }}
-            formatter={(value: any) => `${value} obligaciones`}
+            formatter={(value) => `${value ?? 0} obligaciones`}
           />
           <Bar dataKey="count" fill="var(--chart-1)" name="Cantidad" />
         </BarChart>

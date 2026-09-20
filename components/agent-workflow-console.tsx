@@ -131,6 +131,14 @@ type ClosurePlanDetail = {
   tasks: ClosureTask[]
   availableEvidence: ClosureEvidenceOption[]
   canMaterialize: boolean
+  automation?: {
+    mode: string
+    verified: number
+    needsHuman: number
+    waitingForEvidence: number
+    canContinueWithoutHuman: boolean
+    guardrail: string
+  }
 }
 
 export function AgentWorkflowConsole({ cases, initialWorkflowId = '' }: { cases: CaseOption[]; initialWorkflowId?: string }) {
@@ -361,6 +369,23 @@ export function AgentWorkflowConsole({ cases, initialWorkflowId = '' }: { cases:
               </div>
 
               {closure?.plan && <div className="mt-5 space-y-4">
+                {closure.automation && <div className="rounded-lg border border-primary/25 bg-background p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Kumplio está trabajando</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {closure.automation.needsHuman > 0
+                      ? `Hay ${closure.automation.needsHuman} decisión(es) que necesitan intervención humana. Kumplio conserva el resto del cierre preparado y ordenado.`
+                      : closure.automation.waitingForEvidence > 0
+                        ? `Hay ${closure.automation.waitingForEvidence} acción(es) esperando evidencia verificable. Kumplio no presumirá que están resueltas.`
+                        : closure.automation.canContinueWithoutHuman
+                          ? 'No hay una decisión humana pendiente en este momento. Kumplio puede continuar preparando el cierre.'
+                          : 'El cierre está al día con las decisiones y evidencia disponibles.'}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
+                    <span>{closure.automation.verified} verificadas</span>
+                    <span>{closure.automation.needsHuman} requieren decisión</span>
+                    <span>{closure.automation.waitingForEvidence} esperan evidencia</span>
+                  </div>
+                </div>}
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Verificadas</p><p className="mt-1 text-xl font-semibold">{verifiedClosureTasks}/{closureTasks.length}</p></div>
                   <div className="rounded-lg border border-border/70 bg-background p-3"><p className="text-xs uppercase tracking-wide text-muted-foreground">Estado del plan</p><p className="mt-1 text-sm font-semibold">{closure.plan.status}</p></div>
