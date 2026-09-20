@@ -120,11 +120,27 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
       return acc
     }, {})
 
+    const automation = buildClosureAutomationSummary(tasks, evidenceResult.data || [], evidenceByTask)
+    const enqueuedPreparations: string[] = []
+    for (const preparation of automation.safePreparations.filter((item) => item.executable)) {
+      const { error: enqueueError } = await admin.rpc('enqueue_outcome_closure_preparation', {
+        p_actor_id: user.id,
+        p_organization_id: organizationId,
+        p_task_id: preparation.taskId,
+        p_preparation_type: preparation.action,
+      })
+      if (enqueueError) {
+        console.error('[agents/closure-plan/automation-enqueue]', enqueueError.code)
+        continue
+      }
+      enqueuedPreparations.push(preparation.taskId)
+    }
+
     return NextResponse.json({
       plan,
       tasks: tasks.map((task) => ({ ...task, evidenceIds: evidenceByTask[task.id] || [] })),
       availableEvidence: evidenceResult.data || [],
-      automation: buildClosureAutomationSummary(tasks, evidenceResult.data || [], evidenceByTask),
+      automation: { ...automation, enqueuedPreparations },
       canMaterialize: false,
     })
   } catch (error) {
