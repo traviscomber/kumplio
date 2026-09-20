@@ -33,6 +33,27 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
     admin.from('compliance_cases').select('id,title,status,metadata').eq('organization_id', organizationId).not('status', 'in', '(closed,archived)').order('updated_at', { ascending: false }).limit(4),
   ])
 
+  const { data: openClosurePlan } = await admin
+    .from('compliance_action_plans')
+    .select('id,case_id,status,created_at')
+    .eq('organization_id', organizationId)
+    .not('source_snapshot_id', 'is', null)
+    .neq('status', 'completed')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const { data: openClosureTask } = openClosurePlan
+    ? await admin
+        .from('compliance_action_plan_tasks')
+        .select('id,title,verification_status,sequence')
+        .eq('action_plan_id', openClosurePlan.id)
+        .neq('verification_status', 'verified')
+        .order('sequence', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+    : { data: null }
+
   const priorities = rankPriorities(dailySummary.priorities)
   const health = calculateOrganizationHealth(dailySummary.priorities)
   const selectedCase = (activeCases || []).find(item => item.id === selectedCaseId) || (activeCases || []).find(item => Boolean((item.metadata as { initialDiagnosis?: unknown } | null)?.initialDiagnosis))
@@ -42,6 +63,10 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
     priorities,
     changes: timeline,
     cases: activeCases || [],
+    closureNextAction: openClosurePlan?.case_id && openClosureTask?.title ? {
+      title: `Cerrar: ${openClosureTask.title}`,
+      href: `/app/casos/${openClosurePlan.case_id}/cierre`,
+    } : null,
     initialNextAction: initialDiagnosis?.nextAction?.title ? {
       title: initialDiagnosis.nextAction.title,
       href: resolveInitialActionHref(initialDiagnosis.nextAction.href, selectedCase?.id),
