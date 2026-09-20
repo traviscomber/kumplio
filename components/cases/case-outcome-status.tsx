@@ -24,6 +24,7 @@ export async function CaseOutcomeStatus({ caseId }: { caseId: string }) {
   const [{ data: workflow }, { data: plan }, { data: similarPlans }] = await Promise.all([
     admin.from('agent_workflows').select('id,status,created_at').eq('organization_id', organizationId).eq('case_id', caseId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     admin.from('compliance_action_plans').select('id,status,source_workflow_id,source_contract_version,created_at').eq('organization_id', organizationId).eq('case_id', caseId).not('source_snapshot_id', 'is', null).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    admin.from('compliance_action_plans').select('id,case_id,status,priority,source_contract_version,created_at').eq('organization_id', organizationId).not('source_snapshot_id', 'is', null).neq('case_id', caseId).order('created_at', { ascending: false }).limit(5),
   ])
 
   const [{ data: tasks }, { data: snapshot }] = await Promise.all([
