@@ -21,7 +21,7 @@ export async function CaseOutcomeStatus({ caseId }: { caseId: string }) {
   if (!access) return null
   const organizationId = access.organizationId
 
-  const [{ data: workflow }, { data: plan }] = await Promise.all([
+  const [{ data: workflow }, { data: plan }, { data: similarPlans }] = await Promise.all([
     admin.from('agent_workflows').select('id,status,created_at').eq('organization_id', organizationId).eq('case_id', caseId).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     admin.from('compliance_action_plans').select('id,status,source_workflow_id,source_contract_version,created_at').eq('organization_id', organizationId).eq('case_id', caseId).not('source_snapshot_id', 'is', null).order('created_at', { ascending: false }).limit(1).maybeSingle(),
   ])
@@ -81,6 +81,13 @@ export async function CaseOutcomeStatus({ caseId }: { caseId: string }) {
           </div>
         </div>
       )}
+
+      {similarPlans?.length ? (
+        <details className="mt-5 border-t border-primary/20 pt-4">
+          <summary className="cursor-pointer text-sm font-semibold text-muted-foreground">Aprendizaje de resultados anteriores ({similarPlans.length})</summary>
+          <p className="mt-2 max-w-3xl text-xs leading-5 text-muted-foreground">Kumplio conserva resultados previos del mismo tenant como contexto potencial. No los aplica automáticamente: primero debe comprobar que el caso, la evidencia y los criterios realmente correspondan.</p>
+        </details>
+      ) : null}
 
       {plan && (
         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-primary/20 pt-4 text-sm">
