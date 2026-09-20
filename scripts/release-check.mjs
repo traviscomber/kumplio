@@ -64,6 +64,10 @@ console.log('\n=== outcome value before/after v1 ===')
 const outcomeValue = spawnSync(process.execPath, ['scripts/check-outcome-value-before-after-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (outcomeValue.status !== 0) process.exit(outcomeValue.status || 1)
 
+console.log('\n=== outcome intelligence foundation v1 ===')
+const outcomeIntelligence = spawnSync(process.execPath, ['scripts/check-outcome-intelligence-v1.mjs'], { stdio: 'inherit', env: process.env })
+if (outcomeIntelligence.status !== 0) process.exit(outcomeIntelligence.status || 1)
+
 console.log('\n=== Copilot FastTrack tenant safety contract ===')
 const copilotFastTrack = spawnSync(process.execPath, ['scripts/check-copilot-fasttrack-v1.mjs'], { stdio: 'inherit', env: process.env })
 if (copilotFastTrack.status !== 0) process.exit(copilotFastTrack.status || 1)
