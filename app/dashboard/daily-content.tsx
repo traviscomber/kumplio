@@ -149,7 +149,21 @@ export async function DailyComplianceContent({ selectedCaseId }: { selectedCaseI
       </section>}
 
       <section className="rounded-3xl border border-primary/30 bg-primary/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-8">
-        <div><p className="text-sm font-semibold text-primary">Siguiente acción</p><h2 className="mt-2 text-2xl font-bold">{home.nextAction.title}</h2><p className="mt-2 text-sm text-muted-foreground">Avanza una cosa a la vez. Kumplio conservará el contexto y la evidencia relacionada.</p></div>
+        <div>
+          <p className="text-sm font-semibold text-primary">Tu única decisión ahora</p>
+          <h2 className="mt-2 text-2xl font-bold">{home.nextAction.title}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {waitingForHuman > 0
+              ? 'Esto necesita tu criterio. Kumplio mantiene preparado el resto del trabajo y continuará después de tu decisión.'
+              : kumplioWorking > 0
+                ? 'No hay otra decisión humana prioritaria. Kumplio continúa preparando y verificando el trabajo abierto.'
+                : 'No hay trabajo urgente bloqueado por ti. Puedes revisar el resultado o iniciar un nuevo caso.'}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <span><strong className="text-foreground">{waitingForHuman}</strong> requieren tu decisión</span>
+            <span><strong className="text-foreground">{kumplioWorking}</strong> avanzan con Kumplio</span>
+          </div>
+        </div>
         <Link href={home.nextAction.href} className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground sm:mt-0">Continuar <ArrowRight className="h-4 w-4" /></Link>
       </section>
 

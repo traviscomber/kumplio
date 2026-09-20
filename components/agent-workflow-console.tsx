@@ -136,6 +136,8 @@ type ClosurePlanDetail = {
     verified: number
     needsHuman: number
     waitingForEvidence: number
+    preparedAutomatically: number
+    safePreparations: Array<{ taskId: string; action: string; executable: boolean; requiresHumanVerification: boolean }>
     canContinueWithoutHuman: boolean
     guardrail: string
   }
@@ -384,6 +386,7 @@ export function AgentWorkflowConsole({ cases, initialWorkflowId = '' }: { cases:
                     <span>{closure.automation.verified} verificadas</span>
                     <span>{closure.automation.needsHuman} requieren decisión</span>
                     <span>{closure.automation.waitingForEvidence} esperan evidencia</span>
+                    <span>{closure.automation.preparedAutomatically} ya tienen contexto verificable preparado</span>
                   </div>
                 </div>}
                 <div className="grid gap-3 sm:grid-cols-3">

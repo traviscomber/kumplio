@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { getOutcomeExecutionTransport } from '@/lib/outcomes/execution-transport'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -120,11 +121,37 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
       return acc
     }, {})
 
+    const automation = buildClosureAutomationSummary(tasks, evidenceResult.data || [], evidenceByTask)
+    const enqueuedPreparations: string[] = []
+    for (const preparation of automation.safePreparations.filter((item) => item.executable)) {
+      const { data: queued, error: enqueueError } = await admin.rpc('enqueue_outcome_closure_preparation', {
+        p_actor_id: user.id,
+        p_organization_id: organizationId,
+        p_task_id: preparation.taskId,
+        p_preparation_type: preparation.action,
+      })
+      if (enqueueError) {
+        console.error('[agents/closure-plan/automation-enqueue]', enqueueError.code)
+        continue
+      }
+      enqueuedPreparations.push(preparation.taskId)
+      if (queued?.queueId) {
+        const transport = getOutcomeExecutionTransport()
+        const published = await transport.publish({
+          queueId: queued.queueId,
+          organizationId,
+          taskId: preparation.taskId,
+          preparationType: 'prepare_evidence_context',
+        })
+        if (!published.accepted) console.warn('[agents/closure-plan/automation-publish]', published.provider)
+      }
+    }
+
     return NextResponse.json({
       plan,
       tasks: tasks.map((task) => ({ ...task, evidenceIds: evidenceByTask[task.id] || [] })),
       availableEvidence: evidenceResult.data || [],
-      automation: buildClosureAutomationSummary(tasks),
+      automation: { ...automation, enqueuedPreparations },
       canMaterialize: false,
     })
   } catch (error) {
@@ -167,16 +194,34 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ w
 }
 
 
-function buildClosureAutomationSummary(tasks: Array<{ verification_status: string; status: string }>) {
+function buildClosureAutomationSummary(
+  tasks: Array<{ id: string; verification_status: string; status: string; closure_criteria?: unknown; evidence_requirements?: unknown }>,
+  evidence: Array<{ id: string; validation_status: string; integrity_status: string }>,
+  evidenceByTask: Record<string, string[]>,
+) {
   const active = tasks.filter((task) => task.status !== 'cancelled')
   const needsHuman = active.filter((task) => ['ready_for_review', 'changes_requested'].includes(task.verification_status)).length
   const waitingForEvidence = active.filter((task) => task.verification_status === 'pending_evidence').length
   const verified = active.filter((task) => task.verification_status === 'verified').length
+  const trustedEvidenceIds = new Set(evidence.filter((item) => item.validation_status === 'accepted' && item.integrity_status === 'verified').map((item) => item.id))
+  const preparedAutomatically = active.filter((task) => {
+    if (task.verification_status !== 'pending_evidence') return false
+    const linked = evidenceByTask[task.id] || []
+    return linked.some((id) => trustedEvidenceIds.has(id))
+  }).length
+  const safePreparations = active.filter((task) => task.verification_status === 'pending_evidence').map((task) => ({
+    taskId: task.id,
+    action: 'prepare_evidence_context',
+    executable: (evidenceByTask[task.id] || []).some((id) => trustedEvidenceIds.has(id)),
+    requiresHumanVerification: true,
+  }))
   return {
     mode: 'human_controlled_autopilot',
     verified,
     needsHuman,
     waitingForEvidence,
+    preparedAutomatically,
+    safePreparations,
     canContinueWithoutHuman: needsHuman === 0 && waitingForEvidence === 0 && verified < active.length,
     guardrail: 'No action is verified automatically. Evidence integrity and required human review remain mandatory.',
   }
