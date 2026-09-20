@@ -124,6 +124,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ wo
       plan,
       tasks: tasks.map((task) => ({ ...task, evidenceIds: evidenceByTask[task.id] || [] })),
       availableEvidence: evidenceResult.data || [],
+      automation: buildClosureAutomationSummary(tasks),
       canMaterialize: false,
     })
   } catch (error) {
@@ -163,4 +164,20 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ w
   }
 
   return NextResponse.json({ closurePlan: data }, { status: data?.created ? 201 : 200 })
+}
+
+
+function buildClosureAutomationSummary(tasks: Array<{ verification_status: string; status: string }>) {
+  const active = tasks.filter((task) => task.status !== 'cancelled')
+  const needsHuman = active.filter((task) => ['ready_for_review', 'changes_requested'].includes(task.verification_status)).length
+  const waitingForEvidence = active.filter((task) => task.verification_status === 'pending_evidence').length
+  const verified = active.filter((task) => task.verification_status === 'verified').length
+  return {
+    mode: 'human_controlled_autopilot',
+    verified,
+    needsHuman,
+    waitingForEvidence,
+    canContinueWithoutHuman: needsHuman === 0 && waitingForEvidence === 0 && verified < active.length,
+    guardrail: 'No action is verified automatically. Evidence integrity and required human review remain mandatory.',
+  }
 }
