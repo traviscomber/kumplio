@@ -1,0 +1,10 @@
+name = "kumplio-outcome-worker"
+main = "src/index.ts"
+compatibility_date = "2026-09-20"
+
+[[queues.consumers]]
+queue = "kumplio-outcome-preparations"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 5
+dead_letter_queue = "kumplio-outcome-preparations-dlq"
